@@ -1,0 +1,461 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html style='overflow: auto;'>
+<head>
+<!-- Manage.html
+
+Copyright 2007, by the author
+
+You are not authorized to copy this code. Please write to RMEHTA AT GMAIL for more information.
+
+-->
+  <title>Account Management</title>
+  <link type="text/css" rel="stylesheet" href="css/default.css">
+<script language="JavaScript" src="js/app2.js"></script>
+<style>
+div.tab_label {
+	float: left;
+	width: 100px;
+	height: 18px;
+	padding: 4px;
+	font-weight: bold;
+	margin: 4px;
+	margin-bottom: 0px;
+	border: 1px solid #AAA;
+	border-bottom: 0px;
+	cursor: pointer;
+	display: none;
+}
+div.tab_label_selected {
+	background-color: #EEF;
+}
+div.tab_labels {
+	border-bottom: 3px solid #AAA;
+	height: 31px;
+}
+
+</style>
+</head>
+
+<body style='overflow: auto;'>
+
+<div style='text-align: right;height: 20px;'>
+	<img src='images/loading.gif' id='loadingImage' style="padding: 2px;">
+</div>
+
+<div id='content_front' style='padding: 10px; font-weight: bold;'>
+Loading...
+<div id='err_front'></div>
+</div>
+
+<div style='margin: 10px; display: none' id='content_main'>
+
+<div style='float: right'><span id='user'></span> | <b>Account: <span id='acc'></span></b></div>
+<div class='standard_title' style='padding-left: 4px;'>Account Management</div>
+
+<div class='tab_labels'>
+	<div id='tab_label_import' class='tab_label tab_label_selected' onclick='show("import");'>Import</div>
+	<div id='tab_label_export' class='tab_label' onclick='show("export");'>Export</div>
+	<div id='tab_label_module'class='tab_label' onclick='show("module");'>Modules</div>
+	<div id='tab_label_account'class='tab_label' onclick='show("account");'>Create</div>
+</div>
+
+<!-- Import Tab -->
+
+<div id='import_tab'>
+	<div style='height: 20px'></div>
+	<h3>Step 1. Download Template</h3>
+	<select id='template' style='margin: 10px;'>
+		<option>Select...</option>
+	</select>
+	
+	<h3>Step 2. Upload and Import</h3>
+	<form action='cgi-bin/run.cgi' method=POST enctype=multipart/form-data>
+	<input type='hidden' name='cmd' value='import_csv'>
+	<input type='hidden' name='__account' id='acc_id1'>
+	<table cellspacing='10px' width='480px'>
+		<tr>
+			<td width='200px'>Select CSV File to be imported</td>
+			<td><input type='file' name='csv_file'></td>
+		</tr>
+		<tr>
+			<td width='200px'>Date format in source CSV</td>
+			<td>
+				<select name='dateformat'>
+					<option value='yyyy-mm-dd'>yyyy-mm-dd</option>
+					<option value='mm/dd/yyyy'>mm/dd/yyyy</option>
+					<option value='mm/dd/yy'>mm/dd/yy</option>
+					<option value='dd-mm-yyyy'>dd-mm-yyyy</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td width='200px'>Over-write records with same name?</td>
+			<td><input type='checkbox' name='overwrite'></td>
+		</tr>
+		<tr>
+			<td width='200px'>Transaction Safe?</td>
+			<td><input type='checkbox' name='tsafe'></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div id='import_btn'><input type='submit' value = 'Import'></div></td>
+		</tr>
+	</table>
+	
+	</form>
+
+	<div style='border: 1px solid #AAA; padding: 10px; margin: 10px; width: 600px;'>
+	<h3>Data Import Guide</h3>
+	<ol>
+		<li>Get the template of the DocType for which you want to import in CSV (Comma seperated values) format.</li>
+		<li>Fill in the data in the template. You can remove columns that are not relevant</li>
+		<li>Save the template in CSV format</li>
+		<li>Select the saved CSV file, identify the date format if any</li>	
+		<li>Click on "Import"</li>
+	</ol>
+	</div>
+</div>
+
+<!-- Export Tab -->
+
+<div id='export_tab'>
+	<div style='height: 20px'></div>
+
+	<table cellspacing='10px' width='480px'>
+		<tr>
+			<td>Select DocType</td>
+			<td>
+				<select id='export_dt' style='width: 100%'>
+					<option>Select...</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Export Type</td>
+			<td>
+				<select id='export_type' style='width: 100%'>
+					<option>CSV</option>
+					<option>Object</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><button onclick='javascript:do_export()'>Export</button></td>
+		</tr>
+	</table>
+
+	<textarea style='width: 80%; height: 300px;' wrap=off id='export_data'></textarea>
+
+	</form>
+	
+</div>
+
+<!-- Module Tab -->
+
+<div id = 'module_tab'>
+	<table cellspacing='10px' width='480px'>
+		<tr>
+			<td width='60%'>Select Source Account</td>
+			<td>
+				<select id='src' style='width: 100%'>
+					<option>Select...</option>
+				</select>
+			</td>
+		</tr>
+	</table>
+	<div id='module_2' style='display: block;'>
+	<table cellspacing='10px' width='480px'>
+		<tr>
+			<td width='60%'>Select Module</td>
+			<td>
+				<select id='module' style='width: 100%'>
+					<option>Select...</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Select Target Account</td>
+			<td>
+				<select id='tar' style='width: 100%'>
+					<option>Select...</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><button onclick='javascript:copy_module()' id='copy_btn' style='display: none'>Copy</button> <button onclick='javascript:export_module()'>Export</button></td>
+		</tr>
+	</table>
+	<textarea style='width: 80%; height: 300px;' wrap=off id='export_data_mod'></textarea>
+    <br><button onclick='javascript:import_module()'>Import To Target</button>
+	</div>
+</div>
+
+<!-- Account Tab -->
+
+<div id='account_tab'>
+	<table cellspacing='10px'>
+	<tr><td width="60%">
+	
+	<h3>Step 1. Put Account Details</h3>
+	<table cellspacing='10px' width='100%'>
+		<tr>
+			<td width='40%' style='color: RED'>Account Login Name</td>
+			<td><input type='text' id='account_name'></td>
+		</tr>
+		<tr>
+			<td style='color: RED'>Title Line 1</td>
+			<td><input type='text' id='title1'></td>
+		</tr>
+		<tr>
+			<td>Title Line 1</td>
+			<td><input type='text' id='title2'></td>
+		</tr>
+	</table>
+	
+	<h3>Step 2. Define Roles and Users</h3>
+	
+	<table cellspacing='10px' width='640px'>
+		<tr>
+			<td width='40%'>Roles (Each on a new line)</td>
+			<td><textarea id='roles' style='width: 100%'></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td width='40%'>Users</td>
+			<td>
+				<textarea id='users' style='width: 100%'></textarea>
+				<div>Example</div>
+				<div class='comment'>Amar Kumar,amar@mymail.com,Manager</div>
+			</td>
+		</tr>
+	</table>
+	
+	<h3>Step 3. Advanced Options</h3>
+	
+	<table cellspacing='10px' width='640px'>
+		<tr>
+			<td style='color: RED'>Password</td>
+			<td><input type='password' id='password'></td>
+		</tr>	<tr>
+			<td></td>
+			<td><button onclick='javascript:create_account()'>Create</button></td>
+		</tr>	
+	</table>
+	
+	</td>
+	
+	<td>
+		<div style='border: 1px solid #AAA; background-color: #EEE; padding: 10px;height: 100%;position: relative;'>
+		<div id='output' style='font-family: Courier'></div>
+		</div>
+	</td>
+	</tr>
+	</table>
+	
+<script>
+
+var cur_tab = 'import';
+$dh('export_tab');
+$dh('module_tab');
+$dh('account_tab');
+
+$ds('tab_label_import');
+$ds('tab_label_export');
+
+function show(k) {
+	$dh(cur_tab+'_tab');
+	$i('tab_label_' + cur_tab).className = 'tab_label';
+	
+	$ds(k+'_tab');
+	$i('tab_label_' + k).className = 'tab_label tab_label_selected';
+	cur_tab = k;
+
+}
+
+///////// CREATE ////////
+
+var sel_get_str = 'Select...';
+
+$i('template').onchange = function() {
+	var dt = sel_val($i('template'));
+	$i('template').value = sel_get_str;	
+
+	if(dt != sel_get_str)
+		window.location = outUrl + '?cmd=get_template&__account=' + account_id + '&dt=' + dt;
+}
+
+
+///////// CREATE ////////
+
+function create_account() {
+
+	// check all values
+	if(!$i('account_name').value) {
+		alert('Account Name must be specified'); return;
+	}
+	if(!$i('title1').value) {
+		alert('Title 1 must be specified'); return;
+	}
+	if($i('password').value!='i have checked all') {
+		alert('Wrong Password'); return;
+	}
+
+	// call the server
+	$i('output').innerHTML = 'Working...';
+	$c('setup_account', args={
+		'ac_name':$i('account_name').value,
+		'title1':$i('title1').value,
+		'title2':$i('title2').value,
+		'roles':$i('roles').value,
+		'users':$i('users').value,
+		'over_write':''
+	}, function(r,rt) {
+		if(r.exc)alert(r.exc);
+		$i('output').innerHTML = r.message;
+	},null,1);
+}
+
+///////// EXPORT ////////
+
+function do_export() {
+
+	var dt = sel_val($i('export_dt'));
+	$i('export_dt').value = sel_get_str;	
+
+	if(dt != sel_get_str) {
+		$c('export_data', args={
+			'dt':dt,
+			'ex_type': sel_val($i('export_type')),
+		}, function(r,rt) {
+			if(r.exc)alert(r.exc);
+			$i('export_data').value = r.export_data;
+			//alert('Done');
+		},null,1);
+	}
+} 
+
+///////// MODULES ////////
+
+function get_modules() {
+	var src = sel_val($i('src'));
+	if(!src)src='';
+	
+	$ds($i('module_2'));
+		
+	$c('get_modules', args={
+		'ac_name':src,
+	}, function(r,rt) {
+		if(r.exc)alert(rt);	
+		empty_select($i('module'));
+		add_sel_options($i('module'), r.mod_list);	
+	},null,1);
+}
+$i('src').onchange = get_modules;
+$i('tar').onchange = show_copy_btn;
+
+function export_module() {
+	var src = sel_val($i('src'));
+	var mod = sel_val($i('module'));
+
+	$c('export_module', args={
+		'src':src?src:'',
+		'mod': mod,
+	}, function(r,rt) {
+		if(r.exc)alert(r.exc);	
+		$i('export_data_mod').value = r.export_data;
+		//alert('Done');
+	},null,1);
+}
+
+function show_copy_btn() {
+	if(sel_val($i('tar')) && sel_val($i('tar')) != sel_val($i('src')))$di('copy_btn');
+}
+
+function copy_module() {
+	var src = sel_val($i('src'));
+	var mod = sel_val($i('module'));
+	var tar = sel_val($i('tar'));
+
+	$c('copy_module', args={
+		'src':src,
+		'mod': mod,
+		'tar': tar,
+	}, function(r,rt) {
+		if(r.exc)alert(r.exc);
+		$i('export_data_mod').value = r.export_data;
+	},null,1);
+}
+
+function import_module() {
+	$c('import_docs', args={
+		'data':$i('export_data_mod').value,
+		'tar':sel_val($i('tar'))
+	}, function(r,rt) {
+		if(r.exc)alert(r.exc);
+		alert(r.message);
+	},null,1);
+}
+
+$c('init_acc_mgmt', {}, function(r,rt) {
+	if(r.user!='Administrator') {
+		$i('err_front').innerHTML = 'Only Allowed to Admin';
+		return;
+	} else {
+		$i('user').innerHTML = r.user;
+		$i('acc').innerHTML = r.acc;
+		$dh('content_front');
+		$ds('content_main');
+		account_id = r.account_id;
+		$i('acc_id1').value = account_id;
+	}
+
+	if(r.acc=='accounts') {
+		$ds('tab_label_module');
+		$ds('tab_label_account');
+	}
+
+	src_list = ['',];
+	for(var i=0;i<r.acc_list.length;i++) {
+		src_list[src_list.length] = r.acc_list[i];
+	}
+	
+	// has accounts?
+	if(src_list.length>1) {
+		empty_select($i('src'));
+		add_sel_options($i('src'), src_list);
+
+		empty_select($i('tar'));
+		add_sel_options($i('tar'), src_list);
+
+	} else {
+		// single module
+		empty_select($i('src'));
+		empty_select($i('tar'));
+		$dh($i('src'));
+		$dh($i('tar'));
+		get_modules();
+	}
+	
+
+	dt_list = [sel_get_str];
+	for(var i=0;i<r.dt_list.length;i++)
+		dt_list[i+1] = r.dt_list[i];
+
+	// update select template
+	
+	empty_select($i('template'));
+	add_sel_options($i('template'), dt_list);
+
+	// update export
+	
+	empty_select($i('export_dt'));
+	add_sel_options($i('export_dt'), dt_list);	
+},null,1);
+
+</script>
+
+</div>
+</body>
+</html>
