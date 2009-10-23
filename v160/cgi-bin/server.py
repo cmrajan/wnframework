@@ -15,7 +15,7 @@
 #	
 #	Web Notes Framework is also available under a commercial license with
 #	patches, upgrades and support. For more information see 
-#	<http://webnotestech.com> TEST
+#	<http://webnotestech.com>
 
 
 import MySQLdb, time, defs
