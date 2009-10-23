@@ -16,7 +16,7 @@
 #    Web Notes Framework is also available under a commercial license with
 #    patches, upgrades and support. For more information see 
 #    <http://webnotestech.com>
-#    testing for svn
+#    testing for svn  by nabin
 
 import cgi, Cookie, sys, time, os
 import server
