@@ -162,6 +162,7 @@ try:
 			content = content[0][1] or content[0][0]
 		if content and content.startswith('#python'):
 			content = server.exec_page(content, form)
+		content = '' # temp fix for id issues
 	
 	# load the links
 	# --------------
