@@ -185,6 +185,7 @@ function makeemail() {
       // ---- show options ---- 
       var call_back = function(r,rt) {
         as.aSug = [];
+        if(!r.cl) return;
         for (var i=0;i<r.cl.length;i++) {
           as.aSug.push({'id':r.cl[i], 'value':r.cl[i], 'info':''});
         }
