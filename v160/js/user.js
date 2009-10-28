@@ -1,3 +1,3 @@
 // home
 
-login_file = 'index.html'
+//login_file = 'index.html'
