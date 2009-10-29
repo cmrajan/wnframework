@@ -1540,8 +1540,15 @@ def login_user(usr, pwd, form, guest_login = 0):
 
 def set_db_name(acc_id):
 	global cookies
+	import os
 	
-	res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
+	domain = os.environ.get('HTTP_HOST')
+	
+	try:
+		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domains` where tabAccount.name = `tabAccount Domains`.parent and `tabAccount Domains`.domain = '%s'" % domain)
+	except:
+		res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
+		
 	if res:
 		server.db_name = res[0][0]
 		if res[0][1]:
@@ -1571,8 +1578,6 @@ def load_session(form, sid):
 	cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
 
 	if (not session):
-		#errprint(sid)
-		#errprint('[Session Error] Session Expired')
 		session = None
 		return
 
@@ -1586,11 +1591,11 @@ if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 
 elif form.has_key('cmd') and (form.getvalue('cmd')=='login'):
 	# check if account given, login from the account else from defs.py
-	if form.has_key('acx') and form.getvalue('acx'): 
-		set_db_name(form.getvalue('acx')) # get db_name
-		cookies['single_account'] = 'No'
-	else:
-		cookies['single_account'] = 'Yes'
+	
+	account_id = form.has_key('acx') and form.getvalue('acx') or ''
+	set_db_name(account_id) # get db_name
+	
+	cookies['single_account'] = account_id and 'No' or 'Yes'
 	
 	out['__account'] = str(server.encrypt(server.db_name))
 
@@ -1606,7 +1611,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='login'):
 		out['message'] = 'Wrong Login / Password or Not Enabled'
 
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
-	# register -- pass on to App Control
+	# register
 	# ----------------------------------
 	sql("START TRANSACTION")
 	try:
