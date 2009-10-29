@@ -1542,11 +1542,14 @@ def set_db_name(acc_id):
 	global cookies
 	import os
 	
-	domain = os.environ.get('HTTP_HOST')
+	domain, res = os.environ.get('HTTP_HOST'), None
 	
 	try:
 		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domains` where tabAccount.name = `tabAccount Domains`.parent and `tabAccount Domains`.domain = '%s'" % domain)
 	except:
+		pass
+		
+	if not res:
 		res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
 		
 	if res:
