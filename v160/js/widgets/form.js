@@ -1636,12 +1636,14 @@ SectionBreak.prototype.make_body = function() {
 			this.header.innerHTML = me.df.label;		
 			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
 			this.header.onmouseover = function() { 
+				if(isIE)return; // ie disappearing table error
 				if(cur_sec_header != this) {
 					this.className = 'sec_tray_tab tray_tab_mo'; 
 					this.bottom.className = 'sec_tray_tab_bottom tray_tab_mo_bottom';
 				}
 			}
 			this.header.onmouseout = function() {
+				if(isIE)return;
 				if(cur_sec_header != this) {
 					this.className = 'sec_tray_tab'; 
 					this.bottom.className = 'sec_tray_tab_bottom'; 
