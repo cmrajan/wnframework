@@ -1545,7 +1545,7 @@ def set_db_name(acc_id):
 	domain, res = os.environ.get('HTTP_HOST'), None
 	
 	try:
-		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domains` where tabAccount.name = `tabAccount Domains`.parent and `tabAccount Domains`.domain = '%s'" % domain)
+		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
 	except:
 		pass
 		
