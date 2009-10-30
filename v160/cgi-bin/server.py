@@ -18,10 +18,11 @@
 #	<http://webnotestech.com>
 
 
-import MySQLdb, time, defs
+import MySQLdb, time, defs, Cookie
 ## Globals
 
 session = {'user':'Administrator'}
+cookies = Cookie.SimpleCookie()
 
 mail_server = defs.mail_server or 'localhost'
 mail_login = defs.mail_login or 'test'
@@ -2115,6 +2116,7 @@ def import_db(source, target='', is_accounts=0):
 	sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
 	sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, target))
 	sql("FLUSH PRIVILEGES")
+	sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
 
 	# import in target
 	os.system('%smysql -u %s -p%s %s < %s.sql' % (mysql_path, target, db_password, target, source))

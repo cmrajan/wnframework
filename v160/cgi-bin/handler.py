@@ -1766,6 +1766,7 @@ else:
 		print "Content-Length: %d" % (len(out_buf))
 	print "Content-Type: text/html"
 	if cookies:
+		if server.cookies: cookes.update(server.cookies)
 		print cookies
 	print # Headers end
 	
