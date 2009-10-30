@@ -1550,7 +1550,10 @@ def set_db_name(acc_id):
 		pass
 		
 	if not res:
-		res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
+		try:
+			res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
+		except:
+			pass
 		
 	if res:
 		server.db_name = res[0][0]
