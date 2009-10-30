@@ -3313,13 +3313,12 @@ function setup_display() {
 
 	// width
 	if(cp.page_width) {
-		overall_width = cint(cp.page_width)
-		max_dd_rows = 15;
-		pagewidth = cint(cp.page_width) - left_sidebar_width - right_sidebar_width - 32;
+		set_overall_width(cp.page_width);
+		pagewidth = overall_width - left_sidebar_width - right_sidebar_width - 32;
 	} else {
 		pagewidth = screen.width - left_sidebar_width - right_sidebar_width - cint(screen.width * 0.1);
-		max_dd_rows = 15;
 	}
+	max_dd_rows = 15;
 	
 	// selector
 	if(cint(cp.new_style_search))
@@ -3335,6 +3334,11 @@ function setup_display() {
 	
 }
 startup_lst[startup_lst.length] = setup_display;
+
+function set_overall_width(w) {
+	overall_width = cint(w);
+	pagewidth = overall_width - left_sidebar_width - right_sidebar_width - 32;
+}
 
 // Quick Search
 var search_sel;
