@@ -77,7 +77,7 @@ function historyChange(newLocation, historyData) {
 	if(window.location.href.search('iwebnotes.com')!=-1) return; // no history for iwebnotes
 	
 	var t = newLocation.replace(/\%20/g, ' ');
-	t = t.split(',');
+	t = t.split('~~~');
 
 	var c = nav_obj.ol[nav_obj.ol.length-1];
 
@@ -3555,7 +3555,7 @@ nav_obj.open_notify = function(t, dt, dn) {
 	nav_obj.ol.push([t, dt, dn])	
 	
 	// add to "back" history
-	dhtmlHistory.add(t+','+ dt + (dn ? (','+dn): ''),'');
+	dhtmlHistory.add(t+'~~~'+ dt + (dn ? ('~~~'+dn): ''),'');
 
 	// update back link
 	if(!(has_back_link && dt)) return;
