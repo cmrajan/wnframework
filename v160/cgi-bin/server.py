@@ -2143,7 +2143,8 @@ def create_account(ac_name, ac_type='Framework'):
 		ac.ac_name = ac_name
 		ac.db_name = newdb
 		ac.name = newdb
-		sql("start transaction")
+		if not in_transaction:
+			sql("start transaction")
 		ac.save(1)
 		sql("commit")
 
