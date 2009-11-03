@@ -2088,6 +2088,10 @@ def import_db(source, target='', is_accounts=0):
 	global mysql_path
 	import os
 
+	if defs.root_login:
+		global conn
+		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
+
 	if not target:
 		if is_accounts:
 			target = 'accounts'
@@ -2106,10 +2110,6 @@ def import_db(source, target='', is_accounts=0):
 			target = dbn
 	
 	os.chdir('../data')
-
-	if defs.root_login:
-		global conn
-		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
 
 	# create user and db
 	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, db_password))
