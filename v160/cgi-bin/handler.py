@@ -1257,7 +1257,7 @@ def acctr_get_sid(form, session):
 	)
 	
 	out['sid'] = rem_serv.cookies['sid150']
-	out['dbx'] = rem_serv.cookies['dbx']
+	out['dbx'] = rem_serv.cookies.get('dbx','')
 	out['__account'] = rem_serv.account_id
 	
 	# get 500 doctypes
