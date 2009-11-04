@@ -1248,7 +1248,8 @@ function refresh_dependency(me) {
 			}
 		}
 		f.dependencies_clear = all_dependants_clear(f);	
-		if(f.guardian_has_value || (!f.dependencies_clear)) {
+		//if(f.guardian_has_value || (!f.dependencies_clear)) {
+		if(f.guardian_has_value) {
 			if(f.grid)f.grid.show(); else $ds(f.wrapper);		
 		} else {
 			if(f.grid)f.grid.hide(); else $dh(f.wrapper);		
