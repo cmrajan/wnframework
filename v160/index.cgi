@@ -157,9 +157,15 @@ try:
 	if page:
 		# load the content
 		# ----------------
-		content = server.sql("select content, static_content from tabPage where name=%s", page)
-		if content:
-			content = content[0][1] or content[0][0]
+		try:
+			content = server.sql("select content, static_content from tabPage where name=%s", page)
+			if content:
+				content = content[0][1] or content[0][0]
+		except:
+			content = server.sql("select content from tabPage where name=%s", page)
+			if content:
+				content = content[0][0]
+				
 		if content and content.startswith('#python'):
 			content = server.exec_page(content, form)
 		content = '' # temp fix for id issues
