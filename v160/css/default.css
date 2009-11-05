@@ -676,18 +676,18 @@ table.layout_row_table {
 
 /* Section */
 .sectionHeading {
-	font-size: 16px;
+	font-size: 18px;
 	font-weight: bold;
 	padding: 0px;
 	margin-bottom: 4px;
-	color: #222;
+	color: #000;
 }
 
 .columnHeading {
 	font-size: 14px;
 	font-weight: bold;
 	margin-bottom: 4px;
-	color: #222;
+	color: #000;
 	/*background-color: rgb(205, 223, 255);*/
 }
 
