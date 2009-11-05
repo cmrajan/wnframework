@@ -726,6 +726,7 @@ div.time_field select{
 /* --- Simple --- */
 .grid_wrapper_simple {
 	width: 100%;
+	margin-bottom: 8px;
 }
 
 .grid_head_wrapper_simple {
@@ -754,6 +755,7 @@ div.time_field select{
 	border: 1px solid #AAA;
 	height: 80px;
 	width: 100%;
+	margin-bottom: 8px;
 }
 
 .grid_tab_wrapper {
