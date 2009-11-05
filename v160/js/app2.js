@@ -334,11 +334,12 @@ function validate_email(id) { if(strip(id).search("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(
 function d2h(d) {return d.toString(16);}
 function h2d(h) {return parseInt(h,16);} 
 
-function get_darker_shade(col) {
+function get_darker_shade(col, factor) {
+	if(!factor) factor = 0.5;
 	if(col.length==3) { var r = col[0]; var g=col[1]; var b=col[2] }
 	else if(col.length==6) { var r = col.substr(0,2); var g = col.substr(2,2); var b = col.substr(4,2) }
 	else return col;
-	return "" + d2h(cint(h2d(r)/2)) + d2h(cint(h2d(g)/2)) + d2h(cint(h2d(b)/2));
+	return "" + d2h(cint(h2d(r)*factor)) + d2h(cint(h2d(g)*factor)) + d2h(cint(h2d(b)*factor));
 }
 
 var $n = '\n';
