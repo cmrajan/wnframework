@@ -1569,7 +1569,7 @@ SectionBreak.prototype.make_simple_section = function(static) {
 		var col = this.df.colour.split(':')[1];
 		if(col!='FFF') {
 			$y(this.row.sub_wrapper, {
-				margin:'16px'
+				margin:'16px', padding: '8px'
 				,border:('1px solid #' + get_darker_shade(col))
 				,borderBottom:('2px solid #' + get_darker_shade(col))
 				,backgroundColor: ('#' + col)}
