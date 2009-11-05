@@ -1563,7 +1563,20 @@ SectionBreak.prototype.make_row = function() {
 SectionBreak.prototype.make_simple_section = function(static) {
 	var head = $a(this.row.header, 'div', '', {margin:'4px 8px 0px 8px'});
 	var me = this;
-	
+
+	// colour
+	if(this.df.colour) {
+		var col = this.df.colour.split(':')[1];
+		if(col!='FFF') {
+			$y(this.row.sub_wrapper, {
+				margin:'16px'
+				,border:('1px solid #' + get_darker_shade(col))
+				,borderBottom:('2px solid #' + get_darker_shade(col))
+				,backgroundColor: ('#' + col)}
+			);
+		}
+	}
+		
 	if(static) {
 		this.label = $a(head, 'div', 'sectionHeading', {margin:'8px 0px'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
@@ -1592,6 +1605,7 @@ SectionBreak.prototype.make_simple_section = function(static) {
 		// divider
 		$y(head,{margin:'8px', borderBottom:'2px solid #445'});
 	}
+
 }
 
 var cur_sec_header;
@@ -1621,6 +1635,7 @@ SectionBreak.prototype.make_body = function() {
 			}
 	
 			this.make_row();
+			this.make_simple_section(1);
 			if(!isIE) this.hide();
 		} else {
 			this.row = this.frm.layout.addsubrow();

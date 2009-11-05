@@ -30,6 +30,8 @@ var startup_lst = [];
 var login_file = 'login.html';
 var datatables = {} // deprecated
 var __sid150; // session id required to store here for cross domain logins
+var tinyMCE;
+var editAreaLoader;
 
 // Globals
 var calendar; var Calendar; 
@@ -328,6 +330,16 @@ function add_sel_options(s, list, sel_val, o_style) {
 
 function cint(v, def) { v=v+''; v=lstrip(v, ['0',]); v=parseInt(v); if(isNaN(v))v=def?def:0; return v; }
 function validate_email(id) { if(strip(id).search("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")==-1) return 0; else return 1; }
+	
+function d2h(d) {return d.toString(16);}
+function h2d(h) {return parseInt(h,16);} 
+
+function get_darker_shade(col) {
+	if(col.length==3) { var r = col[0]; var g=col[1]; var b=col[2] }
+	else if(col.length==6) { var r = col.substr(0,2); var g = col.substr(2,2); var b = col.substr(4,2) }
+	else return col;
+	return "" + d2h(cint(h2d(r)/2)) + d2h(cint(h2d(g)/2)) + d2h(cint(h2d(b)/2));
+}
 
 var $n = '\n';
 var $f_lab = '<div style="padding: 4px; color: #888;">Fetching...</div>';
@@ -1020,13 +1032,17 @@ Layout.prototype.close_borders = function() {
 function LayoutRow(layout, parent) {
 	this.layout = layout;
 	this.wrapper = $a(parent,'div','layout_row');
+	
+	// for sub rows
+	this.sub_wrapper = $a(this.wrapper,'div');
+
 	if(layout.with_border) {
 		this.wrapper.style.border = '1px solid #000';
 		this.wrapper.style.borderBottom = '0px';
 	}
 	
-	this.header = $a(this.wrapper, 'div');
-	this.body = $a(this.wrapper,'div');
+	this.header = $a(this.sub_wrapper, 'div');
+	this.body = $a(this.sub_wrapper,'div');
 	this.table = $a(this.body, 'table', 'layout_row_table');
 	$w(this.table, '100%');
 	this.table.setAttribute('cellspacing', '8px');
