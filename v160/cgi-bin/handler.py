@@ -1677,6 +1677,7 @@ else:
 				errprint('[Authentication Error] Login is Required')
 			else:
 				errprint('[Authentication Error] Session Expired')
+			cookies['remember_me'] = ''
 			out['__redirect_login'] = 1
 	
 	# all clear - run the show
