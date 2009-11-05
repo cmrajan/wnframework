@@ -1016,7 +1016,7 @@ def runserverobj(form, session):
 	arg = form.getvalue('arg')
 	dt = form.getvalue('doctype')
 	dn = form.getvalue('docname')
-	
+		
 	if dt: # not called from a doctype (from a page)
 		if not dn: dn = dt # single
 		errdoc = dn
@@ -1609,6 +1609,13 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='login'):
 	if login_user(form.getvalue('usr'), form.getvalue('pwd'), form): 
 		out['message'] = 'Logged In'
 		out['sid150'] = str(session['sid'])
+		
+		# remember me - add max-age to cookies
+		if server.cint(form.getvalue('remember_me')):
+			cookies['remember_me'] = 1
+			for k in cookies.keys():
+				cookies[k]['max-age'] = '3600'
+		
 	# try logging in as guest
 	elif login_user('Guest', form.getvalue('pwd'), form, 1): 
 		out['message'] = 'Logged In'
