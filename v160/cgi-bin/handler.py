@@ -1469,6 +1469,7 @@ def save_log(t, errtype = ''):
 def logout(form, session):
 	server.delete_session()
 	cookies['sid150'] = ''
+	cookies['remember_me'] = ''
 
 # ----------------
 # Loading
