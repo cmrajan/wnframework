@@ -1570,8 +1570,8 @@ SectionBreak.prototype.make_simple_section = function(static) {
 		if(col!='FFF') {
 			$y(this.row.sub_wrapper, {
 				margin:'16px', padding: '8px'
-				,border:('1px solid #' + get_darker_shade(col))
-				,borderBottom:('2px solid #' + get_darker_shade(col))
+				,border:('1px solid #' + get_darker_shade(col, 0.75))
+				//,borderBottom:('2px solid #' + get_darker_shade(col))
 				,backgroundColor: ('#' + col)}
 			);
 		}
@@ -1587,7 +1587,7 @@ SectionBreak.prototype.make_simple_section = function(static) {
 		var t = make_table($a(head,'div'), 1,2, '100%', ['20px',null], {verticalAlign:'middle'});
 		$y(t,{borderCollapse:'collapse'});
 		
-		this.label = $a($td(t,0,1), 'div', 'columnHeading');
+		this.label = $a($td(t,0,1), 'div', 'sectionHeading');
 		this.label.innerHTML = this.df.label?this.df.label:'';
 		
 		// exp / collapse
