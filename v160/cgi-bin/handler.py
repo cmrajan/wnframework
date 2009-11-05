@@ -1613,9 +1613,11 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='login'):
 		
 		# remember me - add max-age to cookies
 		if server.cint(form.getvalue('remember_me')):
+			import datetime
 			cookies['remember_me'] = 1
+			expires = datetime.datetime.now() + datetime.timedelta(days=3)
 			for k in cookies.keys():
-				cookies[k]['max-age'] = '3600'
+				cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')
 		
 	# try logging in as guest
 	elif login_user('Guest', form.getvalue('pwd'), form, 1): 
