@@ -74,6 +74,10 @@ try:
 		image = Image.open(fobj)
 		image.thumbnail((tn,tn*2), Image.ANTIALIAS)
 		outfile = cStringIO.StringIO()
+
+		if image.mode != "RGB":
+			image = image.convert("RGB")
+
 		image.save(outfile, 'JPEG')
 		outfile.seek(0)
 		fcontent = outfile.read()
