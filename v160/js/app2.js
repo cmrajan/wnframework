@@ -3103,6 +3103,7 @@ function open_url_post(URL, PARAMS) {
 	var temp=document.createElement("form");
 	temp.action=URL;
 	temp.method="POST";
+	temp.target = "_blank"
 	temp.style.display="none";
 	for(var x in PARAMS) {
 		var opt=document.createElement("textarea");
