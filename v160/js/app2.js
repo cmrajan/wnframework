@@ -3103,7 +3103,6 @@ function open_url_post(URL, PARAMS) {
 	var temp=document.createElement("form");
 	temp.action=URL;
 	temp.method="POST";
-	temp.target = "_blank"
 	temp.style.display="none";
 	for(var x in PARAMS) {
 		var opt=document.createElement("textarea");
@@ -3128,7 +3127,8 @@ function export_csv(q, report_name, sc_id, is_simple, filter_values, colnames) {
 	args.report_name = report_name ? report_name : '';
 	args.defaults = pack_defaults();
 	args.roles = '["'+user_roles.join('","')+'"]';
-		
+	
+	if(session.from_gateway) window.location = outUrl + '?' + makeArgString(arg, 1)
 	open_url_post(outUrl, args);
 }
 
