@@ -3534,6 +3534,7 @@ function Grid(parent) { }
 
 Grid.prototype.init = function(parent, row_height) {
 	
+	this.alt_row_bg = '#F2F2FF';
 	this.row_height = row_height;
 	if(this.is_scrolltype) {
 		if(!row_height)this.row_height = '26px';
@@ -3572,7 +3573,7 @@ Grid.prototype.make_ui = function(parent) {
 	this.wrapper.onscroll = function() { me.head_wrapper.style.top = me.wrapper.scrollTop+'px'; }
 }
 
-Grid.prototype.make_ui_simple = function(parent, no_toolbar) { 
+Grid.prototype.make_ui_simple = function(parent) { 
 
 	var ht = make_table($a(parent, 'div'), 1, 2, '100px', ['60%','40%']);
 
@@ -3617,7 +3618,7 @@ Grid.prototype.insert_column = function(doctype, fieldname, fieldtype, label, wi
 	
 	if(!this.is_scrolltype){ 
 		col.style.padding = '2px';
-		col.style.borderRight = '0px';
+		col.style.borderRight = '1px solid #AA9';
 	}
 	col.doctype = doctype; // for report (fields may be from diff doctypes)
 	col.fieldname = fieldname;
@@ -3691,8 +3692,8 @@ Grid.prototype.append_row = function(idx, docname) {
 		cell.div.onclick = function(e) { me.cell_click(this.cell, e); }
 
 		if(odd) {
-			$bg(cell,'#F2F2F2'); cell.is_odd = 1;
-			cell.div.style.border = '2px solid #F2F2F2';
+			$bg(cell, this.alt_row_bg); cell.is_odd = 1;
+			cell.div.style.border = '2px solid ' + this.alt_row_bg;
 		} else $bg(cell,'#FFF');
 
 		if(!hc.fieldname) cell.div.style.cursor = 'default'; // Index
@@ -3797,10 +3798,11 @@ function grid_click_event(e, target) {
 
 Grid.prototype.cell_deselect = function() {
 	if(grid_selected_cell) {
-		grid_selected_cell.grid.remove_template(grid_selected_cell);
-		grid_selected_cell.div.className = 'grid_cell_div';
-		if(grid_selected_cell.is_odd) grid_selected_cell.div.style.border = '2px solid #F2F2F2';
-		else grid_selected_cell.div.style.border = '2px solid #FFF';
+		var c = grid_selected_cell;
+		c.grid.remove_template(c);
+		c.div.className = 'grid_cell_div';
+		if(c.is_odd) c.div.style.border = '2px solid ' + c.grid.alt_row_bg;
+		else c.div.style.border = '2px solid #FFF';
 		grid_selected_cell = null;
 		cur_grid = null;
 		this.isactive = false;

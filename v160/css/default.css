@@ -366,9 +366,9 @@ div.frm_button_area {
 }
 
 div.grid_tbarlinks {
-	border: 1px solid #AAA;
+	border: 1px solid #AAB;
 	border-bottom: 0px;
-	background-color: #F8F8F8;
+	background-color: #ECECDB;
 	padding: 2px;
 	width: 180px;
 	float: right;
@@ -727,6 +727,7 @@ div.time_field select{
 .grid_wrapper_simple {
 	width: 100%;
 	margin-bottom: 8px;
+	border: 1px solid #AA9;
 }
 
 .grid_head_wrapper_simple {
@@ -734,17 +735,21 @@ div.time_field select{
 	border-bottom: 2px solid #AAA;
 }
 
+.grid_head_wrapper_simple td {
+	border-right: 1px solid #AA9;
+}
+
 .grid_head_wrapper_simple td div {
 	padding: 2px;
 }
 
 .grid_tab_wrapper_simple {
-	border-bottom: 1px solid #DDD;
 }
 
 .grid_cell_simple {
 	padding: 2px;
 	background-color: #fff;
+	border-right: 1px solid #AA9;
 }
 
 
@@ -756,6 +761,7 @@ div.time_field select{
 	height: 80px;
 	width: 100%;
 	margin-bottom: 8px;
+	background-color: #fff;	
 }
 
 .grid_tab_wrapper {
@@ -785,7 +791,7 @@ div.time_field select{
 }
 
 .grid_head_table td {
-	background-color: #EEE;
+	background-color: #D6D6C5;
 	border-right: 1px solid #AAA;
 	border-bottom: 1px solid #AAA;
 	height: 30px;
