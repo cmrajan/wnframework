@@ -3119,7 +3119,7 @@ function export_csv(q, report_name, sc_id, is_simple, filter_values, colnames) {
 	var args = {}
 	args.cmd = 'runquery_csv';
 	args.__account = account_id;
-	if(__sid150) args.__sid150 = __sid150;
+	if(__sid150) args.sid150 = __sid150;
     if(is_simple) args.simple_query = q; else args.query = q;
     args.sc_id = sc_id ? sc_id : '';
     args.filter_values = filter_values ? filter_values: '';
@@ -3128,11 +3128,11 @@ function export_csv(q, report_name, sc_id, is_simple, filter_values, colnames) {
 	args.defaults = pack_defaults();
 	args.roles = '["'+user_roles.join('","')+'"]';
 	
-	if(session.from_gateway) { 
+/*	if(session.from_gateway) { 
 		alert(outUrl + '?' + makeArgString(args, 1));
 		window.location.href = outUrl + '?' + makeArgString(args, 1); 
 		return; 
-	}
+	}*/
 	open_url_post(outUrl, args);
 }
 
