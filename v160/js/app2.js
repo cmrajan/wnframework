@@ -3128,7 +3128,11 @@ function export_csv(q, report_name, sc_id, is_simple, filter_values, colnames) {
 	args.defaults = pack_defaults();
 	args.roles = '["'+user_roles.join('","')+'"]';
 	
-	if(session.from_gateway) { window.location = outUrl + '?' + makeArgString(args, 1); return; }
+	if(session.from_gateway) { 
+		alert(outUrl + '?' + makeArgString(args, 1));
+		window.location.href = outUrl + '?' + makeArgString(args, 1); 
+		return; 
+	}
 	open_url_post(outUrl, args);
 }
 
