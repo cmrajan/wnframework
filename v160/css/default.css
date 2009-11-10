@@ -984,8 +984,8 @@ div.report_tab_wrapper table td div, div.report_head_wrapper table td div {
 }
 
 .report_head_cell {
-	background-color: #EEE;
-	border-bottom: 1px solid #AAA;
+	background-color: #D6D6C5;
+	border-bottom: 1px solid #AA9;
 	text-align: center;
 	font-weight: bold;
 }

@@ -350,20 +350,21 @@ FrmContainer.prototype.make_toolbar = function() {
 
 FrmContainer.prototype.refresh_save_btns= function() {
 	var frm = cur_frm;
+	var p = frm.get_doc_perms();
 
 	if(cur_frm.editable) this.btns['Edit'].hide();
 	else this.btns['Edit'].show();
 	
-	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && frm.perm[0][WRITE]) this.btns['Save'].show();
+	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[WRITE]) this.btns['Save'].show();
 	else this.btns['Save'].hide();
 
-	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && frm.perm[0][SUBMIT] && (!frm.doc.__islocal)) this.btns['Submit'].show();
+	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[SUBMIT] && (!frm.doc.__islocal)) this.btns['Submit'].show();
 	else this.btns['Submit'].hide();
 
-	if(cur_frm.editable && cint(frm.doc.docstatus)==1  && frm.perm[0][CANCEL]) this.btns['Cancel'].show();
+	if(cur_frm.editable && cint(frm.doc.docstatus)==1  && p[CANCEL]) this.btns['Cancel'].show();
 	else this.btns['Cancel'].hide();
 
-	if(cint(frm.doc.docstatus)==2  && frm.perm[0][AMEND]) this.btns['Amend'].show();
+	if(cint(frm.doc.docstatus)==2  && p[AMEND]) this.btns['Amend'].show();
 	else this.btns['Amend'].hide();
 }
 
@@ -1090,6 +1091,20 @@ Frm.prototype.defocus_rest = function() {
 	mclose();
 	if(grid_selected_cell) grid_selected_cell.grid.cell_deselect();
 	cur_page = null;
+}
+
+// -------- Permissions -------
+// Returns global permissions, at all levels
+Frm.prototype.get_doc_perms = function() {
+	var p = []
+	for(var i=0; i<this.perm.length; i++) {
+		if(this.perm[i][READ]) p[READ] = 1;
+		if(this.perm[i][WRITE]) p[WRITE] = 1;
+		if(this.perm[i][SUBMIT]) p[SUBMIT] = 1;
+		if(this.perm[i][CANCEL]) p[CANCEL] = 1;
+		if(this.perm[i][AMEND]) p[AMEND] = 1;
+	}
+	return p;
 }
 
 ///// FRM Refresh

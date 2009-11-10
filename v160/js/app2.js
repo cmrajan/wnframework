@@ -2704,15 +2704,13 @@ Listing.prototype.set_sort = function(cell, ci, field_name) {
 }
 Listing.prototype.do_export = function() {
 	this.build_query();
-	var q = export_ask_for_max_rows(this.query);
-	if(!q) return;
 	var cn = [];
 	if(this.no_index)
 		cn = this.colnames; // No index
 	else {
 		for(var i=1;i<this.colnames.length;i++) cn.push(this.colnames[i]); // Ignore the SR label
 	}
-	export_csv(q, this.head_text, null, 1, null, cn);
+	var q = export_ask_for_max_rows(this.query, function(query) { export_csv(query, this.head_text, null, 1, null, cn); });
 }
 
 Listing.prototype.build_query = function() {
@@ -3091,12 +3089,29 @@ function makeui(r, rt) {
 	if(sys_defaults.login_file)login_file = sys_defaults.login_file;	
 }
 
-function export_ask_for_max_rows(query, label) {
-	if(!label)label='export';
-    var n = prompt('Enter maximum number of rows to '+label+' from the beginning (Blank means all rows)', '500');
-    if(n==null){ return null; }
-    if(!cint(n)) { return query; }
-    else { query += ' LIMIT 0,' + cint(n); return query; }
+var export_dialog;
+function export_ask_for_max_rows(query, callback) {
+
+	if(!export_dialog) {
+		var d = new Dialog(400, 300, "Export...");
+		d.make_body([
+			['Data', 'Max rows', 'Blank to export all rows'],
+			['Button', 'Go'],
+		]);	
+		d.widgets['Go'].onclick = function() {
+			export_dialog.hide();
+			n = export_dialog.widgets['Max rows'].value;
+			if(cint(n))
+				export_dialog.query += ' LIMIT 0,' + cint(n);
+			callback(export_dialog.query);
+		}
+		d.onshow = function() {
+			this.widgets['Max rows'].value = '500';
+		}
+		export_dialog = d;
+	}
+	export_dialog.query = query;
+	export_dialog.show();
 }
 
 function open_url_post(URL, PARAMS) {
@@ -3494,7 +3509,7 @@ function setup_recent_docs() {
 		}
 	}
 	rdocs.remove = function(dt, dn) {
-		var it = rdocs.items[dt + '-' + dn];
+		var it = rdocs.items[dt+'-'+dn];
 		if(it)$dh(it);
 		if(pscript.on_recent_update)pscript.on_recent_update();
 	}
@@ -3503,9 +3518,11 @@ function setup_recent_docs() {
 	var m = rlist.length;
 	if(m>15)m=15;
 	for (var i=0;i<m;i++) {
-		var t = rlist[i].split(',');
-		var dn = t[0]; var dt = t[1];
-		rdocs.add(dt, dn, 0);
+		var t = rlist[i].split('~~~');
+		if(t[1]) {
+			var dn = t[0]; var dt = t[1];
+			rdocs.add(dt, dn, 0);
+		}
 	}
 }
 

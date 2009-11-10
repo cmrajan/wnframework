@@ -1114,7 +1114,7 @@ DataTable.prototype.add_sort_option = function(label, val) {
 	 new Option(label, val, false, s.options.length==0?true:false);
 }
 
-DataTable.prototype.update_query = function(in_export, no_limit) { 
+DataTable.prototype.update_query = function(no_limit) { 
 
   // add sorting
   if(this.search_criteria && this.search_criteria.custom_query) {
@@ -1128,10 +1128,6 @@ DataTable.prototype.update_query = function(in_export, no_limit) {
   
   if(no_limit) return;
   
-  if(in_export) {
-    this.query = export_ask_for_max_rows(this.query);
-    return;
-  }
   // add paging  
   this.query += ' LIMIT ' + (this.start_rec-1) + ',' + this.page_len;
   if(this.show_query)
@@ -1139,11 +1135,11 @@ DataTable.prototype.update_query = function(in_export, no_limit) {
 
 }
 
-DataTable.prototype._get_query = function(in_export, no_limit) {
+DataTable.prototype._get_query = function(no_limit) {
 	$dh(this.no_data_tag);
 	this.show_query = 0;
   	if(this.make_query)this.make_query();
-	this.update_query(in_export, no_limit);
+	this.update_query(no_limit);
 }
 
 DataTable.prototype.run = function() {
@@ -1333,7 +1329,7 @@ DataTable.prototype.make_data_cell = function(ri, ci, val) {
 }
 
 DataTable.prototype.do_print = function() {
-	this._get_query(true, true);  
+	this._get_query(true);  
 	
 	args = {
 		query : this.query,
@@ -1354,12 +1350,14 @@ DataTable.prototype.do_print = function() {
 }
 
 DataTable.prototype.do_export = function() {
-	this._get_query(true);  
-	var q = this.query;
-  
-	export_csv(q, (this.rep_name?this.rep_name:this.dt), (this.search_criteria?this.search_criteria.name:''), this.is_simple, docstring(this.filter_vals));
+	this._get_query(true);
 
+	var me = this;
+	export_ask_for_max_rows(this.query, function(q) {
+		export_csv(q, (me.rep_name?me.rep_name:me.dt), (me.search_criteria?me.search_criteria.name:''), me.is_simple, docstring(me.filter_vals));	
+	});
 }
+
 
 // Calculator 
 // ----------
