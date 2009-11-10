@@ -1538,7 +1538,6 @@ ColumnBreak.prototype.make_body = function() {
 
 	this.cell = this.frm.layout.addcell(this.df.width);
 	cur_col_break_width = this.df.width;
-	this.cell.wrapper.style.padding = '2px';
 
 	var fn = this.df.fieldname?this.df.fieldname:this.df.label;
 	// header
@@ -1748,7 +1747,7 @@ Field.prototype.make_body = function() {
 		var t = $a(this.wrapper, 'table', 'frm_field_table');
 		var r = t.insertRow(0); this.r = r;
 		var lc = r.insertCell(0); this.input_cell = r.insertCell(1);
-		lc.className='datalabelcell';
+		lc.className='datalabelcell'; this.input_cell.className = 'datainputcell';
 		
 		var lt = make_table($a(lc,'div'),1,2,'100%',[null,'20px']);
 		this.label_icon = $a($td(lt,0,1),'img'); $dh(this.label_icon);

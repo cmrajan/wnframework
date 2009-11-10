@@ -673,6 +673,7 @@ div.layout_row {
 table.layout_row_table {
 	width: 100%;
 }
+table.layout_row_table td { }
 
 /* Section */
 .sectionHeading {
@@ -1215,14 +1216,15 @@ div.todo_links div {
 
 .frm_field_table {
 	width: 100%;
+	border-collapse: collapse;
 }
 
-.datalabelcell { padding: 2px 0px; width: 120px; vertical-align: top; }
-.datainputcell { padding: 2px 0px; }
+.datalabelcell { padding: 4px 0px; width: 120px; vertical-align: top; }
+.datainputcell { padding: 4px 0px; }
 
-.input_area input { width: 80%; margin: 2px; font-size: 12px; }
-.input_area select { width: 80%; margin: 2px; }
-.input_area textarea { width: 80%; margin: 2px; font-size: 12px; }
+.input_area input { width: 80%; font-size: 12px; }
+.input_area select { width: 80%; }
+.input_area textarea { width: 80%; font-size: 12px; }
 .input_area button { width: 40%; }
 
 .disp_area { width: 80%; background-color: #F2F2F2; padding: 2px;}

@@ -1045,8 +1045,6 @@ function LayoutRow(layout, parent) {
 	this.header = $a(this.sub_wrapper, 'div');
 	this.body = $a(this.sub_wrapper,'div');
 	this.table = $a(this.body, 'table', 'layout_row_table');
-	$w(this.table, '100%');
-	this.table.setAttribute('cellspacing', '8px');
 	this.row = this.table.insertRow(0);
 	
 	this.mycells = [];
@@ -1081,7 +1079,8 @@ function LayoutCell(layout, layoutRow, width) {
 		this.cell.style.width = width;
 	
 	var h = $a(this.cell, 'div');	
-	this.wrapper = $a(this.cell, 'div');
+	this.wrapper = $a(this.cell, 'div','',{padding:'8px'});
+	
 	layout.cur_cell = this.wrapper;
 	layout.cur_cell.header = h;
 }
