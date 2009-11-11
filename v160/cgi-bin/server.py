@@ -398,13 +398,20 @@ class EMail:
 		self.port = cp.mail_port and cp.mail_port or None
 		self.password = cp.mail_password and cp.mail_password or mail_password
 		self.sender = cp.auto_mail_id or self.login	
+		self.use_ssl = cint(cp.use_ssl)
 	
 	def send(self):
 		self.setup()
 		self.validate()
 		
 		import smtplib
-		sess = smtplib.SMTP(self.server, self.port)
+		sess = smtplib.SMTP(self.server, cint(self.port))
+		
+		if self.use_ssl: 
+			sess.ehlo()
+			sess.starttls()
+			sess.ehlo()
+			
 		ret = sess.login(self.login, self.password)
 
 		# check if logged correctly
@@ -420,7 +427,11 @@ class EMail:
 			self.msg['CC'] = ', '.join([r.strip() for r in self.cc])
 		
 		sess.sendmail(self.sender, self.recipients, self.msg.as_string())
-		sess.quit()
+		
+		try:
+			sess.quit()
+		except:
+			pass
 		
 # validate
 def validate_email_add(email_str):

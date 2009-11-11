@@ -308,7 +308,7 @@ def update_recent(dt, dn, owner, created, modified, user):
 		rec = rec and rec[0][0] or ''
 		rec = rec and rec.split('\n') or []
 
-		tmp = ','.join((dn,dt,owner,created or  '',server.nowdate(),'__#STARRED#__'))
+		tmp = '~~~'.join((dn,dt,owner,created or  '',server.nowdate(),'__#STARRED#__'))
 		new = [tmp]
 		starred = '0'
 		for r in rec:
@@ -1081,6 +1081,16 @@ def sendmail(form, session):
 		recipients = recipients.split(',')
 		server.sendmail(recipients, sendfrom, '', subject, [['text/plain', form.getvalue('message') or ''], ['text/html', form.getvalue('body')]], cc=[form.getvalue('cc'),])
 	msgprint('Sent')
+
+def get_contact_list(form, session):
+	cond = ['`%s` like "%s%%"' % (f, form.getvalue('txt')) for f in form.getvalue('where').split(',')]
+	cl = sql("select `%s` from `tab%s` where %s" % (
+  			 form.getvalue('select')
+			,form.getvalue('from')
+			,' OR '.join(cond)
+		)
+	)
+	out['cl'] = filter(None, [c[0] for c in cl])
 
 # Reset Password
 # --------------
