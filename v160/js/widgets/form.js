@@ -2490,6 +2490,7 @@ SelectField.prototype.make_input = function() {
 	var me = this;
 	
 	this.input = $a(this.input_area, 'select');
+	if(isIE6) $y(this.input,{margin:'1px'}); //?? - wont work without this
 	select_register[select_register.length] = this.input;
 	var opt=[];
 	
@@ -2524,9 +2525,6 @@ SelectField.prototype.make_input = function() {
 
 		for (var i=0; i<opt.length; i++) { 
 			var cur_sel=false; 
-			/*if((v!=null)&&opt[i].toLowerCase()==v.toLowerCase()) {
-				cur_sel=true; selectedflag = true;
-			}*/
 			me.input.options[me.input.options.length] = new Option(opt[i], opt[i], false, cur_sel);
 		}
 		
