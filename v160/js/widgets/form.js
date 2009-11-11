@@ -1106,7 +1106,6 @@ Frm.prototype.get_doc_perms = function() {
 			if(this.perm[i][AMEND]) p[AMEND] = 1;
 		}
 	}
-	alert(p);
 	return p;
 }
 
