@@ -2759,11 +2759,6 @@ Listing.prototype.set_rec_label = function(total, cur_page_len) {
 Listing.prototype.run = function(from_page) {
 	this.build_query();
 	
-	// hide everything
-	this.clear_tab();
-	this.hide_paging();
-	$ds(this.fetching_area);
-	
 	var q = this.query;
 	var me = this;
 
@@ -2776,7 +2771,7 @@ Listing.prototype.run = function(from_page) {
 	// callback
 	var call_back = function(r,rt) {
 		// show results
-		$dh(me.fetching_area);
+		me.clear_tab();
 		me.max_len = r.n_values;
 		if(r.values && r.values.length) {
 			me.n_records = r.values.length;
