@@ -1096,14 +1096,17 @@ Frm.prototype.defocus_rest = function() {
 // -------- Permissions -------
 // Returns global permissions, at all levels
 Frm.prototype.get_doc_perms = function() {
-	var p = []
+	var p = [0,0,0,0,0,0];
 	for(var i=0; i<this.perm.length; i++) {
-		if(this.perm[i][READ]) p[READ] = 1;
-		if(this.perm[i][WRITE]) p[WRITE] = 1;
-		if(this.perm[i][SUBMIT]) p[SUBMIT] = 1;
-		if(this.perm[i][CANCEL]) p[CANCEL] = 1;
-		if(this.perm[i][AMEND]) p[AMEND] = 1;
+		if(this.perm[i]) {
+			if(this.perm[i][READ]) p[READ] = 1;
+			if(this.perm[i][WRITE]) p[WRITE] = 1;
+			if(this.perm[i][SUBMIT]) p[SUBMIT] = 1;
+			if(this.perm[i][CANCEL]) p[CANCEL] = 1;
+			if(this.perm[i][AMEND]) p[AMEND] = 1;
+		}
 	}
+	alert(p);
 	return p;
 }
 
@@ -1970,7 +1973,7 @@ Field.prototype.run_trigger = function() {
 
 Field.prototype.set_disp_html = function(t) {
 	if(this.disp_area){
-		this.disp_area.innerHTML = t;
+		this.disp_area.innerHTML = (t==null ? '' : t);
 		if(t)this.disp_area.className = 'disp_area';
 		if(!t)this.disp_area.className = 'disp_area_no_val';
 	}
