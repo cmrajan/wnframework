@@ -2492,7 +2492,7 @@ SelectField.prototype.make_input = function() {
 	var me = this;
 	
 	this.input = $a(this.input_area, 'select');
-	if(isIE6) $y(this.input,{margin:'1px'}); //?? - wont work without this
+	if(isIE6 || isIE7) $y(this.input,{margin:'1px'}); //?? - wont show without this
 	select_register[select_register.length] = this.input;
 	var opt=[];
 	
