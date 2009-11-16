@@ -359,7 +359,7 @@ function $a(parent, newtag, className, cs) {
 	if(cs)$y(c,cs);
 	return c;
 }
-function $a_input(p,in_type,in_name) {
+function $a_input(p,in_type,in_name, cs) {
 	if(isIE) {
 		p.innerHTML = repl('<input type="%(in_type)s" %(in_name)s>',{in_type:in_type,in_name:(in_name ? ('name="'+in_name+'"') : '')}); // IE fix
 		var o = p.childNodes[0];
@@ -368,6 +368,7 @@ function $a_input(p,in_type,in_name) {
 		o.setAttribute('type', in_type);
 		if(in_name)o.setAttribute('name', in_name);
 	}
+	if(cs)$y(o,cs);
 	return o;
 }
 
