@@ -1431,8 +1431,7 @@ Dialog.prototype.make_row = function(d) {
 		if(d[2])row.innerHTML = d[2];
 		this.widgets[d[1]]=row;
 	} else if(d[0]=='Check') {
-		var i = $a_input(c2, 'checkbox');
-		$y(c2,{textAlign:'left'});
+		var i = $a_input(c2, 'checkbox','',{width:'20px'});
 		c1.innerHTML = d[1];
 		this.widgets[d[1]] = i;
 	} else if(d[0]=='Data') {
