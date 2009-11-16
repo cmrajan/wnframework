@@ -1432,11 +1432,7 @@ Dialog.prototype.make_row = function(d) {
 		this.widgets[d[1]]=row;
 	} else if(d[0]=='Check') {
 		var i = $a_input(c2, 'checkbox');
-		$t(row, d[1]);
-
-		c1.innerHTML = '';
-		$w(c1, '0%');
-
+		c1.innerHTML = d[1];
 		this.widgets[d[1]] = i;
 	} else if(d[0]=='Data') {
 		c1.innerHTML = d[1];
