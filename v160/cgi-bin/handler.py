@@ -1557,7 +1557,6 @@ def set_db_name(acc_id):
 	
 	try:
 		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
-		errprint(domain)
 	except:
 		pass
 		
@@ -1679,9 +1678,9 @@ else:
 	# ------------------------------------
 
 	if not session:
+		set_db_name(None)
 		if sql("select name from tabProfile where name='Guest' and (enabled=1 and enabled IS NOT NULL)"):
 			# if from a domain, set the db		
-			set_db_name(None)
 			if login_user('Guest', 'password', form):
 				sid = session['sid']
 			else:
