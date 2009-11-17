@@ -1679,7 +1679,8 @@ else:
 
 	if not session:
 		if sql("select name from tabProfile where name='Guest' and (enabled=1 and enabled IS NOT NULL)"):
-			# Login as guest
+			# if from a domain, set the db		
+			set_db_name(None)
 			if login_user('Guest', 'password', form):
 				sid = session['sid']
 			else:
