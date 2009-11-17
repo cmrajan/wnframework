@@ -1557,6 +1557,7 @@ def set_db_name(acc_id):
 	
 	try:
 		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
+		msgprint(domain)
 	except:
 		pass
 		
