@@ -39,7 +39,7 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
  <script language="JavaScript" src="js/widgets/calendar.js"></script>
  <script type="text/javascript" src="js/rsh.compressed.js"></script>
  <script language="JavaScript" src="js/user.js"></script>
- <script language="JavaScript" src="js/tiny_mce/tiny_mce.js"></script>
+ <script language="JavaScript" src="js/tiny_mce/tiny_mce_gzip.js"></script>
 
 <script type="text/javascript">
 window.dhtmlHistory.create({ debugMode: false });

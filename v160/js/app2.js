@@ -130,7 +130,7 @@ function loadscript(src, call_back) {
 	set_loading();
 	var script = $a('head','script');
 	script.type = 'text/javascript';
-	script.src = src+'?v=160.43';
+	script.src = src;
 	script.onload = function() { 
 		if(call_back)call_back(); hide_loading(); 
 	}

@@ -2330,15 +2330,15 @@ ButtonField.prototype.make_input = function() { var me = this;
 ButtonField.prototype.set = function(v) { }; // No Setter
 ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly
 
-var codeid=0
+var codeid=0; var code_editors={}; var tinymce_loaded;
 function CodeField() { } CodeField.prototype = new Field();
 CodeField.prototype.make_input = function() {
 	var me = this; 
 	$ds(this.label_area);
 	this.label_area.innerHTML = this.df.label;
 	this.input = $a(this.input_area, 'textarea','code_text');
-	var myid = 'code-'+codeid;
-	this.input.setAttribute('id',myid);
+	this.myid = 'code-'+codeid;
+	this.input.setAttribute('id',this.myid);
 	codeid++;
 
 	this.input.setAttribute('wrap', 'off');
@@ -2365,10 +2365,55 @@ CodeField.prototype.make_input = function() {
 			return this.input.value;
 		}
 	}
+	if(this.df.fieldtype=='Text Editor') {
+		if(!tinymce_loaded) {
+			tinymce_loaded = 1;
+			tinyMCE_GZ.init({
+				themes : "advanced",
+				plugins : "style,table",
+				languages : "en",
+				disk_cache : true
+			}, function() { me.setup_editor() });
+		} else {
+			this.setup_editor();
+		}
+	}
 }
 CodeField.prototype.set_disp = function(val) { 
 	$y(this.disp_area, {width:'90%'})
 	this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>'; 
+}
+CodeField.prototype.setup_editor = function() { 
+	var me = this;
+	code_editors[me.df.fieldname] = me.input;
+	// make the editor
+	tinyMCE.init({
+		theme : "advanced",
+		mode : "exact",
+		elements: this.myid,
+		plugins:"table,style",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		extended_valid_elements: "div[id|dir|class|align|style]",
+
+		// w/h
+		width: '100%',
+		height: '360px',
+
+		// buttons
+		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,image,unlink,cleanup,help,code,|,forecolor,backcolor",
+		theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,ltr,rtl",
+
+		// framework integation
+		init_instance_callback : "code_editors."+ this.df.fieldname+".editor_init_callback",
+		onchange_callback : "code_editors."+ this.df.fieldname+".onchange"
+	});
+	this.input.editor_init_callback = function() {
+		if(cur_frm)
+			cur_frm.fields_dict[me.df.fieldname].editor = tinyMCE.get(me.myid);
+	}
 }
 
 function TextField() { } TextField.prototype = new Field();
@@ -2678,6 +2723,7 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 		case 'text':var f = new TextField(); break;
 		case 'small text':var f = new TextField(); break;
 		case 'code':var f = new CodeField(); break;
+		case 'text editor':var f = new CodeField(); break;
 		case 'select':var f = new SelectField(); break;
 		case 'table':var f = new TableField(); break;
 		case 'section break':var f= new SectionBreak(); break;
