@@ -193,7 +193,7 @@ function makeemail() {
       }
       $c('get_contact_list',{'select':email_as_field, 'from':email_as_dt, 'where':email_as_in, 'txt':(last_txt ? strip(last_txt) : '%')},call_back);
       return;
-    }  
+    }
 	
 	var sel;
 
@@ -221,85 +221,88 @@ FrmContainer.prototype.oninit = function() {
 }
 
 FrmContainer.prototype.make_head = function() {
-	this.head_div = $a(this.head, 'div', '', {borderBottom:'1px solid #AAA'});
+	this.head_div = $a(this.head, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px 4px'});
 
-	this.tbartab = make_table($a(this.head_div, 'div'), 1, 2, '100%', ['50%','50%']);
+	// Row 1
+	// ------------------
 
-	// actions links
-	// tool bar ----
-	this.tbar_div = $a($td(this.tbartab,0,1),'div','',{marginRight:'8px'})
-	var tab2 = make_table(this.tbar_div, 1, 5, '100%', ['8%','34%','30%','8%','20%'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
+	this.tbartab = make_table($a(this.head_div, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: "#DDD"});
+
+	// left side - headers
+	// -------------------
+	$y($td(this.tbartab,0,0),{padding:'4px'});
+	this.main_title = $a($td(this.tbartab,0,0), 'h2', '',{margin: '0px 8px', display:'inline'});
+	this.sub_title = $a($td(this.tbartab,0,0), 'div','',{display:'inline'});
+	this.sub_title.is_inline = 1;
+	this.status_title = $a($td(this.tbartab,0,0), 'span','',{marginLeft:'8px'});
+	this.status_title.is_inline = 1;
 	
-	// close button
-	$y($td(tab2,0,4),{textAlign:'right', paddingTop:'6px'});
-	this.close_btn = $a($td(tab2,0,4), 'img','',{cursor:'pointer'}); this.close_btn.src="images/ui/close_btn.gif";
-	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
-
-	// mouseovers
-	var fn = function(t) {
-		$y(t,{cursor:'pointer', backgroundColor:'#DDD'});
-	}
-	fn($td(tab2,0,1)); fn($td(tab2,0,2));
-	$y($td(tab2,0,0),{background:'url("images/ui/rc/tb-left-bottom.gif") bottom left no-repeat',backgroundColor:'#DDD'})
-	$y($td(tab2,0,3),{background:'url("images/ui/rc/tb-right-bottom.gif") bottom right no-repeat',backgroundColor:'#DDD'})
-
-
-	// Actions...
-	this.tbarlinks = $a($td(tab2,0,1),'select','',{width:'120px'});
+	// right side - actions, comments & close btn
+	// ------------------------------------------
+	this.tbar_div = $a($td(this.tbartab,0,1),'div','',{marginRight:'8px', textAlign:'right'})
+	var tab2 = make_table(this.tbar_div, 1, 3, '360px', ['120px','120px','120px'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
+	$y(tab2,{cssFloat:'right'});
+	// 1. Actions...
+	// -------------
+	this.tbarlinks = $a($td(tab2,0,0),'select','',{width:'120px'});
 	select_register[select_register.length] = this.tbarlinks; // for IE 6
-	
+
 	// (Tweets) Comments
-	this.comments_btn = $a($td(tab2,0,2),'div','link_type',{padding:'2px',position:'relative'});
+	// -----------------
+	this.comments_btn = $a($td(tab2,0,1),'div','link_type',{padding:'2px',position:'relative'});
 	
-	// Tweets Dropdown
-	this.comments_btn.dropdown = new DropdownMenu($td(tab2,0,2), '240px');
+	this.comments_btn.dropdown = new DropdownMenu($td(tab2,0,1), '240px'); // Tweets Dropdown
 	$y(this.comments_btn.dropdown.body, {height:'400px'});
 
-	$td(tab2,0,2).set_unselected = function() { // called by dropdown on hide
+	$td(tab2,0,1).set_unselected = function() { // called by dropdown on hide
 		tweet_dialog.hide();
 	}
 	this.comments_btn.onmouseover = function() { // custom mouseover
-		$y($td(tab2,0,2),{backgroundColor:'#EEE'});
+		$y($td(tab2,0,1),{backgroundColor:'#EEE'});
 		if(cur_frm.doc.__islocal) {
 			return;
 		}
-
 		this.dropdown.body.appendChild(tweet_dialog);
 		this.dropdown.show();
-
 		tweet_dialog.show(); 
 	}
 	this.comments_btn.onmouseout = function() {
-		$y($td(tab2,0,2),{backgroundColor:'#DDD'});
+		$y($td(tab2,0,1),{backgroundColor:'#DDD'});
 		this.dropdown.clear();
 	}
 		
 	this.comments_btn.innerHTML = 'Comments';
 
-	// last comment area
-	this.last_comment_area = $a($td(this.tbartab,0,1),'div',{display:'none'});
-	$a(this.last_comment_area,'div','',{background:'url("images/ui/rc/comment_top.gif") top left no-repeat', height:'10px', marginLeft:'50%',fontSize:'1px' });
-	this.last_comment_area.comment = $a(this.last_comment_area,'div','',{backgroundColor:'#FFFAAA', padding:'4px', margin:'0px 8px 8px 0px'})
+	// 3. close button
+	// ---------------
+	$y($td(tab2,0,2),{padding:'6px 0px 2px 0px', textAlign:'right'});
+	this.close_btn = $a($td(tab2,0,2), 'img','',{cursor:'pointer'}); this.close_btn.src="images/ui/close_btn.gif";
+	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
+	// Row 2
+	// ------------------
 
-	// headers
-	$y($td(this.tbartab,0,0),{padding:'8px'});
-	this.main_title = $a($td(this.tbartab,0,0), 'div', 'standard_title',{marginTop:'0px', marginRight: '4px', display:'inline'});
-	this.sub_title = $a($td(this.tbartab,0,0), 'div','',{display:'inline'});
-	this.sub_title.is_inline = 1;
-	this.status_title = $a($td(this.tbartab,0,0), 'span','',{marginLeft:'8px'});
-	this.status_title.is_inline = 1;
-
-	var t = make_table($a($td(this.tbartab,0,0),'div'),1,2,'100%',['38%','62%'])
+	this.tbartab2 = make_table($a(this.head_div, 'div'), 1, 2, '100%', ['50%','50%']);
+	var t = make_table($a($td(this.tbartab2,0,0),'div'),1,2,'100%',['38%','62%'])
 	
 	// buttons
-	this.button_area = $a($td(t,0,0), 'div', 'frm_button_area');
+	this.button_area = $a($td(t,0,1), 'div', '', {margin:'4px'});
 	
 	// created / modified
-	this.comment = $a($td(t,0,1), 'div', 'comment',{fontSize:'11px', marginTop:'8px'});
+	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px'});
+	this.mod_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px'});
+
+	// last comment area
+	// -----------------
+	this.last_comment = $a($td(this.tbartab2,0,1),'div','',{display:'none', paddingTop:'4px'});
 	
+	var t = make_table(this.last_comment,1,2,'100%',['40px','']);
+	this.last_comment.img = $a($td(t,0,0), 'img','',{width:'40px',marginBottom:'8px'});
+	this.last_comment.comment = $a($td(t,0,1),'div','',{backgroundColor:'#FFFAAA', padding:'4px', height:'32px'})
+
+
 	// header elements
-	this.head_elements = [this.button_area, this.tbar_div, this.comment, this.sub_title, this.status_title];
+	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title];
 	
 }
 
@@ -549,11 +552,21 @@ Frm.prototype.set_heading = function() {
 	// lst commnet
 	this.set_last_comment();
 	
-	frm_con.comment.innerHTML = repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s", 
+	var created_str = repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s", 
 		{c_by:doc.owner
 		,c_on:scrub_date(doc.creation ? doc.creation:'')
-		,m_by:doc.modified_by?('<br>Modified: '+doc.modified_by):''
+		,m_by:doc.modified_by?('/ Modified: '+doc.modified_by):''
 		,m_on:scrub_date(doc.modified ? doc.modified:'')} );
+	
+	// images
+	set_user_img(frm_con.owner_img, doc.owner);
+	frm_con.owner_img.title = created_str;
+
+	if(doc.owner != doc.modified_by) {
+		$di(frm_con.mod_img);
+		set_user_img(frm_con.owner_img, doc.modified_by);
+	} else
+		$dh(frm_con.mod_img);
 	
 	if(this.heading){
 		if(this.meta.hide_heading) $dh(frm_con.head_div);
@@ -567,10 +580,13 @@ Frm.prototype.set_last_comment = function() {
 
 	// last comment
 	if(lc && lc[2]) { 
-		frm_con.last_comment_area.comment.innerHTML = 'Last Comment: <b>'+lc[2]+'</b><div id="comment" style="font-size:11px">By '+lc[1]+' on '+dateutil.str_to_user(lc[0])+'</div>'; 
-		$ds(frm_con.last_comment_area); 
+		frm_con.last_comment.comment.innerHTML = 'Last Comment: <b>'+lc[2]+'</b><div id="comment" style="font-size:11px">By '+lc[1]+' on '+dateutil.str_to_user(lc[0])+'</div>'; 
+		$ds(frm_con.last_comment); 
+		
+		// image
+		set_user_img(frm_con.last_comment.img, lc[1]);
 	} else { 
-		$dh(frm_con.last_comment_area); 
+		$dh(frm_con.last_comment); 
 	}
 }
 

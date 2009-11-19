@@ -225,6 +225,16 @@ def initdata(form, session):
 
 	out['docs1'] = server.compress_doclist(out_docs)
 
+# Get user image
+# --------------
+def get_user_img(form,session):
+	f = sql("select file_list from tabProfile where name=%s", form.getvalue('username'))
+	if f and f[0][0]:
+		out['message'] = f[0][0].split(',')[1]
+	else:
+		out['message'] = 'no_img'
+
+
 # Document Load
 # -------------
 

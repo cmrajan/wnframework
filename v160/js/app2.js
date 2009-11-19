@@ -1100,20 +1100,24 @@ function ReportPage(parent) {
 	// tool bar
 
 	var div = $a(parent, 'div','',{margin:'8px'});
-	var htab = make_table($a(div,'div'), 1,2, '100%', ['80%','20%']);
+	var htab = make_table($a(div,'div','',{padding:'4px', backgroundColor:'#DDD'}), 1,2, '100%', ['80%','20%']);
 	
-	this.main_title = $a($td(htab,0,0),'div','standard_title');
-	this.button_area = $a($td(htab,0,0),'div');
-	
-	$y($td(htab,0,1),{textAlign:'right'});
-	
+	this.main_title = $a($td(htab,0,0),'h2','',{margin: '0px 4px', display:'inline'});
+		
 	// close button
-
-	this.close_btn = $a($a($td(htab,0,1),'p','',{padding: '0px 0px 8px 0px', margin:'0px'}), 'img', '', {cursor:'pointer'});
+	$y($td(htab,0,1),{textAlign:'right'});
+	this.close_btn = $a($a($td(htab,0,1),'p','',{padding: '4px 4px 0px 0px', margin:'0px'}), 'img', '', {cursor:'pointer'});
 	this.close_btn.src="images/ui/close_btn.gif";
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
+
+	// row 2
+	var htab = make_table($a(div,'div','',{padding:'4px'}), 1,2, '100%', ['80%','20%']);
+
+	this.button_area = $a($td(htab,0,0),'div');
+	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
+	$y($td(htab,0,1),{textAlign:'right'});
 
 	// new
 	if(has_common(['Administrator', 'System Manager'], user_roles)) {
@@ -2380,7 +2384,7 @@ list_opts = {
 	round_corners: 1,
 	no_border: 0
 };
-function Listing(head_text, no_index) {
+function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
 	this.page_len = 20;
 	this.paging_len = 5;
@@ -2408,6 +2412,7 @@ function Listing(head_text, no_index) {
 	
 	this.is_std_query = false;
 	this.server_call = null;
+	this.no_loading = no_loading;
 	
 	this.opts = copy_dict(list_opts);
 }
@@ -2805,7 +2810,7 @@ Listing.prototype.run = function(from_page) {
 			,'roles':'["'+user_roles.join('","')+'"]'}
 		if(this.is_std_query) args.query = q;
 		else args.simple_query = q;
-		$c('runquery', args, call_back);
+		$c('runquery', args, call_back, null, this.no_loading);
 	}
 }
 
@@ -3022,6 +3027,7 @@ var selector;
 var is_testing = false;
 var tree;
 var user_defaults; var user_roles; var user_fullname; var user_recent; var user_email;
+var user_img = {};
 var recent_docs = [];
 session.al = [];
 var max_dd_rows;
@@ -5441,7 +5447,7 @@ function Tweets(parent) {
 		me.inp.value = ''; // clear
 	}
 	
-	var lst = new Listing('Tweets',1);
+	var lst = new Listing('Tweets',1,1);
 	lst.opts.hide_export = 1;
 	lst.opts.hide_print = 1;
 	lst.opts.hide_refresh = 1;
@@ -5534,4 +5540,19 @@ function setup_tweets() {
 			cur_frm.set_last_comment();
 	}
 }
- startup_lst[startup_lst.length] = setup_tweets;
+startup_lst[startup_lst.length] = setup_tweets;
+ 
+ 
+// set user image
+function set_user_img(img, username) {
+	function set_it() {
+		if(user_img[username]=='no_img')
+			img.src = 'images/ui/no_img/no_img_m.gif'; // no image
+		else
+			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:account_id});
+	}
+	if(user_img[username]) 
+		set_it();
+	else
+		$c('get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
+}

@@ -199,15 +199,6 @@ def fetchoneDict(cursor):
 	cols = [ d[0] for d in cursor.description ]
 	return dict(zip(cols, row))
 	
-def getTraceback():
-	import sys, traceback, string
-	type, value, tb = sys.exc_info()
-	body = "Traceback (innermost last):\n"
-	list = traceback.format_tb(tb, None) \
-		+ traceback.format_exception_only(type, value)
-	body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
-	return body
-
 def set_timezone():
 	import os
 	os.environ['TZ'] = user_timezone
@@ -694,7 +685,7 @@ def getcoldef(ftype):
 		dt = 'text';
 	elif t == 'check':
 		dt = 'int(3)';
-	elif t in ('long text', 'code'): 
+	elif t in ('long text', 'code', 'text editor'): 
 		dt = 'text';
 	elif t in ('data', 'link', 'password', 'select', 'read only'):
 		dt = 'varchar(180)';
@@ -2081,7 +2072,7 @@ def copy_db(source, target=''):
 		raise Exception
 
 	import os
-	os.chdir('../data')
+	os.chdir(os.path.normpath('../data'))
 	
 	# dump
 	mysqldump(source)
