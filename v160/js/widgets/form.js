@@ -564,7 +564,7 @@ Frm.prototype.set_heading = function() {
 
 	if(doc.owner != doc.modified_by) {
 		$di(frm_con.mod_img);
-		set_user_img(frm_con.owner_img, doc.modified_by);
+		set_user_img(frm_con.mod_img, doc.modified_by);
 	} else
 		$dh(frm_con.mod_img);
 	

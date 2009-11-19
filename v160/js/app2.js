@@ -5549,7 +5549,7 @@ function set_user_img(img, username) {
 		if(user_img[username]=='no_img')
 			img.src = 'images/ui/no_img/no_img_m.gif'; // no image
 		else
-			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:account_id});
+			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
 	}
 	if(user_img[username]) 
 		set_it();
