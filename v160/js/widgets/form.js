@@ -289,7 +289,8 @@ FrmContainer.prototype.make_head = function() {
 	this.button_area = $a($td(t,0,1), 'div', '', {margin:'4px'});
 	
 	// created / modified
-	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px'});
+	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
+	this.owner_img.is_inline = 1;
 	this.mod_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px'});
 
 	// last comment area
@@ -565,6 +566,7 @@ Frm.prototype.set_heading = function() {
 	if(doc.owner != doc.modified_by) {
 		$di(frm_con.mod_img);
 		set_user_img(frm_con.mod_img, doc.modified_by);
+		frm_con.mod_img.title = created_str;
 	} else
 		$dh(frm_con.mod_img);
 	
