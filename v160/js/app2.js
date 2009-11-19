@@ -5479,7 +5479,7 @@ function Tweets(parent) {
 		if(d[ri][3]) {
 			var img = $a($td(t,0,0),'img','',{width:'40px'});
 			var img_src = d[ri][3].split(NEWLINE)[0].split(',')[0];
-			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s&thumbnail=40',{fn:img_src,ac:account_id});
+			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s&thumbnail=40',{fn:img_src, ac:session.account_name});
 		} else {
 			var div = make_table($td(t,0,0),1,1,'40px',['100%']);
 			var np_div = $td(div,0,0);
