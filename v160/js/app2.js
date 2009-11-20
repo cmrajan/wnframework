@@ -1099,14 +1099,14 @@ function ReportPage(parent) {
 
 	// tool bar
 
-	var div = $a(parent, 'div','',{margin:'8px'});
+	var div = $a(parent, 'div','',{margin:'0px 8px'});
 	var htab = make_table($a(div,'div','',{padding:'4px', backgroundColor:'#DDD'}), 1,2, '100%', ['80%','20%']);
 	
 	this.main_title = $a($td(htab,0,0),'h2','',{margin: '0px 4px', display:'inline'});
 		
 	// close button
 	$y($td(htab,0,1),{textAlign:'right'});
-	this.close_btn = $a($a($td(htab,0,1),'p','',{padding: '4px 4px 0px 0px', margin:'0px'}), 'img', '', {cursor:'pointer'});
+	this.close_btn = $a($a($td(htab,0,1),'div','',{padding: '2px', margin:'0px'}), 'img', '', {cursor:'pointer'});
 	this.close_btn.src="images/ui/close_btn.gif";
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 

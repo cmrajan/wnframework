@@ -563,7 +563,7 @@ Frm.prototype.set_heading = function() {
 	set_user_img(frm_con.owner_img, doc.owner);
 	frm_con.owner_img.title = created_str;
 
-	if(doc.owner != doc.modified_by) {
+	if(doc.modified_by && doc.owner != doc.modified_by) {
 		$di(frm_con.mod_img);
 		set_user_img(frm_con.mod_img, doc.modified_by);
 		frm_con.mod_img.title = created_str;
