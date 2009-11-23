@@ -1107,7 +1107,7 @@ function ReportPage(parent) {
 	// close button
 	$y($td(htab,0,1),{textAlign:'right'});
 	this.close_btn = $a($a($td(htab,0,1),'div','',{padding: '2px', margin:'0px'}), 'img', '', {cursor:'pointer'});
-	this.close_btn.src="images/ui/close_btn.gif";
+	this.close_btn.src="images/icons/close.gif";
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
@@ -1358,14 +1358,14 @@ function Dialog(w, h, title, content) {
 }
 
 Dialog.prototype.make_head = function(title) {
-	var t = make_table(this.head,1,2,'100%',['100%','16px'],{padding:'3px'});
+	var t = make_table(this.head,1,2,'100%',['100%','16px'],{padding:'2px'});
 	
-	$y(t,{borderBottom:'1px solid #DDD'});
+	//$y(t,{borderBottom:'1px solid #DDD'});
 	$y($td(t,0,0),{paddingLeft:'16px',fontWeight:'bold',fontSize:'14px',textAlign:'center'});
 	$y($td(t,0,1),{textAlign:'right'});	
 
 	var img = $a($td(t,0,01),'img','',{cursor:'pointer'});
-	img.src='images/icons/cancel.gif';
+	img.src='images/icons/close.gif';
 	this.title_text = $td(t,0,0);
 	if(!title)title='';
 	this.title_text.innerHTML = title;

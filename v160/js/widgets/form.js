@@ -240,25 +240,28 @@ FrmContainer.prototype.make_head = function() {
 	// right side - actions, comments & close btn
 	// ------------------------------------------
 	this.tbar_div = $a($td(this.tbartab,0,1),'div','',{marginRight:'8px', textAlign:'right'})
-	var tab2 = make_table(this.tbar_div, 1, 3, '360px', ['120px','120px','120px'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
+	var tab2 = make_table(this.tbar_div, 1, 4, '400px', ['60px','120px','160px','60px'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
 	$y(tab2,{cssFloat:'right'});
-	// 1. Actions...
-	// -------------
-	this.tbarlinks = $a($td(tab2,0,0),'select','',{width:'120px'});
-	select_register[select_register.length] = this.tbarlinks; // for IE 6
+
 
 	// (Tweets) Comments
 	// -----------------
-	this.comments_btn = $a($td(tab2,0,1),'div','link_type',{padding:'2px',position:'relative'});
+	$y($td(tab2,0,0),{textAlign:'right'});
+	var comm_img = $a($td(tab2,0,0),'img','',{marginRight:'4px', paddingTop:'2px'});
+	comm_img.src = 'images/icons/comments.gif';
+
+	var c = $td(tab2,0,1); 
+	this.comments_btn = $a(c,'div','link_type',{padding:'0px 2px',position:'relative',display:'inline'});
 	
-	this.comments_btn.dropdown = new DropdownMenu($td(tab2,0,1), '240px'); // Tweets Dropdown
+	$y(c,{textAlign:'left'});
+	this.comments_btn.dropdown = new DropdownMenu(c, '240px'); // Tweets Dropdown
 	$y(this.comments_btn.dropdown.body, {height:'400px'});
 
-	$td(tab2,0,1).set_unselected = function() { // called by dropdown on hide
+	c.set_unselected = function() { // called by dropdown on hide
 		tweet_dialog.hide();
 	}
 	this.comments_btn.onmouseover = function() { // custom mouseover
-		$y($td(tab2,0,1),{backgroundColor:'#EEE'});
+		$y(c,{backgroundColor:'#EEE'});
 		if(cur_frm.doc.__islocal) {
 			return;
 		}
@@ -267,16 +270,21 @@ FrmContainer.prototype.make_head = function() {
 		tweet_dialog.show(); 
 	}
 	this.comments_btn.onmouseout = function() {
-		$y($td(tab2,0,1),{backgroundColor:'#DDD'});
+		$y(c,{backgroundColor:'#DDD'});
 		this.dropdown.clear();
 	}
 		
 	this.comments_btn.innerHTML = 'Comments';
 
-	// 3. close button
+	// Actions...
+	// -------------
+	this.tbarlinks = $a($td(tab2,0,2),'select','',{width:'120px'});
+	select_register[select_register.length] = this.tbarlinks; // for IE 6
+
+	// close button
 	// ---------------
-	$y($td(tab2,0,2),{padding:'6px 0px 2px 0px', textAlign:'right'});
-	this.close_btn = $a($td(tab2,0,2), 'img','',{cursor:'pointer'}); this.close_btn.src="images/ui/close_btn.gif";
+	$y($td(tab2,0,3),{padding:'6px 0px 2px 0px', textAlign:'right'});
+	this.close_btn = $a($td(tab2,0,3), 'img','',{cursor:'pointer'}); this.close_btn.src="images/icons/close.gif";
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	// Row 2
@@ -521,7 +529,7 @@ Frm.prototype.set_heading = function() {
 		st = "<span style='color:#f81'>Unsaved Draft</span>";
 		set_st('#f81');
 	} else if(doc.__unsaved) {
-		st = "<span style='color:#f81'>Changes are not saved</span>";		
+		st = "<span style='color:#f81'>Not Saved</span>";		
 		set_st('#f81');
 	} else if(cint(doc.docstatus)==0) {
 		st = "<span style='color:#0a1'>Saved</span>";
