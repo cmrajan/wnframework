@@ -287,6 +287,7 @@ FrmContainer.prototype.make_head = function() {
 	
 	// buttons
 	this.button_area = $a($td(t,0,1), 'div', '', {margin:'4px'});
+	this.last_update_area = $a($td(t,0,1), 'div', '', {margin:'0px 4px 4px 4px',color:"#888"});
 	
 	// created / modified
 	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
@@ -303,7 +304,7 @@ FrmContainer.prototype.make_head = function() {
 
 
 	// header elements
-	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title];
+	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title, this.last_update_area];
 	
 }
 
@@ -517,7 +518,7 @@ Frm.prototype.set_heading = function() {
 
 	var st = "";
 	if(doc.__islocal) {
-		st = "<span style='color:#f81'>Not saved</span>";
+		st = "<span style='color:#f81'>Unsaved Draft</span>";
 		set_st('#f81');
 	} else if(doc.__unsaved) {
 		st = "<span style='color:#f81'>Changes are not saved</span>";		
@@ -543,33 +544,37 @@ Frm.prototype.set_heading = function() {
 	// created & modified
 	var scrub_date = function(d) {
 		if(d)t=d.split(' ');else return '';
-		return 'on '+dateutil.str_to_user(t[0]) + ' ' + t[1];
+		return dateutil.str_to_user(t[0]) + ' ' + t[1];
 	}
 	
 	var t = doc.doctype+'/'+doc.name;
 	// tweets
 	frm_con.comments_btn.innerHTML = 'Comments (' + cint(n_tweets[t]) + ')';
 	
-	// lst commnet
+	// lst comment
 	this.set_last_comment();
 	
 	var created_str = repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s", 
 		{c_by:doc.owner
 		,c_on:scrub_date(doc.creation ? doc.creation:'')
 		,m_by:doc.modified_by?('/ Modified: '+doc.modified_by):''
-		,m_on:scrub_date(doc.modified ? doc.modified:'')} );
+		,m_on:doc.modified ? ('on '+scrub_date(doc.modified)) : ''} );
 	
 	// images
 	set_user_img(frm_con.owner_img, doc.owner);
 	frm_con.owner_img.title = created_str;
 
-	if(doc.modified_by && doc.owner != doc.modified_by) {
-		$di(frm_con.mod_img);
-		set_user_img(frm_con.mod_img, doc.modified_by);
-		frm_con.mod_img.title = created_str;
+	frm_con.last_update_area.innerHTML = '';
+	if(doc.modified_by) {
+		frm_con.last_update_area.innerHTML = scrub_date(doc.modified ? doc.modified:'') + ' <span class="link_type" style="margin-left: 8px; font-size: 10px;" onclick="msgprint(\''+created_str.replace('/','<br>')+'\')">Details</span>';
+		if(doc.owner != doc.modified_by) {
+			$di(frm_con.mod_img);
+			set_user_img(frm_con.mod_img, doc.modified_by);
+			frm_con.mod_img.title = created_str;
+		}
 	} else
 		$dh(frm_con.mod_img);
-	
+
 	if(this.heading){
 		if(this.meta.hide_heading) $dh(frm_con.head_div);
 		else $ds(frm_con.head_div);
@@ -1599,11 +1604,13 @@ SectionBreak.prototype.make_simple_section = function(static) {
 	var me = this;
 
 	// colour
+	var has_col = false;
 	if(this.df.colour) {
+		has_col = true;
 		var col = this.df.colour.split(':')[1];
 		if(col!='FFF') {
 			$y(this.row.sub_wrapper, {
-				margin:'16px', padding: '8px'
+				margin:'8px', padding: '0px'
 				,border:('1px solid #' + get_darker_shade(col, 0.75))
 				//,borderBottom:('2px solid #' + get_darker_shade(col))
 				,backgroundColor: ('#' + col)}
@@ -1635,7 +1642,7 @@ SectionBreak.prototype.make_simple_section = function(static) {
 		this.collapse = this.exp_icon.collapse;
 		this.expand = this.exp_icon.expand;
 		
-	} else {
+	} else if(!has_col) {
 		// divider
 		$y(head,{margin:'8px', borderBottom:'2px solid #445'});
 	}
