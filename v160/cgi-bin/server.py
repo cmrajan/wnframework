@@ -2062,19 +2062,22 @@ def backup_db(db, from_all=0):
 
 	sql('FLUSH TABLES WITH READ LOCK')
 
-	p = '../backups'
-	if from_all: p = '../backups/dumps'	
+	try:
+		p = '../backups'
+		if from_all: p = '../backups/dumps'	
+		
+		os.system('rm %s/%s.tar.gz' % (p,db))
 	
-	os.system('rm %s/%s.tar.gz' % (p,db))
-
-	# dump
-	mysqldump(db, p+'/')
-	
-	# zip
-	os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
-	os.system('rm %s/%s.sql' % (p, db))
-	
-	sql('unlock tables')
+		# dump
+		mysqldump(db, p+'/')
+		
+		# zip
+		os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
+		os.system('rm %s/%s.sql' % (p, db))
+		sql('unlock tables')
+	except Exception, e:
+		sql('unlock tables')
+		raise e
 
 def copy_db(source, target=''):
 	if not server_prefix:
