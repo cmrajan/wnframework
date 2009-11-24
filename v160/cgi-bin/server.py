@@ -762,7 +762,7 @@ def update_engine(doctype=None, engine='InnoDB'):
 # -----------------------
 
 def change_column(dt, old_fn, new_fn, new_type, old_type, new_type_orig):
-	if ((old_type.lower() in ['text','small text']) and (new_type_orig.lower() not in ['text', 'small text'])) or ((old_type.lower() in ['data','select','link']) and (new_type_orig.lower() in ['date','int','currency','float','time','table'])):
+	if ((old_type.lower() in ['text','small text','code','text editor']) and (new_type_orig.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old_type.lower() in ['data','select','link']) and (new_type_orig.lower() in ['date','int','currency','float','time','table'])):
 		msgprint('%s: Coversion from %s to %s is not allowed' % (new_fn, old_type, new_type_orig))
 		raise Exception
 	try:
