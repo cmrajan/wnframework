@@ -2013,12 +2013,17 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 # -----------
 
 def backup_all():
+	if defs.root_login:
+		global conn
+		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
+
 	# backups folder
 	import os
 	dblist = sql_accounts('select db_name from tabAccount')
 
 	# backup -all in /backups folder
 	for d in dblist:
+		sql('use %s' % d[0])
 		backup_db(d[0], 1)
 	
 	# dump all in /daily folder
@@ -2054,6 +2059,8 @@ def mysqldump(db, folder=''):
 def backup_db(db, from_all=0):
 	import os
 
+	sql('FLUSH TABLES WITH READ LOCK')
+
 	p = '../backups'
 	if from_all: p = '../backups/dumps'	
 	
@@ -2065,6 +2072,8 @@ def backup_db(db, from_all=0):
 	# zip
 	os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
 	os.system('rm %s/%s.sql' % (p, db))
+	
+	sql('unlock tables')
 
 def copy_db(source, target=''):
 	if not server_prefix:
