@@ -2060,7 +2060,7 @@ def backup_db(db, from_all=0):
 		
 	sql('use %s' % db)
 
-	sql('FLUSH TABLES WITH READ LOCK')
+	#sql('FLUSH TABLES WITH READ LOCK')
 
 	try:
 		p = '../backups'
@@ -2074,9 +2074,9 @@ def backup_db(db, from_all=0):
 		# zip
 		os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
 		os.system('rm %s/%s.sql' % (p, db))
-		sql('unlock tables')
+		#sql('unlock tables')
 	except Exception, e:
-		sql('unlock tables')
+		#sql('unlock tables')
 		raise e
 
 def copy_db(source, target=''):
