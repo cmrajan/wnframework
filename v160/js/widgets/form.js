@@ -300,7 +300,8 @@ FrmContainer.prototype.make_head = function() {
 	// created / modified
 	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
 	this.owner_img.is_inline = 1;
-	this.mod_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px'});
+	this.mod_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
+	this.mod_img.is_inline = 1;
 
 	// last comment area
 	// -----------------

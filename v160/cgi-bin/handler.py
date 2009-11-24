@@ -228,7 +228,7 @@ def initdata(form, session):
 # Get user image
 # --------------
 def get_user_img(form,session):
-	f = sql("select file_list from tabProfile where name=%s", form.getvalue('username'))
+	f = sql("select file_list from tabProfile where name=%s", form.getvalue('username',''))
 	if f and f[0][0]:
 		out['message'] = f[0][0].split(',')[1]
 	else:
