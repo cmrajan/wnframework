@@ -5251,8 +5251,10 @@ SidebarMenu.prototype.menu_click = function(n) {
     n.toggle();
   } else if(n.menu_item.menu_item_type == 'Report') {
     loadreport(n.menu_item.link_id, n.menu_item.criteria_name, n.onload, n);
-  } else
+  } else {
+  	if(n.onload) n.onload();
     n.toggle();
+  }
 }
 
 // Make Menu
