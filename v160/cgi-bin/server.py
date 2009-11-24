@@ -1351,17 +1351,17 @@ def rename(dt, old, new, is_doctype = 0):
 	sql("update `tab%s` set name='%s' where name='%s'" % (dt, new, old))
 
 	# get child docs
-	ct = sql("select options from tabDocField where parent = '%s' and fieldtype='Table' and docstatus=1" % dt)
+	ct = sql("select options from tabDocField where parent = '%s' and fieldtype='Table'" % dt)
 	for c in ct:
 		sql("update `tab%s` set parent='%s' where parent='%s'" % (c[0], new, old))
 
 	# get links
-	ll = sql("select parent, fieldname from tabDocField where options = '%s' and fieldtype='Link' and docstatus=1" % dt)
+	ll = sql("select parent, fieldname from tabDocField where options = '%s' and fieldtype='Link'" % dt)
 	for l in ll:
 		sql("update `tab%s` set `%s`='%s' where `%s`='%s'" % (l[0], l[1], new, l[1], old))
 
 	# get links (from select)
-	ll = sql("select parent, fieldname from tabDocField where options = 'link:%s' and fieldtype='Select' and docstatus=1" % dt)
+	ll = sql("select parent, fieldname from tabDocField where options = 'link:%s' and fieldtype='Select'" % dt)
 	for l in ll:
 		sql("update `tab%s` set `%s`='%s' where `%s`='%s'" % (l[0], l[1], new, l[1], old))
 
@@ -1370,7 +1370,7 @@ def rename(dt, old, new, is_doctype = 0):
 		sql("RENAME TABLE `tab%s` TO `tab%s`" % (old, new))
 
 		# get child docs (update parenttype)
-		ct = sql("select options from tabDocField where parent = '%s' and fieldtype='table' and docstatus=1" % new)
+		ct = sql("select options from tabDocField where parent = '%s' and fieldtype='Table'" % new)
 		for c in ct:
 			sql("update `tab%s` set parenttype='%s' where parenttype='%s'" % (c[0], new, old))
 
