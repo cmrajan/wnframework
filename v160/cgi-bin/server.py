@@ -1356,7 +1356,7 @@ def rename(dt, old, new, is_doctype = 0):
 		sql("update `tab%s` set parent='%s' where parent='%s'" % (c[0], new, old))
 
 	# get links (link / select)
-	ll = sql("select parent, fieldname from tabDocField where (options = '%s' and fieldtype='Link') or (options = 'link:%s' and fieldtype='Select')" % (dt, dt))
+	ll = sql("select parent, fieldname from tabDocField where parent not like 'old%' and ((options = '%s' and fieldtype='Link') or (options = 'link:%s' and fieldtype='Select'))" % (dt, dt))
 	for l in ll:
 		is_single = sql("select issingle from tabDocType where name = '%s'" % l[0])
 		if is_single:
