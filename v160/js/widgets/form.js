@@ -520,7 +520,7 @@ Frm.prototype.set_heading = function() {
 		frm_con.sub_title.innerHTML = dt;
 
 	// status
-	var doc = this.doc;
+	var doc = locals[this.doctype][this.docname];
 	var tn = $i('rec_'+this.doctype+'-'+this.docname);
 	//var tn = null;
 	var set_st = function(col) { if(tn)$bg(tn,col); }
@@ -574,6 +574,7 @@ Frm.prototype.set_heading = function() {
 	frm_con.owner_img.title = created_str;
 
 	frm_con.last_update_area.innerHTML = '';
+	$dh(frm_con.mod_img);
 	if(doc.modified_by) {
 		frm_con.last_update_area.innerHTML = scrub_date(doc.modified ? doc.modified:'') + ' <span class="link_type" style="margin-left: 8px; font-size: 10px;" onclick="msgprint(\''+created_str.replace('/','<br>')+'\')">Details</span>';
 		if(doc.owner != doc.modified_by) {
@@ -581,9 +582,8 @@ Frm.prototype.set_heading = function() {
 			set_user_img(frm_con.mod_img, doc.modified_by);
 			frm_con.mod_img.title = created_str;
 		}
-	} else
-		$dh(frm_con.mod_img);
-
+	} 
+	
 	if(this.heading){
 		if(this.meta.hide_heading) $dh(frm_con.head_div);
 		else $ds(frm_con.head_div);
