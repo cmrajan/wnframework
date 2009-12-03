@@ -442,7 +442,7 @@ def sendmail(recipients, sender='automail@webnotestech.com', msg='', subject='[N
 	for a in attach:
 		email.attach(a)
 
-	email.set_message('<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')	
+	email.set_message(get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')
 	email.send()
 
 #-----------------
