@@ -2279,12 +2279,10 @@ def delete_session():
 	sql('delete from tabSessions where sid="%s"' % session['sid'])
 
 def load_session(sid):
-	try:
-		r = sql("select user, sessiondata from tabSessions where sid='%s'" % sid)
-		if r:
-			return {'data':eval(r[0][1]), 'user':r[0][0], 'sid':sid}
-	except:
-		return None
+	r = sql("select user, sessiondata from tabSessions where sid='%s'" % sid)
+	if r:
+		return {'data':eval(r[0][1]), 'user':r[0][0], 'sid':sid}
+	return None
 
 def update_session(session):
 	return sql("update tabSessions set sessiondata=%s, user=%s, lastupdate=NOW() where sid=%s" , (str(session['data']), session['user'], session['sid']))

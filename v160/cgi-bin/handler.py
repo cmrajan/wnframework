@@ -1598,16 +1598,6 @@ def load_session(form, sid):
 	if session:
 		server.is_testing = session.get('data', {}).get('__testing',0)
 
-	# validate account in case of login in multiple accounts
-	# ------------------------------------------------------
-	
-	# get command cmd
-	cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
-
-	if (not session):
-		session = None
-		return
-
 # Execution Starts Here
 # ---------------------------------------------------------------------
 
