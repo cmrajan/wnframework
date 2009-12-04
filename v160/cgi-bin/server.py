@@ -388,7 +388,6 @@ class EMail:
 		self.login = cp.mail_login and cp.mail_login or mail_login
 		self.port = cp.mail_port and cp.mail_port or None
 		self.password = cp.mail_password and cp.mail_password or mail_password
-		self.sender = cp.auto_mail_id or self.login	
 		self.use_ssl = cint(cp.use_ssl)
 	
 	def send(self):
@@ -411,7 +410,7 @@ class EMail:
 			raise Exception
 		
 		self.msg['Subject'] = self.subject
-		self.msg['From'] = self.reply_to or self.sender
+		self.msg['From'] = self.sender
 		self.msg['To'] = ', '.join([r.strip() for r in self.recipients])
 		self.msg['Reply-To'] = self.reply_to
 		if self.cc:
@@ -433,7 +432,9 @@ def validate_email_add(email_str):
 
 # parts = [['content-type', 'body']]
 
-def sendmail(recipients, sender='automail@webnotestech.com', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+	if not sender:
+		sender = get_value('Control Panel',None,'auto_mail_id')
 	email = EMail(sender, recipients, subject)
 	email.cc = cc
 	if msg: email.set_message(msg)
