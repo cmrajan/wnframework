@@ -395,6 +395,15 @@ Finder.prototype.set_criteria_sel = function(criteria_name) {
 // --------------------------------------------
 
 Finder.prototype.setup_filters = function() {
+
+	function can_dt_be_submitted(dt) {
+		var plist = getchildren('DocPerm', dt, 'permissions', 'DocType');
+		for(var pidx in plist) {
+			if(plist[pidx].submit) return 1;
+		}
+		return 0;
+	}
+
 	var me = this;
 	me.make_body();
 
@@ -411,16 +420,7 @@ Finder.prototype.setup_filters = function() {
 	];
 
 	// can this be submitted?
-	var can_submit = 0;
-	var p = get_perm(dt);
-	for(var i=0;i<p.length;i++) {
-		if(p[i] && p[i][SUBMIT]) {
-			can_submit = 1;
-			break;
-		}
-	}
-
-	if(can_submit) {
+	if(can_dt_be_submitted(dt)) {
 		fl[fl.length] = {'fieldtype':'Check', 'label':'Saved', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt};
 		fl[fl.length] = {'fieldtype':'Check', 'label':'Submitted', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt};
 		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'parent':dt};
