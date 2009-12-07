@@ -372,10 +372,10 @@ class EMail:
 	
 	def validate(self):
 		# validate ids
-		if not validate_email_add(self.sender):
+		if self.sender and (not validate_email_add(self.sender)):
 			raise Exception, "%s is not a valid email id" % self.sender
 
-		if not validate_email_add(self.reply_to):
+		if self.reply_to and (not validate_email_add(self.reply_to)):
 			raise Exception, "%s is not a valid email id" % reply_to
 
 		for e in self.recipients:
