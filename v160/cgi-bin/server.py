@@ -319,6 +319,7 @@ class EMail:
 			recipients.replace(';', ',')
 			recipients = recipients.split(',')
 			
+		self.sender = sender
 		self.reply_to = sender
 		self.recipients = recipients
 		self.subject = subject
