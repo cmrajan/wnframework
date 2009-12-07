@@ -435,7 +435,7 @@ def validate_email_add(email_str):
 
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
 	if not sender:
-		sender = get_value('Control Panel',None,'auto_mail_id')
+		sender = get_value('Control Panel',None,'auto_email_id')
 	email = EMail(sender, recipients, subject)
 	email.cc = cc
 	if msg: email.set_message(msg)
