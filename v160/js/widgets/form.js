@@ -3263,6 +3263,7 @@ var def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12p
 	+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
 	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; }"
 	+"\n.noborder td { vertical-align: top; }"
+	+"\n.layout_row_table { width: 100%; }"
 
 var print_formats = {}
 
