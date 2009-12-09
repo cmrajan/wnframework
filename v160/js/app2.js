@@ -5374,7 +5374,7 @@ SidebarMenu.prototype.show_listing = function(mid) {
       var fl = [];
       q.table = repl('`tab%(dt)s`', {dt:this.dt});
       
-      for(var i=0;i<this.cl.length;i++) fl.push(q.table+'.`'+this.cl[i][0]+'`')
+      for(var i=0;i<this.cl.length;i++) { if(this.cl[i][0]) fl.push(q.table+'.`'+this.cl[i][0]+'`'); }
       q.fields = fl.join(', ');
       q.conds = q.table + '.docstatus < 2 ';
       this.sort_order = in_list(this.coltypes, 'Date') ? 'DESC' : 'ASC';
