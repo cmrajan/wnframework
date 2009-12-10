@@ -10,7 +10,8 @@ database object --- conn
 .. class:: Database(self, host='', user='', password='', use_default = 0):
 
    Open a database connection with the given parmeters, if use_default is True, use the
-   login details from `defs.py`
+   login details from `defs.py`. This is called by the request handler and is accessible using
+   the `conn` global variable. the `sql` method is also global to run queries
 
    .. attribute:: host
    

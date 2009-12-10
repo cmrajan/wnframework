@@ -10,8 +10,8 @@ Authentication object
 .. class:: Authentication(self, form, in_cookies, out_cookies, out)
    
    A new Authenticate object is created at the beginning of any request. It will manage login, session and
-   cookie management. :method:update must be called at the end of the request so that the cookies and
-   session object will be updated.
+   cookies. :method: update must be called at the end of the request to update cookies and
+   session.
    
    To enable a login, the :object:form must have a cmd = "login" (see request handling for more details)
    
