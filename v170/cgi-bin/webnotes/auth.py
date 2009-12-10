@@ -58,7 +58,10 @@ class Authentication:
 
 		# set self.cookies
 		self.set_cookies()
-			
+		
+		# clear defs password - for security
+		defs.db_password = ''
+		
 	def set_env(self):
 		import os
 		self.domain = os.environ.get('HTTP_HOST')
