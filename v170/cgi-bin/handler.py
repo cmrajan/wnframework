@@ -19,7 +19,7 @@
 #    testing for svn  by nabin
 
 import cgi, Cookie, sys, time, os
-import server
+from webnotes import server
 
 form = cgi.FieldStorage()
 cookies = Cookie.SimpleCookie()
@@ -198,7 +198,7 @@ def initdata(form, session):
 		out['user_email'] = session['user']
 		out['recent_documents'] = ''
 	
-	out['account'] = server.encrypt(server.db_name)
+	out['account'] = ''
 	out['account_id'] = cp.account_id or ''
 	out['sysdefaults'] = server.get_defaults()
 	out['n_online'] = server.cint(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0])
@@ -1519,126 +1519,22 @@ def login_app(form,session):
 	else:
 		msgprint("Application not defined correctly")
 
-# login: authenticate user and start a session
-# --------------------------------------------
-
-def login_user(usr, pwd, form, guest_login = 0):
-	global out, session, cookes, defaults
-	
-	remote_ip = os.environ.get('REMOTE_ADDR')	
-	userid = server.authenticate(usr, pwd, remote_ip)
-	if userid:
-		sql("start transaction")
-		try:
-			server.log("Login", '')
-	
-			try: # update last login
-				sql("UPDATE tabProfile SET last_login = '%s' where name='%s'" % (server.now(), userid[0][0]))
-				sql("UPDATE tabProfile SET last_ip = '%s' where name='%s'" % (os.environ.get('REMOTE_ADDR'), userid[0][0]))
-			except: pass
-
-			# create session
-			session = {}
-			session['user'] = userid[0][0]
-			session['sid'] = server.generate_hash()
-			cookies['sid150'] = session['sid']
-			cookies[server.encrypt(server.db_name)] = session['sid'] # dual keys
-			session['data'] = {}
-			if remote_ip == server.gateway_ip:
-				session['data']['from_gateway'] = 1
-			
-			defaults = {}
-			
-			server.start_session(session)
-			server.session = session
-			return 1
-			sql("commit")
-		except Exception, e:
-			sql("rollback")
-			raise e
-	else:
-		return 0
-
-def set_db_name(acc_id):
-	global cookies
-	import os
-	
-	domain, res = os.environ.get('HTTP_HOST'), None
-	
-	try:
-		res = server.sql_accounts("select tabAccount.db_name, tabAccount.db_login from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
-	except:
-		pass
-		
-	if not res:
-		try:
-			res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
-		except:
-			pass
-		
-	if res:
-		server.db_name = res[0][0]
-		if res[0][1]:
-			server.db_login = res[0][1]
-		else:
-			server.db_login = res[0][0]
-		cookies['dbx'] = res[0][0]
-
-# load session
-# ------------
-
-def load_session(form, sid):
-	global session
-	session = server.load_session(sid)
-	server.session = session
-
-	# set is_testing
-	# --------------
-
-	if session:
-		server.is_testing = session.get('data', {}).get('__testing',0)
-
 # Execution Starts Here
 # ---------------------------------------------------------------------
 
+import webnotes.auth
+import webnotes.db
+
 if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
+	server.conn = webnotes.db.Database(use_default = 1)
 	sql("start transaction")
 	reset_password(form, session)
 	sql("commit")
-
-elif form.has_key('cmd') and (form.getvalue('cmd')=='login'):
-	# check if account given, login from the account else from defs.py
 	
-	account_id = form.has_key('acx') and form.getvalue('acx') or ''
-	set_db_name(account_id) # get db_name
-	
-	cookies['single_account'] = account_id and 'No' or 'Yes'
-	
-	out['__account'] = str(server.encrypt(server.db_name))
-
-	# check login, pwd
-	if login_user(form.getvalue('usr'), form.getvalue('pwd'), form): 
-		out['message'] = 'Logged In'
-		out['sid150'] = str(session['sid'])
-		
-		# remember me - add max-age to cookies
-		if server.cint(form.getvalue('remember_me')):
-			import datetime
-			cookies['remember_me'] = 1
-			expires = datetime.datetime.now() + datetime.timedelta(days=3)
-			for k in cookies.keys():
-				cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')
-		
-	# try logging in as guest
-	elif login_user('Guest', form.getvalue('pwd'), form, 1): 
-		out['message'] = 'Logged In'
-		out['sid150'] = str(session['sid'])
-	else: 
-		out['message'] = 'Wrong Login / Password or Not Enabled'
-
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# register
 	# ----------------------------------
+	server.conn = webnotes.db.Database(use_default = 1)
 	sql("START TRANSACTION")
 	try:
 		out['message'] = server.get_obj('Profile Control').prelogin(form) or ''
@@ -1646,76 +1542,32 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	except:
 		errprint(server.getTraceback())
 		sql("ROLLBACK")
+
 else:
-	sid = None
+	auth_obj = webnotes.auth.Authentication(form, incookies, cookies, out)
+	server.conn = auth_obj.conn
+	server.session = auth_obj.session
+	session = auth_obj.session
 
-	# from cookies
-	# ------------
-	
-	if incookies.has_key('sid150') and incookies['sid150']:
-		sid = incookies['sid150']
-
-		if incookies.has_key('dbx') and incookies['dbx']:
-			server.db_name = incookies['dbx']
-			server.db_login = incookies['dbx']
-			
-	# sid & app id is given
-	# ---------------------
-
-	if form.getvalue('sid150') and form.getvalue('__account'):
-		sid = form.getvalue('sid150')
-		if incookies.get('single_account') != 'Yes':
-			dbx = str(server.decrypt(form.getvalue('__account')))
-			server.db_name = dbx
-			server.db_login = dbx
-		
-
-	# load session
-	if sid:
-		load_session(form, sid)
-
-	# check for guest login, if no session
-	# ------------------------------------
-
-	if not session:
-		set_db_name(None)
-		if sql("select name from tabProfile where name='Guest' and (enabled=1 and enabled IS NOT NULL)"):
-			# if from a domain, set the db		
-			if login_user('Guest', 'password', form):
-				sid = session['sid']
-			else:
-				errprint('[Authentication Error] Guest Account does not have correct login')
-		else:
-			if not sid:
-				errprint('[Authentication Error] Login is Required')
-			else:
-				errprint('[Authentication Error] Session Expired')
-			cookies['remember_me'] = ''
-			out['__redirect_login'] = 1
-	
-	# all clear - run the show
-	# ------------------------
-	
-	if sid and session:
-		session['sid'] = sid
-		
+	if server.conn:
 		# get command cmd
 		cmd = form.has_key('cmd') and form.getvalue('cmd') or None
 		read_only = form.has_key('_read_only') and form.getvalue('_read_only') or None
 
 		# do something
-		if cmd:
+		if cmd and locals().has_key(cmd):
 			f = locals()[cmd]
-			if (not read_only) and (not server.in_transaction): sql("START TRANSACTION")
+			if (not server.conn.in_transaction): 
+				sql("START TRANSACTION")
 			try:
-				f(form, session) # execute the command
-
-				# update session
-				if not read_only: server.update_session(session)
-				if not read_only: sql("COMMIT")
+				f(form, server.session) # execute the command
+				sql("COMMIT")
 			except:
 				errprint(server.getTraceback())
-				if not read_only: sql("ROLLBACK")
+				sql("ROLLBACK")
+
+		# update session
+		auth_obj.update()
 
 #### cleanup
 #-----------

@@ -18,7 +18,10 @@
 #	<http://webnotestech.com>
 
 
-import MySQLdb, time, defs, Cookie
+import time, defs, Cookie
+
+import webnotes.db
+
 ## Globals
 
 session = {'user':'Administrator'}
@@ -36,13 +39,6 @@ gateway_ip = hasattr(defs, 'gateway_ip') and defs.gateway_ip or '72.55.168.105'
 
 encryption_key = hasattr(defs,'encryption_key') and defs.encryption_key or '1234567890123456' # 16 digit
 
-# Default database
-# ----------------
-
-db_name = defs.db_name or 'test'
-db_login = defs.db_login or 'root'
-db_password = defs.db_password or 'test'
-db_host = 'localhost'
 
 # Default timezone
 # ----------------
@@ -63,7 +59,6 @@ is_testing = 0
 testing_tables = []
 
 in_transaction = 0
-sql_cursor = None
 
 NEWLINE = '\n'
 NULL_CHAR = '^\5*'
@@ -75,129 +70,22 @@ BACKSLASH = '\\'
 
 conn = None
 
-def getcursor():
+def sql(query, values=(), allow_testing=1, as_dict = 0, as_list=0):
 	global conn
 	if not conn:
-		make_conn()
-	return conn.cursor()
-
-def make_conn(my_db_name=None, my_db_login=None, my_db_pwd=None):
-	global conn
-	conn = None
-	if not my_db_name: 
-		my_db_name = db_name
-	if not my_db_login: 
-		my_db_login = db_login
-	if not my_db_pwd: 
-		my_db_pwd = db_password
-
-	conn = MySQLdb.connect(user=my_db_login, host=db_host, passwd=my_db_pwd)
-	conn.select_db(my_db_name)
-	
-def use_account(ac_name = None, my_db_name = None):
-	my_db_login = None
-	conn.close()
-	if ac_name:
-		res = sql_accounts('select db_name, db_login from tabAccount where ac_name = "%s"' % ac_name)
-		if res: 
-			my_db_name = res[0][0]
-			my_db_login = res[0][1]
-	if not my_db_login:
-		my_db_login = my_db_name
-	
-	make_conn(my_db_name, my_db_login)
-
-def get_testing_tables():
-	global testing_tables
-	if not testing_tables:
-		testing_tables = ['tab'+r[0] for r in sql('SELECT name from tabDocType where docstatus<2 and (issingle=0 or issingle is null)', allow_testing = 0)]
-		testing_tables+=['tabSeries','tabSingles'] # tabSessions is not included here
-	return testing_tables
-
-def scrub_query_for_testing(query):
-	if is_testing:
-		tl = get_testing_tables()
-		for t in tl:
-			query = query.replace(t, 'test' + t[3:])
-	return query
-
-def sql(query, values=(), allow_testing=1, as_dict = 0):
-	global sql_cursor, in_transaction
-	if is_testing and allow_testing:
-		query = scrub_query_for_testing(query)
-	sql_cursor = getcursor()
-
-	# in transaction validations
-	if in_transaction and query and query.strip().lower()=='start transaction':
-		msgprint("[Implicit Commit Error] START TRANSACTION in transaction without commit or rollback")
-		raise Exception, 'Implicit Commit Error'
-
-	if query and query.strip().lower()=='start transaction':
-		in_transaction = 1
-
-	if query and query.strip().lower() in ['commit', 'rollback']:
-		in_transaction = 0
-
-	# execute
-	if values != ():
-		sql_cursor.execute(query, values)
-	else:
-		sql_cursor.execute(query)
-
-	if is_testing:
-		errprint(query)
-	if as_dict:
-		result = sql_cursor.fetchall()
-		ret = []
-		for r in result:
-			dict = {}
-			for i in range(len(r)):
-				dict[sql_cursor.description[i][0]] = r[i]
-			ret.append(dict)
-		return ret
-	else:
-		return sql_cursor.fetchall()
+		conn = webnotes.db.Database()
+		
+	return conn.sql(query, values, as_dict, as_list, allow_testing)
 
 # Run a query on the accounts server
-def sql_accounts(query):
-	conn_a = MySQLdb.connect(user=defs.db_login, host=db_host, passwd=db_password)
-	conn_a.select_db(defs.db_name)
-
-	cur = conn_a.cursor()
-	cur.execute(query)
-
-	return cur.fetchall()
+def sql_accounts(query, values = ()):
+	conn_a = webnotes.db.Database(use_default = 1)
+	return conn_a.sql(query, values)
 
 # Convert sql response to list
 def convert_to_lists(res):
-	try: import decimal # for decimal Python 2.5 (?)
-	except: pass
-	nres = []
-	for r in res:
-		nr = []
-		for c in r:
-			try:
-				if type(c)==decimal.Decimal: c=float(c)
-			except: pass
-
-			if c == None: c=''
-			elif hasattr(c, 'seconds'): c = ':'.join(str(c).split(':')[:2])
-			elif hasattr(c, 'strftime'): 
-				try:
-					c = c.strftime('%Y-%m-%d')
-				except ValueError, e:
-					c = 'ERR'
-			elif type(c) == long: c = int(c)
-			nr.append(c)
-		nres.append(nr)
-	return nres
-	
-def fetchoneDict(cursor):
-	row = cursor.fetchone()
-	if row is None:
-		return None
-	cols = [ d[0] for d in cursor.description ]
-	return dict(zip(cols, row))
+	global conn
+	return conn.convert_to_lists(res)
 	
 def set_timezone():
 	import os
@@ -306,134 +194,16 @@ class FrameworkServer:
 		})
 		return eval(res.read())
 
-# ----------
-# EMAIL 
-# ----------
+# Email
+# ------------
 
-# EMail Object
-
-class EMail:
-	def __init__(self, sender='', recipients=[], subject=''):
-		from email.mime.multipart import MIMEMultipart
-		if type(recipients)==str:
-			recipients.replace(';', ',')
-			recipients = recipients.split(',')
-			
-		self.sender = sender
-		self.reply_to = sender
-		self.recipients = recipients
-		self.subject = subject
-		self.msg = MIMEMultipart()
-		self.cc = []
-		
-	def set_message(self, message, mime_type='text/html'):
-		from email.mime.text import MIMEText
-		
-		maintype, subtype = mime_type.split('/')
-		msg = MIMEText(message, _subtype = subtype)
-		self.msg.attach(msg)
-		
-	def attach(self, n):
-		res = get_file(n)
-
-		from email.mime.audio import MIMEAudio
-		from email.mime.base import MIMEBase
-		from email.mime.image import MIMEImage
-		from email.mime.text import MIMEText
-			
-		fname = res[0][0]
-		fcontent = res[0][1]
-		fmodified = res[0][2]
-		
-		import mimetypes
-
-		ctype, encoding = mimetypes.guess_type(fname)
-		if ctype is None or encoding is not None:
-			# No guess could be made, or the file is encoded (compressed), so
-			# use a generic bag-of-bits type.
-			ctype = 'application/octet-stream'
-		
-		maintype, subtype = ctype.split('/', 1)
-		if maintype == 'text':
-			# Note: we should handle calculating the charset
-			msg = MIMEText(fcontent, _subtype=subtype)
-		elif maintype == 'image':
-			msg = MIMEImage(fcontent, _subtype=subtype)
-		elif maintype == 'audio':
-			msg = MIMEAudio(fcontent, _subtype=subtype)
-		else:
-			msg = MIMEBase(maintype, subtype)
-			msg.set_payload(fcontent)
-			# Encode the payload using Base64
-			encoders.encode_base64(msg)
-		# Set the filename parameter
-		msg.add_header('Content-Disposition', 'attachment', filename=fname)
-		self.msg.attach(msg)
-	
-	def validate(self):
-		# validate ids
-		if self.sender and (not validate_email_add(self.sender)):
-			raise Exception, "%s is not a valid email id" % self.sender
-
-		if self.reply_to and (not validate_email_add(self.reply_to)):
-			raise Exception, "%s is not a valid email id" % reply_to
-
-		for e in self.recipients:
-			if not validate_email_add(e):
-				raise Exception, "%s is not a valid email id" % e	
-	
-	def setup(self):
-		# get defaults from control panel
-		cp = Document('Control Panel','Control Panel')
-		self.server = cp.outgoing_mail_server and cp.outgoing_mail_server or mail_server
-		self.login = cp.mail_login and cp.mail_login or mail_login
-		self.port = cp.mail_port and cp.mail_port or None
-		self.password = cp.mail_password and cp.mail_password or mail_password
-		self.use_ssl = cint(cp.use_ssl)
-	
-	def send(self):
-		self.setup()
-		self.validate()
-		
-		import smtplib
-		sess = smtplib.SMTP(self.server, cint(self.port))
-		
-		if self.use_ssl: 
-			sess.ehlo()
-			sess.starttls()
-			sess.ehlo()
-			
-		ret = sess.login(self.login, self.password)
-
-		# check if logged correctly
-		if ret[0]!=235:
-			msgprint(ret[1])
-			raise Exception
-		
-		self.msg['Subject'] = self.subject
-		self.msg['From'] = self.sender
-		self.msg['To'] = ', '.join([r.strip() for r in self.recipients])
-		self.msg['Reply-To'] = self.reply_to
-		if self.cc:
-			self.msg['CC'] = ', '.join([r.strip() for r in self.cc])
-		
-		sess.sendmail(self.sender, self.recipients, self.msg.as_string())
-		
-		try:
-			sess.quit()
-		except:
-			pass
-		
-# validate
 def validate_email_add(email_str):
 	if email_str: email_str = email_str.strip()
 	import re
 	return re.match("^[a-zA-Z0-9._%-]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email_str)
-
-
-# parts = [['content-type', 'body']]
-
+	
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+	from email_lib import Email
 	if not sender:
 		sender = get_value('Control Panel',None,'auto_email_id')
 	email = EMail(sender, recipients, subject)
@@ -654,8 +424,8 @@ def getdoctype(name):
 # ------------
 
 def getchildren(name, childtype, field='', parenttype=''):
-	global sql_cursor
-
+	global conn
+	
 	tmp = ''
 	if field: 
 		tmp = ' and parentfield="%s" ' % field
@@ -668,7 +438,7 @@ def getchildren(name, childtype, field='', parenttype=''):
 	for i in range(len(dataset)):
 		d = Document()
 		d.doctype = childtype
-		d.loadfields(dataset, i, sql_cursor.description)
+		d.loadfields(dataset, i, conn.cursor.description)
 		l.append(d)
 	return l
 
@@ -945,7 +715,7 @@ class Document:
 	# -------------
 
 	def loadfromdb(self, doctype = None, name = None):
-		global sql_cursor
+		global conn
 		
 		if name: self.name = name
 		if doctype: self.doctype = doctype
@@ -960,7 +730,7 @@ class Document:
 			if not dataset:
 				msgprint('%s %s does not exist' % (self.doctype, self.name))
 				raise Exception
-			self.loadfields(dataset, 0, sql_cursor.description)
+			self.loadfields(dataset, 0, conn.cursor.description)
 
 	# Load Fields from dataset
 	# ------------------------
@@ -2226,69 +1996,6 @@ def db_make_series(name, doctype):
 	ttl = get_testing_tables()
 	return sql("insert into tabSeries (name, current) values ('%s', 1)" % name, allow_testing = (doctype in ttl) and 0 or 1)
 	
-# Session
-# --------
-
-def authenticate(user, pwd, remote_ip):
-	if not (user and pwd):
-		return None
-	if user=='Administrator':
-		ret = sql("select name from tabProfile where name=%s and (`password`=%s OR `password`=PASSWORD(%s))", (user, pwd, pwd))
-	else:
-		ret = sql("select name from tabProfile where name=%s and (password=%s  OR `password`=PASSWORD(%s)) and IFNULL(enabled,0)=1", (user, pwd, pwd))
-
-	# login from gateway
-	if not ret and remote_ip==gateway_ip:
-		ret = sql("select name from tabProfile where name=%s and `password`=PASSWORD(%s)", ('Guest', pwd))
-		if ret: ret = ((user,),) # but allowed to keep name
-		
-		# if disabled, then don't allow
-		prof = sql("select ifnull(enabled,0) from tabProfile where name=%s", user)
-		if prof and not prof[0][0]:
-			ret = None
-			raise Exception, 'User Disabled'
-
-	try:
-		ip = sql("select ip_address from tabProfile where name = '%s'" % user)
-		ip = ip and ip[0][0] or ''
-		ip = ip.replace(",", "\n").split('\n')
-		ip = [i.strip() for i in ip]
-		
-		if ret and ip:
-			if remote_ip.startswith(ip[0]) or remote_ip in ip:
-				return ret
-			else:
-				msgprint('Not allowed from this IP Address')
-				return None
-	except Exception, e:
-		if ret:
-			return ret
-		else:
-			return None
-
-def start_session(session):
-	# in control panel?
-	exp_sec = get_value('Control Panel', None, 'session_expiry') or '24:00'
-	
-	# clear out old sessions
-	sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > %s OR TIMEDIFF(NOW(), lastupdate) > '72:00'", exp_sec)
-	
-	# clear other open sessions of the current user
-	data = str(session['data']).replace("'", "\\'")
-	return sql("insert into tabSessions (sessiondata, user, lastupdate, sid) values ('%s' , '%s', NOW(), '%s')" % (data, session['user'], session['sid']))
-
-def delete_session():
-	sql('delete from tabSessions where sid="%s"' % session['sid'])
-
-def load_session(sid):
-	r = sql("select user, sessiondata from tabSessions where sid='%s'" % sid)
-	if r:
-		return {'data':eval(r[0][1]), 'user':r[0][0], 'sid':sid}
-	return None
-
-def update_session(session):
-	return sql("update tabSessions set sessiondata=%s, user=%s, lastupdate=NOW() where sid=%s" , (str(session['data']), session['user'], session['sid']))
-
 # Model
 # ------------
 
@@ -2300,18 +2007,11 @@ def db_exists(dt, dn):
 
 def db_gettablefields(doctype):
 	return sql("select options, fieldname from tabDocField where parent='%s' and fieldtype='Table'" % doctype)
-	
+
 def get_value(doctype, docname, fieldname):
-	if docname:
-		try:
-			r = sql("select `%s` from `tab%s` where name='%s'" % (fieldname, doctype, docname))
-			return r and r[0][0] or ''
-		except:
-			return None
-	else:
-		r = sql("select value from tabSingles where field=%s and doctype=%s", (fieldname, doctype))
-		return r and r[0][0] or None
-		
+	global conn
+	return conn.get_value(doctype, docname, fieldname)
+
 def db_getchildtype(doctype, fieldname):
 	r = sql("select options from tabDocField where parent='%s' and fieldtype='Table' and fieldname = '%s'" % (doctype, fieldname))
 	return r and r[0][0] or ''

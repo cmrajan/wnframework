@@ -140,10 +140,15 @@ try:
 			+ traceback.format_exception_only(type, value)
 		body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
 		return body
-		
-	import server
+
+	from webnotes import server
+	import webnotes.auth
+	
 	incookies = server.get_cookies()
 	form = cgi.FieldStorage()
+
+	auth_obj = webnotes.auth.Authentication(form, incookies, {}, {})
+	server.conn = auth_obj.conn
 	
 	page = form.getvalue('page', '')
 	if not page: # load from control panel

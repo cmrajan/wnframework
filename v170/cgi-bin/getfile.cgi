@@ -36,7 +36,9 @@ try:
 		body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
 		return body
 
-	import cgi, server
+	import cgi
+	from webnotes import server
+	
 	form = cgi.FieldStorage()
 	n = form.getvalue('name')
 

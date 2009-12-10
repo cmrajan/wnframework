@@ -21,7 +21,7 @@
 function onLoginReply(r, rtext) {
  if(r.message=="Logged In"){
 	$i('messages').innerHTML = '<span style="color: #3C6; font-weight: bold">Login Successful</span>';
-    window.location.href='index.cgi?__account='+r.__account+'&sid150='+r.sid150;
+    window.location.href='index.cgi';
  } else {
 	$i('messages').innerHTML = '<span style="color: #C44; font-weight: bold">'+r.message+'</span>';
 	if(r.exc)alert(r.exc);
