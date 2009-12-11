@@ -336,11 +336,14 @@ class EMail:
 	def attach(self, n):
 		res = get_file(n)
 
+		if not res: 
+			return
+
 		from email.mime.audio import MIMEAudio
 		from email.mime.base import MIMEBase
 		from email.mime.image import MIMEImage
 		from email.mime.text import MIMEText
-			
+		
 		fname = res[0][0]
 		fcontent = res[0][1]
 		fmodified = res[0][2]
