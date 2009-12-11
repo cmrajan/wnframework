@@ -1088,6 +1088,7 @@ def sendmail(form, session):
 	sendfrom = form.getvalue('sendfrom')
 	
 	# get attachments
+	al = []
 	if server.cint(form.getvalue('with_attachments')):
 		al = sql('select file_list from `tab%s` where name="%s"' % (form.getvalue('dt'), form.getvalue('dn')))
 		if al:
