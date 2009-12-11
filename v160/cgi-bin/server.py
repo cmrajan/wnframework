@@ -362,6 +362,7 @@ class EMail:
 		elif maintype == 'audio':
 			msg = MIMEAudio(fcontent, _subtype=subtype)
 		else:
+			from email import encoders
 			msg = MIMEBase(maintype, subtype)
 			msg.set_payload(fcontent)
 			# Encode the payload using Base64

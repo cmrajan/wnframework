@@ -1086,10 +1086,28 @@ def sendmail(form, session):
 	recipients = form.getvalue('sendto')
 	subject = form.getvalue('subject')
 	sendfrom = form.getvalue('sendfrom')
+	
+	# get attachments
+	if server.cint(form.getvalue('with_attachments')):
+		al = sql('select file_list from `tab%s` where name="%s"' % (form.getvalue('dt'), form.getvalue('dn')))
+		if al:
+			al = al[0][0].split('\n')
 	if recipients:
 		recipients = recipients.replace(';', ',')
 		recipients = recipients.split(',')
-		server.sendmail(recipients, sendfrom, '', subject, [['text/plain', form.getvalue('message') or ''], ['text/html', form.getvalue('body')]], cc=[form.getvalue('cc'),])
+
+		if not sendfrom:
+			sendfrom = get_value('Control Panel',None,'auto_email_id')
+		email = server.EMail(sendfrom, recipients, subject)
+		email.cc = [form.getvalue('cc'),]
+
+		email.set_message(form.getvalue('message') or 'No text')
+		email.set_message(form.getvalue('body'))
+		
+		for a in al:
+			email.attach(a.split(',')[0])
+
+		email.send()
 	msgprint('Sent')
 
 def get_contact_list(form, session):
