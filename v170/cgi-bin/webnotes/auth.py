@@ -29,16 +29,18 @@
 #
 #-----------------------------------------------------
 
+import webnotes
 import webnotes.db
 import webnotes.utils
+import webnotes.profile
 
 import defs
 
 class Authentication:
-	def __init__(self, form, in_cookies, out_cookies, out):
+	def __init__(self, form, out_cookies, out):
 
 		self.form = form
-		self.cookies = in_cookies
+		self.cookies = self.set_in_cookies()
 		self.account = None
 		self.account_id = None
 		self.session = None
@@ -46,10 +48,13 @@ class Authentication:
 		self.out = out
 		
 		self.set_env()
-
 		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
 				
 		if (form.getvalue('cmd')=='login') or (not self.load_session(self.cookies.get('sid') or self.form.getvalue('sid'))):
+
+			if form.getvalue('acx'):
+				self.set_db(form.getvalue('acx'))
+				
 			self.login() or self.login(as_guest = True)
 		
 		if not self.session: 
@@ -59,6 +64,10 @@ class Authentication:
 		# set self.cookies
 		self.set_cookies()
 		
+		webnotes.conn = self.conn
+		webnotes.session = self.session
+		webnotes.user = webnotes.profile.Profile()
+		
 		# clear defs password - for security
 		defs.db_password = ''
 		
@@ -67,7 +76,7 @@ class Authentication:
 		self.domain = os.environ.get('HTTP_HOST')
 		self.remote_ip = os.environ.get('REMOTE_ADDR')
 	
-	def set_db(self):
+	def set_db(self, acc_id = None):
 		res = None
 		
 		# database (account_id) is given
@@ -76,12 +85,13 @@ class Authentication:
 			return webnotes.db.connect(self.account_id)
 			
 		# account id is given
-		acc_id = self.cookies.get('__account') or self.form.getvalue('__account')
+		if not acc_id:
+			acc_id = self.cookies.get('__account') or self.form.getvalue('__account')
 		
-		conn = webnotes.db.Database(use_default=1)
+		c = webnotes.db.Database(use_default=1)
 		if acc_id:
 			try:
-				res = conn.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
+				res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
 			except: pass
 			if res:
 				self.account = acc_id
@@ -89,7 +99,7 @@ class Authentication:
 		# select database from domain mapping table "Account Domain"
 		else:
 			try:
-				res = conn.sql("select tabAccount.db_name, tabAccount.db_login, tabAccount.ac_name from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
+				res = c.sql("select tabAccount.db_name, tabAccount.db_login, tabAccount.ac_name from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
 			except: pass
 			if res:
 				self.account = res[0][2]
@@ -107,7 +117,12 @@ class Authentication:
 				raise Exception, "Your IP address has changed mid-session. For security reasons, please login again"
 			
 	def load_session(self, sid):
-		if not sid: return False
+		if not sid: 
+			return False
+
+		if not self.conn:
+			self.conn = self.set_db()
+
 		r = self.conn.sql("select user, sessiondata from tabSessions where sid='%s'" % sid)
 		if r:
 			self.session = {'data':eval(r[0][1]), 'user':r[0][0], 'sid':sid}
@@ -194,3 +209,15 @@ class Authentication:
 			for k in out_cookies.keys():
 				self.cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')	
 	
+	def set_in_cookies(self):
+		import os
+		cookies = {}
+		if 'HTTP_COOKIE' in os.environ:
+			c = os.environ['HTTP_COOKIE']
+			c = c.split('; ')
+			  
+			for cookie in c:
+				cookie = cookie.split('=')
+				cookies[cookie[0].strip()] = cookie[1].strip()
+				
+		return cookies

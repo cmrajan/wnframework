@@ -4,7 +4,8 @@
 # Allows easy adding of Attachments of "File" objects
 # -------------------
 
-from model import *
+import webnotes.model
+from webnotes.handler import msgprint
 
 class EMail:
 	def __init__(self, sender='', recipients=[], subject=''):
@@ -28,8 +29,11 @@ class EMail:
 		self.msg.attach(msg)
 		
 	def attach(self, n):
-		res = get_file(n)
+		res = webnotes.model.get_file(n)
 
+		if not res:
+			self.msg.attach('Sender tried to attach an unknown file id: ' + n)
+	
 		from email.mime.audio import MIMEAudio
 		from email.mime.base import MIMEBase
 		from email.mime.image import MIMEImage
@@ -78,7 +82,7 @@ class EMail:
 	
 	def setup(self):
 		# get defaults from control panel
-		cp = Document('Control Panel','Control Panel')
+		cp = webnotes.model.Document('Control Panel','Control Panel')
 		self.server = cp.outgoing_mail_server and cp.outgoing_mail_server or mail_server
 		self.login = cp.mail_login and cp.mail_login or mail_login
 		self.port = cp.mail_port and cp.mail_port or None
@@ -118,3 +122,22 @@ class EMail:
 		except:
 			pass
 
+def validate_email_add(email_str):
+	if email_str: email_str = email_str.strip()
+	import re
+	return re.match("^[a-zA-Z0-9._%-]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email_str)
+	
+def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+	from email_lib import Email
+	if not sender:
+		sender = get_value('Control Panel',None,'auto_email_id')
+	email = EMail(sender, recipients, subject)
+	email.cc = cc
+	if msg: email.set_message(msg)
+	for p in parts:
+		email.set_message(p[1])
+	for a in attach:
+		email.attach(a)
+
+	email.set_message(get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')
+	email.send()

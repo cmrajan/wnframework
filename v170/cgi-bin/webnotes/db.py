@@ -1,7 +1,8 @@
 # Database Module
 # --------------------
 
-import MySQLdb, defs
+import MySQLdb
+from webnotes import defs
 
 class Database:
 	def __init__(self, host='', user='', password='', use_default = 0):
@@ -123,6 +124,10 @@ class Database:
 		else:
 			r = self.sql("select value from tabSingles where field=%s and doctype=%s", (fieldname, doctype))
 			return r and r[0][0] or None
-			
+
+	def set(doc, field, val):
+		self.sql("update `tab"+doc.doctype+"` set `"+field+"`=%s where name=%s", (val, doc.name))
+		doc.fields[field] = val
+				
 	def close(self):
 		self.conn.close()

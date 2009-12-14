@@ -23,6 +23,10 @@ Authentication object
    
       session dictionary of the current session
 
+   .. attribute:: cookies
+   
+      session dictionary of incoming cookies
+
    .. attribute:: domain
    
       domain name of the request
@@ -92,4 +96,7 @@ Authentication object
    
       Checks if there is a 'remember_me' property in `form` with a value and if true, its sets the
       expiry of each cookie for `remember_for_days` in `Control Panel` or 7 days
-	
+
+   .. method:: get_cookies()
+   
+      Loads incoming cookies in `cookies`

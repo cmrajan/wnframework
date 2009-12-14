@@ -141,18 +141,23 @@ try:
 		body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
 		return body
 
-	from webnotes import server
+	import webnotes.server
 	import webnotes.auth
+	import webnotes.profile
 	
-	incookies = server.get_cookies()
 	form = cgi.FieldStorage()
 
-	auth_obj = webnotes.auth.Authentication(form, incookies, {}, {})
-	server.conn = auth_obj.conn
+	auth_obj = webnotes.auth.Authentication(form, {}, {})
+
+	# global connection
+	import webnotes
+
+	webnotes.conn = auth_obj.conn
+	webnotes.session = auth_obj.session
 	
 	page = form.getvalue('page', '')
 	if not page: # load from control panel
-		page = server.get_home_page()
+		page =  webnotes.profile.get_home_page()
 	
 	# Create Search Engine Friendly Pages
 	# -----------------------------------
@@ -163,11 +168,11 @@ try:
 		# load the content
 		# ----------------
 		try:
-			content = server.sql("select content, static_content from tabPage where name=%s", page)
+			content = webnotes.conn.sql("select content, static_content from tabPage where name=%s", page)
 			if content:
 				content = content[0][1] or content[0][0]
 		except:
-			content = server.sql("select content from tabPage where name=%s", page)
+			content = webnotes.conn.sql("select content from tabPage where name=%s", page)
 			if content:
 				content = content[0][0]
 				
@@ -185,7 +190,7 @@ try:
 		
 		if page:
 			# load child links to the current page	
-			parent_node = server.sql("select name from `tabMenu Item` where link_id=%s and menu_item_type='Page'", page)
+			parent_node = webnotes.conn.sql("select name from `tabMenu Item` where link_id=%s and menu_item_type='Page'", page)
 			ml += mc.get_children('', 'Page', ['Guest'])
 		
 		links_html = '<br>'.join(['<a href="index.cgi?page=%s&page_content=%s">%s</a>' % (m['link_id'], m['link_content'], m['link_id']) for m in ml])

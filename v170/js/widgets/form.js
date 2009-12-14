@@ -72,7 +72,7 @@ function execute_print() {
 
 var email_dialog;
 
-function sendmail(emailto, emailfrom, cc, subject, message, fmt) {
+function sendmail(emailto, emailfrom, cc, subject, message, fmt, with_attachments) {
 	var fn = function(html) {
 		$c('sendmail', {
 			'sendto':emailto, 
@@ -80,7 +80,10 @@ function sendmail(emailto, emailfrom, cc, subject, message, fmt) {
 			'cc':cc?cc:'',
 			'subject':subject,
 			'message':message,
-			'body':html
+			'body':html,
+			'with_attachments':with_attachments ? 1 : 0,
+			'dt':cur_frm.doctype,
+			'dn':cur_frm.docname
 			}, 
 			function(r, rtxt) { 
 				//
@@ -141,7 +144,7 @@ function makeemail() {
 			emailfrom = locals['Control Panel']['Control Panel'].auto_email_id; 
 			cc = ''; 
 		}
-		sendmail(emailto, emailfrom, emailfrom, d.widgets['Subject'].value, d.widgets['Message'].value, sel_val(cur_frm.print_sel));
+		sendmail(emailto, emailfrom, emailfrom, d.widgets['Subject'].value, d.widgets['Message'].value, sel_val(cur_frm.print_sel), d.widgets['Send With Attachments'].checked);
 		email_dialog.hide();
 	}
 
@@ -154,6 +157,7 @@ function makeemail() {
 		,['Data','Format']
 		,['Data','Subject']
 		,['Data','From','Optional']
+		,['Check','Send With Attachments','Will send all attached documents (if any)']
 		,['Text','Message']
 		,['Button','Send',email_go]]
 	);
@@ -199,6 +203,8 @@ function makeemail() {
 
 	email_dialog = d;
 }
+
+
 
 function is_doc_loaded(dt, dn) {
 	var exists = false;
