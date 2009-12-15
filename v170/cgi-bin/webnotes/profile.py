@@ -9,7 +9,7 @@ class Profile:
 		self.can_read = []
 		self.can_write = []
 		
-	def load_roles(self):
+	def _load_roles(self):
 		res = webnotes.conn.sql('select role from tabUserRole where parent = "%s"' % self.name)
 		self.roles = []
 		for t in res:
@@ -25,7 +25,7 @@ class Profile:
 		if self.roles:
 			return self.roles
 		
-		return self.load_roles()
+		return self._load_roles()
 	
 	def get_allow_list(self, key):
 		role_options = ["role = '"+r+"'" for r in self.get_roles()]
@@ -54,8 +54,6 @@ class Profile:
 		except:
 			pass
 		return webnotes.conn.get_value('Control Panel',None,'home_page')
-
-		roles.append(session['user'])
 
 	def get_defaults(self):
 		
@@ -110,6 +108,7 @@ class Profile:
 		t = webnotes.conn.sql('select email, first_name, last_name, recent_documents from tabProfile where name = %s', self.name)[0]
 
 		d = {}
+		d['name'] = self.name
 		d['email'] = t[0]
 		d['first_name'] = t[1]
 		d['last_name'] = t[2]

@@ -374,4 +374,4 @@ def getseries(key, digits, doctype=''):
 def get(dt, dn=''):
 	import webnotes.model.doclist
 	dn = dn or dt
-	return webnotes.model.doclist.make_doclist(dt, dn)
+	return webnotes.model.doclist.make(dt, dn)

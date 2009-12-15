@@ -141,7 +141,6 @@ try:
 		body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
 		return body
 
-	import webnotes.server
 	import webnotes.auth
 	import webnotes.profile
 	
@@ -151,13 +150,10 @@ try:
 
 	# global connection
 	import webnotes
-
-	webnotes.conn = auth_obj.conn
-	webnotes.session = auth_obj.session
 	
 	page = form.getvalue('page', '')
 	if not page: # load from control panel
-		page =  webnotes.profile.get_home_page()
+		page =  webnotes.user.get_home_page()
 	
 	# Create Search Engine Friendly Pages
 	# -----------------------------------
@@ -177,7 +173,7 @@ try:
 				content = content[0][0]
 				
 		if content and content.startswith('#python'):
-			content = server.exec_page(content, form)
+			content = webnotes.widgets.page.exec_page(content, form)
 		content = '' # temp fix for id issues
 	
 	# load the links
@@ -185,7 +181,7 @@ try:
 	
 	# load root links
 	try:
-		mc = server.get_obj('Menu Control')
+		mc = webnotes.model.code.get_obj('Menu Control')
 		ml = mc.get_children('', 'Page', ['Guest'])
 		
 		if page:

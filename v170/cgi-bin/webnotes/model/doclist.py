@@ -103,7 +103,7 @@ def getchildren(name, childtype, field='', parenttype=''):
 		l.append(d)
 	return l
 
-def make_doclist(self, dt, dn = ''):
+def make(self, dt, dn = ''):
 	
 	if not dn: dn = dn
 	doc = webnotes.model.doc.Document(dt, dn)

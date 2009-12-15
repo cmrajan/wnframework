@@ -10,8 +10,10 @@ Authentication object
 .. class:: Authentication(self, form, in_cookies, out_cookies, out)
    
    A new Authenticate object is created at the beginning of any request. It will manage login, session and
-   cookies. :method: update must be called at the end of the request to update cookies and
+   cookies. :method:`update` must be called at the end of the request to update cookies and
    session.
+   
+   The constructor will also set the global `webnotes.conn`, `webnotes.session` and `webnotes.user`
    
    To enable a login, the :object:form must have a cmd = "login" (see request handling for more details)
    

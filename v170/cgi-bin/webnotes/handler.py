@@ -19,8 +19,8 @@ fw_folder = '/Users/rushabh/workbench/www/'
 
 # Logs
 
-# start page
-def refresh():
+# refresh / start page
+def startup():
 	import webnotes.model.doc
 	import webnotes.model.doctype
 	import webnotes.widgets.page

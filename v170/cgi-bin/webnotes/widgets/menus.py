@@ -21,6 +21,6 @@ def get_menu_items():
 		
 	for p in webnotes.user.can_read:
 		tmp = singles.get(p, None)
-		if tmp: menuitems.append([p, p, tmp[1] or '', tmp[0] or '', server.cint(tmp[2])])
+		if tmp: menuitems.append([p, p, tmp[1] or '', tmp[0] or '', int(tmp[2] or 0)])
 	
 	return menuitems
