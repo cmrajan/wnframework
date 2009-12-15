@@ -3150,7 +3150,7 @@ function print_std() {
 	// add letter head
 	var cp = locals['Control Panel']['Control Panel'];
 	pf_list[pf_list.length-1].addrow();
-	if(cp.letter_head) {
+	if (cstr(cp.letter_head)) {
 		pf_list[pf_list.length-1].cur_row.header.innerHTML = cp.letter_head;
 	}
 
