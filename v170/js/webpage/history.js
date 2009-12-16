@@ -51,4 +51,3 @@ nav_obj.show_last_open = function() {
 		loadapp(l[1]);
 	}
 }
-

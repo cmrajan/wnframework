@@ -8,6 +8,7 @@ class Profile:
 		self.can_create = []
 		self.can_read = []
 		self.can_write = []
+		self.can_get_report = []
 		
 	def _load_roles(self):
 		res = webnotes.conn.sql('select role from tabUserRole where parent = "%s"' % self.name)
@@ -41,6 +42,33 @@ class Profile:
 		self.can_read = list(set(self.get_allow_list('read') + self.get_allow_list('write')))
 		return self.can_read
 	
+	def get_report_list(self):
+	
+		# get all tables list
+		res = webnotes.conn.sql('SELECT parent, options from tabDocField where fieldtype="Table"')
+		table_types, all_tabletypes = {}, []
+		
+		# make a dictionary fo all table types
+		for t in res: 
+			all_tabletypes.append(t[1])
+			if not table_types.has_key(t[0]):
+				table_types[t[0]] = []
+			table_types[t[0]].append(t[1])
+	
+		no_search_list = [r[0] for r in webnotes.conn.sql('SELECT name FROM tabDocType WHERE read_only = 1 ORDER BY name')]
+		# make the lists
+		for f in self.can_read:
+			tl = table_types.get(f, None)
+			if tl:
+				for t in tl:
+					if t and (not t in self.can_get_report) and (not t in no_search_list):
+						self.can_get_report.append(t)
+			
+			if f and (not f in self.can_get_report) and (not f in no_search_list): 
+				self.can_get_report.append(f)
+	
+		return self.can_get_report
+		
 	def get_write_list(self):
 		self.can_write = self.get_allow_list('write')
 		return self.can_write
@@ -109,10 +137,10 @@ class Profile:
 
 		d = {}
 		d['name'] = self.name
-		d['email'] = t[0]
-		d['first_name'] = t[1]
-		d['last_name'] = t[2]
-		d['recent'] = t[3]
+		d['email'] = t[0] or ''
+		d['first_name'] = t[1] or ''
+		d['last_name'] = t[2] or ''
+		d['recent'] = t[3] or ''
 		
 		d['roles'] = self.get_roles()
 		d['defaults'] = self.get_defaults()
@@ -120,12 +148,12 @@ class Profile:
 		d['can_create'] = self.get_create_list()
 		d['can_read'] = self.get_read_list()
 		d['can_write'] = self.get_write_list()
+		d['can_get_report'] = self.get_report_list()
 		
 		return d
 		
-	def load_from_session(self):
+	def load_from_session(self, d):
 
-		d = session['data']['profile']
 		self.can_create = d['can_create']
 		self.can_read = d['can_read']
 		self.can_write = d['can_write']

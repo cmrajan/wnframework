@@ -79,7 +79,8 @@ LocalDB.sync = function(list) {
 			if((!d.localname) && calendar && (!calendar.has_event[d.name]))
 				calendar.set_event(d);
 		}
-		rename_from_local(d);
+		if(d.localname)
+			notify_rename_observers(d.doctype, d.localname, d.name);
 	}
 }
 
@@ -143,6 +144,26 @@ LocalDB.copy=function(dt, dn, from_amend) {
 	}
 	return locals[dt][newdoc];
 }
+
+// Renaming notification list
+// --------------------------
+
+var rename_observers = [];
+function notify_rename_observers(dt, old_name, new_name) {
+	// delete from local
+	try {
+		var old = locals[doc.doctype][doc.localname]; 
+		old.parent = null; old.__deleted = 1;
+	} catch(e) {
+		alert("[rename_from_local] No Document for: "+ doc.localname);
+	}
+
+	// everyone who observers			
+	for(var i=0; i<rename_observers.length;i++) {
+		rename_observers.length.rename_notify(dt, old_name, new_name);
+	}	
+}
+
 // Meta Data
 //----------
 

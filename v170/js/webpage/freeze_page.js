@@ -1,0 +1,55 @@
+var fcount = 0;
+var frozen = 0;
+
+function freeze(msg, do_freeze) {
+	// show message
+	if(msg) {
+		var div = $i('dialog_message');
+
+		var d = get_screen_dims();
+		div.style.left = ((d.w - 250)/2) + 'px';
+		div.style.top  = (get_scroll_top() + 200) + 'px';
+		
+		div.innerHTML = '<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';
+		$ds(div);
+	} 
+	
+	// blur
+	hide_selects();	
+	$ds($i('dialog_back'));
+	$h($i('dialog_back'), document.body.offsetHeight+'px');
+	fcount++;
+	frozen = 1;
+}
+function unfreeze() {
+	$dh($i('dialog_message'));
+	if(!fcount)return; // anything open?
+	fcount--;
+	if(!fcount) {
+		$dh($i('dialog_back'));
+		show_selects();
+		frozen = 0;
+	}
+}
+
+// Selects for IE6
+// ------------------------------------
+
+function hide_selects() {
+	if(!isIE6)return;
+	$dh('form_newsel');
+	for(var i=0;i<select_register.length;i++) {
+		select_register[i].style.visibility = 'hidden';
+	}
+}
+
+function show_selects() {
+	if(!isIE6)return;
+	$ds('form_newsel');
+	for(var i=0;i<select_register.length;i++) {
+		select_register[i].style.visibility = 'visible';
+	}
+}
+
+
+//var fmessage;

@@ -1,3 +1,4 @@
+var startup_list = [];
 function fmt_money(v){
 	if(v==null || v=='')return '0.00'; // no nulls
 	v = (v+'').replace(/,/g, ''); // remove existing commas
@@ -179,3 +180,49 @@ function validatePassword (pw, options) {
 		$i('pwd_new').innerHTML = '';
 	}
 }
+
+///// dict type
+
+function keys(obj) { var mykeys=[];for (key in obj) mykeys[mykeys.length]=key;return mykeys;}
+function values(obj) { var myvalues=[];for (key in obj) myvalues[myvalues.length]=obj[key];return myvalues;}
+function seval(s) { return eval('var a='+s+';a'); }
+
+function in_list(list, item) {
+	for(var i=0;i<list.length;i++) {
+		if(list[i]==item) return true;
+	}
+	return false;
+}
+function has_common(list1, list2) {
+	if(!list1 || !list2) return false;
+	for(var i=0; i<list1.length; i++) {
+		if(in_list(list2, list1[i]))return true;
+	}
+	return false;
+}
+var inList = in_list; // bc
+function add_lists(l1, l2) {
+	var l = [];
+	for(var k in l1) l[l.length] = l1[k];
+	for(var k in l2) l[l.length] = l2[k];
+	return l;
+}
+
+function docstring(obj)  {
+	var l = [];
+	for(key in obj) {
+		var v = obj[key];
+		if(v!=null) {
+			if(typeof(v)==typeof(1)) {
+				l[l.length] = "'"+ key + "':" + (v + '');
+			} else {
+	   			v = v+''; // convert to string
+   				l[l.length] = "'"+ key + "':'" + v.replace(/'/g, "\\'").replace(/\n/g, "\\n") + "'";
+   			}
+   		}
+	}
+	return  "{" + l.join(',') + '}';
+}
+
+function ie_refresh(e) { $dh(e); $ds(e); }
+

@@ -102,15 +102,3 @@ def getchildren(name, childtype, field='', parenttype=''):
 		d.loadfields(dataset, i, conn.cursor.description)
 		l.append(d)
 	return l
-
-def make(self, dt, dn = ''):
-	
-	if not dn: dn = dn
-	doc = webnotes.model.doc.Document(dt, dn)
-	
-	tablefields = webnotes.model.get_table_fields(dt)
-	doclist = [doc,]
-	for t in tablefields:
-		doclist += getchildren(doc.name, t[0], t[1], dt)
-
-	return doclist

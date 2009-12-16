@@ -1,3 +1,6 @@
+import webnotes
+sql = webnotes.conn.sql
+
 class BaseDocType:
 	def __init__(self):
 		pass
@@ -37,7 +40,6 @@ class Document:
 	# -------------
 
 	def loadfromdb(self, doctype = None, name = None):
-		global conn
 		
 		if name: self.name = name
 		if doctype: self.doctype = doctype
@@ -52,7 +54,7 @@ class Document:
 			if not dataset:
 				msgprint('%s %s does not exist' % (self.doctype, self.name))
 				raise Exception
-			self.loadfields(dataset, 0, conn.cursor.description)
+			self.loadfields(dataset, 0, webnotes.conn.cursor.description)
 
 	# Load Fields from dataset
 	# ------------------------
@@ -372,6 +374,16 @@ def getseries(key, digits, doctype=''):
 	return ('%0'+str(digits)+'d') % n
 
 def get(dt, dn=''):
+	import webnotes.model
 	import webnotes.model.doclist
+
 	dn = dn or dt
-	return webnotes.model.doclist.make(dt, dn)
+
+	doc = Document(dt, dn)
+	
+	tablefields = webnotes.model.get_table_fields(dt)
+	doclist = [doc,]
+	for t in tablefields:
+		doclist += webnotes.model.doclist.getchildren(doc.name, t[0], t[1], dt)
+
+	return doclist

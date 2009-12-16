@@ -4,7 +4,7 @@ search_fields = {};
 // -------------------
 
 function makeselector2() {
-	var d = new Dialog(600,440, 'Search');
+	var d = new Dialog(640,440, 'Search');
 
 	d.make_body([
 		['HTML', 'List']
@@ -106,7 +106,8 @@ function makeselector2() {
 		}
 	}
 	d.onhide = function() {
-		search_sel.disabled = 0;
+		if(page_body.wntoolbar)
+			page_body.wntoolbar.search_sel.disabled = 0;
 	}
 	d.show_lst = function() {
 		$ds(d.ls.wrapper);
@@ -132,11 +133,9 @@ function makeselector2() {
 	}	
 	selector = d;
 }
-//startup_lst[startup_lst.length] = makeselector2;
 
 // Link Selector
 // -------------
-
 
 function makeselector() {
 	var d = new Dialog(540,440, 'Search');
@@ -227,11 +226,12 @@ function makeselector() {
 		}
 	}
 	d.onhide = function() {
-		search_sel.disabled = 0;
+		if(page_body.wntoolbar)
+			page_body.wntoolbar.search_sel.disabled = 0;
 	}
 
 	btn.onclick = function() {
-		btn_dis(btn, true);
+		btn.disabled = true;
 		d.set_doctype = d.sel_type;
 		var q = '';
 		if(d.input && d.input.get_query) {
@@ -248,11 +248,11 @@ function makeselector() {
 				'defaults':pack_defaults(),
 				'roles':'["'+user_roles.join('","')+'"]' }, 
 			function(r, rtxt) {
-				btn_dis(btn, false);
+				btn.disabled = false;
 				if(r.coltypes)r.coltypes[0]='Link'; // first column must always be selectable even if it is not a link
 				d.values_len = r.values.length;
 				d.set_result(r);
-			}, function() { btn_dis(btn, false); });
+			}, function() { btn.disabled= false; });
 	}
 	
 	d.set_result = function(r) {
@@ -286,5 +286,3 @@ function makeselector() {
 	
 	selector = d;	
 }
-//startup_lst[startup_lst.length] = makeselector;
-

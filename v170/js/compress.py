@@ -1,3 +1,33 @@
+in_files = [
+        'utils/datatype.js'
+       ,'utils/browser_detect.js'
+       ,'utils/datetime.js'
+       ,'utils/dom.js'
+       ,'utils/handler.js'
+       ,'utils/msgprint.js'
+       ,'utils/rsh.compressed.js'
+       ,'widgets/dialog.js'
+       ,'widgets/listing.js'
+       ,'widgets/menu.js'
+       ,'widgets/layout.js'
+       ,'widgets/tabbedpage.js'
+       ,'webpage/wntoolbar.js'
+       ,'webpage/history.js'
+       ,'webpage/search.js'
+       ,'webpage/body.js'
+       ,'webpage/spinner.js'
+       ,'webpage/freeze_page.js'
+       ,'webpage/error_console.js'
+       ,'webpage/about.js'
+       ,'model/local_data.js'
+       ,'model/doclist.js'
+       ,'app.js'
+     ]
+
+out_file = 'wnf.compressed.js'
+
+
+
 import os, os.path, shutil
 
 # This code is original from jsmin by Douglas Crockford, it was translated to
@@ -242,11 +272,3 @@ def compress(in_files, out_file, in_type='js', verbose=False,
     print ''
 
     os.remove(temp_file)
-
-in_files = [
-        'app2.js'
-       ,'widgets/form.js'
-       ,'widgets/report_table.js'
-     ]
-
-out_file = 'wnf.js'

@@ -38,8 +38,7 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 		if (checkResponse(req, on_timeout, no_spinner, freeze_msg)) {
 			var rtxt = req.responseText;
 			if(!no_spinner)hide_loading(); // Loaded
-			rtxt = rtxt.replace(/'\^\\x05\*'/g, 'null')
-			rtxt = rtxt.replace(/"\^\\x05\*"/g, 'null')
+			rtxt = rtxt.replace(/'\^\\x05\*'/g, 'null');
 			//alert(rtxt);
 			r = eval("var a="+rtxt+";a")
 			if(r.exc && r.__redirect_login) {
@@ -87,12 +86,8 @@ function $c_graph(img, control_dt, method, arg) {
 	img.src = outUrl + '?' + makeArgString({cmd:'get_graph', dt:control_dt, method:method, arg:arg});
 }
 
-function makeArgString(dict,no_account) {
+function makeArgString(dict) {
 	var varList = [];
-	if(!no_account) {
-		dict['__account'] = account_id; // for multiple logins on same domain
-		if(__sid150)dict['sid150'] = __sid150; // for cross domain login
-	}
  
 	for(key in dict){
 		varList[varList.length] = key + '=' + encodeURIComponent(dict[key]);

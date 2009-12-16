@@ -15,7 +15,7 @@ MenuToolbar.prototype.add_top_menu = function(label, onclick) {
 	var li = $a(this.ul, 'li');
 	var a = $a(li, 'a', this.top_menu_style);
 	var me = this;
-	a.onclick = function() { /*this.set_selected();*/ onclick(); } ;
+	a.onclick = function() { onclick(); } ;
 	a.innerHTML = label;
 	a.onmouseover = function() { 
 		if(this!=me.cur_top_menu) this.className = me.top_menu_style+' '+me.top_menu_mo_style;
@@ -81,6 +81,7 @@ function DropdownMenu(label_ele, width) {
 	this.items = {};
 	this.item_style = 'dd_item';
 	this.item_mo_style = 'dd_item_mo';
+	this.max_height = 400;
 		
 	var me = this;
 	
@@ -96,6 +97,12 @@ function DropdownMenu(label_ele, width) {
 		
 		hide_selects(); 
 		$ds(me.body); // show
+
+		if(cint(me.body.clientHeight) >= me.max_height) {
+			$y(me.body, {height:'400px'});
+		} else {
+			$y(me.body, {height:null});
+		}
 		
 		// events on label
 		if(me.label.set_selected)
@@ -143,10 +150,6 @@ DropdownMenu.prototype.add_item = function(label, onclick, on_top) {
 	mi.onmouseout = function() { this.className = me.item_style; }
 	mi.bring_to_top = function() { me.body.insertBefore(this, me.body.firstChild); }
 
-	var nitems = this.body.childNodes.length;
-	if(nitems>max_dd_rows)nitems = max_dd_rows;
-	$h(this.body, (nitems * 23) + 'px');
-	
 	this.items[label] = mi;
 
 	return mi;

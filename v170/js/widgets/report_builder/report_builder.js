@@ -1,10 +1,91 @@
-//------------------
-// FINDER 2.0
-//------------------
+
+/// Report Page
+var ReportBuilder;
+
+function ReportPage(parent) {
+	var me = this;
+	this.finders = {};
+
+	// tool bar
+
+	var div = $a(parent, 'div','',{margin:'0px 8px'});
+	var htab = make_table($a(div,'div','',{padding:'4px', backgroundColor:'#DDD'}), 1,2, '100%', ['80%','20%']);
+	
+	this.main_title = $a($td(htab,0,0),'h2','',{margin: '0px 4px', display:'inline'});
+		
+	// close button
+	$y($td(htab,0,1),{textAlign:'right'});
+	this.close_btn = $a($a($td(htab,0,1),'div','',{padding: '2px', margin:'0px'}), 'img', '', {cursor:'pointer'});
+	this.close_btn.src="images/icons/close.gif";
+	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
+
+	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
+
+	// row 2
+	var htab = make_table($a(div,'div','',{padding:'4px'}), 1,2, '100%', ['80%','20%']);
+
+	this.button_area = $a($td(htab,0,0),'div');
+	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
+	$y($td(htab,0,1),{textAlign:'right'});
+
+	// new
+	if(has_common(['Administrator', 'System Manager'], user_roles)) {
+		// save
+		var savebtn = $a(this.button_area2,'span','link_type',{marginRight:'8px'});
+		savebtn.innerHTML = 'Save';
+		savebtn.onclick = function() {if(me.cur_finder) me.cur_finder.save_criteria(); };
+		
+		// advanced
+		var advancedbtn = $a(this.button_area2,'span','link_type');
+		advancedbtn.innerHTML = 'Advanced';
+		advancedbtn.onclick = function() { 
+			if(me.cur_finder) {
+				if(!me.cur_finder.current_loaded) {
+					msgprint("error:You must save the report before you can set Advanced features");
+					return;
+				}
+				loaddoc('Search Criteria', me.cur_finder.sc_dict[me.cur_finder.current_loaded]);
+			}
+		};
+	}
+	
+	// buttons
+	var runbtn = $a(this.button_area, 'button');
+	runbtn.innerHTML = 'Run'.bold();
+	runbtn.onclick = function() { if(me.cur_finder){
+		me.cur_finder.dt.start_rec = 1;
+		me.cur_finder.dt.run();} 
+	}
+	$dh(this.button_area);
+	
+	this.finder_area = $a(parent, 'div');
+
+	// set a type
+	this.set_dt = function(dt, onload) {
+		// show finder
+		$dh(me.home_area);
+		$ds(me.finder_area);
+		$ds(me.button_area);
+		my_onload = function(f) {
+			me.cur_finder = f;
+			me.cur_finder.mytabs.tabs['Result'].show();
+			if(onload)onload(f);
+		}
+	
+		if(me.cur_finder)
+			me.cur_finder.hide();
+		if(me.finders[dt]){
+			me.finders[dt].show(my_onload);
+		} else {
+			me.finders[dt] = new ReportBuilder(me.finder_area, dt, my_onload);
+		}
+
+	}
+}
 
 var FILTER_SEP = '\1';
 
-function Finder(parent, doctype, onload) {
+function ReportBuilder(parent, doctype, onload) {
 	this.menuitems = {};
 	this.has_primary_filters = false;
 	this.doctype = doctype;
@@ -28,7 +109,7 @@ function Finder(parent, doctype, onload) {
 	this.make_save_criteria();
 }
 
-Finder.prototype.make_tabs = function() {
+ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
 	this.mytabs = new TabbedPage(this.tab_wrapper);
 	this.mytabs.body_area.className = 'finder_body_area';
@@ -41,7 +122,7 @@ Finder.prototype.make_tabs = function() {
 	$dh(this.mytabs.tabs['Graph']);
 }
 
-Finder.prototype.make_body = function() {
+ReportBuilder.prototype.make_body = function() {
 
 	search_page.main_title.innerHTML = this.doctype;
 	this.mytabs.tabs['Result'].show();
@@ -61,7 +142,7 @@ Finder.prototype.make_body = function() {
 // Graph
 // -----
 
-Finder.prototype.make_graph = function() {
+ReportBuilder.prototype.make_graph = function() {
 	var me = this;
 	this.graph_area = $a(this.mytabs.tabs['Graph'].tab_body, 'div', '');
 	this.mytabs.tabs['Graph'].onshow = function() {
@@ -69,12 +150,12 @@ Finder.prototype.make_graph = function() {
 	}
 }
 
-Finder.prototype.clear_graph = function() { 
+ReportBuilder.prototype.clear_graph = function() { 
 	if(this.graph_div)$dh(this.graph_div);
 	this.graph_clear = 1; 
 }
 
-Finder.prototype.show_graph = function() {
+ReportBuilder.prototype.show_graph = function() {
 	var me = this;
 	
 	if(isIE) {
@@ -175,7 +256,7 @@ Finder.prototype.show_graph = function() {
 // Saving of criteria
 // ------------------
 
-Finder.prototype.make_save_criteria = function() {
+ReportBuilder.prototype.make_save_criteria = function() {
 	var me = this;
 	
 	// make_list
@@ -194,7 +275,7 @@ Finder.prototype.make_save_criteria = function() {
 // Save Criteria
 // -------------
 
-Finder.prototype.save_criteria = function(save_as) {
+ReportBuilder.prototype.save_criteria = function(save_as) {
 	var overwrite = 0;
 	// is loaded?
 	if(this.current_loaded && (!save_as)) {
@@ -261,7 +342,7 @@ Finder.prototype.save_criteria = function(save_as) {
 	}
 }
 
-Finder.prototype.hide_all_filters = function() {
+ReportBuilder.prototype.hide_all_filters = function() {
 	for(var i=0; i<this.filter_fields.length; i++) {
 		this.filter_fields[i].df.filter_hide = 1;
 	}
@@ -269,7 +350,7 @@ Finder.prototype.hide_all_filters = function() {
 
 // Load Criteria
 // -------------
-Finder.prototype.clear_criteria = function() {
+ReportBuilder.prototype.clear_criteria = function() {
 	// clear all fields
 	// ----------------
 		
@@ -307,18 +388,18 @@ Finder.prototype.clear_criteria = function() {
 	this.refresh_filters();	
 }
 
-Finder.prototype.select_column = function(dt, label, value) {
+ReportBuilder.prototype.select_column = function(dt, label, value) {
 	if(value==null)value = 1;
 	if(this.report_fields_dict[dt+'\1'+ label])
 		this.report_fields_dict[dt+'\1'+ label].checked = value;
 }
 
-Finder.prototype.set_filter = function(dt, label, value) {
+ReportBuilder.prototype.set_filter = function(dt, label, value) {
 	if(this.filter_fields_dict[dt+'\1'+ label])
 		this.filter_fields_dict[dt+'\1'+ label].set_input(value);
 }
 
-Finder.prototype.load_criteria = function(criteria_name) {
+ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	this.clear_criteria();	
 	
 	if(!this.sc_dict[criteria_name]) {
@@ -360,7 +441,7 @@ Finder.prototype.load_criteria = function(criteria_name) {
 	this.set_criteria_sel(criteria_name);
 }
 
-Finder.prototype.set_criteria_sel = function(criteria_name) {
+ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	// load additional fields sort option
 	search_page.main_title.innerHTML = criteria_name;
 	
@@ -394,7 +475,7 @@ Finder.prototype.set_criteria_sel = function(criteria_name) {
 // Create the filter UI and column selection UI
 // --------------------------------------------
 
-Finder.prototype.setup_filters = function() {
+ReportBuilder.prototype.setup_filters = function() {
 
 	function can_dt_be_submitted(dt) {
 		var plist = getchildren('DocPerm', dt, 'permissions', 'DocType');
@@ -473,7 +554,7 @@ Finder.prototype.setup_filters = function() {
 	$ds(me.body);
 }
 
-Finder.prototype.refresh_filters = function() {
+ReportBuilder.prototype.refresh_filters = function() {
 	// called after customization
 	for(var i=0; i<this.filter_fields.length; i++) {
 		var f = this.filter_fields[i];
@@ -501,7 +582,7 @@ Finder.prototype.refresh_filters = function() {
 	}
 }
 
-Finder.prototype.add_filter = function(f) {
+ReportBuilder.prototype.add_filter = function(f) {
 	if(this.filter_fields_dict[f.parent + '\1' + f.label]) {
 		// exists
 		this.filter_fields_dict[f.parent + '\1' + f.label].df = f; // reset properties
@@ -511,7 +592,7 @@ Finder.prototype.add_filter = function(f) {
 	}
 }
 
-Finder.prototype.add_field = function(f, dt, in_primary) {
+ReportBuilder.prototype.add_field = function(f, dt, in_primary) {
 	var me = this;
 	
 	// make a field object
@@ -596,7 +677,7 @@ Finder.prototype.add_field = function(f, dt, in_primary) {
 	
 }
 
-Finder.prototype.make_filter_fields = function(fl, dt) {
+ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 	var me = this; 
 	
 	if(search_page.sel)search_page.sel.value = dt;
@@ -668,7 +749,7 @@ Finder.prototype.make_filter_fields = function(fl, dt) {
 	me.set_sort_options();
 }
 
-Finder.prototype.set_sort_options = function(l) {
+ReportBuilder.prototype.set_sort_options = function(l) {
 	var sl = this.orig_sort_list;
 	
 	empty_select(this.dt.sort_sel);
@@ -680,7 +761,7 @@ Finder.prototype.set_sort_options = function(l) {
 }
 
 
-Finder.prototype.make_filters = function(onload) {
+ReportBuilder.prototype.make_filters = function(onload) {
 	// load doctype
 	var me = this;
 	
@@ -709,7 +790,7 @@ Finder.prototype.make_filters = function(onload) {
 // Make the SQL query
 // ------------------
 
-Finder.prototype.make_datatable = function() {
+ReportBuilder.prototype.make_datatable = function() {
 	var me = this;
 	
 	this.dt_area = $a(this.mytabs.tabs['Result'].tab_body, 'div', 'finder_dt_area');
@@ -925,731 +1006,4 @@ Finder.prototype.make_datatable = function() {
 		if(me.current_loaded) this.rep_name = me.current_loaded;
 		else this.rep_name = me.doctype;
 	}
-}
-
-/// Data Table
-
-function DataTable(html_fieldname, dt, repname, hide_toolbar) {
-  var me = this;
-  if(html_fieldname.substr) {
-	  var html_field = cur_frm.fields_dict[html_fieldname];
-  
-	  // override onrefresh
-	  html_field.onrefresh = function() {
-	  	if(me.docname != cur_frm.docname) {
-	  	  me.clear_all();
-	  	  me.docname = cur_frm.docname;
-	  	}
-	  }
-  
-	  var parent = html_field.wrapper;
-	  datatables[html_fieldname] = this;
-  } else {
-  	var parent = html_fieldname;
-  }
-
-  this.start_rec = 1;
-  this.page_len = 50;
-  this.repname = repname;
-  this.dt = dt;
-  this.query = '';
-  this.history = [];
-  this.has_index = 1;
-  this.has_headings = 1;  //this.sort_options = {};
-  
-  this.levels = [];
-  
-  // make ui
-
-  // new link
-  if(this.dt) {
-    var tw = $a(parent, 'div');
-  	var t = $a(tw, 'div', 'link_type');
-  	t.style.cssFloat = 'right';
-  	$h(tw, '14px');
-  	t.style.margin = '2px 0px';
-  	t.style.fontSize = '11px';
-  	t.onclick = function() { new_doc(me.dt); }
-  	t.innerHTML = 'New '+ this.dt;
-  }
-
-  // toolbar
-  if(!hide_toolbar) this.make_toolbar(parent);
-
-  this.wrapper = $a(parent, 'div', 'report_tab');
-  $h(this.wrapper, cint(pagewidth * 0.5) + 'px');
-
-  this.wrapper.onscroll = function() {scroll_head(this); }
-  
-  this.hwrapper = $a(this.wrapper, 'div', 'report_head_wrapper');
-  this.twrapper = $a(this.wrapper, 'div', 'report_tab_wrapper');
-  
-  this.no_data_tag = $a(this.wrapper, 'div', 'report_no_data');
-  this.no_data_tag.innerHTML = 'No Records Found';
-
-  this.fetching_tag = $a(this.wrapper, 'div', '', {height:'120px', background:'url("images/ui/square_loading.gif") center no-repeat', display:'none'});  
-}
-
-DataTable.prototype.add_icon = function(parent, imgsrc) {
-  var i = $a(parent, 'img');
-  i.style.padding = '2px';
-  i.style.cursor = 'pointer';
-  i.setAttribute('src', 'images/icons/'+imgsrc+'.gif');
-  return i;
-}
-
-DataTable.prototype.make_toolbar = function(parent) {
-  var me = this;
-  
-  // headbar
-  this.hbar = $a(parent, 'div', 'report_hbar');
-
-  var ht = make_table(this.hbar,1,2,'100%',['80%','20%'],{verticalAlign:'middle'});
-  
-	var t = make_table($td(ht,0,0), 1,13, '',['20px','','20px','','20px','','20px','','80px','100px','20px','80px','50px'],{height: '54px', verticalAlign:'middle'});
-	var cnt = 0;
-	var make_btn = function(label,src,onclick,bold) {
-		$w($td(t,0,cnt+1), (20 + ((bold?7:6)*label.length)) + 'px');
-		var img = $a($td(t,0,cnt+0), 'img', ''); img.src = "images/icons/"+src+".gif";
-		var span = $a($td(t,0,cnt+1),'span','link_type',{margin:'0px 8px 0px 4px'});
-		if(bold)$y(span,{fontSize: '14px', fontWeight: 'bold'});
-		span.innerHTML = label;
-		span.onclick = onclick;
-	}
-	
-	
-	// refresh btn
-	make_btn('Refresh','page_refresh',function() { me.start_rec = 1; me.run();},1); cnt+=2;
-	
-	// export
-	make_btn('Export','page_excel',function() {me.do_export();}); cnt +=2;
-
-	// print
-	make_btn('Print','printer',function() {me.do_print();}); cnt+=2;
-
-	// print
-	make_btn('Calc','calculator',function() {me.do_calc();}); cnt+=2;
-
-  // sort select
-  $td(t,0,cnt).innerHTML = 'Sort By:'; $y($td(t,0,cnt),{textAlign:'right',paddingRight:'4px'});
-  this.sort_sel = $a($td(t,0,cnt+1), 'select');
-  $w(this.sort_sel, '100px');
-  //$p(this.sort_sel,2,210);
-  this.sort_sel.onchange = function() {
-    me.start_rec = 1;
-    me.run();
-  }
-  select_register[select_register.length] = this.sort_sel;
-  // sort order
-  this.sort_icon = this.add_icon($td(t,0,cnt+2), 'arrow_down');
-  this.sort_order = 'DESC';
-  
-  this.sort_icon.onclick = function() {
-  	if(me.sort_order=='ASC') me.set_desc();
-    else me.set_asc();
-
-    me.start_rec = 1;
-    me.run();
-  }
-
-  // page len
-
-  $td(t,0,cnt+3).innerHTML = 'Per Page:'; $y($td(t,0,cnt+3),{textAlign:'right',paddingRight:'4px'});  
-  var s = $a($td(t,0,cnt+4), 'select');
-  $w(s, '50px');
-  
-  s.options[s.options.length] = new Option('50', '50', false, true);
-  s.options[s.options.length] = new Option('100', '100', false, false);
-  s.options[s.options.length] = new Option('500', '500', false, false);
-  s.options[s.options.length] = new Option('1000', '1000', false, false);
-
-  s.onchange = function() { 
-  	me.page_len = flt(sel_val(this));
-  }
-  select_register[select_register.length] = s;
-  this.page_len_sel = s;
-
-  var c1 = $td(ht,0,1);
-  c1.style.textAlign = 'right';
-
-  // first page
-  var ic = this.add_icon(c1, 'resultset_first');
-  ic.onclick = function() {
-  	me.start_rec = 1;
-  	me.run();
-  }
-  
-  // prev page
-  var ic = this.add_icon(c1, 'resultset_previous');
-  ic.onclick = function() {
-    if(me.start_rec - me.page_len <= 0)return;
-  	me.start_rec = me.start_rec - me.page_len;
-  	me.run();
-  }
-  
-  // next page
-  this.has_next = false;
-  var ic = this.add_icon(c1, 'resultset_next');
-  ic.onclick = function() {
-    if(!me.has_next)return;
-  	me.start_rec = me.start_rec + me.page_len;
-  	me.run();
-  }
-
-}
-
-
-DataTable.prototype.set_desc = function() {
-	this.sort_icon.src = 'images/icons/arrow_down.png'; this.sort_order='DESC';
-}
-DataTable.prototype.set_asc = function(icon) {
-	this.sort_icon.src = 'images/icons/arrow_up.png'; this.sort_order='ASC'; 
-}
-
-////
-
-DataTable.prototype.add_sort_option = function(label, val) {
-  var s = this.sort_sel;
-  s.options[s.options.length] = 
-	 new Option(label, val, false, s.options.length==0?true:false);
-}
-
-DataTable.prototype.update_query = function(no_limit) { 
-
-  // add sorting
-  if(this.search_criteria && this.search_criteria.custom_query) {
-  	
-  	// no sorting
-  } else {
-	  this.query += NEWLINE 
-             + ' ORDER BY ' + sel_val(this.sort_sel)
-             + ' ' + this.sort_order;
-  }
-  
-  if(no_limit) return;
-  
-  // add paging  
-  this.query += ' LIMIT ' + (this.start_rec-1) + ',' + this.page_len;
-  if(this.show_query)
-	alert(this.query);
-
-}
-
-DataTable.prototype._get_query = function(no_limit) {
-	$dh(this.no_data_tag);
-	this.show_query = 0;
-  	if(this.make_query)this.make_query();
-	this.update_query(no_limit);
-}
-
-DataTable.prototype.run = function() {
-  if(this.validate && !this.validate())
-    return;
-
-  if(search_page.cur_finder) {
-  	if(search_page.cur_finder.large_report == 1) {
-  	  msgprint("This is a very large report and cannot be shown in the browser as it is likely to make your browser very slow.<br><br>Please click on 'Export' to open in a spreadsheet");
-  	  return;
-  	}
-  	search_page.cur_finder.mytabs.tabs['Result'].show();
-  }
-  
-  var me = this;
-  this._get_query();
-  
-  // preset data
-  if(this.set_data) {
-  	this.show_result(this.set_data);
-  	this.set_data = null;
-  	return;
-  }
-    
-  $ds(this.fetching_tag);
-  if(isFF)this.clear_all();
-  
-  var args = { 
-			'query':me.query,
-			'report_name': 'DataTable', 
-			'show_deleted':1,
-			'sc_id':me.search_criteria ? me.search_criteria.name : '',
-			'filter_values':me.filter_vals ? docstring(me.filter_vals) : '',
-			'defaults':pack_defaults(),
-			'roles':'["'+user_roles.join('","')+'"]'
-		}
-
-  if(this.is_simple) args.is_simple = 1;
-
-  $c('runquery', args, function(r,rt) {  $dh(me.fetching_tag); me.show_result(r,rt); });
-  
-}
-
-DataTable.prototype.clear_all = function() {
-	// clear old
-	if(this.htab && this.htab.parentNode) {
-		this.htab.parentNode.removeChild(this.htab); delete this.htab; }
-	if(this.tab && this.tab.parentNode) {
-		this.tab.parentNode.removeChild(this.tab); delete this.tab; }
-	$dh(this.no_data_tag);
-	// clear graph in finder
-	if(this.finder)this.finder.clear_graph();
-}
-
-DataTable.prototype.has_data = function() {
-	if(this.htab && this.htab.rows.length)return 1;
-	else return 0;
-}
-
-DataTable.prototype.show_result = function(r, rt) {
-	// clear old
-	var me = this;
-	this.clear_all();
-
-	// add 
-	if(this.has_headings) {
-		this.htab = $a(this.hwrapper, 'table');
-		$y(this.twrapper,{top:'25px',borderTop:'0px'});
-	}
-	this.tab = $a(this.twrapper, 'table');
-
-	this.colwidths  = eval(r.colwidths);
-	this.coltypes   = eval(r.coltypes);
-	this.coloptions = eval(r.coloptions);
-	this.colnames = eval(r.colnames);
-	this.rset = eval(r.values);
-
-	$y(this.tab,{tableLayout:'fixed'});
-
-	if(this.beforetableprint)this.beforetableprint(this);
-
-	if(this.rset && this.rset.length) {
-
-		// heading
-		if(this.has_headings) this.make_head_tab(this.colnames);
-	
-		// data
-	 	var start = this.start_rec;
-	  
-		for(var vi=0;vi<this.rset.length;vi++) {
-			var row = this.tab.insertRow(vi);
-			// for script
-
-			if(this.has_index) {
-				var c0 = row.insertCell(0);
-				$w(c0, '30px');
-				$a(c0, 'div', '', {width:'23px'}).innerHTML = start;
-			}
-	      
-			// cells
-			start++;      
-			for(var ci=0;ci < this.rset[vi].length;ci++) {
-				this.make_data_cell(vi, ci, this.rset[vi][ci]);
-			}
-		  
-			if(this.afterrowprint) {
-				row.data_cells = {}; row.data = {};
-				for(var ci=0;ci< this.colnames.length;ci++) {
-					row.data[this.colnames[ci]] = this.rset[vi][ci];
-					row.data_cells[this.colnames[ci]] = row.cells[ci+1];
-				}
-				this.afterrowprint(row);
-			}
-		}
-	} else {
-		$ds(this.no_data_tag);
-	}
-  
-	// has next page?
-	if(this.rset.length && this.rset.length==this.page_len)this.has_next = true;
-
-	// style
-	if(r.style) {
-		for(var i=0;i<r.style.length;i++) {
-			$yt(this.tab,r.style[i][0],r.style[i][1],r.style[i][2]);
-		}
-	}	
-
-	// after table print
-	if(this.aftertableprint) this.aftertableprint(this.tab);
-}
-
-DataTable.prototype.get_col_width = function(i) {
-	if(this.colwidths 
-		&& this.colwidths.length 
-			&& this.colwidths[i])
-				return cint(this.colwidths[i]) +'px';
-	else return '100px';
-}
-
-DataTable.prototype.make_head_tab = function(colnames) {
-	var r0 = this.htab.insertRow(0);
-	if(this.has_index) {
-		var c0 = r0.insertCell(0);
-		c0.className = 'report_head_cell';
-		$w(c0, '30px');
-		$a(c0, 'div').innerHTML = 'Sr';
-		this.total_width = 30;  
-	}
-	
-	for(var i=0;i<colnames.length;i++) {
-		var w = this.get_col_width(i);
-		this.total_width+=cint(w);  
-	
-		var c = r0.insertCell(r0.cells.length);
-		c.className = 'report_head_cell';
-		if(w)$w(c, w);
-		$a(c,'div').innerHTML = colnames[i];
-		c.val = colnames[i];
-	}
-	$w(this.htab, this.total_width + 'px');
-	$w(this.tab, this.total_width + 'px');
-}
-
-DataTable.prototype.make_data_cell = function(ri, ci, val) {
-  var row = this.tab.rows[ri];
-  var c = row.insertCell(row.cells.length);
-  
-  // row style:
-  if(row.style.color) 
-  	c.style.color = row.style.color;
-  if(row.style.backgroundColor) 
-  	c.style.backgroundColor = row.style.backgroundColor;
-  if(row.style.fontWeight) 
-  	c.style.fontWeight = row.style.fontWeight;
-  if(row.style.fontSize) 
-  	c.style.fontSize = row.style.fontSize;
-  
-  var w = this.get_col_width(ci);
-  if(w)$w(c, w);
-  c.val = val;
-  
-  var me = this;
-
-  c.div = $a(c, 'div', '', {width:(cint(w)-7)+'px'});
-  $s(c.div, val, this.coltypes[ci], this.coloptions[ci])
-}
-
-DataTable.prototype.do_print = function() {
-	this._get_query(true);  
-	
-	args = {
-		query : this.query,
-		title : this.rep_name?this.rep_name:this.dt,
-		colnames : null,
-		colwidhts : null,
-		coltypes : null, 
-		has_index : this.has_index, 
-		has_headings: this.has_headings,
-		check_limit : 1,
-		is_simple : (this.is_simple ? 'Yes' : ''),
-		sc_id : (this.search_criteria ? this.search_criteria.name : ''),
-		filter_values : docstring(this.filter_vals),
-		finder: this.finder ? this.finder : null
-	};
-	print_query(args);
-
-}
-
-DataTable.prototype.do_export = function() {
-	this._get_query(true);
-
-	var me = this;
-	export_ask_for_max_rows(this.query, function(q) {
-		export_csv(q, (me.rep_name?me.rep_name:me.dt), (me.search_criteria?me.search_criteria.name:''), me.is_simple, docstring(me.filter_vals));	
-	});
-}
-
-
-// Calculator 
-// ----------
-DataTable.prototype.do_calc = function() {
-	show_calc(this.tab, this.colnames, this.coltypes, 1);
-}
-
-DataTable.prototype.get_col_data = function(colname) {
-	var ci = 0;
-	if(!this.htab) return [];
-    for(var i=1;i<this.htab.rows[0].cells.length;i++) {
-		var hc = this.htab.rows[0].cells[i];
-    	if(hc.val == colname) {
-    		ci = i;
-    		break;
-    	}
-    }
-	
-	var ret = [];
-	for(var ri=0;ri<this.tab.rows.length;ri++) {
-		ret[ret.length] = this.tab.rows[ri].cells[ci].val;
-	}
-	return ret;
-}
-
-DataTable.prototype.get_html = function() {
-	var w = document.createElement('div');
-	w = $a(w, 'div');
-	w.style.marginTop = '16px';
-	var tab = $a(w, 'table');
-
-	var add_head_style = function(c, w) {
-		c.style.fontWeight = 'bold';
-		c.style.border = '1px solid #000';
-		c.style.padding = '2px';
-		if(w)$w(c, w);
-		return c;
-	}
-
-	var add_cell_style = function(c) {
-		c.style.padding = '2px';
-		c.style.border = '1px solid #000';
-		return c;
-	}
-
-	tab.style.borderCollapse = 'collapse';  
-	var hr = tab.insertRow(0);
-	var c0 = add_head_style(hr.insertCell(0), '30px');
-	c0.innerHTML = 'Sr';
-  
-	// heading
-	for(var i=1;i<this.htab.rows[0].cells.length;i++) {
-		var hc = this.htab.rows[0].cells[i];
-		var c = add_head_style(hr.insertCell(i), hc.style.width);
-		c.innerHTML = hc.innerHTML;
-	}
-  
-	// data
-	for(var ri=0;ri<this.tab.rows.length;ri++) {
-		var row = this.tab.rows[ri];
-		var dt_row = tab.insertRow(tab.rows.length);
-		for(var ci=0;ci<row.cells.length;ci++) {
-			var c = add_cell_style(dt_row.insertCell(ci));
-			c.innerHTML = row.cells[ci].innerHTML;
-		}
-	}
-	return w.innerHTML;
-}
-
-GraphViewer= function(parent, w, h) {
-
-	this.show_labels = true;
-	this.font_size = 10;
-	
-	if(!parent) {
-		this.wrapper = document.createElement('div')
-		parent = this.wrapper
-	}
-	
-	this.body = $a(parent, 'div', 'gr_body');
-	
-	if(w&&h) {
-		$w(this.body, w + 'px');
-		$w(this.body, h + 'px');
-	}
-	
-	this._y_name = $a(parent, 'div', 'gr_y_name');
-	this._x_name = $a(parent, 'div', 'gr_x_name');
-
-	this._y_labels = $a(parent, 'div', 'gr_y_labels');
-	this._x_labels = $a(parent, 'div', 'gr_x_labels');
-	
-	this.legend_area = $a(parent, 'div', 'gr_legend_area');
-	this.title_area = $a(parent, 'div', 'gr_title_area');
-	
-	this.main_area = $a(parent, 'div', 'gr_main_area');
-	this.set_horizontal();
-	//this.set_vertical();
-}
-GraphViewer.prototype.clear = function() {
-	this.series = [];
-	this.xlabels = [];
-	this.xtitle = null;
-	this.ytitle = null;
-}
-GraphViewer.prototype.set_vertical = function() {
-	this.k_barwidth = 'width';
-	this.k_barstart = 'left';
-	this.k_barlength = 'height';
-	this.k_barbase = 'bottom';
-	this.k_bartop = 'top';
-	this.k_gridborder = 'borderTop';
-	
-	this.y_name = this._y_name;
-	this.x_name = this._x_name;
-	
-	this.y_labels = this._y_labels;
-	this.x_labels = this._x_labels;
-	
-	this.vertical = true;
-}
-
-GraphViewer.prototype.set_horizontal = function() {
-	this.k_barwidth = 'height';
-	this.k_barstart = 'top';
-	this.k_barlength = 'width';
-	this.k_barbase = 'left';
-	this.k_bartop = 'right';
-	this.k_gridborder = 'borderRight';
-
-	this.y_name = this._x_name;
-	this.x_name = this._y_name;
-	
-	this.y_labels = this._x_labels;
-	this.x_labels = this._y_labels;
-
-	this.vertical = false;
-}
-
-GraphViewer.prototype.set_title = function(t) {
-	this.title_area.innerHTML = t;
-}
-
-GraphViewer.prototype.add_series = function(label, color, values, borderColor) {
-	var s = new GraphViewer.GraphSeries(this, label);
-	s.color = color;
-	s.borderColor = borderColor;
-	s.data = values;
-	this.series[this.series.length] = s;
-	//this.xlabels[this.xlabels.length] = label;
-}
-
-GraphViewer.prototype.refresh = function() {
-	
-	//
-	this.legend_area.innerHTML = '';
-	this.main_area.innerHTML = '';
-	this.x_labels.innerHTML = '';
-	this.y_labels.innerHTML = '';
-	this.x_name.innerHTML = '';
-	this.y_name.innerHTML = '';
-		
-	// get max
-	var maxx=null;
-	var legendheight = 12;
-
-	for(i=0;i<this.series.length;i++) {
-		var series_max = this.series[i].get_max();
-		if(!maxx)maxx = series_max;
-		if(series_max > maxx)maxx = series_max;
-		
-		// show series names
-		var tmp = $a(this.legend_area, 'div', 'gr_legend');
-		tmp.style.backgroundColor = this.series[i].color;
-		if(this.series[i].borderColor)
-			tmp.style.border = '1px solid ' + this.series[i].borderColor;
-		tmp.style.top = (i*(legendheight + 2)) + 'px';
-		tmp.style.height= legendheight + 'px';
-
-		var tmp1 = $a(this.legend_area, 'div', 'gr_legend');
-		tmp1.style.top = (i*(legendheight + 2)) + 'px';
-		tmp1.style.left = '30px';
-		$w(tmp1, '80px');
-		tmp1.innerHTML = this.series[i].name;
-	}
-	if(maxx==0)maxx = 1;
-	this.maxx = 1.1 * maxx;
-
-	// y - axis grid
-	var xfn = fmt_money;
-	
-	// smart grid
-	if(maxx>1) {
-		var nchars = (cint(maxx)+'').length;
-		var gstep = Math.pow(10, (nchars-1));
-		while(flt(maxx / gstep) < 4) {
-			gstep = gstep / 2;
-		}
-	} else {
-		var gstep = maxx / 6;
-	}
-		
-	var curstep = gstep;
-	
-	while(curstep < this.maxx) {
-		var gr = $a(this.main_area, 'div', 'gr_grid');
-		gr.style[this.k_bartop] = (100-((flt(curstep)/this.maxx) * 100)) + '%';
-		gr.style[this.k_barwidth] = '100%';
-		gr.style[this.k_gridborder] = '1px dashed #888';
-		var ylab = $a(this.y_labels, 'div', 'gr_label');
-		ylab.style[this.k_bartop] = (99-((flt(curstep)/this.maxx)*100)) + '%';
-		ylab.style[this.k_barstart] = '10%';
-		ylab.innerHTML = xfn(curstep);
-		curstep += gstep;
-	}
-	
-	if(this.vertical) {	
-		this.x_name.innerHTML = this.xtitle;
-		middletext(this.y_name, this.ytitle);
-	} else {
-		middletext(this.x_name, this.xtitle);
-		this.y_name.innerHTML = this.ytitle;
-	}
-	
-	// make X units
-	this.xunits = [];
-	this.xunit_width = (100 / this.xlabels.length);
-	if(this.series[0]){
-		for(i=0;i<this.xlabels.length;i++) {
-			this.xunits[this.xunits.length] = new GraphViewer.GraphXUnit(this, i, this.xlabels[i]);
-		}
-	}	
-}
-
-GraphViewer.GraphSeries= function(graph, name) {
-	this.graph = graph;
-	this.name = name;
-}
-GraphViewer.GraphSeries.prototype.get_max = function() {
-	var m;
-	for(t=0;t<this.data.length;t++) {
-		if(!m)m = this.data[t];
-		if(this.data[t]>m)m=this.data[t]
-	}
-	return m;
-}
-
-GraphViewer.GraphXUnit= function(graph, idx, label) {
-	this.body = $a(graph.main_area, 'div', 'gr_xunit');
-	this.body.style[graph.k_barstart] = (idx * graph.xunit_width) + '%';	
-	this.body.style[graph.k_barwidth] = graph.xunit_width + '%';
-	this.body.style[graph.k_barlength] = '100%';
-	this.show(graph, label, idx);
-	
-	//
-	if(graph.show_labels) {
-		this.label = $a(graph.x_labels, 'div', 'gr_label');
-		this.label.style[graph.k_barstart] = (idx * graph.xunit_width) + '%';
-		this.label.style[graph.k_barwidth] = graph.xunit_width + '%';	
-		if(graph.vertical) {
-			$y(this.label,{height:'100%',top:'10%'});
-			this.label.innerHTML = label;
-		} else {
-			middletext(this.label, label);
-		}
-	}
-}
-
-GraphViewer.GraphXUnit.prototype.show = function(graph, l, idx) {
-	var bar_width = (100 / (graph.series.length + 1));
-	//if(bar_width>15) bar_width = 15;
-	//if(bar_width<20) bar_width = 20;
-	start = (100 - (graph.series.length*bar_width)) / 2
-	
-	for(var i=0;i<graph.series.length; i++) {
-		var v = graph.series[i].data[idx];
-		var b = $a(this.body, 'div', 'gr_bar');
-		b.style[graph.k_barbase] = '0%';
-		b.style[graph.k_barstart] = start + '%';
-		b.style[graph.k_barwidth] = bar_width + '%';
-		b.style[graph.k_barlength] = (v / graph.maxx * 100) + '%';
-		if(graph.series[i].color)b.style.backgroundColor = graph.series[i].color;
-		if(graph.series[i].borderColor)
-			b.style.border = '1px solid ' + graph.series[i].borderColor;
-		
-		start += bar_width;
-	}
-}
-
-function middletext(par, t, size) {
-	if(!size)size = 10;
-	var tb = $a(par, 'div', 'absdiv');
-	tb.style.top = ((par.clientHeight - size) / 2) + 'px';
-	tb.innerHTML = t;
 }

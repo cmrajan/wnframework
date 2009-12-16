@@ -1,6 +1,5 @@
 import webnotes
 import webnotes.model.doc
-import webnotes.model.doclist
 
 def execute(self, code, doc=None, doclist=[]):
 	from webnotes import *
@@ -35,7 +34,7 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 		if not dn:
 			dn = dt
 		if with_children:
-			doclist = webnotes.model.doclist.make(dt, dn)
+			doclist = webnotes.model.doc.get(dt, dn)
 		else:
 			doclist = [webnotes.model.doc.Document(dt, dn),]
 		return get_server_obj(doclist[0], doclist)

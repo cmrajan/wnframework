@@ -37,3 +37,18 @@ function msgprint(msg, static, callback) {
 	msg_dialog.custom_onhide = callback;
 	
 }
+
+
+// Floating Message
+
+function FloatingMessage() {
+	if($i('fm_cancel')) {
+		$i('fm_cancel').onclick = function() {
+			$dh($i('floating_message'));	
+		}
+		this.show = function(content) {
+			$i('fm_content').innerHTML = content;
+			$ds($i('floating_message'));
+		}
+	}
+}

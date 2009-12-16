@@ -47,7 +47,7 @@ def startup():
 	webnotes.response['n_online'] = int(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0] or 0)
 	webnotes.response['docs'] = doclist
 	webnotes.response['home_page'] = webnotes.widgets.page.get(webnotes.user.get_home_page())
-	webnotes.response['menu_items'] = webnotes.widgets.menus.get_menu_items()
+	webnotes.response['start_items'] = webnotes.widgets.menus.get_menu_items()
 	webnotes.session['data']['profile'] = webnotes.response['profile']
 
 def cleanup_docs():

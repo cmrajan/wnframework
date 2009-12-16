@@ -137,6 +137,45 @@ function Frm(doctype, parent) {
 	frms[doctype] = this;
 
 	this.setup_meta(doctype);
+	
+	// notify on rename
+	rename_observers.push(this);	
+}
+
+Frm.prototype.rename_notify = function(dt, old, name) {
+	if(this.doctype != dt) return;
+	
+	// sections
+	this.cur_section[name] = this.cur_section[old];
+	delete this.cur_section[old];
+
+	// editable
+	this.is_editable[name] = this.is_editable[old];
+	delete this.is_editable[old];
+
+	// attach
+	if(this.attachments[old]) {
+		this.attachments[name] = this.attachments[old];
+		this.attachments[name] = null;
+		for(var i in this.attachments[name]){ // rename each attachment
+			this.attachments[name][i].docname = name;
+		}
+	}
+
+	// from form
+	if(this.docname == old)
+		this.docname = name;	
+
+	// cleanup
+
+	if(this && this.opendocs[doc.localname]) {
+		// local doctype copy
+		local_dt[doc.doctype][doc.name] = local_dt[doc.doctype][doc.localname];
+		local_dt[doc.doctype][doc.localname] = null;
+	}
+	
+	this.opendocs[old] = false;
+	this.opendocs[name] = true;
 }
 
 Frm.prototype.onhide = function() { if(grid_selected_cell) grid_selected_cell.grid.cell_deselect(); }

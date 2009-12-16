@@ -32,17 +32,11 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
   <link type="text/css" rel="stylesheet" href="css/user.css?v=1.6.0">
   <link rel="Shortcut Icon" href="/favicon.ico">
   
- <script type="text/javascript" src="js/shadedborder.js"></script>
- <script language="JavaScript" src="js/app2.js?v=1.6.0"></script>
- <script language="JavaScript" src="js/widgets/form.js"></script>
- <script language="JavaScript" src="js/widgets/report_table.js"></script>
- <script language="JavaScript" src="js/widgets/calendar.js"></script>
- <script type="text/javascript" src="js/rsh.compressed.js"></script>
- <script language="JavaScript" src="js/user.js"></script>
+ <script language="JavaScript" src="js/wnf.compressed.js"></script>
  <script language="JavaScript" src="js/tiny_mce/tiny_mce_gzip.js"></script>
 
 <script type="text/javascript">
-window.dhtmlHistory.create({ debugMode: false });
+//window.dhtmlHistory.create({ debugMode: false });
 </script>
 
 </head>
@@ -73,38 +67,6 @@ window.dhtmlHistory.create({ debugMode: false });
 		</div>
 	</div>
 
-	<div id="head_div">
-		<div class="top_bar" id="wn_toolbar">
-			<div id="topmenu_div"></div>
-			<div id="user_div">
-				<span id='user_id'></span> | 
-				<a href="#" onclick='edit_profile()' class="logout_link">Profile</a> | 
-				<a href="#" onclick='logout()' class="logout_link">Logout</a>
-			</div>
-			<div onclick='about_dialog.show()' class="about_link"></div>
-			
-			<div id="qsearch_sel"></div>
-			<div id="qsearch_btn"></div>
-			
-			<div id='testing_div'>Testing Mode</div>
-		</div>
-	
-		<div id="head_banner"></div>
-	</div>
-	<div id="main_div">
-	  <div>
-		  <table id="main_table">
-		  	<tr>
-			  <td id="menu_div"></td>
-			  <td id="center_div"></td>
-			  <td id="right_sidebar_div"></td>
-		    </tr>
-		    <tr>
-		      <td colspan=3><div id="footer_div"></div></td>
-		    </tr>
-		  </table>
-	  </div>
-	</div>
 	<div id="dialog_back">
 	</div>
 </div>
