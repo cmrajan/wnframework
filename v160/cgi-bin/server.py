@@ -2069,41 +2069,51 @@ def backup_db(db, from_all=0):
 	#sql('FLUSH TABLES WITH READ LOCK')
 
 	try:
-		p = '../backups'
-		if from_all: p = '../backups/dumps'	
-		
-		os.system('rm %s/%s.tar.gz' % (p,db))
-	
-		# dump
-		mysqldump(db, p+'/')
-		
-		# zip
-		os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
-		os.system('rm %s/%s.sql' % (p, db))
-		#sql('unlock tables')
+    # Check processlist
+    if len(sql("show processlist")) == 1:
+      p = '../backups'
+      if from_all: p = '../backups/dumps'	
+      
+      os.system('rm %s/%s.tar.gz' % (p,db))
+	  
+      # dump
+      mysqldump(db, p+'/')
+      
+      # zip
+      os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
+      os.system('rm %s/%s.sql' % (p, db))
+		  #sql('unlock tables')
+    else:
+      msgprint("Another process is running in database. Please try after 1 minute.")
 	except Exception, e:
 		#sql('unlock tables')
 		raise e
-
+    
+    
 def copy_db(source, target=''):
-	if not server_prefix:
-		msgprint("Server Prefix must be set in defs.py")
-		raise Exception
+  # Check processlist
+  if len(sql("show processlist")) == 1:
+    if not server_prefix:
+      msgprint("Server Prefix must be set in defs.py")
+      raise Exception
 
-	import os
-	os.chdir(os.path.normpath('../data'))
-	
-	# dump
-	mysqldump(source)
+    import os
+    os.chdir(os.path.normpath('../data'))
+    
+    # dump
+    mysqldump(source)
 
-	# import
-	target = import_db(source, target)
-	
-	# delete dump
-	os.system('rm %s.sql' % source)
-	
-	return target
-
+    # import
+    target = import_db(source, target)
+    
+    # delete dump
+    os.system('rm %s.sql' % source)
+    
+    return target
+  else:
+    msgprint("Another process is running in database. Please try after 1 minute.")
+    
+    
 def import_db(source, target='', is_accounts=0):
 	# dump source
 	global mysql_path
