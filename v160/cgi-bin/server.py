@@ -2070,7 +2070,7 @@ def backup_db(db, from_all=0):
 
 	try:
 	# Check processlist
-    if len(sql("show processlist")) == 1:
+		if len(sql("show processlist")) == 1:
 			p = '../backups'
 			if from_all: p = '../backups/dumps'	
 	
@@ -2088,8 +2088,8 @@ def backup_db(db, from_all=0):
 	except Exception, e:
 		#sql('unlock tables')
 		raise e
-    
-    
+	
+  	
 def copy_db(source, target=''):
 	# Check processlist
 	if len(sql("show processlist")) == 1:
