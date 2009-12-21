@@ -13,7 +13,6 @@
 **/
 function Body() { 
 	var me = this;
-	this.wrapper = $i('body_div');
 
 	this.no_of_columns = function() {
 		var n = 1;
@@ -48,8 +47,11 @@ function Body() {
 		this.cp = locals['Control Panel']['Control Panel'];
 
 		// core areas;
-		this.wntoolbar = new WNToolbar(this.wrapper);
+		this.wntoolbar = new WNToolbar($i('body_div'));
+
+		this.wrapper = $a($i('body_div'),'div');
 		this.header = $a(this.wrapper, 'div');
+		this.topmenu = $a(this.wrapper, 'div');
 		this.body = $a(this.wrapper, 'div');
 		this.footer = $a(this.wrapper, 'div');
 		
@@ -57,7 +59,7 @@ function Body() {
 		this.setup_sidebars();
 		
 		// page width
-		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});
+		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});		
 	}
 	
 	// Standard containers

@@ -47,7 +47,7 @@ function mclose() { // close all active
 			all_dropdowns[i].hide();
 	}
 }
-function mclosetime() { closetimer = window.setTimeout(mclose, 500); }
+function mclosetime() { closetimer = window.setTimeout(mclose, 700); }
 function mcancelclosetime() { if(closetimer) { window.clearTimeout(closetimer); closetimer = null; } }
 
 MenuToolbar.prototype.make_dropdown = function(tm) {
@@ -74,19 +74,22 @@ MenuToolbar.prototype.add_item = function(top_menu_label, label, onclick, on_top
 	return tm.dropdown.add_item(label, onclick, on_top);
 }
 
-var all_dropdowns = [];
+var all_dropdowns = []; var cur_dropdown;
 function DropdownMenu(label_ele, width) {
 	this.body = $a(label_ele, 'div', 'menu_toolbar_dropdown', {width:(width ? width : '140px')});
 	this.label = label_ele;
 	this.items = {};
 	this.item_style = 'dd_item';
 	this.item_mo_style = 'dd_item_mo';
+	this.list = [];
 	this.max_height = 400;
+	this.keypressdelta = 500;
 		
 	var me = this;
 	
 	this.body.onmouseout = function() { me.clear(); }
 	this.body.onmouseover = function() { mcancelclosetime(); } // re-entered
+	this.clear_user_inp = function() { me.user_inp = '';}
 
 	this.show = function() {
 		// close others
@@ -99,9 +102,11 @@ function DropdownMenu(label_ele, width) {
 		$ds(me.body); // show
 
 		if(cint(me.body.clientHeight) >= me.max_height) {
-			$y(me.body, {height:'400px'});
+			$y(me.body, {height:me.max_height + 'px'});
+			me.scrollbars = 1;
 		} else {
 			$y(me.body, {height:null});
+			me.scrollbars = 0;
 		}
 		
 		// events on label
@@ -109,6 +114,7 @@ function DropdownMenu(label_ele, width) {
 			me.label.set_selected();
 		
 		me.is_active = 1;
+		
 	}
 
 	this.hide = function() {
@@ -142,15 +148,26 @@ DropdownMenu.prototype.add_item = function(label, onclick, on_top) {
 	}
 	
 	mi.innerHTML = label;
+	mi.label = label;
 	mi.onclick = onclick;
-	mi.onmouseover = function() {
+	
+	mi.highlight = function() {
+		if(me.cur_mi) me.cur_mi.clear();
 		this.className = me.item_style + ' ' + me.item_mo_style;
 		me.cur_mi=this;
 	}
-	mi.onmouseout = function() { this.className = me.item_style; }
+	mi.clear = function() { 
+		this.className = me.item_style; 
+	}
+
+	mi.onmouseover = mi.highlight;
+	mi.onmouseout = mi.clear;
+	
 	mi.bring_to_top = function() { me.body.insertBefore(this, me.body.firstChild); }
-
-	this.items[label] = mi;
-
+	
+	//var k=0, e=mi;
+	//while (e = e.previousSibling) { ++k;}
+	
+	//mi.idx = k;
 	return mi;
 }

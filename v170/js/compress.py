@@ -1,4 +1,4 @@
-in_files = [
+in_files_main = [
         'utils/datatype.js'
        ,'utils/browser_detect.js'
        ,'utils/datetime.js'
@@ -11,6 +11,8 @@ in_files = [
        ,'widgets/menu.js'
        ,'widgets/layout.js'
        ,'widgets/tabbedpage.js'
+       ,'widgets/autosuggest.js'
+       ,'widgets/select.js'
        ,'webpage/wntoolbar.js'
        ,'webpage/history.js'
        ,'webpage/search.js'
@@ -24,8 +26,21 @@ in_files = [
        ,'app.js'
      ]
 
-out_file = 'wnf.compressed.js'
+out_file_main = 'wnf.compressed.js'
 
+#-------------------------------------------------
+
+in_files_form = [
+	'widgets/form/form_container.js'
+	'widgets/form/form.js'
+	'widgets/form/fields.js'
+	'widgets/form/grid.js'
+	'widgets/form/form_grid.js'
+	'widgets/form/date_picker.js'
+	'widgets/form/print-format.js'
+]
+
+out_file_form = 'form.compressed.js';
 
 
 import os, os.path, shutil

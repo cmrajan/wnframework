@@ -184,14 +184,6 @@ function makeselector() {
 		if(kc==13) if(!btn.disabled)btn.onclick(); 
 	}
 
-	var _add_sel_options = function(s, list) {
-		for(var i in list){
-			s.options[s.options.length] = 
-				new Option(list[i][1], list[i][0], false, false);
-		}
-		//if(s.options.length>1)s.selectedIndex = 1; // select first
-	}
-
 	d.onshow = function() { 
 		if(d.set_doctype!=d.sel_type) {
 			d.rows['Result'].innerHTML ='';
@@ -205,22 +197,29 @@ function makeselector() {
 		try{inp.focus();} catch(e){}
 		
 		if(d.input) d.input.set_get_query();
+
+		// temp function to strip labels from search fields
+		var get_sf_list = function(dt) {
+			var l = []; var lf = search_fields[dt];
+			for(var i=0; i<lf.length; i++) l.push(lf[i][1]);
+			return l;
+		}
 	
 		// set fields
 		$ds(d.rows['Search By']);
 		
 		if(search_fields[d.sel_type]) {
 			empty_select(field_sel);
-			_add_sel_options(field_sel, search_fields[d.sel_type]);
+			add_sel_options(field_sel, get_sf_list(d.sel_type));
 		} else {
 			// set default select by
 			empty_select(field_sel);
-			_add_sel_options(field_sel, [['name','ID']]);
+			add_sel_options(field_sel, ['ID']);
 
 			$c('getsearchfields', {'doctype':d.sel_type}, function(r,rt) {
 				search_fields[d.sel_type] = r.searchfields;
 				empty_select(field_sel);
-				_add_sel_options(field_sel, search_fields[d.sel_type]);
+				add_sel_options(field_sel, get_sf_list(d.sel_type));
 				field_sel.selectedIndex = 0;
 			} );
 		}
@@ -240,13 +239,20 @@ function makeselector() {
 			var q = d.input.get_query(doc);
 			if(!q) { return ''; }
 		}
-		
-		$c('search2', 
-			args = {'txt':strip(inp.value), 'doctype':d.sel_type, 'defaults':pack_defaults(),
-				'query':q,
-				'searchfield':sel_val(field_sel),
-				'defaults':pack_defaults(),
-				'roles':'["'+user_roles.join('","')+'"]' }, 
+
+		// for field type, return field name
+		var get_sf_fieldname = function(v) {
+			var lf = search_fields[d.sel_type];
+			for(var i=0; i<lf.length; i++) if(lf[i][1]==v) return lf[i][0];
+		}		
+
+		$c('search_widget', 
+			args = {
+				'txt':strip(inp.value)
+				,'doctype':d.sel_type
+				,'query':q
+				,'searchfield':get_sf_fieldname(sel_val(field_sel))
+			},
 			function(r, rtxt) {
 				btn.disabled = false;
 				if(r.coltypes)r.coltypes[0]='Link'; // first column must always be selectable even if it is not a link

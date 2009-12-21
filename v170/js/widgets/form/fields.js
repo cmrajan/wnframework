@@ -475,7 +475,7 @@ LinkField.prototype.make_input = function() {
 		maxresults: 10,
 		link_field: me
 	};
-	var as = new bsn.AutoSuggest(me.txt.id, opts);
+	var as = new AutoSuggest(me.txt.id, opts);
 	
 }
 LinkField.prototype.set_get_query = function() { 

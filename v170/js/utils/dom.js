@@ -1,3 +1,13 @@
+function addEvent(ev, fn) {
+	if(isIE) {
+		document.attachEvent('on'+ev, function() { 
+			fn(window.event, window.event.srcElement); 
+		});
+	} else {
+		document.addEventListener(ev, function(e) { fn(e, e.target); }, true);
+	}
+}
+
 function set_opacity(ele, ieop) {
 	var op = ieop / 100;
 	if (ele.filters) { // internet explorer
@@ -46,9 +56,16 @@ function easeInOut(minValue,maxValue,totalSteps,actualStep,powr) {
 // Dom
 
 function empty_select(s) {
-if(s) { var tmplen = s.length; for(var i=0;i<tmplen; i++) s.options[0] = null; } }
+	if(s.custom_select) s.empty();
+	if(s) { 
+		var tmplen = s.length; for(var i=0;i<tmplen; i++) s.options[0] = null; 
+	} 
+}
 
 function sel_val(sel) { 
+	if(sel.custom_select) {
+		return sel.inp.value ? sel.inp.value : '';
+	}
 	try {
 		if(sel.selectedIndex<sel.options.length) return sel.options[sel.selectedIndex].value;
 		else return '';
@@ -56,6 +73,11 @@ function sel_val(sel) {
 }
 
 function add_sel_options(s, list, sel_val, o_style) {
+	if(s.custom_select) {
+		s.set_options(list)
+		if(sel_val) s.inp.value = sel_val;
+		return;
+	}
 	for(var i in list){
 		var o = new Option(list[i], list[i], false, (list[i]==sel_val? true : false));
 		if(o_style) $y(o, o_style);
@@ -94,14 +116,20 @@ function $a(parent, newtag, className, cs) {
 	if(cs)$y(c,cs);
 	return c;
 }
-function $a_input(p,in_type,in_name, cs) {
+function $a_input(p,in_type, attributes, cs) {
+	if(!attributes) attributes = {};
+	if(in_type) attributes.type = in_type 
 	if(isIE) {
-		p.innerHTML = repl('<input type="%(in_type)s" %(in_name)s>',{in_type:in_type,in_name:(in_name ? ('name="'+in_name+'"') : '')}); // IE fix
+		var s= '<input ';
+		for(key in attributes)
+			s+= ' ' + key + '="'+ attributes[key] + '"';
+		s+= '>'
+		p.innerHTML = s
 		var o = p.childNodes[0];
 	} else {
 		var o = $a(p, 'input'); 
-		o.setAttribute('type', in_type);
-		if(in_name)o.setAttribute('name', in_name);
+		for(key in attributes)
+			o.setAttribute(key, attributes[key]);
 	}
 	if(cs)$y(o,cs);
 	return o;

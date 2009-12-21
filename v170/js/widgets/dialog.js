@@ -104,30 +104,37 @@ Dialog.prototype.make_row = function(d) {
 	if(d[0]=='HTML') {
 		if(d[2])row.innerHTML = d[2];
 		this.widgets[d[1]]=row;
-	} else if(d[0]=='Check') {
+	} 
+	else if(d[0]=='Check') {
 		var i = $a_input(c2, 'checkbox','',{width:'20px'});
 		c1.innerHTML = d[1];
 		this.widgets[d[1]] = i;
-	} else if(d[0]=='Data') {
+	} 
+	else if(d[0]=='Data') {
 		c1.innerHTML = d[1];
 		c2.style.overflow = 'auto';
 		this.widgets[d[1]] = $a(c2, 'input');
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
-	} else if(d[0]=='Password') {
+	} 
+	else if(d[0]=='Password') {
 		c1.innerHTML = d[1];
 		c2.style.overflow = 'auto';
 		this.widgets[d[1]] = $a_input(c2, 'password');
 		if(d[3])$a(c2, 'div', 'comment').innerHTML = d[3];
-	} else if(d[0]=='Select') {
+		
+	} 
+	else if(d[0]=='Select') {
 		c1.innerHTML = d[1];
-		this.widgets[d[1]] = $a(c2, 'select');		
+		this.widgets[d[1]] = new SelectWidget(c2, [], '200px');
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
-	} else if(d[0]=='Text') {
+	} 
+	else if(d[0]=='Text') {
 		c1.innerHTML = d[1];
 		c2.style.overflow = 'auto';
 		this.widgets[d[1]] = $a(c2, 'textarea');		
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
-	} else if(d[0]=='Button') {
+	} 
+	else if(d[0]=='Button') {
 		c2.style.height = '32px';
 		c2.style.textAlign = 'right';
 		var b = $a(c2, 'button');

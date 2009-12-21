@@ -1,42 +1,52 @@
 # Search
+import webnotes
 
-def search_link(form, session):
-	txt = form.getvalue('txt')
-	dt = form.getvalue('dt')
-	query = form.getvalue('query')
-	sflist = ['`tab%s`.name' % dt]
-	if query:
-		if '%(key)s' in query:
-			query = query.replace('%(key)s', 'name')
-		if '%s' in query:
-			query = query % (txt + '%')
+def getsearchfields():
 
-		res = sql(query)
+	sf = webnotes.conn.sql("select search_fields from tabDocType where name=%s", webnotes.form.getvalue("doctype"))
+	sf = sf and sf[0][0] or ''
+	sf = [s.strip() for s in sf.split(',')]
+	if sf and sf[0]:
+		res =  webnotes.conn.sql("select fieldname, label, fieldtype, options from tabDocField where parent='%s' and fieldname in (%s)" % (webnotes.form.getvalue("doctype","_NA"), '"'+'","'.join(sf)+'"'))
 	else:
-		sf = sql('select search_fields from tabDocType where name = "%s"' % dt)
-		sf = sf and sf[0][0] or ''
-		if sf:
-			sf = sf.split(',')
-			for s in sf:
-				sflist.append('`tab%s`.`%s`' % (dt, s.strip()))
+		res = []
 
-		q = """
-			SELECT %(fields)s 
-			FROM `tab%(dt)s` 
-			WHERE `tab%(dt)s`.`%(key)s` LIKE '%(txt)s' AND `tab%(dt)s`.docstatus != 2
-			ORDER BY `tab%(dt)s`.`%(key)s` 
-			DESC LIMIT %(start)s, %(len)s """ % {
-				'fields': ', '.join(sflist),
-				'dt': dt,
-				'key': 'name',
-				'txt': txt + '%',
-				'start': '0', 
-				'len': '10'
-			}
+	res = [[c or '' for c in r] for r in res]
+	for r in res:
+		if r[2]=='Select' and r[3] and r[3].startswith('link:'):
+			dt = r[3][5:]
+			ol = webnotes.conn.sql("select name from `tab%s` where docstatus!=2 order by name asc" % dt)
+			r[3] = '\n'.join([''] + [o[0] for o in ol])
 
-		res = runquery(form, session, q, ret=1)
+	webnotes.response['searchfields'] = [['name', 'ID', 'Data', '']] + res
 
-	# make output
+def make_query(fields, dt, key, txt, start, length):
+	return  """
+		SELECT %(fields)s 
+		FROM `tab%(dt)s` 
+		WHERE `tab%(dt)s`.`%(key)s` LIKE '%(txt)s' AND `tab%(dt)s`.docstatus != 2
+		ORDER BY `tab%(dt)s`.`%(key)s` 
+		DESC LIMIT %(start)s, %(len)s """ % {
+			'fields': fields,
+			'dt': dt,
+			'key': key,
+			'txt': txt + '%',
+			'start': start, 
+			'len': length
+		}
+		
+def get_std_fields_list(dt, key):
+	# get additional search fields
+	sflist = webnotes.conn.sql("select search_fields from tabDocType where name = '%s'" % dt)
+	sflist = sflist and sflist[0][0] and sflist[0][0].split(',') or []
+
+	sflist = ['name'] + sflist
+	if not key in sflist:
+		sflist = sflist + [key]
+
+	return ['`tab%s`.`%s`' % (dt, f.strip()) for f in sflist]
+
+def build_for_autosuggest(res):
 	results = []
 	for r in res:
 		info = ''
@@ -46,47 +56,43 @@ def search_link(form, session):
 				info = info[:30] + '...'
 				
 		results.append({'id':r[0], 'value':r[0], 'info':info})
-	out['results'] = results
+	return results
 	
-def search2(form, session):
-	dt = form.getvalue('doctype')
-	txt = form.getvalue('txt') or ''
-	key = form.getvalue('searchfield') or 'name' # key field
-	start = form.getvalue('start') or 0
-	page_len = form.getvalue('page_len') or 50
-	user_query = form.getvalue('query') or ''
-
-	# get additional search fields
-	sflist = sql("select search_fields from tabDocType where name = '%s'" % dt)
-	sflist = sflist and sflist[0][0] and sflist[0][0].split(',') or []
-
-	sflist = ['name'] + sflist
-	if not key in sflist:
-		sflist = sflist + [key]
-
-	sflist = ['`tab%s`.`%s`' % (dt, f.strip()) for f in sflist]
-
-	if not user_query:
-		query = """
-			SELECT %(fields)s 
-			FROM `tab%(dt)s` 
-			WHERE `tab%(dt)s`.`%(key)s` LIKE '%(txt)s' 
-				AND `tab%(dt)s`.docstatus != 2
-			ORDER BY `tab%(dt)s`.`%(key)s` 
-			DESC LIMIT %(start)s, %(len)s """ % {
-				'fields': ', '.join(sflist),
-				'dt': dt,
-				'key': key,
-				'txt': txt + '%',
-				'start': start, 
-				'len': page_len
-			}
-	else:
-		if '%(key)s' in user_query:
-			user_query = user_query.replace('%(key)s', key)
-		if '%s' in user_query:
-			user_query = user_query % (txt + '%')
+def scrub_custom_query(query, txt):
+	if '%(key)s' in query:
+		query = query.replace('%(key)s', 'name')
+	if '%s' in query:
+		query = query % (txt + '%')
 		
-		query = user_query
+	return query
 
-	runquery(form, session, query)
+def search_link():
+	import webnotes.widgets.query_builder
+
+	txt = webnotes.form.getvalue('txt')
+	dt = webnotes.form.getvalue('dt')
+	query = webnotes.form.getvalue('query')
+	
+	if query:
+		res = sql(scrub_custom_query(query,txt))
+	else:
+		q = make_query(', '.join(get_std_fields_list(dt, 'name')), dt, 'name', txt, '0', '10')
+		res = webnotes.widgets.query_builder.runquery(q, ret=1)
+
+	# make output
+	out['results'] = build_for_autosuggest(res)
+	
+def search_widget():
+	import webnotes.widgets.query_builder
+
+	dt = webnotes.form.getvalue('doctype')
+	txt = webnotes.form.getvalue('txt') or ''
+	key = webnotes.form.getvalue('searchfield') or 'name' # key field
+	user_query = webnotes.form.getvalue('query') or ''
+
+	if user_query:
+		query = scrub_custom_query(user_query, txt)
+	else:
+		query = make_query(', '.join(get_std_fields_list(dt, key)), dt, key, txt, webnotes.form.getvalue('start') or 0, webnotes.form.getvalue('page_len') or 50)
+		
+	webnotes.widgets.query_builder.runquery(query)

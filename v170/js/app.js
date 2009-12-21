@@ -11,8 +11,18 @@ var user_fullname;
 var user_email;
 var user_img = {};
 var pscript = {};
-var select_register = [];
 var selector; 
+var keypress_observers = [];
+var click_observers = [];
+
+// Globals related to forms
+var cur_frm;
+var frm_con;
+var gridselectedcell;
+
+var load_js_file(fn, callback) {
+	$c('load_js_file', {'filename': fn}, function(r,rt) { eval(r.js); callback(); }, null, 1);
+}
 
 function startup() {
 	
@@ -34,11 +44,26 @@ function startup() {
 		rename_observers.push(nav_obj);
 	}
 	
+	var setup_events = function() {
+		addEvent('keypress', function(ev, target) {
+			for(var i in keypress_observers) {
+				keypress_observers[i].notify_keypress((ev.keyCode ? ev.keyCode : ev.charCode));
+			} 
+		});
+		addEvent('click', function(ev, target) {
+			for(var i=0; i<click_observers.length; i++) {
+				click_observers[i].notify_click(target);
+			}
+		});
+
+	}
+	
 	var callback = function(r,rt) {
 		if(r.exc) msgprint(r.ext);
 		
 		setup_globals(r);
 		setup_history(r);
+		setup_events();
 
 		page_body = new Body();
 		

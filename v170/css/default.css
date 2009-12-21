@@ -184,14 +184,13 @@ ul.menu_toolbar li {
 
 .top_menu {
 	display: block;
-	text-decoration: none;
+	text-decoration: underline;
 	margin: 0px;
 	margin: 0px 8px;
 	padding: 3px 6px;
 	cursor: pointer;
 	font-size: 13px;
-	font-weight: bold;
-	color: #666;
+	color: #00B;
 }
 .top_menu_mo {
 	color: #FFF;

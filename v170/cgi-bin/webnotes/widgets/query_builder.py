@@ -1,3 +1,10 @@
+import webnotes
+
+form = webnotes.form
+session = webnotes.session
+sql = webnotes.conn.sql
+out = webnotes.response
+
 def get_search_criteria_list(dt):
 	sc_list = sql("select criteria_name, doc_type from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s'" % (dt, dt))
 	return [list(s) for s in sc_list]
@@ -70,7 +77,7 @@ def get_sql_meta(tl):
 def add_match_conditions(q, tl, ur, ud):
 	sl = []
 	for dt in tl:
-		s = server.getmatchcondition(dt, ud, ur)
+		s = getmatchcondition(dt, ud, ur)
 		if s: 
 			sl.append(s)
 
@@ -87,15 +94,33 @@ def add_match_conditions(q, tl, ur, ud):
 			
 	return q
 
+def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[], filter_values={}, query='', from_export=0):
+	col_idx, i, out, style, header_html, footer_html, page_template = {}, 0, None, [], '', '', ''
+	for c in colnames:
+		col_idx[c] = i
+		i+=1
+		
+	from webnotes import *
+	from webnotes.utils import *
+
+	exec str(code)
+	
+	if out!=None:
+		res = out
+		
+	return res, style, header_html, footer_html, page_template
+
 #####
-def runquery(form, session, q='', ret=0, from_export=0):
+def runquery(q='', ret=0, from_export=0):
+	import webnotes.utils
+	
 	colnames, coltypes, coloptions, colwidths = [], [], [], []
 
 	if form.getvalue('simple_query') or form.getvalue('is_simple'):
 		q = form.getvalue('simple_query') or form.getvalue('query')
 		if q.split()[0].lower() != 'select':
 			raise Exception, 'Query must be a SELECT'
-		res = server.convert_to_lists(sql(q))
+		res = webnotes.conn.convert_to_lists(sql(q))
 	else:
 		if not q: q = form.getvalue('query')
 
@@ -114,7 +139,7 @@ def runquery(form, session, q='', ret=0, from_export=0):
 				coloptions.append('')
 				colwidths.append('100')
 	
-		q = add_match_conditions(q, tl, eval(form.getvalue('roles')), eval(form.getvalue('defaults')))
+		q = add_match_conditions(q, tl, webnotes.user.roles, webnotes.user.roles)
 	
 		if session['data'].get('__testing'):
 			for dt in tl:
@@ -124,17 +149,18 @@ def runquery(form, session, q='', ret=0, from_export=0):
 		
 		# replace special variables
 		q = q.replace('__user', session['user'])
-		q = q.replace('__today', server.nowdate())
+		q = q.replace('__today', webnotes.utils.nowdate())
 		
-		res = server.convert_to_lists(sql(q))
+		res = webnotes.conn.convert_to_lists(sql(q))
 		
 	# run server script
 	style, header_html, footer_html, page_template = '', '', '', ''
 	if form.has_key('sc_id') and form.getvalue('sc_id'):
-		code = server.Document("Search Criteria", form.getvalue('sc_id')).server_script
+		from webnotes.model.doc import Document
+		code = Document("Search Criteria", form.getvalue('sc_id')).server_script
 		if code:
 			filter_values = form.has_key('filter_values') and eval(form.getvalue('filter_values','')) or {}
-			res, style, header_html, footer_html, page_template = server.exec_report(code, res, colnames, colwidths, coltypes, coloptions, filter_values, q, from_export)
+			res, style, header_html, footer_html, page_template = exec_report(code, res, colnames, colwidths, coltypes, coloptions, filter_values, q, from_export)
 		
 	out['colnames'] = colnames
 	out['coltypes'] = coltypes
@@ -159,14 +185,14 @@ def runquery(form, session, q='', ret=0, from_export=0):
 		if qm.split()[0].lower() != 'select':
 			raise Exception, 'Query (Max) must be a SELECT'
 		if not form.has_key('simple_query'):
-			qm = add_match_conditions(qm, tl, eval(form.getvalue('roles')), eval(form.getvalue('defaults')))
+			qm = add_match_conditions(qm, tl, webnotes.user.roles, webnotes.user.defaults)
 
-		out['n_values'] = server.cint(sql(qm)[0][0])
+		out['n_values'] = webnotes.utils.cint(sql(qm)[0][0])
 
 def runquery_csv(form, session):
 
 	# run query
-	res = runquery(form, session, from_export = 1)
+	res = runquery(from_export = 1)
 	
 	q = form.getvalue('query')
 	

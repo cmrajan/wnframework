@@ -8,19 +8,20 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC'});
-		this.body_tab = make_table(this.wrapper, 1, 4, '100%', ['5%','45%','25%','25%'],{padding:'2px'});
+		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC', backgroundColor:'#EEE'});
+		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['30%','45%','25%'],{padding:'2px'});
 		
-		// webnotes logo
-		this.webnotes = $a($td(this.body_tab,0,0), 'img', '', {marginTop:'0px', cursor:'pointer'})
-		this.webnotes.src = 'images/ui/webnotes20x80-1.gif';
-		this.webnotes.onclick = function() { show_about(); }
+		// model tab
+		$y($td(this.body_tab, 0, 1),{paddingTop:'3px', paddingBottom:'0px'});
+		this.model_tab = make_table($td(this.body_tab,0,1), 1, 4, null, ['140px','140px','140px','80px'], {padding:'2px'});
 		
-		this.menu = new MenuToolbar($td(this.body_tab,0,1));
-		this.setup_start();
+		this.menu = new MenuToolbar($td(this.body_tab,0,0));
 		this.setup_home();
-		this.setup_new();
 		this.setup_recent();
+		this.setup_options();
+		this.setup_help();
+
+		this.setup_new();
 		this.setup_report_builder();
 
 		this.setup_logout();
@@ -32,8 +33,8 @@ function WNToolbar(parent) {
 	
 	// Start
 	// ----------------------------------------------------------------------------------------
-	this.setup_start = function() {
-		var tm = this.menu.add_top_menu('Start', function() { });
+	this.setup_options = function() {
+		var tm = this.menu.add_top_menu('Options', function() { });
 		
 		var fn = function() {
 			if(this.dt=='Page')
@@ -47,7 +48,7 @@ function WNToolbar(parent) {
 		profile.start_items.sort(function(a,b){return (a[4]-b[4])});
 		for(var i=0;i< profile.start_items.length;i++) {
 			var d = profile.start_items[i];
-			var mi = this.menu.add_item('Start',d[1], fn);
+			var mi = this.menu.add_item('Options',d[1], fn);
 			mi.dt = d[0]; mi.dn = d[5]?d[5]:d[1];
 		}
 	}
@@ -57,24 +58,6 @@ function WNToolbar(parent) {
 
 	this.setup_home = function() {
 		this.menu.add_top_menu('Home', function() { loadpage(home_page); } );
-	}
-	
-	// New
-	// ----------------------------------------------------------------------------------------
-
-	this.setup_new = function() {
-		this.menu.add_top_menu('New', function() {  } );
-	
-		var fn = function() {
-			new_doc(this.dt);
-			mclose();
-		}
-		
-		// add menu items
-		for (var i=0;i<profile.can_create.length;i++) {
-			var mi = this.menu.add_item('New',profile.can_create[i], fn);
-			mi.dt = profile.can_create[i];
-		}
 	}
 
 	// Recent
@@ -137,29 +120,65 @@ function WNToolbar(parent) {
 		}
 		rename_observers.push(this);
 	}
+	
+	// Help
+	// ----------------------------------------------------------------------------------------
+	this.setup_help = function() {
+		me.menu.add_top_menu('Tools', function() {  } );
+		this.menu.add_item('Tools','Error Console', function() { err_console.show(); });
+		this.menu.add_item('Tools','Start / Finish Testing Mode', function() { enter_testing(); });
+		if(has_common(user_roles,['Administrator','System Manager'])) {
+			this.menu.add_item('Tools','Download Backup', function() { start_testing(); });
+			this.menu.add_item('Tools','Reset Testing', function() { download_backup(); });			
+		}
+		this.menu.add_item('Tools','About <b>Web Notes</b>', function() { show_about(); });
+	}	
 
+	// New
+	// ----------------------------------------------------------------------------------------
+	this.setup_new = function() {	
+		this.new_sel = new SelectWidget($td(this.model_tab, 0, 0), profile.can_create);
+		this.new_sel.inp.value='Create New...';
+		this.new_sel.inp.onchange = function() { new_doc(wntoolbar.new_sel.inp.value); this.value = 'Create New...'; }
+	}
+	
 	// Report Builder
 	// ----------------------------------------------------------------------------------------
 	this.setup_report_builder = function() {
-		me.menu.add_top_menu('Report Builder', function() {  } );
-	
-		var fn = function() {
-			loadreport(this.dt);
-			mclose();
-		}
+		this.rb_sel = new SelectWidget($td(this.model_tab, 0, 1), profile.can_get_report);
+		this.rb_sel.inp.value = 'Report Builder...';
+		this.rb_sel.inp.onchange = function() { loadreport(wntoolbar.rb_sel.inp.value); this.value = 'Report Builder...'; }
+	}
+
+	// Setup Search
+	// ----------------------------------------------------------------------------------------
+
+	this.setup_search = function() {
+
+		this.search_sel = new SelectWidget($td(this.model_tab, 0, 2), []);
+		this.search_sel.inp.value = 'Search...';
+		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
+		this.search_btn = $a($td(this.model_tab, 0, 3), 'button'); this.search_btn.innerHTML = 'Search';
 		
-		// add menu items
-		for (var i=0;i<profile.can_get_report.length;i++) {
-			var mi = me.menu.add_item('Report Builder',profile.can_get_report[i], fn);
-			mi.dt = profile.can_get_report[i];
+		function open_quick_search() {
+			if(me.search_sel.inp.value)
+				selector.set_search(me.search_sel.inp.value);
+			me.search_sel.disabled = 1;
+			selector.show();
 		}
+
+		me.search_sel.set_options(profile.can_read);
+		me.search_sel.inp.onchange = function() { open_quick_search(); this.value = 'Search...'; }
+		
+		this.search_btn.onclick = function() { open_quick_search(); }	
+		makeselector();
 	}
 	
 	// Setup User / Logout area
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
-		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px'});
+		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px', paddingLeft:'16px', textAlign:'right'});
 		var t = make_table(w, 1, 3, null, [null, null, null], {padding: '2px 6px', borderLeft:'1px solid #CCC', fontSize: '13px'});
 		$y($td(t,0,0),{border:'0px'});
 		$td(t,0,0).innerHTML = user_fullname;
@@ -167,29 +186,6 @@ function WNToolbar(parent) {
 		$td(t,0,2).innerHTML = '<span class="link_type" onclick="logout()">Logout</span>';
 	}
 
-	// Setup Search
-	// ----------------------------------------------------------------------------------------
-
-	this.setup_search = function() {
-		var w = $a($td(this.body_tab, 0, 3),'div');
-
-		this.search_sel = $a(w,'select','',{width:'100px', margin:'0px', marginRight:'8px'});
-		this.search_btn = $a(w,'button'); this.search_btn.innerHTML = 'Search';
-		
-		function open_quick_search() {
-			selector.set_search(sel_val(me.search_sel));
-			me.search_sel.disabled = 1;
-			selector.show();
-		}
-
-		add_sel_options(me.search_sel, profile.can_read);
-		me.search_sel.selectedIndex = 0;
-		me.search_sel.onchange = function() { open_quick_search(); }
-		select_register.push(me.search_sel);
-		
-		this.search_btn.onclick = function() { open_quick_search(); }	
-		makeselector();
-	}
 
 	this.setup();
 }

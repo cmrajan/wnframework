@@ -8,12 +8,6 @@ function show_about() {
 			['HTML', 'info']
 		]);
 		
-		var reset_testing_html = '';
-		if(has_common(user_roles,['Administrator','System Manager'])) {
-			reset_testing_html = "<br><div onclick='setup_testing()' class='link_type'>Reset Testing Mode (Old testing data will be lost)</div>"
-				+"<br><div onclick='download_backup()' class='link_type'>Download Backup</div>";
-		}
-	
 		d.rows['info'].innerHTML = "<div style='padding: 16px;'><center>"
 			+"<div style='text-align: center'><img src = 'images/ui/webnotes30x120.gif'></div>"
 			+"<br><br>&copy; 2007-08 Web Notes Technologies Pvt. Ltd."
@@ -23,14 +17,7 @@ function show_about() {
 			+"<br>Email: info@webnotestech.com"
 			+"<br><b>Customer Support: support@webnotestech.com</b></p>"
 			+"<p><a href='http://www.webnotestech.com'>www.webnotestech.com</a></p></center>"
-			+"<div style='background-color: #DFD; padding: 16px;'>"
-			+"<div id='testing_mode_link' onclick='enter_testing()' class='link_type'>Enter Testing Mode</div>"
-			+reset_testing_html
-			+"<br><div onclick='err_console.show()' class='link_type'><b>Error Console</b></div>"
-			+"</div>"
 			+"</div>";
-	
-		if(is_testing)$i('testing_mode_link').innerHTML = 'End Testing';
 	
 		about_dialog = d;
 	}

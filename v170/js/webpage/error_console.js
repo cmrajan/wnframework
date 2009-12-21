@@ -32,7 +32,6 @@ function setup_err_console() {
 		err_console.rows['Error List'].innerHTML = '';
 	}
 	err_console.onshow = function() {
-		about_dialog.hide();
 		err_console.rows['Error List'].innerHTML = '<div style="padding: 16px; height: 360px; width: 90%; overflow: auto;">' 
 			+ err_list.join('<div style="height: 10px; margin-bottom: 10px; border-bottom: 1px solid #AAA"></div>') + '</div>';
 	}

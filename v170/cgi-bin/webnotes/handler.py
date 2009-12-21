@@ -66,6 +66,32 @@ def set_timezone():
 
 set_timezone()
 
+def getsearchfields():
+	import webnotes.widgets.search
+	webnotes.widgets.search.getsearchfields()
+
+def search_widget():
+	import webnotes.widgets.search
+	webnotes.widgets.search.search_widget()
+
+def runquery():
+	import webnotes.widgets.query_builder
+	webnotes.widgets.query_builder.runquery()
+	
+def load_js_file():
+	filename = webnotes.form.getvalue('filename')
+	import os
+	try:
+		f = open(os.path.join('../js/', filename))
+		try:
+			webnotes.response['js'] = f.read()
+		finally:
+			f.close()
+	except IOError,e:
+		webnotes.response['js'] = 'msgprint("%s not found")' % filename
+
+ # ------------------------------------------------------------------------------------
+
 # Get user image
 # --------------
 def get_user_img(form,session):
@@ -598,28 +624,6 @@ def update_password(form, session):
 		webnotes.msgprint('Password Reset')
 	else:
 		webnotes.msgprint('Old Password is not correct. Did not reset!')
-
-# Search Fields
-# -------------
-
-def getsearchfields(form, session):
-	sf = sql("select search_fields from tabDocType where name=%s", form.getvalue("doctype"))
-	sf = sf and sf[0][0] or ''
-	sf = [s.strip() for s in sf.split(',')]
-	if sf and sf[0]:
-		res = sql("select fieldname, label, fieldtype, options from tabDocField where parent='%s' and fieldname in (%s)" % (form.getvalue("doctype","_NA"), '"'+'","'.join(sf)+'"'))
-	else:
-		res = []
-
-	res = [[c or '' for c in r] for r in res]
-	for r in res:
-		if r[2]=='Select' and r[3] and r[3].startswith('link:'):
-			dt = r[3][5:]
-			ol = sql("select name from `tab%s` where docstatus!=2 order by name asc" % dt)
-			r[3] = '\n'.join([''] + [o[0] for o in ol])
-			
-
-	out['searchfields'] = [['name', 'ID', 'Data', '']] + res
 
 # Testing
 # -------
