@@ -1,3 +1,11 @@
+// fields.js
+//
+// Fields are divided into 2 types
+// 1. Standard fields are loaded with the libarary
+// 2. Special fields are loaded with form.compressed.js
+
+// ======================================================================================
+
 function Field() {	}
 
 Field.prototype.make_body = function() { 
@@ -5,8 +13,10 @@ Field.prototype.make_body = function() {
 		this.wrapper = $a(this.parent, 'div');
 	else
 		this.wrapper = document.createElement('div');
-			
+	
 	if(!this.with_label) {
+
+		// simple field with label on top
 		this.label_area = $a(this.wrapper, 'div');
 		$dh(this.label_area);
 		this.comment_area = $a(this.wrapper, 'div', 'comment');
@@ -14,6 +24,8 @@ Field.prototype.make_body = function() {
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
 	} else {
+		
+		// 2 column layout with label on LHS	
 		var t = $a(this.wrapper, 'table', 'frm_field_table');
 		var r = t.insertRow(0); this.r = r;
 		var lc = r.insertCell(0); this.input_cell = r.insertCell(1);
@@ -30,8 +42,6 @@ Field.prototype.make_body = function() {
 	if(this.onmake)this.onmake();
 }
 
-Field.prototype.onresize = function() { }
-
 Field.prototype.set_label = function() {
 	if(this.label_cell&&this.label!=this.df.label) { 
 		this.label_cell.innerHTML = this.df.label;this.label = this.df.label; 
@@ -47,7 +57,7 @@ Field.prototype.set_label = function() {
 
 Field.prototype.get_status = function() {
 	// if used in filters
-	if(this.in_filter) {
+	if(this.not_in_form) {
 		return 'Write';
 	}
 	
@@ -90,13 +100,14 @@ Field.prototype.get_status = function() {
 	return ret;
 }
 
+// for grids (activate against a particular record in the table
 Field.prototype.activate = function(docname) {
 	this.docname = docname;
 	this.refresh();
 
 	if(this.input) {
 		this.input.isactive = true;
-		var v = get_value(this.doctype, this.docname, this.df.fieldname);
+		var v = _f.get_value(this.doctype, this.docname, this.df.fieldname);
 		this.last_value=v;
 		// set input value
 
@@ -119,7 +130,7 @@ Field.prototype.activate = function(docname) {
 	}
 }
 Field.prototype.refresh_mandatory = function() { 
-	if(this.in_filter)return;
+	if(this.not_in_form)return;
 
 	// mandatory changes
 	if(this.label_cell) {
@@ -182,16 +193,16 @@ Field.prototype.refresh = function() {
 	if(this.onrefresh) this.onrefresh();
 	if(this.input&&this.input.refresh) this.input.refresh(this.df);
 
-	if(!this.in_filter)
-		this.set_input(get_value(this.doctype,this.docname,this.df.fieldname));
+	if(!this.not_in_form)
+		this.set_input(_f.get_value(this.doctype,this.docname,this.df.fieldname));
 }
 
 Field.prototype.refresh_label_icon = function() {
-	if(this.in_filter)return;
+	if(this.not_in_form)return;
 	
 	// mandatory
 	if(this.label_icon && this.df.reqd) {
-		var v = get_value(this.doctype, this.docname, this.df.fieldname);
+		var v = _f.get_value(this.doctype, this.docname, this.df.fieldname);
 	 	if(is_null(v)) 
 	 		$di(this.label_icon);
 	 	else 
@@ -200,8 +211,10 @@ Field.prototype.refresh_label_icon = function() {
 }
 
 Field.prototype.set = function(val) {
-	if(this.in_filter)
-		return;		
+	// not in form
+	if(this.not_in_form)
+		return;
+		
 	if((!this.docname) && this.grid) {
 		this.docname = this.grid.add_newrow(); // new row
 	}
@@ -211,7 +224,7 @@ Field.prototype.set = function(val) {
 	
 	var set_val = val;
 	if(this.validate)set_val = this.validate(val);
-	set_value(this.doctype, this.docname, this.df.fieldname, set_val);
+	_f.set_value(this.doctype, this.docname, this.df.fieldname, set_val);
 	this.value = val; // for return
 }
 
@@ -227,7 +240,7 @@ Field.prototype.set_input = function(val) {
 }
 
 Field.prototype.run_trigger = function() {
-	if(this.in_filter) {
+	if(this.not_in_form) {
 		if(this.report)
 			this.report.run();
 		return;
@@ -249,6 +262,8 @@ Field.prototype.set_disp_html = function(t) {
 Field.prototype.set_disp = function(val) { 
 	this.set_disp_html(val);
 }
+
+// ======================================================================================
 
 function DataField() { } DataField.prototype = new Field();
 DataField.prototype.with_label = 1;
@@ -301,77 +316,19 @@ DataField.prototype.onrefresh = function() {
 	}
 }
 
+// ======================================================================================
+
 function ReadOnlyField() { } ReadOnlyField.prototype = new Field();
 ReadOnlyField.prototype.with_label = 1;
+
+// ======================================================================================
 
 function HTMLField() { } HTMLField.prototype = new Field();
 HTMLField.prototype.set_disp = function(val) { this.disp_area.innerHTML = val; }
 HTMLField.prototype.set_input = function(val) { if(val) this.set_disp(val); }
 HTMLField.prototype.onrefresh = function() { this.set_disp(this.df.options?this.df.options:''); }
 
-// Image field definition
-
-function get_image_src(doc) {
-	if(doc.file_list) {
-		file = doc.file_list.split(',');
-		// if image
-		extn = file[0].split('.');
-		extn = extn[extn.length - 1].toLowerCase();
-		var img_extn_list = ['gif', 'jpg', 'bmp', 'jpeg', 'jp2', 'cgm',  'ief', 'jpm', 'jpx', 'png', 'tiff', 'jpe', 'tif'];
-
-		if(in_list(img_extn_list, extn)) {
-			var src = outUrl + "?cmd=downloadfile&file_id="+file[1]+"&__account="+account_id + (__sid150 ? ("&sid150="+__sid150) : '');
-		}
-	} else {
-		var src = "";
-	}
-	return src;
-}
-
-function ImageField() { this.images = {}; }
-ImageField.prototype = new Field();
-ImageField.prototype.onmake = function() {
-	this.no_img = $a(this.wrapper, 'div','no_img');
-	this.no_img.innerHTML = "No Image";
-	$dh(this.no_img);
-}
-ImageField.prototype.onrefresh = function() { 
-	var me = this;
-	if(!this.images[this.docname]) this.images[this.docname] = $a(this.wrapper, 'img');
-	else $di(this.images[this.docname]);
-	
-	var img = this.images[this.docname]
-	
-	// hide all other
-	for(var dn in this.images) if(dn!=this.docname)$dh(this.images[dn]);
-
-	var doc = locals[this.frm.doctype][this.frm.docname];
-	
-	if(!this.df.options) var src = get_image_src(doc);
-	else var src = outUrl + '?cmd=get_file&fname='+this.df.options+"&__account="+account_id + (__sid150 ? ("&sid150="+__sid150) : '');
-
-	
-	if(src) {
-		$dh(this.no_img);
-		if(img.getAttribute('src')!=src) img.setAttribute('src',src);
-		canvas = this.wrapper;
-		canvas.img = this.images[this.docname];
-		canvas.style.overflow = "auto";
-		$w(canvas, "100%");
-	
-		if(!this.col_break_width)this.col_break_width = '100%';
-		var allow_width = cint(pagewidth * (cint(this.col_break_width)-10) / 100);
-
-		if((!img.naturalWidth) || cint(img.naturalWidth)>allow_width)
-			$w(img, allow_width + 'px');
-
-	} else {
-		$ds(this.no_img);
-	}
-}
-ImageField.prototype.set_disp = function (val) { }
-ImageField.prototype.set = function (val) { }
-
+// ======================================================================================
 
 function DateField() { } DateField.prototype = new Field();
 DateField.prototype.with_label = 1;
@@ -428,6 +385,8 @@ DateField.prototype.validate = function(v) {
 	return v;
 };
 
+// ======================================================================================
+
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
@@ -454,7 +413,7 @@ LinkField.prototype.make_input = function() {
 	me.get_value = function() {
 		return me.txt.value;
 	}
-	if((!me.in_filter) && in_list(session.nt, me.df.options)) {
+	if((!me.not_in_form) && in_list(profile.can_create, me.df.options)) {
 		me.new_link_area = $a(me.input_area,'div','',{display:'none',textAlign:'right',width:'81%'});
 		var sp = $a(me.new_link_area, 'span', 'link_type',{fontSize:'11px'});
 		sp.innerHTML = 'New ' + me.df.options;
@@ -482,7 +441,7 @@ LinkField.prototype.set_get_query = function() {
 	if(this.get_query)return;
 
 	// if from dialog
-	if(dialog_record && dialog_record.display) {
+	if(_f.frm_dialog && _f.frm_dialog.display) {
 		// find if there is a twin as template?
 		var gl = cur_frm.grids;
 		for(var i = 0; i < gl.length; i++) {
@@ -502,6 +461,8 @@ LinkField.prototype.set_disp = function(val) {
 	this.set_disp_html(t);
 }
 
+// ======================================================================================
+
 function IntField() { } IntField.prototype = new DataField();
 IntField.prototype.validate = function(v) {
 	var v= parseInt(v); if(isNaN(v))return null;
@@ -511,6 +472,8 @@ IntField.prototype.format_input = function() {
 	if(this.input.value==null) this.input.value='';
 }
 
+// ======================================================================================
+
 function FloatField() { } FloatField.prototype = new DataField();
 FloatField.prototype.validate = function(v) {
 	var v= parseFloat(v); if(isNaN(v))return null;
@@ -519,6 +482,8 @@ FloatField.prototype.validate = function(v) {
 FloatField.prototype.format_input = function() {
 	if(this.input.value==null) this.input.value='';
 }
+
+// ======================================================================================
 
 function CurrencyField() { } CurrencyField.prototype = new DataField();
 CurrencyField.prototype.format_input = function() { 
@@ -539,6 +504,8 @@ CurrencyField.prototype.onmake = function() {
 		if(flt(this.value)==0)this.value=''; 
 	}
 }
+
+// ======================================================================================
 
 function CheckField() { } CheckField.prototype = new Field();
 CheckField.prototype.with_label = 1;
@@ -577,26 +544,7 @@ CheckField.prototype.set_disp = function(val) {
 	else { $dh(this.checkimg); }
 }
 
-function ButtonField() { } ButtonField.prototype = new Field();
-ButtonField.prototype.make_input = function() { var me = this;
-
-	//this.input_area.className = 'buttons';
-	$y(this.input_area,{height:'30px', marginTop:'4px', marginBottom: '4px'});
-
-	this.input = $a(this.input_area, 'button');
-	this.input.label = $a(this.input,'span');
-	this.input.label.innerHTML = me.df.label;
-	this.input.onclick = function() {
-		this.disabled = true;
-		if(me.df.trigger=='Client' && (!me.in_filter)) {
-			cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
-			this.disabled = false;
-		} else
-			cur_frm.runscript(me.df.options, me);
-	}
-}
-ButtonField.prototype.set = function(v) { }; // No Setter
-ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly
+// ======================================================================================
 
 var codeid=0; var code_editors={}; var tinymce_loaded;
 function CodeField() { } CodeField.prototype = new Field();
@@ -684,6 +632,8 @@ CodeField.prototype.setup_editor = function() {
 	}
 }
 
+// ======================================================================================
+
 function TextField() { } TextField.prototype = new Field();
 TextField.prototype.with_label = 1;
 TextField.prototype.set_disp = function(val) { 
@@ -725,186 +675,112 @@ function make_text_dialog() {
 	}
 	d.onshow = function() {
 		this.widgets['Enter Text'].style.height = '300px';
-		var v = get_value(this.field.doctype,this.field.docname,this.field.df.fieldname);
+		var v = _f.get_value(this.field.doctype,this.field.docname,this.field.df.fieldname);
 		this.widgets['Enter Text'].value = v==null?'':v;
 		this.widgets['Enter Text'].focus();
 	}
 	d.onhide = function() {
-		if(grid_selected_cell)
-			grid_selected_cell.grid.cell_deselect();
+		if(_f.cur_grid_cell)
+			_f.cur_grid_cell.grid.cell_deselect();
 	}
 	text_dialog = d;
 }
 
 TextField.prototype.table_refresh = function() {
+	if(!this.text_dialog)
+		make_text_dialog();
 	text_dialog.title_text.data = 'Enter text for "'+ this.df.label +'"';
 	text_dialog.field = this;
 	text_dialog.show();
 }
 
-// Table
-
-function TableField() { } TableField.prototype = new Field();
-TableField.prototype.make_body = function() {
-	if(this.perm[this.df.permlevel] && this.perm[this.df.permlevel][READ]) {
-		this.grid = new FormGrid(this);
-		if(this.frm)this.frm.grids[this.frm.grids.length] = this;
-		this.grid.make_buttons();
-	}
-}
-
-TableField.prototype.refresh = function() {
-	if(!this.grid)return;
-	
-	// hide / show grid
-	var st = this.get_status();
-
-	if(!this.df['default']) 
-		this.df['default']='';
-
-	this.grid.can_add_rows = false;
-	this.grid.can_edit = false
-	if(st=='Write') {
-		if(cur_frm.editable && this.perm[this.df.permlevel] && this.perm[this.df.permlevel][WRITE]) {
-			this.grid.can_edit = true;
-			if(this.df['default'].toLowerCase()!='no toolbar')
-				this.grid.can_add_rows = true;
-		}
-		if(cur_frm.editable 
-			&& this.df.allow_on_submit 
-				&& cur_frm.doc.docstatus == 1 
-					&& this.df['default'].toLowerCase()!='no toolbar') {
-				this.grid.can_add_rows = true;
-				this.grid.can_edit = true;
-		}
-	}
-	
-	if(this.old_status!=st) {
-		if(st=='Write') {
-			// nothing
-			this.grid.show();
-		} else if(st=='Read') {
-			this.grid.show();
-		} else {
-			this.grid.hide();
-		}
-		this.old_status = st; // save this if next time
-	}
-
-	this.grid.refresh();
-}
-
-TableField.prototype.set = function(v) { }; // nothing
-TableField.prototype.set_input = function(v) { }; // nothing
 
 // Select
+// ======================================================================================
 
 function SelectField() { } SelectField.prototype = new Field();
 SelectField.prototype.with_label = 1;
 SelectField.prototype.make_input = function() { 
 	var me = this;
-	
-	this.input = $a(this.input_area, 'select');
-	if(isIE6 || isIE7) $y(this.input,{margin:'1px'}); //?? - wont show without this
-	select_register[select_register.length] = this.input;
 	var opt=[];
 	
-	if(this.in_filter && (!this.df.single_select)) {
+	if(this.not_in_form && (!this.df.single_select)) {
+		this.input = $a(this.input_area, 'select');
 		this.input.multiple = true;
 		this.input.style.height = '4em';
 		var lab = $a(this.input_area, 'div');
 		lab.innerHTML = '(Use Ctrl+Click to select multiple or de-select)'
 		lab.style.fontSize = '9px';
 		lab.style.color = '#999';
-	}
-
-	this.input.onchange = function() {
-		if(!me.in_filter) {
+	} else {
+		this.input = new SelectWidget(this.input_area, []);	
+		this.txt = this.input.inp;
+		this.txt.onchange = function() {
 			if(me.validate)
 				me.validate();
-			me.set(me.input.options[me.input.selectedIndex].value); 
+			me.set(me.txt.value); 
 		}
-		me.run_trigger();
 	}
+
 	
 	this.refresh_options = function(options) {
 		if(options)
 			me.df.options = options;
-		if(this.set_options == me.df.options) return; // no change	
-
-		var opt = me.df.options?me.df.options.split('\n'):[];
+			
+		me.options_list = me.df.options?me.df.options.split('\n'):[];
 		
 		// add options
-		var selectedflag = false;
-		empty_select(this.input);
-
-		for (var i=0; i<opt.length; i++) { 
-			var cur_sel=false; 
-			me.input.options[me.input.options.length] = new Option(opt[i], opt[i], false, cur_sel);
-		}
-		
-		// set selected
-		this.set_options = me.df.options;
-	
+		this.input.set_options(me.options_list);
 	}
 	
 	this.onrefresh = function() {
 		this.refresh_options();
 
-		if(this.in_filter) {
-			if(isIE) { // deselect all in IE
-				this.input.selectedIndex = -1;
-			}
+		if(this.not_in_form) {
+			this.txt.value = '';
 			return;
 		}
-			
-		var v = get_value(this.doctype,this.docname,this.df.fieldname);
+		
+		if(_f.get_value)
+			var v = _f.get_value(this.doctype,this.docname,this.df.fieldname);
+		else 
+			var v=null;
 		this.input.set_input(v);
-
-	}
-	this.in_options = function(v) {
-		var opt = me.df.options?me.df.options.split('\n'):[];
-		if(in_list(opt, v))
-			return 1;
-		else
-			return 0;
 	}
 	
 	this.input.set_input=function(v) {
 		if(!v) {
-			if(!me.in_filter) {
+			if(!me.not_in_form) {
 				if(me.docname) { // if called from onload without docname being set on fields
-					me.input.selectedIndex = 0;
-					me.set(sel_val(me.input));
+					if(me.df.options) {
+						me.set(me.options_list[0]);
+						me.txt.value = me.options_list[0];
+					} else {
+						me.txt.value = '';
+					}
 				}
 			}
 		} else {
-			if(me.in_options(v))
-				me.input.value = v;
-			else {
-				if(!me.df.options) {
-					me.df.options = '\n'+v;
-					me.refresh_options();
-				}
-				me.input.value = v;
-			}
+			if(me.options_list && in_list(me.options_list, v))
+				me.txt.value = v;
 		}
 	}
 	this.get_value= function() {
-		if(me.in_filter) {	
+		if(me.not_in_form) {
 			var l = [];
 			for(var i=0;i<me.input.options.length; i++ ) {
 				if(me.input.options[i].selected)l[l.length] = me.input.options[i].value;
 			}
 			return l;
 		} else {
-			return sel_val(me.input);
+			return me.txt.value;
 		}
 	}
 	this.refresh();
 }
 
 // Time
+// ======================================================================================
 
 function TimeField() { } TimeField.prototype = new Field();
 TimeField.prototype.with_label = 1;
@@ -950,7 +826,7 @@ TimeField.prototype.make_input = function() { var me = this;
 	this.input_am.onchange = onchange_fn;
 	
 	this.onrefresh = function() {
-		var v = get_value(me.doctype,me.docname,me.df.fieldname);
+		var v = _f.get_value ? _f.get_value(me.doctype,me.docname,me.df.fieldname) : null;
 		me.set_time(v);
 		if(!v)
 			me.set(me.get_time());
@@ -973,9 +849,63 @@ TimeField.prototype.set_disp=function(v) {
 	this.set_disp_html(t);
 }
 
+// ======================================================================================
+// Used by date and link fields
+
+function makeinput_popup(me, iconsrc, iconsrc1) {
+	me.input = $a(me.input_area, 'div');
+	me.input.onchange = function() { /*alert('in_oc'); me.txt.onchange();*/ }
+	
+	var tab = $a(me.input, 'table');
+	$w(tab, '100%');
+	tab.style.borderCollapse = 'collapse';
+	
+	var c0 = tab.insertRow(0).insertCell(0);
+	var c1 = tab.rows[0].insertCell(1);
+	
+	me.txt = $a(c0, 'input');
+	$w(me.txt, isIE ? '92%' : '100%');
+
+	c0.style.verticalAlign = 'top';
+	$w(c0, "80%");
+
+	me.btn = $a(c1, 'img', 'btn-img');
+	me.btn.src = iconsrc;
+	if(iconsrc1) // link
+		me.btn.setAttribute('title','Search');
+	else // date
+		me.btn.setAttribute('title','Select Date');
+	me.btn.style.margin = '4px 2px 2px 8px';
+
+	if(iconsrc1) {
+		$w(c1, '18px');
+		me.btn1 = $a(tab.rows[0].insertCell(2), 'img', 'btn-img');
+		me.btn1.src = iconsrc1;
+		me.btn1.setAttribute('title','Open Link');
+		me.btn1.style.margin = '4px 2px 2px 0px';
+	}
+	
+	if(me.df.colour)
+		me.txt.style.background = '#'+me.df.colour.split(':')[1];
+	me.txt.name = me.df.fieldname;
+	tmpid++;
+	me.txt.setAttribute('id', 'idx'+tmpid);
+	me.txt.id = 'idx'+tmpid;
+
+	me.setdisabled = function(tf) { me.txt.disabled = tf; }
+}
+
+
+var tmpid = 0;
+
+
+// ======================================================================================
+
 function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Factory
 
 	switch(docfield.fieldtype.toLowerCase()) {
+		
+		// general fields
 		case 'data':var f = new DataField(); break;
 		case 'password':var f = new DataField(); break;
 		case 'int':var f = new IntField(); break;
@@ -987,23 +917,26 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 		case 'time':var f = new TimeField(); break;
 		case 'html':var f = new HTMLField(); break;
 		case 'check':var f = new CheckField(); break;
-		case 'button':var f = new ButtonField(); break;
 		case 'text':var f = new TextField(); break;
 		case 'small text':var f = new TextField(); break;
 		case 'code':var f = new CodeField(); break;
 		case 'text editor':var f = new CodeField(); break;
 		case 'select':var f = new SelectField(); break;
-		case 'table':var f = new TableField(); break;
-		case 'section break':var f= new SectionBreak(); break;
-		case 'column break':var f= new ColumnBreak(); break;
-		case 'image':var f= new ImageField(); break;
+		
+		// form fields
+		case 'button':var f = new _f.ButtonField(); break;
+		case 'table':var f = new _f.TableField(); break;
+		case 'section break':var f= new _f.SectionBreak(); break;
+		case 'column break':var f= new _f.ColumnBreak(); break;
+		case 'image':var f= new _f.ImageField(); break;
 	}
 
 	f.parent 	= parent;
 	f.doctype 	= doctype;
-	f.df = docfield;
-	f.perm = frm.perm;
-	f.col_break_width = cur_col_break_width;
+	f.df 		= docfield;
+	f.perm 		= frm.perm;
+	if(_f)
+		f.col_break_width = _f.cur_col_break_width;
 
 	if(in_grid) {
 		f.in_grid = true;
@@ -1017,3 +950,4 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 	f.make_body();
 	return f;
 }
+

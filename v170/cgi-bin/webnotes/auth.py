@@ -67,6 +67,7 @@ class Authentication:
 		webnotes.conn = self.conn
 		webnotes.session = self.session
 		webnotes.user = webnotes.profile.Profile()
+		webnotes.form = self.form
 		
 		# clear defs password - for security
 		defs.db_password = ''

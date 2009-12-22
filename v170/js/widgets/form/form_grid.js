@@ -1,10 +1,4 @@
-
-//
-// Grid
-//
-
-
-function FormGrid(field) {
+_f.FormGrid = function(field) {
 	this.field = field;
 	this.doctype = field.df.options;
 		
@@ -21,20 +15,41 @@ function FormGrid(field) {
 	this.setup();
 }
 
-FormGrid.prototype = new Grid();
+_f.FormGrid.prototype = new _f.Grid();
 
-FormGrid.prototype.setup = function() {
+_f.FormGrid.prototype.setup = function() {
 	this.make_columns();
 }
 
-FormGrid.prototype.make_buttons = function() {
+_f.FormGrid.prototype.make_tbar_link = function(parent, label, fn, icon, isactive) {
+
+	var div = $a(parent,'div','',{cursor:'pointer'});
+	var t = make_table(div, 1, 2, '90%', ['20px',null]);
+	var img = $a($td(t,0,0),'img');
+	img.src = 'images/icons/'+icon;
+	var l = $a($td(t,0,1),'span','link_type');
+	l.style.fontSize = '11px';
+	l.innerHTML = label;
+	div.onclick = fn;
+	div.show = function() { $ds(this); }
+	div.hide = function() { $dh(this); }
+
+	$td(t,0,0).isactive = isactive;
+	$td(t,0,1).isactive = isactive;
+	l.isactive = isactive;
+	div.isactive = isactive;
+
+	return div;
+}
+
+_f.FormGrid.prototype.make_buttons = function() {
 	var me = this;
 	if(this.is_scrolltype) {
 		this.tbar_btns = {};
-		this.tbar_btns['Del'] = make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'table_row_delete.gif',1);
-		this.tbar_btns['Ins'] = make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'table_row_insert.gif',1);
-		this.tbar_btns['Up'] = make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'arrow_up.gif',1);
-		this.tbar_btns['Dn'] = make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'arrow_down.gif',1);
+		this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'table_row_delete.gif',1);
+		this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'table_row_insert.gif',1);
+		this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'arrow_up.gif',1);
+		this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'arrow_down.gif',1);
 		
 		for(var i in this.btns)
 			this.btns[i].isactive = true;
@@ -52,7 +67,7 @@ FormGrid.prototype.make_buttons = function() {
 	}
 }
 
-FormGrid.prototype.make_columns = function() {
+_f.FormGrid.prototype.make_columns = function() {
 	var gl = fields_list[this.field.df.options];
 
 	if(!gl) {
@@ -75,7 +90,7 @@ FormGrid.prototype.make_columns = function() {
 	}
 }
 
-FormGrid.prototype.set_column_label = function(fieldname, label) {
+_f.FormGrid.prototype.set_column_label = function(fieldname, label) {
 	for(var i=0;i<this.head_row.cells.length;i++) {
 		var c = this.head_row.cells[i];
 		if(c.fieldname == fieldname) {
@@ -86,7 +101,7 @@ FormGrid.prototype.set_column_label = function(fieldname, label) {
 	}
 }
 
-FormGrid.prototype.refresh = function() {
+_f.FormGrid.prototype.refresh = function() {
 	var docset = getchildren(this.doctype, this.field.frm.docname, this.field.df.fieldname, this.field.frm.doctype);
 	var data = [];
 	
@@ -98,16 +113,16 @@ FormGrid.prototype.refresh = function() {
 	this.set_data(data);
 }
 
-FormGrid.prototype.set_unsaved = function() {
+_f.FormGrid.prototype.set_unsaved = function() {
 	// set unsaved
 	locals[cur_frm.doctype][cur_frm.docname].__unsaved=1;
 	cur_frm.set_heading();	
 }
 
-FormGrid.prototype.insert_row = function() {
+_f.FormGrid.prototype.insert_row = function() {
 	var d = this.new_row_doc();
-	var ci = grid_selected_cell.cellIndex;
-	var row_idx = grid_selected_cell.row.rowIndex;
+	var ci = _f.cur_grid_cell.cellIndex;
+	var row_idx = _f.cur_grid_cell.row.rowIndex;
 	d.idx = row_idx+1;
 	for(var ri = row_idx; ri<this.tab.rows.length; ri++) {
 		var r = this.tab.rows[ri];
@@ -120,7 +135,7 @@ FormGrid.prototype.insert_row = function() {
 	this.set_unsaved();
 }
 
-FormGrid.prototype.new_row_doc = function() {
+_f.FormGrid.prototype.new_row_doc = function() {
 	// create row doc
 	var n = LocalDB.create(this.doctype);
 	var d = locals[this.doctype][n];
@@ -129,7 +144,7 @@ FormGrid.prototype.new_row_doc = function() {
 	d.parenttype = this.field.frm.doctype;
 	return d;
 }
-FormGrid.prototype.add_newrow = function() {
+_f.FormGrid.prototype.add_newrow = function() {
 	var r = this.tab.rows[this.tab.rows.length - 1];
 	if(!r.is_newrow)
 		show_alert('fn: add_newrow: Adding a row which is not flagged as new');
@@ -152,7 +167,7 @@ FormGrid.prototype.add_newrow = function() {
 	return d.name;
 }
 
-FormGrid.prototype.make_newrow = function(from_add_btn) {
+_f.FormGrid.prototype.make_newrow = function(from_add_btn) {
 	if(!this.can_add_rows) // No Addition
 		return;
 		
@@ -171,54 +186,44 @@ FormGrid.prototype.make_newrow = function(from_add_btn) {
 	r.is_newrow = true;
 }
 
-FormGrid.prototype.check_selected = function() {
-	if(!grid_selected_cell) {
+_f.FormGrid.prototype.check_selected = function() {
+	if(!_f.cur_grid_cell) {
 		show_alert('Select a cell first');
 		return false;
 	}
-	if(grid_selected_cell.grid != this) {
+	if(_f.cur_grid_cell.grid != this) {
 		show_alert('Select a cell first');
 		return false;
 	}
 	return true;
 }
 
-function delete_local(dt, dn)  {
-	var d = locals[dt][dn];
-	if(!d.__islocal) // newly created (not required to tag)
-		d.__oldparent = d.parent;
-	d.parent = 'old_parent:' + d.parent; // should be ..
-	d.docstatus = 2;
-	d.__deleted = 1;
-	
-}
-
-FormGrid.prototype.delete_row = function(dt, dn) {
+_f.FormGrid.prototype.delete_row = function(dt, dn) {
 	if(dt && dn) {
-		delete_local(dt, dn);
+		LocalDB.delete_record(dt, dn);
 		this.refresh();	
 	} else {
 		if(!this.check_selected()) return;
-		var r = grid_selected_cell.row;
+		var r = _f.cur_grid_cell.row;
 		if(r.is_newrow)return;
 
-		var ci = grid_selected_cell.cellIndex;
-		var ri = grid_selected_cell.row.rowIndex;
+		var ci = _f.cur_grid_cell.cellIndex;
+		var ri = _f.cur_grid_cell.row.rowIndex;
 		
-		delete_local(this.doctype, r.docname);	
+		LocalDB.delete_record(this.doctype, r.docname);	
 		
 		this.refresh();
 		if(ri < (this.tab.rows.length-2))
 			this.cell_select(null, ri, ci);
-		else grid_selected_cell = null;	
+		else _f.cur_grid_cell = null;	
 	}
 	this.set_unsaved();
 }
 
-FormGrid.prototype.move_row = function(up) {
+_f.FormGrid.prototype.move_row = function(up) {
 	
 	if(!this.check_selected()) return;
-	var r = grid_selected_cell.row;	
+	var r = _f.cur_grid_cell.row;	
 	if(r.is_newrow)return;
 
 	if(up && r.rowIndex > 0) {
@@ -232,7 +237,7 @@ FormGrid.prototype.move_row = function(up) {
 	}
 	
 	if(swap_row) {
-		var cidx = grid_selected_cell.cellIndex;
+		var cidx = _f.cur_grid_cell.cellIndex;
 		this.cell_deselect();
 
 		// swap index

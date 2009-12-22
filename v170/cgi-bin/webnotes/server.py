@@ -121,23 +121,6 @@ def check_syntax(code):
 
 from webnotes.model.doc import *
 
-# Set, exec (Document functions)
-# ------------------------------
-
-def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[], filter_values={}, query='', from_export=0):
-	col_idx, i, out, style, header_html, footer_html, page_template = {}, 0, None, [], '', '', ''
-	for c in colnames:
-		col_idx[c] = i
-		i+=1
-
-	exec str(code)
-	
-	if out!=None:
-		res = out
-		
-	return res, style, header_html, footer_html, page_template
-
-
 # Series
 # -------
 

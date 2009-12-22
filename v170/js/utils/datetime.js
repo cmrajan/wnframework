@@ -99,6 +99,16 @@ function only_date(val) {
 		val =  d[2]+'-'+d[1]+'-'+d[0];
 	return val;
 }
+
+function get_today() {
+	var today = new Date();
+	var m = (today.getMonth()+1)+'';
+	if(m.length==1)m='0'+m;
+	var d = today.getDate()+'';
+	if(d.length==1)d='0'+d;
+	return today.getFullYear()+'-'+m+'-'+d;
+}
+
 // Time
 
 function time_to_ampm(v) {

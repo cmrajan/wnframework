@@ -1,11 +1,11 @@
 in_files_main = [
-        'utils/datatype.js'
+       'utils/rsh.compressed.js'
+       ,'utils/datatype.js'
        ,'utils/browser_detect.js'
        ,'utils/datetime.js'
        ,'utils/dom.js'
        ,'utils/handler.js'
        ,'utils/msgprint.js'
-       ,'utils/rsh.compressed.js'
        ,'widgets/dialog.js'
        ,'widgets/listing.js'
        ,'widgets/menu.js'
@@ -13,6 +13,8 @@ in_files_main = [
        ,'widgets/tabbedpage.js'
        ,'widgets/autosuggest.js'
        ,'widgets/select.js'
+       ,'widgets/form/fields.js'
+       ,'widgets/form/date_picker.js'
        ,'webpage/wntoolbar.js'
        ,'webpage/history.js'
        ,'webpage/search.js'
@@ -21,6 +23,7 @@ in_files_main = [
        ,'webpage/freeze_page.js'
        ,'webpage/error_console.js'
        ,'webpage/about.js'
+       ,'webpage/loaders.js'
        ,'model/local_data.js'
        ,'model/doclist.js'
        ,'app.js'
@@ -31,17 +34,20 @@ out_file_main = 'wnf.compressed.js'
 #-------------------------------------------------
 
 in_files_form = [
-	'widgets/form/form_container.js'
-	'widgets/form/form.js'
-	'widgets/form/fields.js'
-	'widgets/form/grid.js'
-	'widgets/form/form_grid.js'
-	'widgets/form/date_picker.js'
-	'widgets/form/print-format.js'
+	 'widgets/form/form_container.js'
+	,'widgets/form/form.js'
+	,'widgets/form/form_fields.js'
+	,'widgets/form/grid.js'
+	,'widgets/form/form_grid.js'
+	,'widgets/form/print_format.js'
+	,'widgets/form/email.js'
+	,'widgets/form/attachments.js'
+	,'widgets/form/clientscriptAPI.js'
 ]
 
 out_file_form = 'form.compressed.js';
 
+#in_files_main += in_files_form
 
 import os, os.path, shutil
 

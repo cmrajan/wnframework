@@ -15,17 +15,63 @@ var selector;
 var keypress_observers = [];
 var click_observers = [];
 
-// Globals related to forms
-var cur_frm;
-var frm_con;
-var gridselectedcell;
+// ui
+var top_index=91;
 
-var load_js_file(fn, callback) {
-	$c('load_js_file', {'filename': fn}, function(r,rt) { eval(r.js); callback(); }, null, 1);
-}
+// Name Spaces
+// ============
+
+// form
+var _f = {};
+
+// print
+var _p = {};
+
+// email
+var _e = {};
+
+// grid
+var _g = {};
+
+// report buidler
+var _r = {};
+
+// API globals
+var frms={};
+var cur_frm;
+var pscript = {};
+var validated = true;
+var validation_message = '';
+
+// Global methods for API
+var getchildren = LocalDB.getchildren;
+var get_field = Meta.get_field;
+var createLocal = LocalDB.create;
+
+var $c_get_values;
+var get_server_fields;
+var set_multiple;
+var set_field_tip;
+var refresh_field;
+var refresh_many;
+var set_field_options;
+var set_field_permlevel;
+var hide_field;
+var unhide_field;
+var print_table;
+
+// icons
+var exp_icon = "images/ui/right-arrow.gif"; 
+var min_icon = "images/ui/down-arrow.gif";
 
 function startup() {
-	
+
+	//initialize our DHTML history
+	dhtmlHistory.initialize();
+
+	//subscribe to DHTML history change events
+	dhtmlHistory.addListener(historyChange);
+			
 	// Globals
 	// ---------------------------------
 	var setup_globals = function(r) {
@@ -41,6 +87,7 @@ function startup() {
 	}
 	
 	var setup_history = function(r) {
+	
 		rename_observers.push(nav_obj);
 	}
 	
@@ -69,12 +116,13 @@ function startup() {
 		
 		for(var i=0; i<startup_list.length; i++) {
 			startup_list[i]();
-		}
+		}		
 		
 		$dh('startup_div');
 		$ds('body_div');
 	}
 	$c('startup',{},callback,null,1);
+	
 }
 
 window.onload = startup;

@@ -210,13 +210,13 @@ function makeselector() {
 		
 		if(search_fields[d.sel_type]) {
 			empty_select(field_sel);
-			add_sel_options(field_sel, get_sf_list(d.sel_type));
+			add_sel_options(field_sel, get_sf_list(d.sel_type), 'ID');
 		} else {
 			// set default select by
 			empty_select(field_sel);
-			add_sel_options(field_sel, ['ID']);
+			add_sel_options(field_sel, ['ID'], 'ID');
 
-			$c('getsearchfields', {'doctype':d.sel_type}, function(r,rt) {
+			$c('webnotes.widgets.search.getsearchfields', {'doctype':d.sel_type}, function(r,rt) {
 				search_fields[d.sel_type] = r.searchfields;
 				empty_select(field_sel);
 				add_sel_options(field_sel, get_sf_list(d.sel_type));
@@ -246,7 +246,7 @@ function makeselector() {
 			for(var i=0; i<lf.length; i++) if(lf[i][1]==v) return lf[i][0];
 		}		
 
-		$c('search_widget', 
+		$c('webnotes.widgets.search.search_widget', 
 			args = {
 				'txt':strip(inp.value)
 				,'doctype':d.sel_type

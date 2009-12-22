@@ -1,4 +1,4 @@
-# Tree (Hierarchical) Node Set Model (nsm)
+# Tree (Hierarchical) Nested Set Model (nsm)
 # ----------------------------------------
 
 def update_nsm(doc_obj):

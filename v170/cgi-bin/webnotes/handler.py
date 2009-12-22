@@ -1,4 +1,3 @@
-
 import cgi, Cookie, sys, time, os
 import webnotes
 import webnotes.defs
@@ -65,30 +64,7 @@ def set_timezone():
 		pass # for Windows
 
 set_timezone()
-
-def getsearchfields():
-	import webnotes.widgets.search
-	webnotes.widgets.search.getsearchfields()
-
-def search_widget():
-	import webnotes.widgets.search
-	webnotes.widgets.search.search_widget()
-
-def runquery():
-	import webnotes.widgets.query_builder
-	webnotes.widgets.query_builder.runquery()
 	
-def load_js_file():
-	filename = webnotes.form.getvalue('filename')
-	import os
-	try:
-		f = open(os.path.join('../js/', filename))
-		try:
-			webnotes.response['js'] = f.read()
-		finally:
-			f.close()
-	except IOError,e:
-		webnotes.response['js'] = 'msgprint("%s not found")' % filename
 
  # ------------------------------------------------------------------------------------
 
@@ -105,30 +81,6 @@ def get_user_img(form,session):
 # Document Load
 # -------------
 
-def getdoc(form, session):
-	doclist = []
-	if form.getvalue('doctype'):
-		doclist = _getdoc(form.getvalue('doctype'), form.getvalue('name'), (form.getvalue('user') or session['user']))
-
-		# execute page
-		if form.getvalue('doctype')=='Page' and server.cint(form.getvalue('is_page'))==1:
-			# check for import
-			doclist[0].__script = server.page_import(doclist[0].script)
-			
-			if doclist[0].fields.get('content') and doclist[0].content.startswith('#python'):
-				doclist[0].__content = server.exec_page(doclist[0].content)
-
-	if form.getvalue('getdoctype'):
-		doclist += server.getdoctype(form.getvalue('doctype'))
-
-	out['docs'] = server.compress_doclist(doclist)
-	#try:
-	if 1:
-		tag = doclist[0].doctype + '/' + doclist[0].name
-		out['n_tweets'] = server.cint(sql("select count(*) from tabTweet where tag=%s", (tag))[0][0] or 0)
-		lc = sql("select creation,`by`,comment from tabTweet where tag=%s order by name desc limit 1", tag)
-		out['last_comment'] = lc and [server.cstr(t) for t in lc[0]] or []
-	#except: pass
 
 def get_print_format(form, session):
 	out['message'] = server.get_print_format(form.getvalue('name'))
@@ -139,30 +91,7 @@ def rename(form, session):
 		
 		getdoc(form, session)
 
-def _getdoc(dt, dn, user):
-	if not dn: dn = dt
-	dl = server.getdoc(dt, dn)
 
-	try:
-		so = server.get_server_obj(dl[0], dl)
-		r = server.run_server_obj(so, 'onload')
-		if hasattr(so, 'custom_onload'):
-			r = server.run_server_obj(so, 'custom_onload')
-		if r: 
-			webnotes.msgprint(r)
-	except Exception, e:
-		webnotes.errprint(server.getTraceback())
-		webnotes.msgprint('Error in script while loading')
-		raise e
-
-	if dl and not dn.startswith('_'):
-		webnotes.profile.update_recent(dt, dn)
-
-	# load search criteria ---- if doctype
-	if dt=='DocType':
-		dl += get_search_criteria(dt)
-
-	return dl
 	
 # TO DO
 # -----
@@ -836,20 +765,30 @@ else:
 		sql = webnotes.conn.sql
 	
 		# get command cmd
-		cmd = form.has_key('cmd') and form.getvalue('cmd') or None
+		cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
 		read_only = form.has_key('_read_only') and form.getvalue('_read_only') or None
 
-		# do something
-		if cmd and locals().has_key(cmd):
-			f = locals()[cmd]
-			if (not webnotes.conn.in_transaction): 
-				sql("START TRANSACTION")
-			try:
-				f() # execute the command
+		try:
+
+			# load module
+			module = ''
+			if '.' in cmd:
+				module = '.'.join(cmd.split('.')[:-1])
+				cmd = cmd.split('.')[-1]
+				
+				exec 'from %s import %s' % (module, cmd) in locals()
+	
+			# execute
+			if locals().has_key(cmd):
+				if (not webnotes.conn.in_transaction): 
+					sql("START TRANSACTION")
+				
+				locals()[cmd]()
+						
 				sql("COMMIT")
-			except:
-				webnotes.errprint(webnotes.utils.getTraceback())
-				sql("ROLLBACK")
+		except:
+			webnotes.errprint(webnotes.utils.getTraceback())
+			sql("ROLLBACK")
 
 		# update session
 		auth_obj.update()

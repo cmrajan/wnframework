@@ -35,21 +35,9 @@ function unfreeze() {
 // Selects for IE6
 // ------------------------------------
 
-function hide_selects() {
-	if(!isIE6)return;
-	$dh('form_newsel');
-	for(var i=0;i<select_register.length;i++) {
-		select_register[i].style.visibility = 'hidden';
-	}
-}
+function hide_selects() { }
 
-function show_selects() {
-	if(!isIE6)return;
-	$ds('form_newsel');
-	for(var i=0;i<select_register.length;i++) {
-		select_register[i].style.visibility = 'visible';
-	}
-}
+function show_selects() { }
 
 
 //var fmessage;

@@ -2,7 +2,7 @@
 // Dialog
 //
 
-var cur_dialog; var top_index=91;
+var cur_dialog;
 function Dialog(w, h, title, content) {
 	this.wrapper = $a('dialogs', 'div', 'dialog_wrapper');
 	this.w = w;
@@ -71,6 +71,9 @@ Dialog.prototype.hide = function() {
 	unfreeze();
 	if(this.onhide)this.onhide();
 	$dh(this.wrapper);
+	
+	if(cur_autosug) cur_autosug.clearSuggestions();
+	
 	this.display = false;
 	cur_dialog = null;
 }

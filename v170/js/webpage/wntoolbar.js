@@ -8,7 +8,7 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC', backgroundColor:'#EEE'});
+		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC', paddingLeft: '32px', background:'url("images/logos/wnf24.gif") center left no-repeat', backgroundColor:'#EEE'});
 		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['30%','45%','25%'],{padding:'2px'});
 		
 		// model tab
@@ -109,7 +109,7 @@ function WNToolbar(parent) {
 		for (var i=0;i<m;i++) {
 			var t = rlist[i].split('~~~');
 			if(t[1]) {
-				var dn = t[0]; var dt = t[1];
+				var dt = t[0]; var dn = t[1];
 				this.rdocs.add(dt, dn, 0);
 			}
 		}

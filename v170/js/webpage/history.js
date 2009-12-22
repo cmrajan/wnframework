@@ -20,15 +20,6 @@ nav_obj.open_notify = function(t, dt, dn) {
 	
 	// add to "back" history
 	dhtmlHistory.add(t+'~~~'+ dt + (dn ? ('~~~'+dn): ''),'');
-
-	// update back link
-	if(!(has_back_link && dt)) return;
-	var l = $i('back_link');
-	var tmp = nav_obj.ol[nav_obj.ol.length-2];
-	if(tmp)
-		l.innerHTML = ('<< Back to '+(tmp[0]=='Page' ? tmp[1] : (tmp[1] + ' ' + tmp[2]))).bold();
-	else
-		l.innerHTML = '';
 }
 
 nav_obj.rename_notify = function(dt, oldn, newn) {
@@ -51,3 +42,35 @@ nav_obj.show_last_open = function() {
 		loadapp(l[1]);
 	}
 }
+
+var _history_current;
+function historyChange(newLocation, historyData) {
+		
+	if(window.location.href.search('iwebnotes.com')!=-1) return; // no history for iwebnotes
+	
+	var t = newLocation.replace(/\%20/g, ' ');
+	t = t.split('~~~');
+
+	var c = nav_obj.ol[nav_obj.ol.length-1];
+
+	if(t.length==2)	{
+		if(c[0]==t[0] && c[1]==t[1]) return;
+	} else {
+		if(c[0]==t[0] && c[1]==t[1] && c[2]==t[2]) return;
+	}
+	
+	if(t[0]=='DocType') {
+		_history_current = newLocation;
+		loaddoc(t[1], t[2]);
+	} else if(t[0]=='Report') {
+		_history_current = newLocation;
+		loadreport(t[1], t[2]);
+	} else if(t[0]=='Page') {
+		_history_current = newLocation;
+		loadpage(t[1]);
+	} else if(t[0]=='Application') {
+		_history_current = newLocation;
+		loadapp(t[1]);
+	}
+	
+};

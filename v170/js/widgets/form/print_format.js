@@ -1,8 +1,27 @@
+_p.build_dialog = function() {
+	if(!_p.dialog) {
+		_p.make_dialog();
+	}
+	_p.dialog.show();
+}
 
-//
-// Print
-//
-function print_make_field_tab(layout_cell) {
+_p.make_dialog = function() {
+	var d = new Dialog(360, 140, "Print Formats");
+	$dh(d.wrapper);
+	d.make_body(
+		[['HTML','Select']
+		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), go); }]]);
+	
+	_p.print_doc_dialog = d;
+	d.onshow = function() {
+		var c = d.widgets['Select'];
+		if(c.cur_sel)c.removeChild(c.cur_sel);
+		c.appendChild(cur_frm.print_sel.wrapper);
+		c.cur_sel = cur_frm.print_sel.wrapper;
+	}
+}
+
+_p.field_tab = function(layout_cell) {
 	var t = $a(layout_cell, 'table');
 	$w(t, '100%');
 	var r = t.insertRow(0); this.r = r;
@@ -16,7 +35,7 @@ function print_make_field_tab(layout_cell) {
 // start a layout
 
 
-function print_std() {
+_p.print_std = function() {
 	var dn = cur_frm.docname;
 	var dt = cur_frm.doctype;
 	var pf_list = [];
@@ -109,7 +128,7 @@ function print_std() {
 			 default:
 			 	// add cell data
 				if(f.fieldtype!="Button"){
-					r = print_make_field_tab(layout.cur_cell)
+					r = _p.field_tab(layout.cur_cell)
 					// label
 					r.cells[0].innerHTML=f.label?f.label:f.fieldname;
 					
@@ -135,7 +154,7 @@ function print_std() {
 	return html;
 }
 
-var print_style= ".datalabelcell {padding: 2px;width: 38%;vertical-align:top; }"
+_p.print_style = ".datalabelcell {padding: 2px;width: 38%;vertical-align:top; }"
 	+".datainputcell { padding: 2px; width: 62%; text-align:left; }"
 	+".sectionHeading { font-size: 16px; font-weight: bold; margin: 8px; }"
 	+".columnHeading { font-size: 14px; font-weight: bold; margin: 8px 0px; }"
@@ -143,7 +162,7 @@ var print_style= ".datalabelcell {padding: 2px;width: 38%;vertical-align:top; }"
 	+".pagehead { font-size: 16px; font-weight: bold; font-family: verdana; padding: 2px 10px 10px 0px; }"		
 	+".pagesubhead { font-size: 12px; font-weight: bold; font-family: verdana; padding: 2px 10px 10px 0px; }";
 
-var def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
+_p.def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
 	+"\nbody { margin: 12px; }"
 	+"td {padding: 2px;}"
 	+"\npre { margin:0; padding:0;}"	
@@ -151,27 +170,27 @@ var def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12p
 	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; }"
 	+"\n.noborder td { vertical-align: top; }"
 
-var print_formats = {}
+_p.formats = {}
 
-function print_format(fmtname, onload) {
+_p.build = function(fmtname, onload) {
 	if(!cur_frm) { alert('No Document Selected'); return; }
 	var doc = locals[cur_frm.doctype][cur_frm.docname];
 	if(fmtname=='Standard') {
-		onload(print_makepage(print_std(), print_style, doc, doc.name));
+		onload(_p.render(print_std(), _p.print_style, doc, doc.name));
 	} else {
-		if(! print_formats[fmtname]) // not loaded, get data
+		if(!_p.formats[fmtname]) // not loaded, get data
 			$c('get_print_format', {'name':fmtname }, 
 				function(r,t) { 
-					print_formats[fmtname] = r.message;
-					onload(print_makepage(print_formats[fmtname], '', doc, doc.name)); 
+					_p.formats[fmtname] = r.message;
+					onload(_p.render(_p.formats[fmtname], '', doc, doc.name)); 
 				}
 			);
 		else // loaded
-			onload(print_makepage(print_formats[fmtname], '', doc, doc.name));	
+			onload(_p.render(_p.formats[fmtname], '', doc, doc.name));	
 	}
 }
 
-function print_makepage(body, style, doc, title) {
+_p.render = function(body, style, doc, title) {
 	var block = document.createElement('div');
 	var tmp_html = '';
 	block.innerHTML = body;
@@ -180,7 +199,7 @@ function print_makepage(body, style, doc, title) {
 		var tmp_html = '<div style="text-align: center; padding: 4px; border: 1px solid #000"><div style="font-size: 20px;">Temporary</div>This box will go away after the document is submitted.</div>';
 	}
 
-	style = def_print_style + style;
+	style = _p.def_print_style + style;
 
 	// run embedded javascript
 	var jslist = block.getElementsByTagName('script');
@@ -205,7 +224,7 @@ function print_makepage(body, style, doc, title) {
 		+'</body></html>';
 }
 
-function print_go(html) {
+_p.go = function(html) {
 	var w = window.open('');
 	w.document.write(html);
 	w.document.close();

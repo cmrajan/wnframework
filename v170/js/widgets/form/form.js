@@ -1,125 +1,40 @@
-function print_doc() {
-	frm_con.tbarlinks.selectedIndex = 0;
 
-	if(cur_frm.doc.docstatus==2)  {
-		msgprint("Cannot Print Cancelled Documents.");
-		return;
-	}
-	if(cint(cur_frm.doc.docstatus)==0 && cur_frm.perm[0][SUBMIT])  {
-	
-	}
-
-	if(cur_frm.print_sel.options.length>1) {
-		print_doc_dialog.show(); // multiple options
-	} else {
-		print_format('Standard', print_go);
-	}
-}
-
-function makeformatselector(frm) {
-	fl = getchildren('DocFormat', frm.meta.name, 'formats', 'DocType');
-	frm.print_sel = document.createElement('select');
-	//frm.print_sel.options[0] = new Option('-- Print Options --', '', false, false);
-	frm.print_sel.options[0] = new Option('Standard', 'Standard', false, false);
-	for(var i=0;i<fl.length;i++) {
-		frm.print_sel.options[frm.print_sel.options.length] 
-			= new Option(fl[i].format, fl[i].format, false, false);
-	}
-	frm.print_sel.selectedIndex==0;
-}
-
-var print_doc_dialog;
-function makeprintdialog() {
-	var d = new Dialog(360, 140, "Print Formats");
-	$dh(d.wrapper);
-	d.make_body(
-		[['HTML','Select']
-		,['Button','Go', execute_print]]);
-	
-	print_doc_dialog = d;
-	d.onshow = function() {
-		var c = d.widgets['Select'];
-		if(c.cur_sel)c.removeChild(c.cur_sel);
-		c.appendChild(cur_frm.print_sel);
-		c.cur_sel = cur_frm.print_sel;	
-	}
-}
-
-function execute_print() {
-	print_format(sel_val(cur_frm.print_sel), print_go);
-}
-
-var email_dialog;
-
-function sendmail(emailto, emailfrom, cc, subject, message, fmt, with_attachments) {
-	var fn = function(html) {
-		$c('sendmail', {
-			'sendto':emailto, 
-			'sendfrom': emailfrom?emailfrom:'',
-			'cc':cc?cc:'',
-			'subject':subject,
-			'message':message,
-			'body':html,
-			'with_attachments':with_attachments ? 1 : 0,
-			'dt':cur_frm.doctype,
-			'dn':cur_frm.docname
-			}, 
-			function(r, rtxt) { 
-				//
-			}
-		);
-	}
-	print_format(fmt, fn);
-}
-
-
-function is_doc_loaded(dt, dn) {
-	var exists = false;
-	//if(dt=='DocType' && !inList(loaded_doctypes, dn)) alert(dn + ' not in list');
-	if(locals[dt] && locals[dt][dn]) exists = true;
-	if(exists && dt=='DocType' // if it is a doctype
-		&& !locals[dt][dn].__islocal // and not copied
-			&& !inList(loaded_doctypes, dn)) // and not loaded
-				 exists = false; // reload
-	return exists;
-}
-
-
-
-var dialog_record;
-function edit_record(dt, dn) {
-	if(!dialog_record) {
-		dialog_record = new Dialog(640, 400, 'Edit Row');
-		dialog_record.body_wrapper = $a(dialog_record.body, 'div', 'dialog_frm');
-		dialog_record.done_btn = $a($a(dialog_record.body, 'div', '', {margin:'8px'}),'button');
-		dialog_record.done_btn.innerHTML = 'Done'; dialog_record.done_btn.onclick = function() { dialog_record.hide() }
-		dialog_record.onhide = function() {
+// Open the Form in a Dialog
+_f.frm_dialog = null;
+_f.edit_record = function(dt, dn) {
+	var d = _f.frm_dialog;
+	if(!d) {
+		d = new Dialog(640, 400, 'Edit Row');
+		d.body_wrapper = $a(frm_dialog.body, 'div', 'dialog_frm');
+		d.done_btn = $a($a(frm_dialog.body, 'div', '', {margin:'8px'}),'button');
+		d.done_btn.innerHTML = 'Done'; frm_dialog.done_btn.onclick = function() { frm_dialog.hide() }
+		d.onhide = function() {
 			if(cur_grid)
-				cur_grid.refresh_row(cur_grid_ridx, dialog_record.dn);
+				cur_grid.refresh_row(cur_grid_ridx, frm_dialog.dn);
 		}
+		_f.frm_dialog = d;
 	}
 	
 	if(!frms[dt]) {
-		var f = new Frm(dt, dialog_record.body_wrapper);
+		var f = new _f.Frm(dt, d.body_wrapper);
 		f.parent_doctype = cur_frm.doctype;
 		f.parent_docname = cur_frm.docname;
-		//alert(get_perm(f.parent_doctype,f.parent_docname));
 		f.in_dialog = true;
 		f.meta.section_style='Simple';
 	}
 	
-	if(dialog_record.cur_frm) { dialog_record.cur_frm.hide(); }
+	if(d.cur_frm) { d.cur_frm.hide(); }
 		
 	var frm = frms[dt];
 	frm.show(dn);
 
-	dialog_record.cur_frm = frm;
-	dialog_record.dn = dn;
-	dialog_record.set_title("Editing Row #" + (cur_grid_ridx+1));
-	dialog_record.show();
+	d.cur_frm = frm;
+	d.dn = dn;
+	d.set_title("Editing Row #" + (cur_grid_ridx+1));
+	d.show();
 }
 
-function Frm(doctype, parent) {
+_f.Frm = function(doctype, parent) {
 	this.docname = '';
 	this.doctype = doctype;
 	this.display = 0;
@@ -132,9 +47,16 @@ function Frm(doctype, parent) {
 	this.grids = [];
 	this.cscript = {};
 	this.parent = parent;
-	if(!parent)this.parent = frm_con.body; // temp
+	if(!parent)this.parent = _f.frm_con.body; // temp
 	this.attachments = {};
+	
+	// comments
+	this.last_comments = {};
+	this.n_comments = {};
+
 	frms[doctype] = this;
+
+
 
 	this.setup_meta(doctype);
 	
@@ -142,7 +64,9 @@ function Frm(doctype, parent) {
 	rename_observers.push(this);	
 }
 
-Frm.prototype.rename_notify = function(dt, old, name) {
+// ======================================================================================
+
+_f.Frm.prototype.rename_notify = function(dt, old, name) {
 	if(this.doctype != dt) return;
 	
 	// sections
@@ -178,23 +102,63 @@ Frm.prototype.rename_notify = function(dt, old, name) {
 	this.opendocs[name] = true;
 }
 
-Frm.prototype.onhide = function() { if(grid_selected_cell) grid_selected_cell.grid.cell_deselect(); }
-Frm.prototype.onshow = function() { }
-Frm.prototype.makeprint = function() { makeformatselector(this); }
-Frm.prototype.set_heading = function() {
+_f.Frm.prototype.onhide = function() { if(_f.cur_grid_cell) _f.cur_grid_cell.grid.cell_deselect(); }
+
+// ======================================================================================
+
+_f.Frm.prototype.setup_print = function() { 
+	var fl = getchildren('DocFormat', this.meta.name, 'formats', 'DocType');
+	var l = [];	
+	for(var i=0;i<fl.length;i++) l.push(fl[i].format);
+	l.push('Standard');
+	this.print_sel = new SelectWidget(null,l);
+	this.print_sel.inp.value = 'Standard';
+}
+
+_f.Frm.prototype.print_doc = function() {
+	if(this.doc.docstatus==2)  {
+		msgprint("Cannot Print Cancelled Documents.");
+		return;
+	}
+
+	if(this.print_sel.options.length>1) {
+		_p.show_dialog(); // multiple options
+	} else {
+		_p.build('Standard', _p.go);
+	}
+}
+
+// ======================================================================================
+
+_f.Frm.prototype.email_doc = function() {
+	// make selector
+	sel = this.print_sel;
+	var c = $td(_e.dialog.rows['Format'].tab,0,1);
+	
+	if(c.cur_sel)c.removeChild(c.cur_sel);
+	c.appendChild(this.print_sel.wrapper);
+	c.cur_sel = this.print_sel.wrapper;
+
+	_e.dialog.widgets['Subject'].value = this.meta.name + ': ' + this.docname;
+	_e.dialog.show();
+}
+
+// ======================================================================================
+
+_f.Frm.prototype.set_heading = function() {
 
 	// main title
 	var prnname = this.docname;
 	if(this.meta.issingle)prnname = this.doctype;
 	
-	if(frm_con.main_title.innerHTML != prnname)	
-		frm_con.main_title.innerHTML = prnname;
+	if(_f.frm_con.main_title.innerHTML != prnname)	
+		_f.frm_con.main_title.innerHTML = prnname;
 	
 	// sub title
 	var dt = this.doctype;
 	if(this.meta.issingle)dt = '';
-	if(frm_con.sub_title.innerHTML != dt)
-		frm_con.sub_title.innerHTML = dt;
+	if(_f.frm_con.sub_title.innerHTML != dt)
+		_f.frm_con.sub_title.innerHTML = dt;
 
 	// status
 	var doc = locals[this.doctype][this.docname];
@@ -225,7 +189,7 @@ Frm.prototype.set_heading = function() {
 	if(is_testing && this.meta.setup_test)
 		var tm = '<span style="margin-left: 4px; padding: 4px; color: #FFF; background-color: #F88;">Test Record</span>';
 	
-	frm_con.status_title.innerHTML = st.bold()+tm;
+	_f.frm_con.status_title.innerHTML = st.bold()+tm;
 
 	// created & modified
 	var scrub_date = function(d) {
@@ -233,9 +197,8 @@ Frm.prototype.set_heading = function() {
 		return dateutil.str_to_user(t[0]) + ' ' + t[1];
 	}
 	
-	var t = doc.doctype+'/'+doc.name;
 	// tweets
-	frm_con.comments_btn.innerHTML = 'Comments (' + cint(n_tweets[t]) + ')';
+	_f.frm_con.comments_btn.innerHTML = 'Comments (' + cint(this.n_comments[this.docname]) + ')';
 	
 	// lst comment
 	this.set_last_comment();
@@ -247,281 +210,55 @@ Frm.prototype.set_heading = function() {
 		,m_on:doc.modified ? ('on '+scrub_date(doc.modified)) : ''} );
 	
 	// images
-	set_user_img(frm_con.owner_img, doc.owner);
-	frm_con.owner_img.title = created_str;
+	set_user_img(_f.frm_con.owner_img, doc.owner);
+	_f.frm_con.owner_img.title = created_str;
 
-	frm_con.last_update_area.innerHTML = '';
-	$dh(frm_con.mod_img);
+	_f.frm_con.last_update_area.innerHTML = '';
+	$dh(_f.frm_con.mod_img);
 	if(doc.modified_by) {
-		frm_con.last_update_area.innerHTML = scrub_date(doc.modified ? doc.modified:'') + ' <span class="link_type" style="margin-left: 8px; font-size: 10px;" onclick="msgprint(\''+created_str.replace('/','<br>')+'\')">Details</span>';
+		_f.frm_con.last_update_area.innerHTML = scrub_date(doc.modified ? doc.modified:'') + ' <span class="link_type" style="margin-left: 8px; font-size: 10px;" onclick="msgprint(\''+created_str.replace('/','<br>')+'\')">Details</span>';
 		if(doc.owner != doc.modified_by) {
-			$di(frm_con.mod_img);
-			set_user_img(frm_con.mod_img, doc.modified_by);
-			frm_con.mod_img.title = created_str;
+			$di(_f.frm_con.mod_img);
+			set_user_img(_f.frm_con.mod_img, doc.modified_by);
+			_f.frm_con.mod_img.title = created_str;
 		}
 	} 
 	
 	if(this.heading){
-		if(this.meta.hide_heading) $dh(frm_con.head_div);
-		else $ds(frm_con.head_div);
+		if(this.meta.hide_heading) $dh(_f.frm_con.head_div);
+		else $ds(_f.frm_con.head_div);
 	}
 }
 
-Frm.prototype.set_last_comment = function() {
-	var t = this.doc.doctype+'/'+this.doc.name;
-	var lc = last_comments[t]
+_f.Frm.prototype.set_last_comment = function() {
+	var lc = this.last_comments[this.docname]
 
 	// last comment
 	if(lc && lc[2]) { 
-		frm_con.last_comment.comment.innerHTML = 'Last Comment: <b>'+lc[2]+'</b><div id="comment" style="font-size:11px">By '+lc[1]+' on '+dateutil.str_to_user(lc[0])+'</div>'; 
-		$ds(frm_con.last_comment); 
+		_f.frm_con.last_comment.comment.innerHTML = 'Last Comment: <b>'+lc[2]+'</b><div id="comment" style="font-size:11px">By '+lc[1]+' on '+dateutil.str_to_user(lc[0])+'</div>'; 
+		$ds(_f.frm_con.last_comment); 
 		
 		// image
-		set_user_img(frm_con.last_comment.img, lc[1]);
+		set_user_img(_f.frm_con.last_comment.img, lc[1]);
 	} else { 
-		$dh(frm_con.last_comment); 
-	}
-}
-
-Frm.prototype.setup_meta = function() {
-	this.meta = get_local('DocType',this.doctype);
-	this.perm = get_perm(this.doctype); // for create
-	this.makeprint();
-}
-
-
-// ATTACHMENT
-// ------------------------
-
-
-Frm.prototype.setup_attach = function() {
-	var me = this;
-	
-	this.attach_area = $a(this.layout.cur_row.wrapper, 'div', 'attach_area');
-	if(!this.meta.max_attachments)
-		this.meta.max_attachments = 10;
-	
-	var tab = $a($a(this.attach_area, 'div'), 'table');
-	tab.insertRow(0);
-	var label_area = tab.rows[0].insertCell(0);
-	var main_area = tab.rows[0].insertCell(1);
-
-	this.files_area = $a(main_area, 'div');	
-	this.btn_area = $a(main_area, 'div');
-
-	$w(label_area, "33%");
-	var d = $a(label_area, 'div');
-	var img = $a(d, 'img', '', {marginRight:'8px'}); img.src = 'images/icons/paperclip.gif';
-	$a(d, 'span').innerHTML = 'File Attachments:';
-	
-	me.attach_msg = $a(label_area,'div','comment', {padding:'8px', fontSize:'11px'});
-	me.attach_msg.innerHTML = "Changes made to the attachments are not permanent until the document is saved";
-
-	// button
-	var btn_add_attach = $a(this.btn_area, 'button');
-	btn_add_attach.innerHTML = 'Add';
-	
-	btn_add_attach.onclick = function() {
-		me.add_attachment();
-		me.sync_attachments(me.docname);
-		me.refresh_attachments();
-	}
-}
-
-Frm.prototype.refresh_attachments = function() {
-	if(!this.perm[0][WRITE]) { $dh(this.btn_area); }
-	else { $ds(this.btn_area); }
-
-	var nattach = 0;
-	for(var dn in this.attachments) {
-		for(var i in this.attachments[dn]){
-			var a = this.attachments[dn][i];
-			if(a.docname!=this.docname)
-				a.hide();
-			else {
-				a.show();
-				nattach++;
-				if(this.perm[0][WRITE] && this.editable) { $ds(a.delbtn); }
-				else { $dh(a.delbtn); }
-			}
-		}
-	}
-	if(this.editable) {
-		if(nattach >= cint(this.meta.max_attachments))
-			$dh(this.btn_area);
-		else
-			$ds(this.btn_area);
-	} else {
-		$dh(this.btn_area);
-	}
-}
-
-Frm.prototype.set_attachments = function() {
-	//if(this.meta.issingle) /// why??
-	//	return;
-
-	this.attachments[this.docname] = [];	
-	var atl = locals[this.doctype][this.docname].file_list;
-
-	if(atl) {
-		atl = atl.split('\n');
-
-		// add new document attachments
-		for(var i in atl) {
-			var a = atl[i].split(',');
-			var ff = this.add_attachment(a[0], a[1]);
-		}
-	}
-}
-
-Frm.prototype.add_attachment = function(filename, fileid) {
-	var at_id = this.attachments[this.docname].length;
-	var ff = new FileField(this.files_area, at_id, this);
-
-	// set name and id if given
-	if(filename)ff.filename = filename;
-	if(fileid)ff.fileid = fileid;
-	ff.docname = this.docname;
-	
-	this.attachments[this.docname][at_id] = ff;
-	
-	ff.refresh();
-	return ff;
-}
-
-Frm.prototype.sync_attachments = function(docname) {
-	var fl = [];
-	for(var i in this.attachments[docname]) {
-		var a = this.attachments[docname][i];
-		fl[fl.length] = a.filename + ',' + a.fileid;
-	} 
-	locals[this.doctype][docname].file_list = fl.join('\n')
-}
-
-// Handling File field
-
-function FileField(parent, at_id, frm, addlink) {
-	var me = this;
-	this.at_id = at_id
-	
-	this.wrapper = $a(parent, 'div');
-	var tab = $a(this.wrapper, 'table');
-
-
-	tab.insertRow(0);
-	var main_area = tab.rows[0].insertCell(0);
-	var del_area = tab.rows[0].insertCell(1);
-	
-	// del button
-	
-	$w(del_area, '20%');
-	this.delbtn = $a(del_area, 'div', 'link_type');
-	this.delbtn.innerHTML = 'Remove';
-
-	this.remove = function() {
-		var yn = confirm("The document will be saved after the attachment is deleted for the changes to be permanent. Proceed?")
-		if(yn) {
-			me.wrapper.style.display = 'none';
-			var fid = frm.attachments[frm.docname][me.at_id].fileid;
-			if(fid) {
-				$c('remove_attach', args = {'fid': fid}, function(r,rt) { } );
-			}
-	
-			delete frm.attachments[frm.docname][me.at_id];
-			frm.sync_attachments(frm.docname);
-			var ret = frm.save('Save');
-			if(ret=='Error')msgprint("error:The document was not saved. To make the attachment permanent, you must save the document before closing.");
-		}
-	}
-	
-	this.hide = function() { $dh(me.wrapper); }
-	this.show = function() { $ds(me.wrapper); }
-
-	this.delbtn.onclick = this.remove;
-		
-	// upload
-	this.upload_div = $a(main_area, 'div');
-	this.download_div = $a(main_area, 'div');
-
-	var div = $a(this.upload_div, 'div');
-	div.innerHTML = '<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:400px; height:100px; border:0px"></iframe>';
-
-	// upload form
-	var div = $a(this.upload_div,'div');
-	div.innerHTML = '<form method="POST" enctype="multipart/form-data" action="'+outUrl+'" target="RSIFrame"></form>';
-	var ul_form = div.childNodes[0];
-      
-	var f_list = [];
-  
-	// file data
-	var inp_fdata = $a_input($a(ul_form,'span'),'file','filedata');
-
-	var inp = $a_input($a(ul_form,'span'),'hidden','cmd'); inp.value = 'uploadfile';
-	var inp = $a_input($a(ul_form,'span'),'hidden','__account'); inp.value = account_id;
-	if(__sid150)
-		var inp = $a_input($a(ul_form,'span'),'hidden','sid150'); inp.value = __sid150;
-	var inp = $a_input($a(ul_form,'span'),'submit'); inp.value = 'Upload';
-	
-	// dt, dn to show
-	var inp = $a_input($a(ul_form,'span'),'hidden','doctype'); inp.value = frm.doctype;
-	var inp = $a_input($a(ul_form,'span'),'hidden','docname'); inp.value = frm.docname;
-	var inp = $a_input($a(ul_form,'span'),'hidden','at_id'); inp.value = at_id;
-	
-	// download
-	this.download_link = $a(this.download_div, 'a', 'link_type');
-	
-	// fresh
-	this.refresh = function() {
-		if (this.filename) {
-			$dh(this.upload_div);
-			this.download_link.innerHTML = this.filename;
-			this.download_link.href = outUrl + '?cmd=downloadfile&file_id='+this.fileid+"&__account="+account_id + (__sid150 ? ("&sid150="+__sid150) : '');
-
-			this.download_link.target = "_blank";
-			$ds(this.download_div);
-		} else {
-			$ds(this.upload_div);
-			$dh(this.download_div);
-		}
-	}
-}
-
-function file_upload_done(doctype, docname, fileid, filename, at_id) {
-	
-	var at_id = cint(at_id);
-	
-	// update file_list
-	var frm = frms[doctype];
-	var a = frm.attachments[docname][at_id];
-	a.filename = filename;
-	a.fileid = fileid;
-
-	frm.sync_attachments(docname);
-	
-	a.refresh();
-	var do_save = confirm('File Uploaded Sucessfully. You must save this document for the uploaded file to be registred. Save this document now?');
-	if(do_save) {
-		var ret = frm.save('Save');
-		if(ret=='Error')msgprint("error:The document was not saved. To make the attachment permanent, you must save the document before closing.");
-	} else {
-		msgprint("error:The document was not saved. To make the attachment permanent, you must save the document before closing.");
+		$dh(_f.frm_con.last_comment); 
 	}
 }
 
 
 // PAGING
-// ------
+// ======================================================================================
 
-Frm.prototype.set_section = function(sec_id) {
+_f.Frm.prototype.set_section = function(sec_id) {
 	this.sections[this.cur_section[this.docname]].hide();
 	this.sections[sec_id].show();
 	this.cur_section[this.docname] = sec_id;
 }
 
 // TABBED
-// ------
+// ======================================================================================
 
-Frm.prototype.setup_tabs = function() {
+_f.Frm.prototype.setup_tabs = function() {
 	var me = this;
 	$ds(this.tab_wrapper);
 	$y(this.tab_wrapper, {marginTop:'8px'});
@@ -529,9 +266,9 @@ Frm.prototype.setup_tabs = function() {
 }
 
 // TIPS
-// ----
+// ======================================================================================
 
-Frm.prototype.setup_tips = function() {
+_f.Frm.prototype.setup_tips = function() {
 	var me = this;
 	this.tip_box = $a(this.tip_wrapper, 'div', 'frm_tip_box');
 
@@ -557,9 +294,16 @@ Frm.prototype.setup_tips = function() {
 }
 
 // SETUP
-// -----
+// ======================================================================================
 
-Frm.prototype.setup_std_layout = function() {
+
+_f.Frm.prototype.setup_meta = function() {
+	this.meta = get_local('DocType',this.doctype);
+	this.perm = get_perm(this.doctype); // for create
+	this.setup_print();
+}
+
+_f.Frm.prototype.setup_std_layout = function() {
 	if(this.in_dialog) $w(this.wrapper, '500px');
 	//else $w(this.wrapper, pagewidth + 'px');
 	
@@ -593,11 +337,6 @@ Frm.prototype.setup_std_layout = function() {
 	//else 
 		//this.wrapper.style.borderTop = '3px solid #CCC';
 	
-	
-	if(isIE&&this.body) {
-		this.body.onscroll = function() { refresh_scroll_heads(); }
-	}
-
 	// bg colour
 	if(this.meta.colour) this.layout.wrapper.style.background = '#'+this.meta.colour.split(':')[1];
 	
@@ -605,7 +344,7 @@ Frm.prototype.setup_std_layout = function() {
 	this.setup_fields_std();
 }
 
-Frm.prototype.setup_fields_std = function() {
+_f.Frm.prototype.setup_fields_std = function() {
 	var fl = fields_list[this.doctype]; 
 
 	if(fl[0]&&fl[0].fieldtype!="Section Break") {
@@ -636,7 +375,7 @@ Frm.prototype.setup_fields_std = function() {
 	} 
 }
 
-Frm.prototype.setup_template_layout = function() {
+_f.Frm.prototype.setup_template_layout = function() {
 	this.body = $a(this.wrapper, 'div');
 	this.body.innerHTML = this.meta.dt_template;
 	var dt = this.doctype.replace(/ /g, '');
@@ -661,7 +400,7 @@ Frm.prototype.setup_template_layout = function() {
 	}
 }
 
-Frm.prototype.setup_client_script = function() {
+_f.Frm.prototype.setup_client_script = function() {
 	// setup client obj
 	if(this.meta.client_script_core || this.meta.client_script || this.meta.__client_script) {
 		this.runclientscript('setup', this.doctype, this.docname);
@@ -669,7 +408,7 @@ Frm.prototype.setup_client_script = function() {
 	this.script_setup = 1;
 }
 
-Frm.prototype.setup = function() {
+_f.Frm.prototype.setup = function() {
 
 	var me = this;
 	this.fields = [];
@@ -693,97 +432,15 @@ Frm.prototype.setup = function() {
 	this.setup_done = true;	
 }
 
-/* Client Side Scripting */
+// ======================================================================================
 
-function set_multiple(dt, dn, dict, table_field) {
-	var d = locals[dt][dn];
-	for(var key in dict) {
-		d[key] = dict[key];
-	    if (table_field)	refresh_field(key, d.name, table_field);     
-		else 				refresh_field(key);	
-	}
-}
-
-function refresh_many(flist, dn, table_field) {
-	for(var i in flist) {
-		if (table_field) refresh_field(flist[i], dn, table_field);
-		else refresh_field(flist[i]);
-	}
-}
-
-function set_field_tip(n,txt) {
-	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
-	if(df)df.description = txt;
-
-	if(cur_frm && cur_frm.fields_dict) {
-		if(cur_frm.fields_dict[n])
-			cur_frm.fields_dict[n].comment_area.innerHTML = replace_newlines(txt);
-		else
-			errprint('[set_field_tip] Unable to set field tip: ' + n);
-	}
-}
-
-function refresh_field(n, docname, table_field) {
-	if(table_field) { // for table
-		if(dialog_record && dialog_record.display) {
-			// in dialog
-			if(dialog_record.cur_frm.fields_dict[n] && dialog_record.cur_frm.fields_dict[n].refresh)
-				dialog_record.cur_frm.fields_dict[n].refresh();
-		} else {
-			var g = grid_selected_cell;
-			if(g) var hc = g.grid.head_row.cells[g.cellIndex];
-			
-			if(g && hc && hc.fieldname==n && g.row.docname==docname) {
-				hc.template.refresh(); // if active
-			} else {
-				cur_frm.fields_dict[table_field].grid.refresh_cell(docname, n);
-			}
-		}
-	} else if(cur_frm && cur_frm.fields_dict) {
-		if(cur_frm.fields_dict[n] && cur_frm.fields_dict[n].refresh)
-			cur_frm.fields_dict[n].refresh();
-	}
-}
-
-function set_field_options(n, txt) {
-	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
-	if(df)df.options = txt;
-	refresh_field(n);
-}
-
-function set_field_permlevel(n, level) {
-	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
-	if(df)df.permlevel = level;
-	refresh_field(n);
-}
-
-function _hide_field(n,hidden) {
-	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
-	if(df)df.hidden = hidden; refresh_field(n);
-}
-function hide_field(n) {
-	if(cur_frm) {
-		if(n.substr) _hide_field(n,1);
-		else { for(var i in n)_hide_field(n[i],1) }
-	}
-}
-
-function unhide_field(n) {
-	if(cur_frm) {
-		if(n.substr) _hide_field(n,0);
-		else { for(var i in n)_hide_field(n[i],0) }
-	}
-}
-//////
-
-Frm.prototype.hide = function() {
-	if(this.layout)this.layout.hide();
+_f.Frm.prototype.hide = function() {
 	$dh(this.wrapper);
 	this.display = 0;
 	hide_autosuggest();
 }
 
-Frm.prototype.show = function(docname, from_refresh) {
+_f.Frm.prototype.show = function(docname, from_refresh) {
 	if(!this.in_dialog && cur_frm && cur_frm != this) {
 		this.defocus_rest();
 		cur_frm.hide();
@@ -795,16 +452,18 @@ Frm.prototype.show = function(docname, from_refresh) {
 	if(!from_refresh) this.refresh();
 }
 
-Frm.prototype.defocus_rest = function() {
+_f.Frm.prototype.defocus_rest = function() {
 	// deselect others
 	mclose();
-	if(grid_selected_cell) grid_selected_cell.grid.cell_deselect();
+	if(_f.cur_grid_cell) _f.cur_grid_cell.grid.cell_deselect();
 	cur_page = null;
 }
 
 // -------- Permissions -------
 // Returns global permissions, at all levels
-Frm.prototype.get_doc_perms = function() {
+// ======================================================================================
+
+_f.Frm.prototype.get_doc_perms = function() {
 	var p = [0,0,0,0,0,0];
 	for(var i=0; i<this.perm.length; i++) {
 		if(this.perm[i]) {
@@ -818,9 +477,10 @@ Frm.prototype.get_doc_perms = function() {
 	return p;
 }
 
-///// FRM Refresh
+// refresh
+// ======================================================================================
 
-Frm.prototype.refresh = function(no_script) {
+_f.Frm.prototype.refresh = function(no_script) {
 	if(this.docname) { // document to show
 
 		// get perm
@@ -855,20 +515,20 @@ Frm.prototype.refresh = function(no_script) {
 			set_title(this.meta.issingle ? this.doctype : this.docname);
 
  			if(!no_script) this.runclientscript('refresh');
-			frm_con.show();
+			page_body.change_to('Forms');
 
 			// show / hide buttons
-			frm_con.refresh_toolbar();
+			_f.frm_con.refresh_toolbar();
 
 			// add to recent
-			rdocs.add(this.doctype, this.docname, 1);
+			if(page_body.wntoolbar) page_body.wntoolbar.rdocs.add(this.doctype, this.docname, 1);
 			this.set_heading();
 		}
 
-		refresh_tabs(this);
-		refresh_fields(this);
-		refresh_dependency(this);
-			
+		this.refresh_tabs();
+		this.refresh_fields();
+		this.refresh_dependency();
+
 		if(this.layout) this.layout.show();
 
 		if(this.meta.allow_attach) this.refresh_attachments();
@@ -877,23 +537,22 @@ Frm.prototype.refresh = function(no_script) {
 		if(!this.display) this.show(this.docname, 1);
 		
 	} 
-	set_frame_dims();
+	//set_frame_dims();
 }
 
-function refresh_tabs(me) {
-	if(!me)me = cur_frm;
+_f.Frm.prototype.refresh_tabs = function() {
+	var me = this;
 	if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed') {
 		for(var i in me.sections) {
 			me.sections[i].hide();
 		}
 		
 		me.set_section(me.cur_section[me.docname]);
-		if(isIE)refresh_scroll_heads();	
 	}
 }
 
-function refresh_fields(me) {
-	if(!me)me = cur_frm;
+_f.Frm.prototype.refresh_fields = function() {
+	var me = this;
 	// set fields
 	for(fkey in me.fields) {
 		var f = me.fields[fkey];
@@ -903,10 +562,11 @@ function refresh_fields(me) {
 	}
 
 	// cleanup activities after refresh
-	on_refresh_main(me);
+	me.cleanup_refresh(me);
 }
 
-function on_refresh_main(me) {
+_f.Frm.prototype.cleanup_refresh = function() {
+	var me = this;
 	if(me.fields_dict['amended_from']) {
 		if (me.doc.amended_from) {
 			unhide_field('amended_from'); unhide_field('amendment_date');
@@ -920,8 +580,8 @@ function on_refresh_main(me) {
 	}
 }
 
-function refresh_dependency(me) {
-	if(!me) return;
+_f.Frm.prototype.refresh_dependency = function() {
+	var me = this;
 
 	// build dependants' dictionary	
 	var dep_dict = {};
@@ -991,7 +651,9 @@ function refresh_dependency(me) {
 }
 
 // setnewdoc is called when a record is loaded for the first time
-Frm.prototype.setnewdoc = function(docname) {
+// ======================================================================================
+
+_f.Frm.prototype.setnewdoc = function(docname) {
 
 	// if loaded
 	if(this.opendocs[docname]) { // already exists
@@ -1033,25 +695,22 @@ Frm.prototype.setnewdoc = function(docname) {
 		this.set_attachments();
 
 	this.opendocs[docname] = true;
-	
-	if(this.doctype=='DocType')
-		loaded_doctypes[loaded_doctypes.length] = docname;
 }
 
-function edit_doc() {
+_f.Frm.prototype.edit_doc = function() {
 	// set fields
-	cur_frm.is_editable[cur_frm.docname] = true;
-	cur_frm.refresh();
+	this.is_editable[cur_frm.docname] = true;
+	this.refresh();
 }
 
-var validated = true;
-var validation_message = '';
 
-Frm.prototype.show_doc = function(dn) {
+_f.Frm.prototype.show_doc = function(dn) {
 	this.show(dn);
 }
 
-Frm.prototype.save = function(save_action, call_back) {
+// ======================================================================================
+
+_f.Frm.prototype.save = function(save_action, call_back) {
 	//alert(save_action);
 	if(!save_action) save_action = 'Save';
 	var me = this;
@@ -1107,32 +766,9 @@ Frm.prototype.save = function(save_action, call_back) {
 	}
 }
 
-//
-// Script
-//
+// ======================================================================================
 
-// MUST REPLACE
-
-function make_doclist(dt, dn, deleted) {
-	var dl = [];
-	dl[0] = locals[dt][dn];
-	
-	// get children
-	for(var ndt in locals) { // all doctypes
-		if(locals[ndt]) {
-			for(var ndn in locals[ndt]) {
-				var doc = locals[ndt][ndn];
-				if(doc && doc.parenttype==dt && (doc.parent==dn||(deleted&&doc.__oldparent==dn))) {
-					dl[dl.length]=doc;
-					//if(deleted&&(doc.__oldparent==dn))alert(doc.name+','+doc.__oldparent);
-				}
-			}
-		}
-	}
-	return dl;
-}
-
-Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
+_f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 	var me = this;
 	if(this.docname) {
 		// make doc list
@@ -1150,47 +786,9 @@ Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 	}
 }
 
-function $c_get_values(args, doc, dt, dn, user_callback) {
-	var call_back = function(r,rt) {
-		if(!r.message)return;
-		if(user_callback) user_callback(r.message);
-		
-		var fl = args.fields.split(',');
-		for(var i in fl) {
-			locals[dt][dn][fl[i]] = r.message[fl[i]]; // set value
-			if(args.table_field)
-				refresh_field(fl[i], dn, args.table_field);
-			else
-				refresh_field(fl[i]);
-		}
-	}
-	$c('get_fields',args,call_back);
-}
+// ======================================================================================
 
-function get_server_fields(method, arg, table_field, doc, dt, dn, allow_edit, call_back) {
-	if(!allow_edit)freeze('Fetching Data...');
-	$c('runserverobj', args={'method':method, 'docs':compress_doclist([doc]), 'arg':arg},
-	function(r, rt) {
-		if (r.message)  {
-			var d = locals[dt][dn];
-			var field_dict = eval('var a='+r.message+';a');
-
-			for(var key in field_dict) {
-				d[key] = field_dict[key];
-				if (table_field) refresh_field(key, d.name, table_field);
-				else refresh_field(key);
-			}
-		}
-		if(call_back){
-			doc = locals[doc.doctype][doc.name];
-			call_back(doc, dt, dn);
-		}
-		if(!allow_edit)unfreeze();
-    }
-  );
-}
-
-Frm.prototype.runclientscript = function(caller, cdt, cdn) {
+_f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 	var _dt = this.parent_doctype ? this.parent_doctype : this.doctype;
 	var _dn = this.parent_docname ? this.parent_docname : this.docname;
 	var doc = get_local(_dt, _dn);
@@ -1232,338 +830,26 @@ Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 	return ret;
 }
 
-//
-// Form Input
-//
 
-function ColumnBreak() {
-	this.set_input = function() { };
-}
+// ======================================================================================
 
-var cur_col_break_width;
-ColumnBreak.prototype.make_body = function() {
-	if((!this.perm[this.df.permlevel]) || (!this.perm[this.df.permlevel][READ]) || this.df.hidden) {
-		// no display
-		return;
-	}
-
-	this.cell = this.frm.layout.addcell(this.df.width);
-	cur_col_break_width = this.df.width;
-
-	var fn = this.df.fieldname?this.df.fieldname:this.df.label;
-	// header
-	if(this.df&&this.df.label){
-		this.label = $a(this.cell.wrapper, 'div', 'columnHeading');
-		this.label.innerHTML = this.df.label;
-	}
-
-}
-
-ColumnBreak.prototype.refresh = function(layout) {
-	if(!this.cell)return; // no perm
+_f.Frm.prototype.copy_doc = function(onload, from_amend) {
 	
-	var fn = this.df.fieldname?this.df.fieldname:this.df.label;
-	if(fn) {
-		this.df = get_field(this.doctype, fn, this.docname);
-	
-		// hidden
-		if(this.set_hidden!=this.df.hidden) {
-			if(this.df.hidden)
-				this.cell.hide();
-			else
-				this.cell.show();
-			this.set_hidden = this.df.hidden;
-		}
-	}
-}
-
-function SectionBreak() {
-	this.set_input = function() { };
-}
-
-SectionBreak.prototype.make_row = function() {
-	this.row = this.frm.layout.addrow();
-}
-
-SectionBreak.prototype.make_simple_section = function(static) {
-	var head = $a(this.row.header, 'div', '', {margin:'4px 8px 0px 8px'});
-	var me = this;
-
-	// colour
-	var has_col = false;
-	if(this.df.colour) {
-		has_col = true;
-		var col = this.df.colour.split(':')[1];
-		if(col!='FFF') {
-			$y(this.row.sub_wrapper, {
-				margin:'8px', padding: '0px'
-				,border:('1px solid #' + get_darker_shade(col, 0.75))
-				//,borderBottom:('2px solid #' + get_darker_shade(col))
-				,backgroundColor: ('#' + col)}
-			);
-		}
-	}
-		
-	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', {margin:'8px 0px'});
-		this.label.innerHTML = this.df.label?this.df.label:'';
+	if(!this.perm[0][CREATE]) {
+		msgprint('You are not allowed to create '+this.meta.name);
 		return;
 	}
 	
-	if(this.df.label) {
-		var t = make_table($a(head,'div'), 1,2, '100%', ['20px',null], {verticalAlign:'middle'});
-		$y(t,{borderCollapse:'collapse'});
-		
-		this.label = $a($td(t,0,1), 'div', 'sectionHeading');
-		this.label.innerHTML = this.df.label?this.df.label:'';
-		
-		// exp / collapse
-		this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
-		this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
-		this.exp_icon.expand = function() { $ds(me.row.body); me.exp_icon.src = min_icon; }
-		this.exp_icon.collapse = function() { $dh(me.row.body); me.exp_icon.src = exp_icon; }
-		$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
-		
-		// callable functions
-		this.collapse = this.exp_icon.collapse;
-		this.expand = this.exp_icon.expand;
-		
-	} else if(!has_col) {
-		// divider
-		$y(head,{margin:'8px', borderBottom:'2px solid #445'});
-	}
-
-}
-
-var cur_sec_header;
-SectionBreak.prototype.make_body = function() {
-	this.fields = [];
-	if((!this.perm[this.df.permlevel]) || (!this.perm[this.df.permlevel][READ]) || this.df.hidden) {
-		// no display
-		return;
-	}
-	var me = this;
-
-	// header
-	if(this.frm.meta.section_style=='Tabbed') {
-		if(this.df.options!='Simple') {
-			// IE full page ??
-			this.sec_id = this.frm.sections.length;
-			this.frm.sections[this.sec_id] = this;
-			
-			this.mytab = this.frm.tabs.add_tab(me.df.label, 
-				function() { me.frm.set_section(me.sec_id);});
-						
-			this.hide = function() { this.row.hide(); me.mytab.hide(); }
-			this.show = function() { 
-				this.row.show(); me.mytab.set_selected();
-				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
-					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
-			}
-	
-			this.make_row();
-			this.make_simple_section(1);
-			if(!isIE) this.hide();
-		} else {
-			this.row = this.frm.layout.addsubrow();
-			this.make_simple_section();
-		}
-	} else if(this.frm.meta.section_style=='Tray') {
-		if(this.df.options!='Simple') {
-			this.sec_id = this.frm.sections.length;
-			this.frm.sections[this.sec_id] = this;
-			
-			var w=$a(this.frm.tray_area, 'div');
-			this.header = $a(w, 'div', 'sec_tray_tab');
-			this.header.bottom = $a(w, 'div', 'sec_tray_tab_bottom');
-			this.header.innerHTML = me.df.label;		
-			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
-			this.header.onmouseover = function() { 
-				if(isIE)return; // ie disappearing table error
-				if(cur_sec_header != this) {
-					this.className = 'sec_tray_tab tray_tab_mo'; 
-					this.bottom.className = 'sec_tray_tab_bottom tray_tab_mo_bottom';
-				}
-			}
-			this.header.onmouseout = function() {
-				if(isIE)return;
-				if(cur_sec_header != this) {
-					this.className = 'sec_tray_tab'; 
-					this.bottom.className = 'sec_tray_tab_bottom'; 
-				}
-			}
-			this.hide = function() { 
-				this.row.hide();
-				this.header.className = 'sec_tray_tab'; 
-				this.header.bottom.className = 'sec_tray_tab_bottom'; 
-			}
-			this.show = function() { 
-				this.row.show(); 
-				this.header.className = 'sec_tray_tab tray_tab_sel';
-				this.header.bottom.className = 'sec_tray_tab_bottom tray_tab_sel_bottom';
-				cur_sec_header = this.header;
-				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
-					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
-				if(!isIE)set_frame_dims();
-			}
-	
-			this.make_row();
-			this.make_simple_section(1);
-			if(!isIE)this.hide();
-		} else {
-			this.row = this.frm.layout.addsubrow();
-			this.make_simple_section();
-		}
-	} else if(this.df){
-		this.row = this.frm.layout.addrow();
-		this.make_simple_section();
-	}	
-}
-
-SectionBreak.prototype.refresh = function(layout) {
-	var fn = this.df.fieldname?this.df.fieldname:this.df.label;
-
-	if(fn)
-		this.df = get_field(this.doctype, fn, this.docname);
-
-	// hidden
-	if((this.frm.meta.section_style!='Tray')&&(this.frm.meta.section_style!='Tabbed')&&this.set_hidden!=this.df.hidden) {
-		if(this.df.hidden) {
-			if(this.header)this.header.hide();
-			if(this.row)this.row.hide();
-		} else {
-			if(this.header)this.header.show();
-			if(this.expanded)
-				this.row.show();
-		}
-		this.set_hidden = this.df.hidden;
-	}
-}
-
-
-
-function get_value(dt, dn, fn) {
-	if(locals[dt] && locals[dt][dn]) 
-		return locals[dt][dn][fn];	
-}
-
-function set_value(dt, dn, fn, v) {
-	var d = locals[dt][dn];
-
-	if(!d) 
-		show_alert('Trying to set a value for "'+dt+','+dn+'" which is not found');
-	if(d[fn] != v) {
-		d[fn] = v;
-		d.__unsaved = 1;
-		var frm = frms[d.doctype];
-		try {
-			if(d.parent && d.parenttype) {
-				locals[d.parenttype][d.parent].__unsaved = 1;
-				frm = frms[d.parenttype];
-			}
-		} catch(e) {
-			if(d.parent && d.parenttype)
-			errprint('Setting __unsaved error:'+d.name+','+d.parent+','+d.parenttype);
-		}
-		if(frm && frm==cur_frm) {
-			frm.set_heading();
-		}
-	}
-}
-
-function makeinput_popup(me, iconsrc, iconsrc1) {
-	me.input = $a(me.input_area, 'div');
-	me.input.onchange = function() { /*alert('in_oc'); me.txt.onchange();*/ }
-	
-	var tab = $a(me.input, 'table');
-	$w(tab, '100%');
-	tab.style.borderCollapse = 'collapse';
-	
-	var c0 = tab.insertRow(0).insertCell(0);
-	var c1 = tab.rows[0].insertCell(1);
-	
-	me.txt = $a(c0, 'input');
-	$w(me.txt, isIE ? '92%' : '100%');
-
-	c0.style.verticalAlign = 'top';
-	$w(c0, "80%");
-
-	me.btn = $a(c1, 'img', 'btn-img');
-	me.btn.src = iconsrc;
-	if(iconsrc1) // link
-		me.btn.setAttribute('title','Search');
-	else // date
-		me.btn.setAttribute('title','Select Date');
-	me.btn.style.margin = '4px 2px 2px 8px';
-
-	if(iconsrc1) {
-		$w(c1, '18px');
-		me.btn1 = $a(tab.rows[0].insertCell(2), 'img', 'btn-img');
-		me.btn1.src = iconsrc1;
-		me.btn1.setAttribute('title','Open Link');
-		me.btn1.style.margin = '4px 2px 2px 0px';
-	}
-	
-	if(me.df.colour)
-		me.txt.style.background = '#'+me.df.colour.split(':')[1];
-	me.txt.name = me.df.fieldname;
-	tmpid++;
-	me.txt.setAttribute('id', 'idx'+tmpid);
-	me.txt.id = 'idx'+tmpid;
-
-	me.setdisabled = function(tf) { me.txt.disabled = tf; }
-}
-
-
-var tmpid = 0;
-
-
-//
-// Documents
-//
-
-function set_default_values(doc) {
-	var doctype = doc.doctype;
-	var docfields = fields_list[doctype];
-	if(!docfields) {
-		return;
-	}
-	for(var fid=0;fid<docfields.length;fid++) {
-		var f = docfields[fid];
-		if(!in_list(no_value_fields, f.fieldtype) && doc[f.fieldname]==null) {
-			var v = LocalDB.get_default_value(f.fieldname, f.fieldtype, f['default']);
-			if(v) doc[f.fieldname] = v;
-		}
-	}
-}
-
-function get_today() {
-	var today = new Date();
-	var m = (today.getMonth()+1)+'';
-	if(m.length==1)m='0'+m;
-	var d = today.getDate()+'';
-	if(d.length==1)d='0'+d;
-	return today.getFullYear()+'-'+m+'-'+d;
-}
-
-function copy_doc(onload, from_amend) {
-	if(!cur_frm) return;
-	
-	if(!cur_frm.perm[0][CREATE]) {
-		msgprint('You are not allowed to create '+cur_frm.meta.name);
-		return;
-	}
-	
-	var dn = cur_frm.docname;
+	var dn = this.docname;
 	// copy parent
-	var newdoc = LocalDB.copy(cur_frm.doctype, dn, from_amend);
+	var newdoc = LocalDB.copy(this.doctype, dn, from_amend);
 
 	// do not copy attachments
-	if(cur_frm.meta.allow_attach && newdoc.file_list)
+	if(this.meta.allow_attach && newdoc.file_list)
 		newdoc.file_list = null;
 	
 	// copy chidren
-	var dl = make_doclist(cur_frm.doctype, dn);
+	var dl = make_doclist(this.doctype, dn);
 
 	// table fields dict - for no_copy check
 	var tf_dict = {};
@@ -1599,18 +885,49 @@ function copy_doc(onload, from_amend) {
 	loaddoc(newdoc.doctype, newdoc.name);
 }
 
-function is_null(v) {
-	if(v==null) {
-		return 1
-	} else if(v==0) {
-		if((v+'').length==1) return 0;
-		else return 1;
+// ======================================================================================
+
+_f.Frm.prototype.reload_doc = function() {
+	var me = this;
+	if(frms['DocType'] && frms['DocType'].opendocs[me.doctype]) {
+		msgprint("error:Cannot refresh an instance of \"" + me.doctype+ "\" when the DocType is open.");
+		return;
+	}
+
+	var ret_fn = function(r, rtxt) {
+		// n tweets and last comment
+		if(r.n_comments) this.n_comments[me] = r.n_comments;
+		if(r.last_comment) this.last_comments[me] = r.last_comment;
+		
+		me.runclientscript('setup', me.doctype, me.docname);
+		me.refresh();
+	}
+
+	if(me.doc.__islocal) { 
+		// reload only doctype
+		$c('webnotes.widgets.form.getdoctype', {'doctype':me.doctype }, ret_fn, null, null, 'Refreshing ' + me.doctype + '...');
 	} else {
-		return 0
+		// delete all unsaved rows
+		var gl = me.grids;
+		for(var i = 0; i < gl.length; i++) {
+			var dt = gl[i].df.options;
+			for(var dn in locals[dt]) {
+				if(locals[dt][dn].__islocal && locals[dt][dn].parent == me.docname) {
+					var d = locals[dt][dn];
+					d.parent = '';
+					d.docstatus = 2;
+					d.__deleted = 1;
+				}
+			}
+		}
+		// reload doc and docytpe
+		$c('webnotes.widgets.form.getdoc', {'name':me.docname, 'doctype':me.doctype, 'getdoctype':1, 'user':user}, ret_fn, null, null, 'Refreshing ' + me.docname + '...');
 	}
 }
 
-function check_required(dt, dn) {
+// ======================================================================================
+
+_f.Frm.prototype.check_required = function(dt, dn) {
 	var doc = locals[dt][dn];
 	if(doc.docstatus>1)return true;
 	var fl = fields_list[dt];
@@ -1632,7 +949,7 @@ function check_required(dt, dn) {
 	return all_clear;
 }
 
-function savedoc(dt, dn, save_action, onsave, onerr) {
+_f.Frm.prototype.savedoc = function(dt, dn, save_action, onsave, onerr) {
 	var doc = locals[dt][dn];
 	var doctype = locals['DocType'][dt];
 	
@@ -1688,52 +1005,58 @@ function savedoc(dt, dn, save_action, onsave, onerr) {
 	}
 }
 
-function amend_doc() {
-	if(!cur_frm.fields_dict['amended_from']) {
+_f.Frm.prototype.savesubmit = function() {
+	var answer = confirm("Permanently Submit "+cur_frm.docname+"?");
+	if(answer) this.save_doc('Submit');
+}
+
+_f.Frm.prototype.savecancel = function() {
+	var answer = confirm("Permanently Cancel "+cur_frm.docname+"?");
+	if(answer) this.save_doc('Cancel');
+}
+
+// ======================================================================================
+
+_f.Frm.prototype.amend_doc = function() {
+	if(!this.fields_dict['amended_from']) {
 		alert('"amended_from" field must be present to do an amendment.');
 		return;
 	}
     var fn = function(newdoc) {
-      newdoc.amended_from = cur_frm.docname;
-      if(cur_frm.fields_dict['amendment_date'])
+      newdoc.amended_from = this.docname;
+      if(this.fields_dict['amendment_date'])
 	      newdoc.amendment_date = dateutil.obj_to_str(new Date());
     }
-    copy_doc(fn, 1);
+    this.copy_doc(fn, 1);
 }
 
-function savesubmit() {
-	var answer = confirm("Permanently Submit "+cur_frm.docname+"?");
-	if(answer) save_doc('Submit');
+// ======================================================================================
+
+_f.get_value = function(dt, dn, fn) {
+	if(locals[dt] && locals[dt][dn]) 
+		return locals[dt][dn][fn];	
 }
 
-function savecancel() {
-	var answer = confirm("Permanently Cancel "+cur_frm.docname+"?");
-	if(answer) save_doc('Cancel');
-}
+_f.set_value = function(dt, dn, fn, v) {
+	var d = locals[dt][dn];
 
-function save_doc(save_action) {
-	if(!cur_frm)return;
-	if(!save_action)save_action = 'Save';
-	if(cur_frm.cscript.server_validate) {
-		// params doc, save_action
-		cur_frm.cscript.server_validate(locals[cur_frm.doctype][cur_frm.name], save_action);
-	} else {
-		cur_frm.save(save_action);
-	}
-}
-
-
-// refresh
-
-function refresh_scroll_heads() {
-	for(var i=0;i<scroll_list.length;i++) {
-		if(scroll_list[i].frm == cur_frm) {
-			ie_refresh(scroll_list[i]);
-			if(scroll_list[i].check_disp)
-				scroll_list[i].check_disp();
+	if(!d) 
+		show_alert('Trying to set a value for "'+dt+','+dn+'" which is not found');
+	if(d[fn] != v) {
+		d[fn] = v;
+		d.__unsaved = 1;
+		var frm = frms[d.doctype];
+		try {
+			if(d.parent && d.parenttype) {
+				locals[d.parenttype][d.parent].__unsaved = 1;
+				frm = frms[d.parenttype];
+			}
+		} catch(e) {
+			if(d.parent && d.parenttype)
+			errprint('Setting __unsaved error:'+d.name+','+d.parent+','+d.parenttype);
 		}
-		if(scroll_list[i].cs == _cs) {
-			ie_refresh(scroll_list[i]);
+		if(frm && frm==cur_frm) {
+			frm.set_heading();
 		}
 	}
 }

@@ -1277,7 +1277,6 @@ div#dialog_back {
 
 div#dialogs {
 	position: absolute;
-	z-index: 90;
 	top: 0px;
 	left: 0px;
 }
@@ -1663,6 +1662,7 @@ autosuggest, inquisitor style
 div.autosuggest
 {
 	position: absolute; margin-top: 3px; border: 1px solid #222;
+	background-color: #FFF;
 }
 
 div.autosuggest ul
@@ -1697,7 +1697,7 @@ div.autosuggest ul li a:hover
 }
 div.autosuggest ul li.as_highlight a:hover
 {
-	background-color: #FFC;
+	background-color: #FF8;
 }
 
 div.autosuggest ul li a span
@@ -1723,7 +1723,7 @@ div.autosuggest ul li.as_highlight a span small
 div.autosuggest ul li.as_highlight a
 {
 	color: #444;
-	background-color: #FFC;
+	background-color: #FF8;
 }
 
 div.autosuggest ul li.as_warning

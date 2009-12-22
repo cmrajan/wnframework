@@ -99,6 +99,6 @@ def getchildren(name, childtype, field='', parenttype=''):
 	for i in range(len(dataset)):
 		d = webnotes.model.doc.Document()
 		d.doctype = childtype
-		d.loadfields(dataset, i, conn.cursor.description)
+		d.loadfields(dataset, i, webnotes.conn.cursor.description)
 		l.append(d)
 	return l

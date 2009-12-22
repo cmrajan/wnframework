@@ -33,6 +33,17 @@ function fmt_money(v){
 	}
 }
 
+function is_null(v) {
+	if(v==null) {
+		return 1
+	} else if(v==0) {
+		if((v+'').length==1) return 0;
+		else return 1;
+	} else {
+		return 0
+	}
+}
+
 function $s(ele, v, ftype, fopt) { 	
 	if(v==null)v='';
 					
@@ -203,8 +214,8 @@ function has_common(list1, list2) {
 var inList = in_list; // bc
 function add_lists(l1, l2) {
 	var l = [];
-	for(var k in l1) l[l.length] = l1[k];
-	for(var k in l2) l[l.length] = l2[k];
+	for(var k in l1) l.push(l1[k]);
+	for(var k in l2) l.push(l2[k]);
 	return l;
 }
 

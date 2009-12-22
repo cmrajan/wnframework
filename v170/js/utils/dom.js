@@ -108,15 +108,15 @@ function set_title(t) {
 }
 
 function $a(parent, newtag, className, cs) {
-	if(!parent)alert("Error in adding to DOM element:"+ newtag+','+className);
-	if(parent.substr)parent = $i(parent);
+	if(parent && parent.substr)parent = $i(parent);
 	var c = document.createElement(newtag);
-	parent.appendChild(c);
+	if(parent)
+		parent.appendChild(c);
 	if(className)c.className = className;
 	if(cs)$y(c,cs);
 	return c;
 }
-function $a_input(p,in_type, attributes, cs) {
+function $a_input(p, in_type, attributes, cs) {
 	if(!attributes) attributes = {};
 	if(in_type) attributes.type = in_type 
 	if(isIE) {
@@ -280,4 +280,20 @@ function get_screen_dims() {
     d.h = document.body.clientHeight;
   }	
   return d
+
+}
+
+// set user image
+var user_img = {};
+function set_user_img(img, username) {
+	function set_it() {
+		if(user_img[username]=='no_img')
+			img.src = 'images/ui/no_img/no_img_m.gif'; // no image
+		else
+			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
+	}
+	if(user_img[username]) 
+		set_it();
+	else
+		$c('get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
 }

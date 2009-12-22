@@ -1,19 +1,18 @@
-function FrmContainer() {  }
-
-FrmContainer.prototype = new Container()
-FrmContainer.prototype.oninit = function() {
+_f.FrmContainer = function() {  
+	this.wrapper = page_body.add_page("Forms", function() {});
 	this.make_head();
 	this.make_toolbar();
-	make_text_dialog();
 }
 
-FrmContainer.prototype.make_head = function() {
-	this.head_div = $a(this.head, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px 4px'});
+_f.FrmContainer.prototype.make_head = function() {
+	var me = this;
+	this.bg_color = '#DDF';
+	this.head = $a(this.wrapper, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px'});
+	this.body = $a(this.wrapper,'div');
 
 	// Row 1
 	// ------------------
-
-	this.tbartab = make_table($a(this.head_div, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: "#DDD"});
+	this.tbartab = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: this.bg_color, borderBottom:'1px solid #AAF'});
 
 	// left side - headers
 	// -------------------
@@ -48,8 +47,8 @@ FrmContainer.prototype.make_head = function() {
 		tweet_dialog.hide();
 	}
 	this.comments_btn.onmouseover = function() { // custom mouseover
-		$y(c,{backgroundColor:'#EEE'});
-		if(cur_frm.doc.__islocal) {
+		$y(c,{backgroundColor:'#EEF'});
+		if(me.doc.__islocal) {
 			return;
 		}
 		this.dropdown.body.appendChild(tweet_dialog);
@@ -57,7 +56,7 @@ FrmContainer.prototype.make_head = function() {
 		tweet_dialog.show(); 
 	}
 	this.comments_btn.onmouseout = function() {
-		$y(c,{backgroundColor:'#DDD'});
+		$y(c,{backgroundColor:me.bg_color});
 		this.dropdown.clear();
 	}
 		
@@ -65,8 +64,7 @@ FrmContainer.prototype.make_head = function() {
 
 	// Actions...
 	// -------------
-	this.tbarlinks = $a($td(tab2,0,2),'select','',{width:'120px'});
-	select_register[select_register.length] = this.tbarlinks; // for IE 6
+	this.tbarlinks = new SelectWidget($td(tab2,0,2),[]);
 
 	// close button
 	// ---------------
@@ -77,7 +75,7 @@ FrmContainer.prototype.make_head = function() {
 	// Row 2
 	// ------------------
 
-	this.tbartab2 = make_table($a(this.head_div, 'div'), 1, 2, '100%', ['50%','50%']);
+	this.tbartab2 = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%']);
 	var t = make_table($a($td(this.tbartab2,0,0),'div'),1,2,'100%',['38%','62%'])
 	
 	// buttons
@@ -104,17 +102,15 @@ FrmContainer.prototype.make_head = function() {
 	
 }
 
-FrmContainer.prototype.show_head = function() { 
-	$ds(this.head_div); 
+_f.FrmContainer.prototype.show_head = function() { 
+	$ds(this.head); 
 }
 
-FrmContainer.prototype.hide_head = function() { 
-	$dh(this.head_div); 
+_f.FrmContainer.prototype.hide_head = function() { 
+	$dh(this.head); 
 }
 
-FrmContainer.prototype.refresh = function() { }
-
-FrmContainer.prototype.make_toolbar = function() {
+_f.FrmContainer.prototype.make_toolbar = function() {
 	this.btns = {};
 	var me = this;
 	var makebtn = function(label, fn, bold) {
@@ -130,26 +126,23 @@ FrmContainer.prototype.make_toolbar = function() {
 		me.btns[label] = btn;
 	}
 
-	makebtn('Edit', edit_doc);
-	makebtn('Save', function() { save_doc('Save');}, 1);
-	makebtn('Submit', savesubmit);
-	makebtn('Cancel', savecancel);
-	makebtn('Amend', amend_doc);
+	makebtn('Edit', function() { cur_frm.edit_doc() });
+	makebtn('Save', function() { cur_frm.save('Save');}, 1);
+	makebtn('Submit', function() { cur_frm.savesubmit(); });
+	makebtn('Cancel', function() { cur_frm.savecancel() });
+	makebtn('Amend', function() { cur_frm.amend_doc() });
 	
 	me.tbarlinks.onchange= function() {
 		var v = sel_val(this);
 		if(v=='New') new_doc();
-		else if(v=='Refresh') reload_doc();
-		else if(v=='Print') print_doc();
-		else if(v=='Email') email_doc();
-		else if(v=='Copy') copy_doc();
+		else if(v=='Refresh') cur_frm.reload_doc();
+		else if(v=='Print') cur_frm.print_doc();
+		else if(v=='Email') cur_frm.email_doc();
+		else if(v=='Copy') cur_frm.copy_doc();
 	}
-	// make email dialog
-	makeemail();
-	makeprintdialog();
 }
 
-FrmContainer.prototype.refresh_save_btns= function() {
+_f.FrmContainer.prototype.refresh_save_btns= function() {
 	var frm = cur_frm;
 	var p = frm.get_doc_perms();
 
@@ -169,7 +162,7 @@ FrmContainer.prototype.refresh_save_btns= function() {
 	else this.btns['Amend'].hide();
 }
 
-FrmContainer.prototype.refresh_opt_btns = function() {
+_f.FrmContainer.prototype.refresh_opt_btns = function() {
 	var frm = cur_frm;
 
 	var ol = ['Actions...','New','Refresh'];
@@ -182,18 +175,18 @@ FrmContainer.prototype.refresh_opt_btns = function() {
 	add_sel_options(this.tbarlinks, ol, 'Actions...');
 }
 
-FrmContainer.prototype.show_toolbar = function() {
+_f.FrmContainer.prototype.show_toolbar = function() {
 	for(var i=0; i<this.head_elements.length; i++) this.head_elements[i].is_inline ? $di(this.head_elements[i]) : $ds(this.head_elements[i]);
 
 	this.refresh_save_btns();
 	this.refresh_opt_btns();
 }
 
-FrmContainer.prototype.hide_toolbar = function() {
+_f.FrmContainer.prototype.hide_toolbar = function() {
 	for(var i=0; i<this.head_elements.length; i++) $dh(this.head_elements[i]);
 }
 
-FrmContainer.prototype.refresh_toolbar = function() {
+_f.FrmContainer.prototype.refresh_toolbar = function() {
 	var frm = cur_frm;
 	if(frm.meta.hide_heading) { this.hide_head(); }
 	else {
@@ -207,7 +200,7 @@ FrmContainer.prototype.refresh_toolbar = function() {
 	}
 }
 
-FrmContainer.prototype.add_frm = function(doctype, onload, opt_name) {
+_f.FrmContainer.prototype.add_frm = function(doctype, onload, opt_name) {
 	// dont open doctype and docname from the same session
 	if(frms['DocType'] && frms['DocType'].opendocs[doctype]) {
 		msgprint("error:Cannot create an instance of \"" + doctype+ "\" when the DocType is open.");
@@ -222,15 +215,15 @@ FrmContainer.prototype.add_frm = function(doctype, onload, opt_name) {
 		if(!locals['DocType'][doctype]) {
 			return;
 		}
-		new Frm(doctype, me.body);
+		new _f.Frm(doctype, me.body);
 
 		if(onload)onload(r,rt);
 	}
-	if(opt_name && (!is_doc_loaded(doctype, opt_name))) {
+	if(opt_name && (!LocalDB.is_doc_loaded(doctype, opt_name))) {
 		// get both
-		$c('getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, fn, null, null, 'Loading ' + opt_name);
+		$c('webnotes.widgets.form.getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, fn);
 	} else {
 		// get doctype only
-		$c('getdoctype', args={'doctype':doctype}, fn, null, null, 'Loading ' + doctype);
+		$c('webnotes.widgets.form.getdoctype', args={'doctype':doctype}, fn);
 	}
 }

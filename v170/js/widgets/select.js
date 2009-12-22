@@ -15,7 +15,11 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 				
 		this.btn = $a($td(this.body_tab, 0, 1), 'img', '', {cursor:'pointer', margin:'2px'});
 		this.btn.src = 'images/ui/down-arrow.gif';
-		this.btn.onclick = function() { 
+		this.btn.onclick = function() {
+			if(me.as && me.as.body) {
+				me.as.clearSuggestions();
+				return;
+			}
 			me.inp.focus();
 			me.as.createList(me.as.aSug); 
 		}
@@ -32,7 +36,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 	
 	this.set_background = function(color) {
 		if(color)this.bg_color = color;
-		$y($td(this.body_tab, 0, 0),{backgroundColor:this.bg_color});		
+		$y($td(this.body_tab, 0, 0),{backgroundColor: this.bg_color});		
 		$y($td(this.body_tab, 0, 1),{backgroundColor:'#ECECDB'});		
 
 	}
@@ -45,6 +49,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 	}
 	
 	this.set_options = function(l) {
+		this.as.init();
 		this.as.aSug = me.create_options(l);
 	}
 	

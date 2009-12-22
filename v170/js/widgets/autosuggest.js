@@ -8,11 +8,7 @@ function AutoSuggest(id, param) {
 	if (!this.fld) {return 0; alert('AutoSuggest: No ID');}
 
 	// init variables
-	//
-	this.sInp 	= "";
-	this.nInpC 	= 0;
-	this.aSug 	= [];
-	this.iHigh 	= 0;
+	this.init();
 
 	// parameters object
 	this.oP = param ? param : {};
@@ -42,6 +38,16 @@ function AutoSuggest(id, param) {
 	
 	this.fld.setAttribute("autocomplete","off");
 };
+
+AutoSuggest.prototype.init = function() {
+
+	this.sInp 	= "";
+	this.nInpC 	= 0;
+	this.aSug 	= [];
+	this.iHigh 	= 0;
+
+}
+
 
 AutoSuggest.prototype.onKeyPress = function(ev)
 {
@@ -248,6 +254,9 @@ AutoSuggest.prototype.setSuggestions = function (r, rt, input)
 
 AutoSuggest.prototype.createList = function(arr) {
 	
+	if(cur_autosug && cur_autosug!= this)
+		cur_autosug.clearSuggestions();
+
 	this.aSug = arr;
 	this.user_inp = '';
 	
@@ -267,8 +276,9 @@ AutoSuggest.prototype.createList = function(arr) {
 		return false;
 		
 	// create holding div
-	var div = $ce("div", {className:this.oP.className});	
-	div.style.zIndex = 95;
+	var div = $ce("div", {className:this.oP.className});
+	top_index++;
+	div.style.zIndex = top_index;
 	div.isactive = 1;
 
 	// create and populate ul
@@ -344,7 +354,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	// add DIV to document
 	//
 	//document.getElementsByTagName("body")[0].appendChild(div);	
-	$i('body_div').appendChild(div);
+	$i('dialogs').appendChild(div);
 	
 	//height
 	if(cint(div.clientHeight) >= this.oP.maxheight) {
@@ -496,9 +506,10 @@ AutoSuggest.prototype.resetTimeout = function() {
 AutoSuggest.prototype.clearSuggestions = function () {
 	this.killTimeout();
 	var me = this;
-	if (this.body) { $dh(this.body); }
+	if (this.body) { $dh(this.body); delete this.body; }
 	if(this.ul)
 		delete this.ul;
+	
 	cur_autosug = null;
 };
 

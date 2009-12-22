@@ -1,8 +1,9 @@
-// Grid
+// _f.Grid
 
-function Grid(parent) { }
+_f.cur_grid_cell = null;
+_f.Grid = function(parent) { }
 
-Grid.prototype.init = function(parent, row_height) {
+_f.Grid.prototype.init = function(parent, row_height) {
 	
 	this.alt_row_bg = '#F2F2FF';
 	this.row_height = row_height;
@@ -19,7 +20,7 @@ Grid.prototype.init = function(parent, row_height) {
 	if(this.oninit)this.oninit();
 }
 
-Grid.prototype.make_ui = function(parent) { 
+_f.Grid.prototype.make_ui = function(parent) { 
 
 	var ht = make_table($a(parent, 'div'), 1, 2, '100%', ['60%','40%']);
 	this.main_title = $td(ht,0,0); this.main_title.className = 'columnHeading';
@@ -28,7 +29,7 @@ Grid.prototype.make_ui = function(parent) {
 	this.tbar_tab = make_table(this.tbar_div,1,4,'100%',['25%','25%','25%','25%']);	
 	
 	this.wrapper = $a(parent, 'div', 'grid_wrapper');
-	$h(this.wrapper, cint(pagewidth * 0.5) + 'px');
+	$h(this.wrapper, cint(screen.width * 0.5) + 'px');
 
 	this.head_wrapper = $a(this.wrapper, 'div', 'grid_head_wrapper');
 
@@ -43,7 +44,7 @@ Grid.prototype.make_ui = function(parent) {
 	this.wrapper.onscroll = function() { me.head_wrapper.style.top = me.wrapper.scrollTop+'px'; }
 }
 
-Grid.prototype.make_ui_simple = function(parent) { 
+_f.Grid.prototype.make_ui_simple = function(parent) { 
 
 	var ht = make_table($a(parent, 'div'), 1, 2, '100px', ['60%','40%']);
 
@@ -65,7 +66,7 @@ Grid.prototype.make_ui_simple = function(parent) {
 	var me = this;	
 }
 
-Grid.prototype.show = function() { 
+_f.Grid.prototype.show = function() { 
 	$ds(this.wrapper);
 	if(this.can_add_rows) {
 		if(this.is_scrolltype)$ds(this.tbar_div);
@@ -75,11 +76,11 @@ Grid.prototype.show = function() {
 		else $dh(this.btn_area);
 	}
 }
-Grid.prototype.hide = function() { 
+_f.Grid.prototype.hide = function() { 
 	$dh(this.wrapper); $dh(this.tbar_div); 
 }
 
-Grid.prototype.insert_column = function(doctype, fieldname, fieldtype, label, width, options, perm, reqd) {
+_f.Grid.prototype.insert_column = function(doctype, fieldname, fieldtype, label, width, options, perm, reqd) {
 	
 	var idx = this.head_row.cells.length;
 	if(!width)width = '100px';
@@ -107,7 +108,7 @@ Grid.prototype.insert_column = function(doctype, fieldname, fieldtype, label, wi
 
 }
 
-Grid.prototype.set_column_disp = function(label, show) { 
+_f.Grid.prototype.set_column_disp = function(label, show) { 
 	//alert(label);
 	for(var i=0; i<this.head_row.cells.length; i++) {
 		var c = this.head_row.cells[i];
@@ -137,7 +138,7 @@ Grid.prototype.set_column_disp = function(label, show) {
 	}
 }
 
-Grid.prototype.append_row = function(idx, docname) { 
+_f.Grid.prototype.append_row = function(idx, docname) { 
 	if(!idx)idx = this.tab.rows.length;
 	var row = this.tab.insertRow(idx);
 	row.docname = docname;
@@ -174,7 +175,7 @@ Grid.prototype.append_row = function(idx, docname) {
 	return row;	
 }
 
-Grid.prototype.refresh_cell = function(docname, fieldname) {
+_f.Grid.prototype.refresh_cell = function(docname, fieldname) {
 	for(var r=0;r<this.tab.rows.length;r++) {
 		if(this.tab.rows[r].docname==docname) {
 			for(var c=0;c<this.head_row.cells.length;c++) {
@@ -187,8 +188,11 @@ Grid.prototype.refresh_cell = function(docname, fieldname) {
 	}
 }
 
-var cur_grid; var cur_grid_ridx; // for form edit
-Grid.prototype.set_cell_value = function(cell) {
+// for form edit
+_f.cur_grid; 
+_f.cur_grid_ridx; 
+
+_f.Grid.prototype.set_cell_value = function(cell) {
 	// if newrow
 	if(cell.row.is_newrow)return;
 
@@ -223,8 +227,8 @@ Grid.prototype.set_cell_value = function(cell) {
 
 			var ed = $a($td(t,0,1),'img','',{cursor:'pointer'}); ed.cell = cell; ed.title = 'Edit Row';
 			ed.src = 'images/icons/page.gif'; ed.onclick = function() { 
-				cur_grid = me;
-				cur_grid_ridx = this.cell.row.rowIndex;
+				_f.cur_grid = me;
+				_f.cur_grid_ridx = this.cell.row.rowIndex;
 				edit_record(me.doctype, this.cell.row.docname);				
 			}
 			
@@ -243,8 +247,8 @@ Grid.prototype.set_cell_value = function(cell) {
 	}
 }
 
-Grid.prototype.cell_click = function(cell, e) {
-	if(grid_selected_cell==cell)
+_f.Grid.prototype.cell_click = function(cell, e) {
+	if(_f.cur_grid_cell==cell)
 		return; // on existing cell
 		
 	this.cell_select(cell);
@@ -259,27 +263,27 @@ Grid.prototype.cell_click = function(cell, e) {
 }
 
 function grid_click_event(e, target) {
-	if(grid_selected_cell && !target.isactive) {
+	if(_f.cur_grid_cell && !target.isactive) {
 		if(!text_dialog.display && !selector.display) {
-			grid_selected_cell.grid.cell_deselect();
+			_f.cur_grid_cell.grid.cell_deselect();
 		}
 	}
 }
 
-Grid.prototype.cell_deselect = function() {
-	if(grid_selected_cell) {
-		var c = grid_selected_cell;
+_f.Grid.prototype.cell_deselect = function() {
+	if(_f.cur_grid_cell) {
+		var c = _f.cur_grid_cell;
 		c.grid.remove_template(c);
 		c.div.className = 'grid_cell_div';
 		if(c.is_odd) c.div.style.border = '2px solid ' + c.grid.alt_row_bg;
 		else c.div.style.border = '2px solid #FFF';
-		grid_selected_cell = null;
-		cur_grid = null;
+		_f.cur_grid_cell = null;
+		_f.cur_grid = null;
 		this.isactive = false;
 	}
 }
 
-Grid.prototype.cell_select = function(cell, ri, ci) {
+_f.Grid.prototype.cell_select = function(cell, ri, ci) {
 	if(ri!=null && ci!=null)
 		cell = this.tab.rows[ri].cells[ci];
 	
@@ -294,13 +298,13 @@ Grid.prototype.cell_select = function(cell, ri, ci) {
 	if(hc.fieldname && hc.template.get_status()=='Write') {
 		this.cell_deselect();
 		cell.div.style.border = '2px solid #88F';
-		grid_selected_cell = cell;
+		_f.cur_grid_cell = cell;
 		this.add_template(cell);
 		this.isactive = true;
 	}
 }
 
-Grid.prototype.add_template = function(cell) {
+_f.Grid.prototype.add_template = function(cell) {
 	if(!cell.row.docname && this.add_newrow) { // activate new row here
 		this.add_newrow();
 		this.cell_select(cell);
@@ -313,7 +317,7 @@ Grid.prototype.add_template = function(cell) {
 	}
 }
 
-Grid.prototype.get_field = function(fieldname) { // get template
+_f.Grid.prototype.get_field = function(fieldname) { // get template
 	for(var i=0;i<this.head_row.cells.length;i++) {
 		var hc = this.head_row.cells[i];
 		if(hc.fieldname == fieldname) {
@@ -327,16 +331,16 @@ Grid.prototype.get_field = function(fieldname) { // get template
 }
 
 
-grid_date_cell = '';
-function grid_refresh_date() {
-	grid_date_cell.grid.set_cell_value(grid_date_cell);
+_f.grid_date_cell = '';
+_f.grid_refresh_date = function() {
+	_f.grid_date_cell.grid.set_cell_value(_f.grid_date_cell);
 }
-function grid_refresh_field(temp, input) {
+_f.grid_refresh_field = function(temp, input) {
 	if(input.value!=get_value(temp.doctype, temp.docname, temp.df.fieldname))
 		if(input.onchange)input.onchange();
 }
 
-Grid.prototype.remove_template = function(cell) {
+_f.Grid.prototype.remove_template = function(cell) {
 	var hc = this.head_row.cells[cell.cellIndex];
 
 	if(!hc.template)return;
@@ -345,14 +349,14 @@ Grid.prototype.remove_template = function(cell) {
 	if(hc.template.txt) {
 		if(hc.template.df.fieldtype=='Date') {
 			// for calendar popup. the value will come after this
-			grid_date_cell = cell;
-			setTimeout('grid_refresh_date()', 100);
+			_f.grid_date_cell = cell;
+			setTimeout('_f.grid_refresh_date()', 100);
 		}
 		if(hc.template.txt.value)
-		grid_refresh_field(hc.template, hc.template.txt);
+		_f.grid_refresh_field(hc.template, hc.template.txt);
 		
 	} else if(hc.template.input) {
-		grid_refresh_field(hc.template, hc.template.input);		
+		_f.grid_refresh_field(hc.template, hc.template.input);		
 	}
 
 	if(hc.template && hc.template.wrapper.parentNode)
@@ -362,7 +366,7 @@ Grid.prototype.remove_template = function(cell) {
 
 }
 
-Grid.prototype.cell_keypress = function(e, keycode) {
+_f.Grid.prototype.cell_keypress = function(e, keycode) {
 	if(keycode>=37 && keycode<=40 && e.shiftKey) {
 		if(text_dialog && text_dialog.display) {
 			return;
@@ -370,9 +374,9 @@ Grid.prototype.cell_keypress = function(e, keycode) {
 	} else 
 		return;
 
-	if(!grid_selected_cell) return;
-	var ri = grid_selected_cell.row.rowIndex;
-	var ci = grid_selected_cell.cellIndex;
+	if(!_f.cur_grid_cell) return;
+	var ri = _f.cur_grid_cell.row.rowIndex;
+	var ci = _f.cur_grid_cell.cellIndex;
 	switch(keycode) {
 		case 38: // up
 			if (ri > 0) {
@@ -393,15 +397,15 @@ Grid.prototype.cell_keypress = function(e, keycode) {
 	}
 }
 
-Grid.prototype.make_template = function(hc) {
+_f.Grid.prototype.make_template = function(hc) {
 	hc.template = make_field(get_field(hc.doctype, hc.fieldname), hc.doctype, '', '', true);
 	hc.template.grid = this;
 }
 
-Grid.prototype.append_rows = function(n) { for(var i=0;i<n;i++) this.append_row(); }
-Grid.prototype.truncate_rows = function(n) { for(var i=0;i<n;i++) this.tab.deleteRow(this.tab.rows.length-1); }
+_f.Grid.prototype.append_rows = function(n) { for(var i=0;i<n;i++) this.append_row(); }
+_f.Grid.prototype.truncate_rows = function(n) { for(var i=0;i<n;i++) this.tab.deleteRow(this.tab.rows.length-1); }
 
-Grid.prototype.set_data = function(data) {
+_f.Grid.prototype.set_data = function(data) {
 	// data is list of docnames
 
 	// deselect if not done yet
@@ -437,15 +441,15 @@ Grid.prototype.set_data = function(data) {
 	if(this.wrapper.onscroll)this.wrapper.onscroll();
 }
 
-Grid.prototype.set_ht = function(ridx, docname) {
+_f.Grid.prototype.set_ht = function(ridx, docname) {
 	var ht = ((cint(this.row_height) + 10) * (((this.tab && this.tab.rows) ? this.tab.rows.length : 0) + 1));
 	if(ht < 100)ht=100; 
-	if(ht > cint(0.3 * pagewidth))ht=cint(0.3 * pagewidth);
+	if(ht > cint(0.3 * screen.width))ht=cint(0.3 * screen.width);
 	ht += 4;
 	$y(this.wrapper,{height:ht+'px'});
 }
 
-Grid.prototype.refresh_row = function(ridx, docname) {
+_f.Grid.prototype.refresh_row = function(ridx, docname) {
 	var row = this.tab.rows[ridx];
 	row.docname = docname;
 	row.is_newrow = false;

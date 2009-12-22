@@ -102,30 +102,3 @@ class _DocType:
 
 def get(dt):
 	return _DocType(dt).make_doclist()
-
-def getdoctype():
-	# load parent doctype too
-	form = webnotes.form
-	
-	dt = form.getvalue('doctype')
-	with_parent = form.getvalue('with_parent')
-
-	# with parent (called from report builder)
-	if with_parent:
-		parent_dt = self.get_parent_dt()
-		if parent_dt:
-			doclist = get(parent_dt)
-			webnotes.response['parent_dt'] = parent_dt
-	
-	if not doclist:
-		doclist = get(dt)
-	
-	# if single, send the record too
-	if doclist[0].issingle:
-		doclist += webnotes.model.doc.get(dt)
-
-	# load search criteria for reports (all)
-	doclist += get_search_criteria(dt)
-
-	webnotes.response['docs'] = doclist
-	

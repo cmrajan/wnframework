@@ -22,35 +22,43 @@ function _loadreport(dt, rep_name, onload, menuitem) {
 	if(cur_page!='_search')loadpage('_search');
 }
 
-// Load Form
-// -------------------------------------------------------------------------------
-
-function loadfrm(call_back) {
-	var fn = function() {
-		frm_con = new FrmContainer();
-		frm_con.init();
-		call_back();
-	}
-	if(!frm_con) fn();
-	else call_back();
-}
-
-
 // Load Doc
 // -------------------------------------------------------------------------------
 
+var load_doc = loaddoc;
+
 function loaddoc(doctype, name, onload, menuitem) {
-	loadfrm(function() { _loaddoc(doctype, name, onload, menuitem); });
-}
-function _loaddoc(doctype, name, onload, menuitem) {
 
-	selector.hide(); // if loaded	
-	if(!name)name = doctype; // single
+	// validate
+	if(frms['DocType'] && frms['DocType'].opendocs[doctype]) {
+		msgprint("Cannot open an instance of \"" + doctype + "\" when the DocType is open.");
+		return;
+	}
+
+	var show_form = function() {
+		// load the frm container
+		if(!_f.frm_con) {
+			_f.frm_con = new _f.FrmContainer();
+		}		
+		
+		// case A - frm not loaded
+		if(!frms[doctype]) {
+			_f.frm_con.add_frm(doctype, show_doc, name);
+
+		// case B - both loaded
+		} else if(LocalDB.is_doc_loaded(doctype, name)) {
+			show_doc();
+		
+		// case C - only frm loaded
+		} else {
+			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user}, show_doc, null, null, 'Loading ' + name);	// onload
+		}
+	}
 	
-	var fn = function(r,rt) {
-
+	var show_doc = function(r,rt) {
 		if(locals[doctype] && locals[doctype][name]) {
 			var frm = frms[doctype];
+
 			// menu item
 			if(menuitem) frm.menuitem = menuitem;
 			if(onload)onload(frm);
@@ -59,8 +67,8 @@ function _loaddoc(doctype, name, onload, menuitem) {
 			nav_obj.open_notify('DocType',doctype,name);
 			
 			// tweets
-			if(r && r.n_tweets) n_tweets[doctype+'/'+name] = r.n_tweets;
-			if(r && r.last_comment) last_comments[doctype+'/'+name] = r.last_comment;
+			if(r && r.n_tweets) frm.n_tweets[name] = r.n_tweets;
+			if(r && r.last_comment) frm.last_comments[name] = r.last_comment;
 
 			
 			// show
@@ -68,31 +76,21 @@ function _loaddoc(doctype, name, onload, menuitem) {
 
 			// show menuitem selected
 			if(frm.menuitem) frm.menuitem.show_selected();
-			cur_page = null;
+
 		} else {
 			msgprint('error:There where errors while loading ' + doctype + ',' + name);
 		}
 	}
 	
-	// dont open doctype and docname from the same session
-	if(frms['DocType'] && frms['DocType'].opendocs[doctype]) {
-		msgprint("Cannot open an instance of \"" + doctype + "\" when the DocType is open.");
-		return;
-	}
-	
-	if(!frms[doctype]) {
-		frm_con.add_frm(doctype, fn, name); // load
-	} else {		
-		if(is_doc_loaded(doctype, name)) {
-			// DocTypes must always be reloaded (because their instances may not have scripts)
-			fn(); // directly	
-		} else {
-			$c('getdoc', {'name':name, 'doctype':doctype, 'user':user}, fn, null, null, 'Loading ' + name);	// onload
-		}
+	// is libary loaded?
+	if(_f.FrmContainer) {
+		show_form();
+	} else {
+		$c_js('form.compressed.js', show_form)
 	}
 }
-var load_doc = loaddoc;
-var loaded_doctypes = [];
+
+
 
 // Load Page
 // -------------------------------------------------------------------------------

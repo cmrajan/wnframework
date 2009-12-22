@@ -36,6 +36,9 @@ class Document:
 		if (doctype and name):
 			self.loadfromdb(doctype, name)
 
+	def __nonzero__(self):
+		return False
+
 	# Load Document
 	# -------------
 

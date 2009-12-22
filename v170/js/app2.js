@@ -17,12 +17,11 @@
     patches, upgrades and support. For more information see 
     <http://webnotestech.com>
 */
-
+ 
 
 var fixh = 50;
 var fixw = 182;
 var toolbarh = 24;
-var select_register = [];
 var account_id = '';
 var pagewidth = 480;
 var NULL_CHAR = '^\5*';
@@ -36,7 +35,6 @@ var editAreaLoader;
 // Globals
 var calendar; var Calendar; 
 var GraphViewer;
-var text_dialog;
 
 try {
  document.execCommand('BackgroundImageCache', false, true);
@@ -44,39 +42,7 @@ try {
 
 /* History */
 
-var _history_current;
-function historyChange(newLocation, historyData) {
-	//if(newLocation == _history_current) // already there
-		//return;
-		
-	if(window.location.href.search('iwebnotes.com')!=-1) return; // no history for iwebnotes
-	
-	var t = newLocation.replace(/\%20/g, ' ');
-	t = t.split('~~~');
 
-	var c = nav_obj.ol[nav_obj.ol.length-1];
-
-	if(t.length==2)	{
-		if(c[0]==t[0] && c[1]==t[1]) return;
-	} else {
-		if(c[0]==t[0] && c[1]==t[1] && c[2]==t[2]) return;
-	}
-	
-	if(t[0]=='DocType') {
-		_history_current = newLocation;
-		loaddoc(t[1], t[2]);
-	} else if(t[0]=='Report') {
-		_history_current = newLocation;
-		loadreport(t[1], t[2]);
-	} else if(t[0]=='Page') {
-		_history_current = newLocation;
-		loadpage(t[1]);
-	} else if(t[0]=='Application') {
-		_history_current = newLocation;
-		loadapp(t[1]);
-	}
-	
-};
 
 var profile;
 var session;
@@ -260,17 +226,6 @@ function loadapp(app_name, sub_id) {
 
 // Events
 
-function addEvent(ev, fn) {
-	if(isIE) {
-		document.attachEvent('on'+ev, function() { 
-			fn(window.event, window.event.srcElement); 
-		});
-	} else {
-		document.addEventListener(ev, function(e) { fn(e, e.target); }, true);
-	}
-}
-
-
 
 function get_content_dims() {
 	var d = get_screen_dims();
@@ -334,50 +289,7 @@ function addImg(parent, src, cls, w, h, opt_id) {
     }
 }
 
-// Error Console:
-
-var err_console;
-var err_list = [];
-
-function errprint(t) {
-	err_list[err_list.length] = ('<pre style="font-family: Courier, Fixed; font-size: 11px; border-bottom: 1px solid #AAA; overflow: auto; width: 90%;">'+t+'</pre>');
-}
-function show_errors() {
-	msgprint(err_list.join('\n'));
-}
-
-function submit_error(e) {
-	if(isIE) {
-		var t = 'Explorer: ' + e + '\n' + e.description;
-	} else {
-		var t = 'Mozilla: ' + e.toString() + '\n' + e.message + '\nLine Number:' + e.lineNumber;// + '\nStack:' + e.stack;
-	}
-	$c('client_err_log', args ={'error':t});
-	errprint(e + '\nLine Number:' + e.lineNumber + '\nStack:' + e.stack);
-}
-
-function setup_err_console() {
-	err_console = new Dialog(640, 480, 'Error Console')
-	err_console.make_body([
-		['HTML', 'Error List'],
-		['Button', 'Ok'],
-		['Button', 'Clear']
-	]);
-	err_console.widgets['Ok'].onclick = function() {
-		err_console.hide();
-	}
-	err_console.widgets['Clear'].onclick = function() {
-		err_list = [];
-		err_console.rows['Error List'].innerHTML = '';
-	}
-	err_console.onshow = function() {
-		about_dialog.hide();
-		err_console.rows['Error List'].innerHTML = '<div style="padding: 16px; height: 360px; width: 90%; overflow: auto;">' 
-			+ err_list.join('<div style="height: 10px; margin-bottom: 10px; border-bottom: 1px solid #AAA"></div>') + '</div>';
-	}
-}
 startup_lst[startup_lst.length] = setup_err_console;
-function show_alert(m) { fm.show(m); }
 
 // Toolbar
 
@@ -953,112 +865,6 @@ function set_overall_width(w) {
 	pagewidth = overall_width - left_sidebar_width - right_sidebar_width - 32;
 }
 
-// Quick Search
-var search_sel;
-function setup_search_select() { 
-	// Set Quick Search
-	search_sel = $a('qsearch_sel', 'select');
-	add_sel_options(search_sel, session.m_rt);
-	search_sel.selectedIndex = 0;
-	search_sel.onchange = function() { open_quick_search(); }
-	select_register[select_register.length] = search_sel;
-
-	var search_btn = $a('qsearch_btn', 'button');
-	search_btn.innerHTML = 'Search';
-	search_btn.onclick = function() { open_quick_search(); }
-}
-function open_quick_search() {
-	selector.set_search(sel_val(search_sel));
-	search_sel.disabled = 1;
-	selector.show();
-}
-startup_lst[startup_lst.length] = setup_search_select;
-
-var load_todo = function() { 
-	loadpage('_todo');
-}
-var load_cal = function() { 
-	loadpage('_calendar');
-}
-
-
-startup_lst[startup_lst.length] = setup_recent_docs;
-
-
-
-startup_lst[startup_lst.length] = setup_search_page;
-
-function check_perm_match(p, dt, dn) {
-	if(!dn) return true;
-	var out =false;
-	if(p.match) {
-		if(user_defaults[p.match]) {
-			for(var i=0;i<user_defaults[p.match].length;i++) {
-				 // user must have match field in defaults
-				if(user_defaults[p.match][i]==locals[dt][dn][p.match]) {
-				    // must match document
-		  			return true;
-				}
-			}
-			return false;
-		} else if(!locals[dt][dn][p.match]) { // blanks are true
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		return true;
-	}
-}
-
-/*
-
-Note: Submitted docstatus overrides the permissions. To ignore submit condition
-pass ignore_submit=1
-
-*/
-
-function get_perm(doctype, dn, ignore_submit) {
-
-	var perm = [[0,0],];
-	if(in_list(user_roles, 'Administrator')) perm[0][READ] = 1;
-	var plist = getchildren('DocPerm', doctype, 'permissions', 'DocType');
-	for(var pidx in plist) {
-		var p = plist[pidx];
-		var pl = cint(p.permlevel?p.permlevel:0);
-		// if user role
-		if(in_list(user_roles, p.role)) {
-			// if field match
-			if(check_perm_match(p, doctype, dn)) { // new style
-				if(!perm[pl])perm[pl] = [];
-				if(!perm[pl][READ]) { 
-					if(cint(p.read))  perm[pl][READ]=1;   else perm[pl][READ]=0;
-				}
-				if(!perm[pl][WRITE]) { 
-					if(cint(p.write)) { perm[pl][WRITE]=1; perm[pl][READ]=1; }else perm[pl][WRITE]=0;
-				}
-				if(!perm[pl][CREATE]) { 
-					if(cint(p.create))perm[pl][CREATE]=1; else perm[pl][CREATE]=0;
-				}
-				if(!perm[pl][SUBMIT]) { 
-					if(cint(p.submit))perm[pl][SUBMIT]=1; else perm[pl][SUBMIT]=0;
-				}
-				if(!perm[pl][CANCEL]) { 
-					if(cint(p.cancel))perm[pl][CANCEL]=1; else perm[pl][CANCEL]=0;
-				}
-				if(!perm[pl][AMEND]) { 
-					if(cint(p.amend)) perm[pl][AMEND]=1;  else perm[pl][AMEND]=0;
-				}
-			}
-		}
-	}
-
-	if((!ignore_submit) && dn && locals[doctype][dn].docstatus>0) {
-		for(pl in perm)
-			perm[pl][WRITE]=0; // read only
-	}
-	return perm;
-}
 
 //
 // Startup
@@ -1257,43 +1063,6 @@ var newdoc = new_doc;
 
 // RELOAD
 
-function reload_doc() {
-	if(frms['DocType'] && frms['DocType'].opendocs[cur_frm.doctype]) {
-		msgprint("error:Cannot refresh an instance of \"" + cur_frm.doctype+ "\" when the DocType is open.");
-		return;
-	}
-
-	var ret_fn = function(r, rtxt) {
-		// n tweets and last comment
-		var t = cur_frm.doctype + '/' + cur_frm.docname;
-		if(r.n_tweets) n_tweets[t] = r.n_tweets;
-		if(r.last_comment) last_comments[t] = r.last_comment;
-		
-		cur_frm.runclientscript('setup', cur_frm.doctype, cur_frm.docname);
-		cur_frm.refresh();
-	}
-
-	if(cur_frm.doc.__islocal) { 
-		// reload only doctype
-		$c('getdoctype', {'doctype':cur_frm.doctype }, ret_fn, null, null, 'Refreshing ' + cur_frm.doctype + '...');
-	} else {
-		// delete all unsaved rows
-		var gl = cur_frm.grids;
-		for(var i = 0; i < gl.length; i++) {
-			var dt = gl[i].df.options;
-			for(var dn in locals[dt]) {
-				if(locals[dt][dn].__islocal && locals[dt][dn].parent == cur_frm.docname) {
-					var d = locals[dt][dn];
-					d.parent = '';
-					d.docstatus = 2;
-					d.__deleted = 1;
-				}
-			}
-		}
-		// reload doc and docytpe
-		$c('getdoc', {'name':cur_frm.docname, 'doctype':cur_frm.doctype, 'getdoctype':1, 'user':user}, ret_fn, null, null, 'Refreshing ' + cur_frm.docname + '...');
-	}
-}
 
 // LOADDOC
 

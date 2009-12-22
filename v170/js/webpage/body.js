@@ -68,26 +68,27 @@ function Body() {
 	// - Item List
 	// - [Pages by their names]
 
-	this.containers = {};
-	this.cur_cont = null;
-	this.add_container = function(label, onshow) {
+	this.pages = {};
+	this.cur_page = null;
+	this.add_page = function(label, onshow) {
 		var c = $a(this.center, 'div');
 		if(onshow) c.onshow = onshow;
-		this.containers[label] = c;
+		this.pages[label] = c;
+		return c
 	}
 	
 	this.change_to = function(label) {
 		// hide existing
-		if(me.cur_cont) 
-			$dh(me.cur_cont);
+		if(me.cur_page) 
+			$dh(me.cur_page);
 			
 		// show
-		me.cur_cont = me.containers[label];
-		$ds(me.cur_cont);
+		me.cur_page = me.pages[label];
+		$ds(me.cur_page);
 	
 		// on show
-		if(me.cur_cont.onshow)
-			me.cur_cont.onshow(me.cur_cont);
+		if(me.cur_page.onshow)
+			me.cur_page.onshow(me.cur_page);
 	}
 	
 	this.resize = function() {

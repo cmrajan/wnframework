@@ -1,21 +1,39 @@
 // EMAIL
 
-function email_doc() {
-	if(!cur_frm)return;
-	// make selector
-	sel = makeformatselector(cur_frm);
-	$td(email_dialog.rows['Format'].tab,0,1).innerHTML = '';
-	$td(email_dialog.rows['Format'].tab,0,1).appendChild(cur_frm.print_sel);
-	email_dialog.widgets['Subject'].value = cur_frm.meta.name + ': ' + cur_frm.docname;
-	email_dialog.show();
-	frm_con.tbarlinks.selectedIndex = 0;
+// Autosuggest defaults
+_e.email_as_field = 'email_id';
+_e.email_as_dt = 'Contact';
+_e.email_as_in = 'email_id,contact_name';
+
+function sendmail(emailto, emailfrom, cc, subject, message, fmt, with_attachments) {
+	var fn = function(html) {
+		$c('sendmail', {
+			'sendto':emailto, 
+			'sendfrom': emailfrom?emailfrom:'',
+			'cc':cc?cc:'',
+			'subject':subject,
+			'message':message,
+			'body':html,
+			'with_attachments':with_attachments ? 1 : 0,
+			'dt':cur_frm.doctype,
+			'dn':cur_frm.docname
+			}, 
+			function(r, rtxt) { 
+				//
+			}
+		);
+	}
+	
+	// build print format
+	_p.build(fmt, fn);
+}
+_e.show_dialog = function() {
+	if(!_e.dialog) {
+		_e.make();	
+	}
 }
 
-var email_as_field = 'email_id';
-var email_as_dt = 'Contact';
-var email_as_in = 'email_id,contact_name';
-
-function makeemail() {
+_e.make = function() {
 	var d = new Dialog(440, 440, "Send Email");
 	$dh(d.wrapper);
 
@@ -51,7 +69,7 @@ function makeemail() {
 			cc = ''; 
 		}
 		sendmail(emailto, emailfrom, emailfrom, d.widgets['Subject'].value, d.widgets['Message'].value, sel_val(cur_frm.print_sel), d.widgets['Send With Attachments'].checked);
-		email_dialog.hide();
+		_e.dialog.hide();
 	}
 
 	d.onhide = function() {
@@ -101,12 +119,12 @@ function makeemail() {
         }
         as.createList(as.aSug);
       }
-      $c('get_contact_list',{'select':email_as_field, 'from':email_as_dt, 'where':email_as_in, 'txt':(last_txt ? strip(last_txt) : '%')},call_back);
+      $c('get_contact_list',{'select':_e.email_as_field, 'from':_e.email_as_dt, 'where':_e.email_as_in, 'txt':(last_txt ? strip(last_txt) : '%')},call_back);
       return;
     }
 	
 	var sel;
 
-	email_dialog = d;
+	_e.dialog = d;
 }
 

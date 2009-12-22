@@ -124,13 +124,13 @@ class Profile:
 	# update recent documents
 	def update_recent(self, dt, dn):
 		if not (dt in ['Print Format', 'Start Page', 'Event', 'ToDo Item', 'Search Criteria']) and not webnotes.is_testing:
-			r = sql("select recent_documents from tabProfile where name=%s", self.name)[0][0]
-			self.recent = [dt+'~~~'+dn] + r
+			r = webnotes.conn.sql("select recent_documents from tabProfile where name=%s", self.name)[0][0]
+			self.recent = dt+'~~~'+dn + '\n' + r
 			
-			if len(self.recent) > 50:
+			if len(self.recent.split('\n')) > 50:
 				self.recent[:49]
 			
-			webnotes.conn.sql("update tabProfile set recent_documents=%s where name=%s", ('\n'.join(self.recent), self.name))
+			webnotes.conn.sql("update tabProfile set recent_documents=%s where name=%s", (self.recent, self.name))
 			
 	def load_profile(self):
 		t = webnotes.conn.sql('select email, first_name, last_name, recent_documents from tabProfile where name = %s', self.name)[0]

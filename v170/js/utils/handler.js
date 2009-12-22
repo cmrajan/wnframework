@@ -40,7 +40,7 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 			if(!no_spinner)hide_loading(); // Loaded
 			rtxt = rtxt.replace(/'\^\\x05\*'/g, 'null');
 			//alert(rtxt);
-			r = eval("var a="+rtxt+";a")
+			var r = eval("var a="+rtxt+";a")
 			if(r.exc && r.__redirect_login) {
 				msgprint(r.exc, 0, function() { document.location = login_file });
 				// logout
@@ -66,6 +66,7 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 	if(freeze_msg)freeze(freeze_msg,1);
 }
 
+// For calling an object
 function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 	// single
 	if(doclist.substr) {
@@ -82,13 +83,51 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 	}
 }
 
+// For loading a matplotlib Plot
 function $c_graph(img, control_dt, method, arg) {
 	img.src = outUrl + '?' + makeArgString({cmd:'get_graph', dt:control_dt, method:method, arg:arg});
 }
 
+function my_eval(co) {
+	var w = window;
+
+	// Evaluate script
+	if (!w.execScript) {
+		if (/Gecko/.test(navigator.userAgent)) {
+			eval(co, w); // Firefox 3.0
+		} else {
+			eval.call(w, co);
+		}
+	} else {
+		w.execScript(co); // IE
+	}
+}
+
+// For loading javascript file on demand using AJAX
+function $c_js(fn, callback) {
+	var req=newHttpReq();
+
+	ret_fn=function() {
+		if (checkResponse(req, function() { }, 1, null)) {
+			if(req.responseText.substr(0,9)=='Not Found') {
+				alert(req.responseText);
+				return;	
+			}
+			my_eval(req.responseText);
+			callback();
+		}
+	}
+
+	req.onreadystatechange=ret_fn;
+	req.open("POST",'cgi-bin/getjsfile.cgi',true);
+	req.setRequestHeader("ENCTYPE", "multipart/form-data");
+	req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+	req.send(makeArgString({filename:fn})); 
+}
+
 function makeArgString(dict) {
 	var varList = [];
- 
+
 	for(key in dict){
 		varList[varList.length] = key + '=' + encodeURIComponent(dict[key]);
 	}
