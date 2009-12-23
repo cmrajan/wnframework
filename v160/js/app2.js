@@ -2661,10 +2661,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 Listing.prototype.remove_filter = function(label) {
 	var inp = this.filters[label];
   if(!inp) return;
-  //alert(1);
-  //if(inp.parent_tab){  
 	inp.parent_tab.rows[0].deleteCell(inp.parent_cell.cellIndex);
-  //}
   delete this.filters[label];
 }
 
