@@ -125,7 +125,11 @@ class Profile:
 	def update_recent(self, dt, dn):
 		if not (dt in ['Print Format', 'Start Page', 'Event', 'ToDo Item', 'Search Criteria']) and not webnotes.is_testing:
 			r = webnotes.conn.sql("select recent_documents from tabProfile where name=%s", self.name)[0][0]
-			self.recent = dt+'~~~'+dn + '\n' + r
+			new_str = dt+'~~~'+dn + '\n'
+			if new_str in r:
+				r = r.replace(new_str, '')
+
+			self.recent = new_str + r
 			
 			if len(self.recent.split('\n')) > 50:
 				self.recent[:49]
@@ -160,3 +164,10 @@ class Profile:
 
 		self.roles = d['roles']
 		self.defaults = d['defaults']
+
+def get_user_img():
+	f = webnotes.conn.sql("select file_list from tabProfile where name=%s", webnotes.form.getvalue('username',''))
+	if f and f[0][0]:
+		webnotes.response['message'] = f[0][0].split(',')[1]
+	else:
+		webnotes.response['message'] = 'no_img'

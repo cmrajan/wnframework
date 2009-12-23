@@ -1661,8 +1661,9 @@ autosuggest, inquisitor style
 
 div.autosuggest
 {
-	position: absolute; margin-top: 3px; border: 1px solid #222;
-	background-color: #FFF;
+	position: absolute; 
+	margin-top: 3px; 
+	border: 1px solid #222;
 }
 
 div.autosuggest ul
@@ -1705,7 +1706,7 @@ div.autosuggest ul li a span
 	display: block;
 	padding: 3px 6px;
 	color: #444;
-	border-bottom:1px dashed #CCC;
+	border-bottom:1px solid #DDD;
 }
 
 div.autosuggest ul li a span small

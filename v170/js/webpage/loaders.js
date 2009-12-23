@@ -64,7 +64,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 			if(onload)onload(frm);
 			
 			// back button
-			nav_obj.open_notify('DocType',doctype,name);
+			nav_obj.open_notify('Form',doctype,name);
 			
 			// tweets
 			if(r && r.n_tweets) frm.n_tweets[name] = r.n_tweets;

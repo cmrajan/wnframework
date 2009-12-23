@@ -278,7 +278,7 @@ function makeselector() {
 			if(d.input)
 				l.onclick = function() { setlinkvalue(this.link_name); }
 			else
-				l.onclick = function() { loaddoc(this.dt, this.link_name); }
+				l.onclick = function() { loaddoc(this.dt, this.link_name); d.hide(); }
 
 			// support
 			var cl = []

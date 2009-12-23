@@ -34,6 +34,14 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 		this.set_background();
 	}
 	
+	this.set_width = function(w) {
+		w = cint(w);
+		$y(this.inp, {width: (w-20) + 'px'});
+		$y(this.body_tab, {width: w+'px'});
+		$y($td(this.body_tab, 0, 0), {width: (w-18) + 'px'})
+		$y($td(this.body_tab, 0, 1), {width: '18px'});
+	}
+	
 	this.set_background = function(color) {
 		if(color)this.bg_color = color;
 		$y($td(this.body_tab, 0, 0),{backgroundColor: this.bg_color});		

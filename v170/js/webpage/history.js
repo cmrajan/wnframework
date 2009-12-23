@@ -19,7 +19,11 @@ nav_obj.open_notify = function(t, dt, dn) {
 	nav_obj.ol.push([t, dt, dn])	
 	
 	// add to "back" history
-	dhtmlHistory.add(t+'~~~'+ dt + (dn ? ('~~~'+dn): ''),'');
+	t = encodeURIComponent(t);
+	dt = encodeURIComponent(dt);
+	if(dn)dn = encodeURIComponent(dn);
+	
+	dhtmlHistory.add(t+'/'+ dt + (dn ? ('/'+dn): ''),'');
 }
 
 nav_obj.rename_notify = function(dt, oldn, newn) {
@@ -36,7 +40,7 @@ nav_obj.show_last_open = function() {
 		loadpage(l[1]);
 	} else if(l[0]=='Report') {
 		loadreport(l[1],l[2]);
-	} else if(l[0]=='DocType') {
+	} else if(l[0]=='Form') {
 		loaddoc(l[1],l[2]);
 	} else if(l[0]=='Application') {
 		loadapp(l[1]);
@@ -48,8 +52,9 @@ function historyChange(newLocation, historyData) {
 		
 	if(window.location.href.search('iwebnotes.com')!=-1) return; // no history for iwebnotes
 	
-	var t = newLocation.replace(/\%20/g, ' ');
-	t = t.split('~~~');
+	t = t.split('/');
+
+	for(var i=0;i<t.length;i++) t[i] = decodeURIComponent(t[i]);
 
 	var c = nav_obj.ol[nav_obj.ol.length-1];
 
@@ -59,7 +64,7 @@ function historyChange(newLocation, historyData) {
 		if(c[0]==t[0] && c[1]==t[1] && c[2]==t[2]) return;
 	}
 	
-	if(t[0]=='DocType') {
+	if(t[0]=='Form') {
 		_history_current = newLocation;
 		loaddoc(t[1], t[2]);
 	} else if(t[0]=='Report') {

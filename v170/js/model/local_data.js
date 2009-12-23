@@ -123,7 +123,7 @@ LocalDB.is_doc_loaded = function(dt, dn) {
 	if(locals[dt] && locals[dt][dn]) exists = true;
 	if(exists && dt=='DocType' // if it is a doctype
 		&& !locals[dt][dn].__islocal // and not copied
-			&& !frms[dn]) // and not loaded
+			&& !frms[dt]) // and not loaded
 				 exists = false; // reload
 	return exists;
 }

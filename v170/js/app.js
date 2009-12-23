@@ -3,6 +3,7 @@
 var profile;
 var page_body;
 var session = {};
+var account_name;
 var is_testing = false;
 var user;
 var user_defaults;
@@ -82,6 +83,7 @@ function startup() {
 		user_roles = profile.roles;
 		user_email = profile.email;
 		profile.start_items = r.start_items;
+		account_name = r.account_name;
 
 		sys_defaults = r.sysdefaults;		
 	}
@@ -94,12 +96,14 @@ function startup() {
 	var setup_events = function() {
 		addEvent('keypress', function(ev, target) {
 			for(var i in keypress_observers) {
-				keypress_observers[i].notify_keypress((ev.keyCode ? ev.keyCode : ev.charCode));
+				if(keypress_observers[i])
+					keypress_observers[i].notify_keypress((ev.keyCode ? ev.keyCode : ev.charCode));
 			} 
 		});
 		addEvent('click', function(ev, target) {
 			for(var i=0; i<click_observers.length; i++) {
-				click_observers[i].notify_click(target);
+				if(click_observers[i])
+					click_observers[i].notify_click(ev, target);
 			}
 		});
 

@@ -14,19 +14,22 @@ function MenuToolbar(parent) {
 MenuToolbar.prototype.add_top_menu = function(label, onclick) {
 	var li = $a(this.ul, 'li');
 	var a = $a(li, 'a', this.top_menu_style);
+	li.label = a;
+
 	var me = this;
 	a.onclick = function() { onclick(); } ;
 	a.innerHTML = label;
 	a.onmouseover = function() { 
-		if(this!=me.cur_top_menu) this.className = me.top_menu_style+' '+me.top_menu_mo_style;
+		this.set_selected();
 		if(a.my_mouseover)a.my_mouseover(this);
 	}
 	a.onmouseout = function() { 
 		if(a.my_mouseout)a.my_mouseout(this);
-		if(this!=me.cur_top_menu)
-			this.className = me.top_menu_style;
+		this.set_unselected();
 	}
 	a.set_unselected = function() {
+		if(this.dropdown && this.dropdown.is_active)
+			return;
 		this.className = me.top_menu_style;
 		me.is_active = 0;
 	}
@@ -52,9 +55,7 @@ function mcancelclosetime() { if(closetimer) { window.clearTimeout(closetimer); 
 
 MenuToolbar.prototype.make_dropdown = function(tm) {
 	var me = this;
-	var dropdown = new DropdownMenu(tm.parentNode, this.dropdown_width);
-
-	tm.dropdown = dropdown;
+	tm.dropdown = new DropdownMenu(tm.parentNode, this.dropdown_width);
 	
 	// triggers on top menu
 	tm.my_mouseover = function() {
@@ -75,9 +76,9 @@ MenuToolbar.prototype.add_item = function(top_menu_label, label, onclick, on_top
 }
 
 var all_dropdowns = []; var cur_dropdown;
-function DropdownMenu(label_ele, width) {
-	this.body = $a(label_ele, 'div', 'menu_toolbar_dropdown', {width:(width ? width : '140px')});
-	this.label = label_ele;
+function DropdownMenu(parent, width) {
+	this.body = $a(parent, 'div', 'menu_toolbar_dropdown', {width:(width ? width : '140px')});
+	this.parent = parent;
 	this.items = {};
 	this.item_style = 'dd_item';
 	this.item_mo_style = 'dd_item_mo';
@@ -88,7 +89,9 @@ function DropdownMenu(label_ele, width) {
 	var me = this;
 	
 	this.body.onmouseout = function() { me.clear(); }
-	this.body.onmouseover = function() { mcancelclosetime(); } // re-entered
+	this.body.onmouseover = function() { 
+		mcancelclosetime(); 		
+	} // re-entered
 	this.clear_user_inp = function() { me.user_inp = '';}
 
 	this.show = function() {
@@ -109,10 +112,6 @@ function DropdownMenu(label_ele, width) {
 			me.scrollbars = 0;
 		}
 		
-		// events on label
-		if(me.label.set_selected)
-			me.label.set_selected();
-		
 		me.is_active = 1;
 		
 	}
@@ -125,8 +124,9 @@ function DropdownMenu(label_ele, width) {
 		me.is_active = 0;
 		
 		// events on label
-		if(me.label.set_unselected)
-			me.label.set_unselected();		
+		if(me.parent.label) {
+			me.parent.label.set_unselected();
+		}
 	}
 
 	this.clear = function() {

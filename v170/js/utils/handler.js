@@ -1,6 +1,7 @@
 // My HTTP Request
 
 var outUrl = "cgi-bin/run.cgi";
+var NULL_CHAR = '^\5*';
 
 // check response of HTTP request, only if ready
 function checkResponse(r, on_timeout, no_spinner, freeze_msg) {

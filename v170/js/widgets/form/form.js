@@ -56,8 +56,6 @@ _f.Frm = function(doctype, parent) {
 
 	frms[doctype] = this;
 
-
-
 	this.setup_meta(doctype);
 	
 	// notify on rename

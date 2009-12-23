@@ -292,7 +292,7 @@ AutoSuggest.prototype.createList = function(arr) {
 		var val = arr[i].value;
 		
 		if(this.oP.fixed_options) {
-			var output = val;	
+			var output = val;
 		} else {
 			var st = val.toLowerCase().indexOf( this.sInp.toLowerCase() );
 			var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInp.length) + "</em>" + val.substring(st+this.sInp.length);
@@ -306,6 +306,7 @@ AutoSuggest.prototype.createList = function(arr) {
 			small.isactive = 1
 		}
 		
+		
 		var a = $ce("a", { href:"#" });
 		
 		a.appendChild(span);
@@ -318,6 +319,11 @@ AutoSuggest.prototype.createList = function(arr) {
 		a.isactive = 1;
 		
 		var li = $ce(  "li", {}, a  );
+
+		// empty option
+		if(!val) {
+			$y(span,{height:'12px'});
+		}
 		
 		ul.appendChild( li );
 	}
@@ -334,7 +340,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	//
 	
 	var mywid = cint(this.fld.offsetWidth);
-	if(cint(mywid) < 120) mywid = 120;
+	if(cint(mywid) < 100) mywid = 100;
 	var left = pos.x - ((mywid - this.fld.offsetWidth)/2);
 	if(left<0) {
 		mywid = mywid + (left/2); left = 0;
@@ -364,6 +370,10 @@ AutoSuggest.prototype.createList = function(arr) {
 	}
 
 	this.body = div;
+	
+	if(isIE) {
+		$y(div,{border:'1px solid #444'});
+	}
 	
 	// currently no item is highlighted
 	//
@@ -509,7 +519,7 @@ AutoSuggest.prototype.clearSuggestions = function () {
 	if (this.body) { $dh(this.body); delete this.body; }
 	if(this.ul)
 		delete this.ul;
-	
+		
 	cur_autosug = null;
 };
 

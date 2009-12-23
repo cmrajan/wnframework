@@ -27,13 +27,7 @@ def startup():
 	import webnotes.utils
 	import webnotes.profile
 	
-	if webnotes.session.get('data') and webnotes.session['data'].get('profile'):
-		p = webnotes.session['data']['profile']
-		webnotes.response['profile'] = p
-		webnotes.user = webnotes.profile.Profile()
-		webnotes.user.load_from_session(p)
-	else:
-		webnotes.response['profile'] = webnotes.user.load_profile()
+	webnotes.response['profile'] = webnotes.user.load_profile()
 
 	doclist = []
 	doclist += webnotes.model.doc.get('Control Panel')
@@ -41,7 +35,7 @@ def startup():
 	
 	doclist += webnotes.model.doctype.get('Event')
 
-	webnotes.response['account_id'] = cp.account_id or ''
+	webnotes.response['account_name'] = cp.account_id or ''
 	webnotes.response['sysdefaults'] = webnotes.utils.get_defaults()
 	webnotes.response['n_online'] = int(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0] or 0)
 	webnotes.response['docs'] = doclist
@@ -67,16 +61,6 @@ set_timezone()
 	
 
  # ------------------------------------------------------------------------------------
-
-# Get user image
-# --------------
-def get_user_img(form,session):
-	f = sql("select file_list from tabProfile where name=%s", form.getvalue('username',''))
-	if f and f[0][0]:
-		out['message'] = f[0][0].split(',')[1]
-	else:
-		out['message'] = 'no_img'
-
 
 # Document Load
 # -------------

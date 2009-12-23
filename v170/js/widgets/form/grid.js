@@ -262,9 +262,9 @@ _f.Grid.prototype.cell_click = function(cell, e) {
 	}
 }
 
-function grid_click_event(e, target) {
+_f.Grid.prototype.notify_click = function(e, target) {
 	if(_f.cur_grid_cell && !target.isactive) {
-		if(!text_dialog.display && !selector.display) {
+		if(!(text_dialog && text_dialog.display) && !selector.display) {
 			_f.cur_grid_cell.grid.cell_deselect();
 		}
 	}
@@ -280,6 +280,9 @@ _f.Grid.prototype.cell_deselect = function() {
 		_f.cur_grid_cell = null;
 		_f.cur_grid = null;
 		this.isactive = false;
+		
+		// remove from observer
+		delete click_observers[this.observer_id];
 	}
 }
 
@@ -301,6 +304,10 @@ _f.Grid.prototype.cell_select = function(cell, ri, ci) {
 		_f.cur_grid_cell = cell;
 		this.add_template(cell);
 		this.isactive = true;
+		
+		// start observing clicks
+		click_observers.push(this);
+		this.observer_id = click_observers.length - 1;
 	}
 }
 
@@ -314,6 +321,10 @@ _f.Grid.prototype.add_template = function(cell) {
 		cell.div.appendChild(hc.template.wrapper);
 		hc.template.activate(cell.row.docname);
 		hc.template.activated=1;
+		
+		if(hc.template.input.set_width) {
+			hc.template.input.set_width(isIE ? cell.offsetWidth : cell.clientWidth);
+		}
 	}
 }
 
@@ -336,7 +347,7 @@ _f.grid_refresh_date = function() {
 	_f.grid_date_cell.grid.set_cell_value(_f.grid_date_cell);
 }
 _f.grid_refresh_field = function(temp, input) {
-	if(input.value!=get_value(temp.doctype, temp.docname, temp.df.fieldname))
+	if(input.value! = _f.get_value(temp.doctype, temp.docname, temp.df.fieldname))
 		if(input.onchange)input.onchange();
 }
 

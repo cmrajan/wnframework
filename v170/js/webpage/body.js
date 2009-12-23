@@ -79,9 +79,12 @@ function Body() {
 	
 	this.change_to = function(label) {
 		// hide existing
-		if(me.cur_page) 
+		if(me.cur_page &&  me.pages[label]!=me.cur_page) {
+			if(me.cur_page.onhide)
+				me.cur_page.onhide();
 			$dh(me.cur_page);
-			
+		}
+					
 		// show
 		me.cur_page = me.pages[label];
 		$ds(me.cur_page);

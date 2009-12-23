@@ -295,5 +295,5 @@ function set_user_img(img, username) {
 	if(user_img[username]) 
 		set_it();
 	else
-		$c('get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
+		$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
 }

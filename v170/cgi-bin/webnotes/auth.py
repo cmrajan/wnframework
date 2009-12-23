@@ -68,6 +68,9 @@ class Authentication:
 		webnotes.session = self.session
 		webnotes.user = webnotes.profile.Profile()
 		webnotes.form = self.form
+
+		if self.session.get('data') and webnotes.session['data'].get('profile'):
+			webnotes.user.load_from_session(webnotes.session['data']['profile'])
 		
 		# clear defs password - for security
 		defs.db_password = ''

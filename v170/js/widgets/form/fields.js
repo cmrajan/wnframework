@@ -6,6 +6,8 @@
 
 // ======================================================================================
 
+var no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image'];
+
 function Field() {	}
 
 Field.prototype.make_body = function() { 
@@ -121,7 +123,7 @@ Field.prototype.activate = function(docname) {
 		
 		if(this.input.focus){
 			try{this.input.focus();} catch(e){} // IE Fix - Unexpected call???
-		}
+		}		
 	}
 	if(this.txt) {
 		try{this.txt.focus();} catch(e){} // IE Fix - Unexpected call???
@@ -247,7 +249,7 @@ Field.prototype.run_trigger = function() {
 	}
 	if(this.df.trigger=='Client')
 		cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
-	refresh_dependency(cur_frm);
+	cur_frm.refresh_dependency();
 	this.refresh_label_icon();
 }
 
@@ -527,7 +529,10 @@ CheckField.prototype.make_input = function() { var me = this;
 		me.set(this.checked?1:0);
 		me.run_trigger();
 	}
-	if(isIE)this.input.onclick = this.input.onchange;
+	if(isIE){
+		this.input.onclick = this.input.onchange;
+		$y(this.input, {margin:'-1px'});
+	}
 	this.input.set_input = function(v) {
 		v = parseInt(v); if(isNaN(v)) v = 0;
 		if(v) me.input.checked = true;
@@ -662,6 +667,7 @@ TextField.prototype.make_input = function() {
 }
 
 // text dialog
+var text_dialog;
 function make_text_dialog() {
 	var d = new Dialog(520,410);
 	d.make_body([
@@ -715,10 +721,16 @@ SelectField.prototype.make_input = function() {
 	} else {
 		this.input = new SelectWidget(this.input_area, []);	
 		this.txt = this.input.inp;
+		this.btn = this.input.btn;
 		this.txt.onchange = function() {
 			if(me.validate)
 				me.validate();
 			me.set(me.txt.value); 
+			// IE grid disappears
+			if(isIE && me.in_grid) {
+				$dh(_f.cur_grid_cell.grid.wrapper);
+				$ds(_f.cur_grid_cell.grid.wrapper);
+			}
 		}
 	}
 

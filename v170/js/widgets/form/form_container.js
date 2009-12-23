@@ -1,23 +1,27 @@
 _f.FrmContainer = function() {  
 	this.wrapper = page_body.add_page("Forms", function() {});
+	
+	// create hidden
+	$dh(this.wrapper);
+	
 	this.make_head();
 	this.make_toolbar();
 }
 
 _f.FrmContainer.prototype.make_head = function() {
 	var me = this;
-	this.bg_color = '#DDF';
+	this.bg_color = '#EEF';
 	this.head = $a(this.wrapper, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px'});
 	this.body = $a(this.wrapper,'div');
 
 	// Row 1
 	// ------------------
-	this.tbartab = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: this.bg_color, borderBottom:'1px solid #AAF'});
+	this.tbartab = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: this.bg_color, borderBottom:'1px solid #AAF', paddingTop:'2px'});
 
 	// left side - headers
 	// -------------------
-	$y($td(this.tbartab,0,0),{padding:'4px'});
-	this.main_title = $a($td(this.tbartab,0,0), 'h2', '',{margin: '0px 8px', display:'inline'});
+	$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 8px'});
+	this.main_title = $a($td(this.tbartab,0,0), 'div', '',{fontFamily:'Helvetica', margin: '0px 8px 0px 0px', display:'inline', fontSize:'24px'});
 	this.sub_title = $a($td(this.tbartab,0,0), 'div','',{display:'inline'});
 	this.sub_title.is_inline = 1;
 	this.status_title = $a($td(this.tbartab,0,0), 'span','',{marginLeft:'8px'});
@@ -47,7 +51,7 @@ _f.FrmContainer.prototype.make_head = function() {
 		tweet_dialog.hide();
 	}
 	this.comments_btn.onmouseover = function() { // custom mouseover
-		$y(c,{backgroundColor:'#EEF'});
+		$y(c,{backgroundColor:'#F8F8FF'});
 		if(me.doc.__islocal) {
 			return;
 		}
@@ -132,7 +136,7 @@ _f.FrmContainer.prototype.make_toolbar = function() {
 	makebtn('Cancel', function() { cur_frm.savecancel() });
 	makebtn('Amend', function() { cur_frm.amend_doc() });
 	
-	me.tbarlinks.onchange= function() {
+	me.tbarlinks.inp.onchange= function() {
 		var v = sel_val(this);
 		if(v=='New') new_doc();
 		else if(v=='Refresh') cur_frm.reload_doc();
