@@ -2665,8 +2665,7 @@ Listing.prototype.remove_filter = function(label) {
 }
 
 Listing.prototype.remove_all_filters = function() {
-  if(this.filters) {
-  alert(keys(this.filters));
+  if(keys(this.filters)) {
 	for(var k in this.filters) this.remove_filter(k);
   }
 	$dh(this.filter_wrapper);
