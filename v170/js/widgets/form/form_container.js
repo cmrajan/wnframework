@@ -137,12 +137,13 @@ _f.FrmContainer.prototype.make_toolbar = function() {
 	makebtn('Amend', function() { cur_frm.amend_doc() });
 	
 	me.tbarlinks.inp.onchange= function() {
-		var v = sel_val(this);
+		var v = this.value;
 		if(v=='New') new_doc();
 		else if(v=='Refresh') cur_frm.reload_doc();
 		else if(v=='Print') cur_frm.print_doc();
 		else if(v=='Email') cur_frm.email_doc();
 		else if(v=='Copy') cur_frm.copy_doc();
+		this.value = 'Actions...';
 	}
 }
 

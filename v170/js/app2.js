@@ -293,25 +293,6 @@ startup_lst[startup_lst.length] = setup_err_console;
 
 // Toolbar
 
-function make_tbar_link(parent, label, fn, icon, isactive) {
-	var div = $a(parent,'div','',{cursor:'pointer'});
-	var t = make_table(div, 1, 2, '90%', ['20px',null]);
-	var img = $a($td(t,0,0),'img');
-	img.src = 'images/icons/'+icon;
-	var l = $a($td(t,0,1),'span','link_type');
-	l.style.fontSize = '11px';
-	l.innerHTML = label;
-	div.onclick = fn;
-	div.show = function() { $ds(this); }
-	div.hide = function() { $dh(this); }
-
-	$td(t,0,0).isactive = isactive;
-	$td(t,0,1).isactive = isactive;
-	l.isactive = isactive;
-	div.isactive = isactive;
-
-	return div;
-}
 
 function Tool_Bar(parent, bottom_rounded, in_grid, btn_col) {
 	this.body = $a(parent, 'div', 'tbar_body');
@@ -504,7 +485,6 @@ var selector;
 var is_testing = false;
 var tree;
 var user_defaults; var user_roles; var user_fullname; var user_recent; var user_email;
-var user_img = {};
 var recent_docs = [];
 session.al = [];
 var max_dd_rows;
@@ -920,12 +900,6 @@ function logout() {
 
 
 
-function DocLink(p, doctype, name, onload) {
-	var a = $a(p,'span','link_type'); a.innerHTML = a.dn = name; a.dt = doctype;
-	a.onclick=function() { loaddoc(this.dt,this.dn,onload) }; return a;
-}
-var doc_link = DocLink;
-
 function page_link(p, name, onload) {
 	var a = $a(p,'span','link_type'); a.innerHTML = a.pn = name;
 	a.onclick=function() { loadpage(this.pn,onload) }; return a;
@@ -1150,16 +1124,3 @@ function show_reset_pwd_dialog(){
 
 
  
-// set user image
-function set_user_img(img, username) {
-	function set_it() {
-		if(user_img[username]=='no_img')
-			img.src = 'images/ui/no_img/no_img_m.gif'; // no image
-		else
-			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
-	}
-	if(user_img[username]) 
-		set_it();
-	else
-		$c('get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
-}

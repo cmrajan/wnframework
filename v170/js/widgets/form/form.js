@@ -90,10 +90,10 @@ _f.Frm.prototype.rename_notify = function(dt, old, name) {
 
 	// cleanup
 
-	if(this && this.opendocs[doc.localname]) {
+	if(this && this.opendocs[old]) {
 		// local doctype copy
-		local_dt[doc.doctype][doc.name] = local_dt[doc.doctype][doc.localname];
-		local_dt[doc.doctype][doc.localname] = null;
+		local_dt[dt][name] = local_dt[dt][old];
+		local_dt[dt][old] = null;
 	}
 	
 	this.opendocs[old] = false;
@@ -640,11 +640,11 @@ _f.Frm.prototype.refresh_dependency = function() {
 		}
 		
 		// show red to indicate dependency missing
-		if(!f.guardian_has_value && !f.dependencies_clear) {
-			if(f.input)f.input.style.color = "RED";
-		} else {
-			if(f.input)f.input.style.color = "BLACK";		
-		}
+		//if(!f.guardian_has_value && !f.dependencies_clear) {
+		//	if(f.input)f.input.style.color = "RED";
+		//} else {
+		//	if(f.input)f.input.style.color = "BLACK";		
+		//}
 	}
 }
 
@@ -760,7 +760,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 	
 	this.savingflag = true;
 	if(this.docname && validated) {
-		return savedoc(this.doctype, this.docname, save_action, ret_fn, ret_fn_err);
+		return this.savedoc(save_action, ret_fn, ret_fn_err);
 	}
 }
 
@@ -947,7 +947,8 @@ _f.Frm.prototype.check_required = function(dt, dn) {
 	return all_clear;
 }
 
-_f.Frm.prototype.savedoc = function(dt, dn, save_action, onsave, onerr) {
+_f.Frm.prototype.savedoc = function(save_action, onsave, onerr) {
+	var dt = this.doctype; var dn = this.docname
 	var doc = locals[dt][dn];
 	var doctype = locals['DocType'][dt];
 	
@@ -960,7 +961,7 @@ _f.Frm.prototype.savedoc = function(dt, dn, save_action, onsave, onerr) {
 	if(save_action!='Cancel') {
 		for(var n in doclist) {
 			// type / mandatory checking
-			var tmp = check_required(doclist[n].doctype, doclist[n].name);
+			var tmp = this.check_required(doclist[n].doctype, doclist[n].name);
 			if(doclist[n].docstatus+''!='2'&&all_clear) // if not deleted
 				all_clear = tmp;
 		}
@@ -976,7 +977,7 @@ _f.Frm.prototype.savedoc = function(dt, dn, save_action, onsave, onerr) {
 		var out = compress_doclist(doclist);
 		//if(user=='Administrator')errprint(out);
 		
-		$c('savedocs', {'docs':out, 'docname':dn, 'action': save_action, 'user':user }, 
+		$c('webnotes.widgets.form.savedocs', {'docs':out, 'docname':dn, 'action': save_action, 'user':user }, 
 			function(r, rtxt) {
 				if(f){ f.savingflag = false;}
 				if(r.saved) {
@@ -1005,12 +1006,12 @@ _f.Frm.prototype.savedoc = function(dt, dn, save_action, onsave, onerr) {
 
 _f.Frm.prototype.savesubmit = function() {
 	var answer = confirm("Permanently Submit "+cur_frm.docname+"?");
-	if(answer) this.save_doc('Submit');
+	if(answer) this.save('Submit');
 }
 
 _f.Frm.prototype.savecancel = function() {
 	var answer = confirm("Permanently Cancel "+cur_frm.docname+"?");
-	if(answer) this.save_doc('Cancel');
+	if(answer) this.save('Cancel');
 }
 
 // ======================================================================================

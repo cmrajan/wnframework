@@ -58,13 +58,12 @@ def set_timezone():
 		pass # for Windows
 
 set_timezone()
-	
+
+def runserverobj():
+	import webnotes.widgets.form
+	webnotes.widgets.form.runserverobj()
 
  # ------------------------------------------------------------------------------------
-
-# Document Load
-# -------------
-
 
 def get_print_format(form, session):
 	out['message'] = server.get_print_format(form.getvalue('name'))
@@ -75,159 +74,6 @@ def rename(form, session):
 		
 		getdoc(form, session)
 
-
-	
-# TO DO
-# -----
-
-def todo_clear_checked(form, session):
-	cl = form.getvalue('cl').split('\1');
-	cl = ['name="' + c  + '"' for c in cl]
-	sql('delete from `tabToDo Item` where (%s)' % (' OR '.join(cl)))
-
-# Document Save
-# -------------
-
-def load_report_list(form, session):
-	out['rep_list'] = server.get_search_criteria_list(form.getvalue('dt'))
-
-def get_doclist(clientlist):
-	midx = 0
-	for i in range(len(clientlist)):
-		if clientlist[i]['name'] == form.getvalue('docname'):
-			main_doc = server.Document(fielddata = clientlist[i])
-			midx = i
-		else:
-			clientlist[i]=server.Document(fielddata = clientlist[i])
-
-	del clientlist[midx]
-	return main_doc, clientlist
-
-def send_docs(doc, doclist):
-	# cleanup
-	#server.log("Doc Save", doc.name)
-		
-	out['docname'] = doc.name
-	doclist = [doc] + doclist
-	out['docs'] = server.compress_doclist(doclist)
-
-def do_action(doc, doclist, so, method_name, docstatus):
-	if so and hasattr(so, method_name):
-		errmethod = method_name
-		server.run_server_obj(so, method_name)
-		if hasattr(so, 'custom_'+method_name):
-			server.run_server_obj(so, 'custom_'+method_name)
-		errmethod = ''
-
-		for d in [doc] + doclist:
-			server.set(d, 'docstatus', docstatus)
-			
-	else:
-		for d in [doc] + doclist:
-			server.set(d, 'docstatus', docstatus)
-
-def savedocs(form, session):
-	global errdoc, errdoctype, errmethod
-	# action
-	action = form.getvalue('action')
-	
-	# get docs	
-	doc, doclist = get_doclist(server.expand_doclist(form.getvalue('docs')))
-	errdoc = doc.name
-	errdoctype = doc.doctype
-		
-	# get server object
-	server_obj = server.get_server_obj(doc, doclist)
-	
-	# check for integrity / transaction safety
-	res = sql('SELECT issingle FROM tabDocType WHERE name="%s"' % doc.doctype)
-	if res:
-		is_single = res[0][0]
-	else:
-		webnotes.errprint('DocType not found "%s"' % doc.doctype)
-		return
-		
-	if (not is_single) and (not doc.fields.get('__islocal')):
-		tmp = sql('SELECT modified FROM `tab%s` WHERE name="%s"' % (doc.doctype, doc.name))
-		if tmp and str(tmp[0][0]) != str(doc.modified):
-			webnotes.msgprint('Document has been modified after you have opened it. To maintain the integrity of the data, you will not be able to save your changes. Please refresh this document. [%s/%s]' % (tmp[0][0], doc.modified))
-			return
-	
-	# validate links
-	ret = server.validate_links_doclist([doc] + doclist)
-	if ret:
-		webnotes.msgprint("[Link Validation] Could not find the following values: %s. Please correct and resave. Document Not Saved." % ret)
-		return
-
-	# saving & post-saving
-	try:
-
-		# validate befor saving and submitting
-		if action in ('Save', 'Submit') and server_obj:
-			if hasattr(server_obj, 'validate'):	
-				t = server.run_server_obj(server_obj, 'validate')
-			if hasattr(server_obj, 'custom_validate'):
-				t = server.run_server_obj(server_obj, 'custom_validate')
-				
-		# save main doc
-		is_new = server.cint(doc.fields.get('__islocal'))
-		if is_new and not doc.owner:
-			doc.owner = form.getvalue('user')
-		
-		doc.modified, doc.modified_by = server.now(), session['user']
-		
-		try:
-			t = doc.save(is_new)
-		except NameError, e:
-			webnotes.msgprint('Name Exists')
-			raise e
-		
-		# save child docs
-		for d in doclist:
-			deleted, local = d.fields.get('__deleted',0), d.fields.get('__islocal',0)
-	
-			if server.cint(local) and server.cint(deleted):
-				pass
-			elif d.fields.has_key('parent'):
-				if d.parent and (not d.parent.startswith('old_parent:')):
-					d.parent = doc.name # rename if reqd
-					d.parenttype = doc.doctype
-				d.modified, d.modified_by = server.now(), session['user']
-				d.save(new = server.cint(local))
-	
-		# on_update
-		if action in ('Save','Submit') and server_obj:
-			if hasattr(server_obj, 'on_update'):
-				t = server.run_server_obj(server_obj, 'on_update')
-				if t: webnotes.msgprint(t)
-			if hasattr(server_obj, 'custom_on_update'):
-				t = server.run_server_obj(server_obj, 'custom_on_update')
-				if t: webnotes.msgprint(t)
-				
-		# on_submit
-		if action == 'Submit':
-			if sql("select docstatus from `tab%s` where name='%s'" % (doc.doctype, doc.name))[0][0] > 0:
-				webnotes.msgprint("Cannot submit a record that has already been submitted. Please Refresh")
-				raise Exception
-			do_action(doc, doclist, server_obj, 'on_submit', 1)
-	
-		# on_cancel
-		if action == 'Cancel':
-			if sql("select docstatus from `tab%s` where name='%s'" % (doc.doctype, doc.name))[0][0] > 1:
-				webnotes.msgprint("Cannot cancel a record that has already been cancelled. Please Refresh")
-				raise Exception
-			do_action(doc, doclist, server_obj, 'on_cancel', 2)
-	
-		webnotes.profile.update_recent(doc.doctype, doc.name)
-
-		out['saved'] = '1'
-		out['main_doc_name'] = doc.name
-		send_docs(doc, doclist)
-		
-	except Exception, e:
-		webnotes.msgprint('Did not save')
-		webnotes.errprint(server.getTraceback())
-		raise e
 
 # DocType Mapper
 # --------------
@@ -409,57 +255,7 @@ def get_template(form, session):
 	out['doctype'] = dt
 	
 
-def runserverobj(form, session):
-	global errdoc, errdoctype, errmethod
 
-	method = form.getvalue('method')
-	errmethod = method
-	doclist, clientlist = [], []
-	arg = form.getvalue('arg')
-	dt = form.getvalue('doctype')
-	dn = form.getvalue('docname')
-		
-	if dt: # not called from a doctype (from a page)
-		if not dn: dn = dt # single
-		errdoc = dn
-		errdoctype = dt
-		so = server.get_obj(dt, dn)
-	else:
-		clientlist = server.expand_doclist(form.getvalue('docs'))
-
-		# find main doc
-		for d in clientlist:
-			if server.cint(d.get('docstatus')) != 2 and not d.get('parent'):
-				main_doc = server.Document(fielddata = d)
-	
-		# find client docs
-		for d in clientlist:
-			doc = server.Document(fielddata = d)
-			if doc.fields.get('parent'):
-				doclist.append(doc)	
-	
-		errdoc = main_doc.name
-		errdoctype = main_doc.doctype
-	
-		so = server.get_server_obj(main_doc, doclist)
-				
-	if so:
-		try:
-			r = server.run_server_obj(so, method, arg)
-			doclist = so.doclist # reference back [in case of null]
-			if r:
-				try:
-					if r['doclist']:
-						clientlist += r['doclist']
-				except:
-					pass
-				out['message'] = r
-			if clientlist:
-				doclist.append(main_doc)
-				out['docs'] = server.compress_doclist(doclist)
-		except Exception, e:
-			webnotes.errprint(server.getTraceback())
-			raise e
 				
 # Load Month Events
 # -----------------

@@ -28,10 +28,7 @@ function WNToolbar(parent) {
 		this.setup_search();
 	}
 	
-	// Toolbar
-	// ======================
-	
-	// Start
+	// Options
 	// ----------------------------------------------------------------------------------------
 	this.setup_options = function() {
 		var tm = this.menu.add_top_menu('Options', function() { });
@@ -98,7 +95,7 @@ function WNToolbar(parent) {
 		
 		// remove from recent
 		this.rdocs.remove = function(dt, dn) {
-			var it = this.rdocs.items[dt+'-'+dn];
+			var it = me.rdocs.items[dt+'-'+dn];
 			if(it)$dh(it);
 			if(pscript.on_recent_update)pscript.on_recent_update();
 		}
@@ -115,13 +112,13 @@ function WNToolbar(parent) {
 		}
 
 		this.rename_notify = function(dt, old, name) {
-			rdocs.remove(dt, old);
-			rdocs.add(dt, name, 1);
+			me.rdocs.remove(dt, old);
+			me.rdocs.add(dt, name, 1);
 		}
 		rename_observers.push(this);
 	}
 	
-	// Help
+	// Tools
 	// ----------------------------------------------------------------------------------------
 	this.setup_help = function() {
 		me.menu.add_top_menu('Tools', function() {  } );
@@ -139,7 +136,7 @@ function WNToolbar(parent) {
 	this.setup_new = function() {	
 		this.new_sel = new SelectWidget($td(this.model_tab, 0, 0), profile.can_create);
 		this.new_sel.inp.value='Create New...';
-		this.new_sel.inp.onchange = function() { new_doc(wntoolbar.new_sel.inp.value); this.value = 'Create New...'; }
+		this.new_sel.inp.onchange = function() { new_doc(me.new_sel.inp.value); this.value = 'Create New...'; }
 	}
 	
 	// Report Builder
@@ -147,7 +144,7 @@ function WNToolbar(parent) {
 	this.setup_report_builder = function() {
 		this.rb_sel = new SelectWidget($td(this.model_tab, 0, 1), profile.can_get_report);
 		this.rb_sel.inp.value = 'Report Builder...';
-		this.rb_sel.inp.onchange = function() { loadreport(wntoolbar.rb_sel.inp.value); this.value = 'Report Builder...'; }
+		this.rb_sel.inp.onchange = function() { loadreport(me.rb_sel.inp.value); this.value = 'Report Builder...'; }
 	}
 
 	// Setup Search

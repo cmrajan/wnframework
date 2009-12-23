@@ -1,12 +1,11 @@
 import webnotes
-import webnotes.model.doc
 
-def execute(code, doc=None, doclist=[]):
-	from webnotes import *
-	from webnotes.utils import *
-	from webnotes.model.doc import *
-	from webnotes.model.doclist import getlist
+from webnotes import *
+from webnotes.utils import *
+from webnotes.model.doc import *
+from webnotes.model.doclist import getlist
 	
+def execute(code, doc=None, doclist=[]):
 	# execute it
 	exec code in globals()
 	
@@ -38,9 +37,9 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 		if not dn:
 			dn = dt
 		if with_children:
-			doclist = webnotes.model.doc.get(dt, dn)
+			doclist = get(dt, dn)
 		else:
-			doclist = [webnotes.model.doc.Document(dt, dn),]
+			doclist = [Document(dt, dn),]
 		return get_server_obj(doclist[0], doclist)
 	else:
 		return get_server_obj(doc, doclist)

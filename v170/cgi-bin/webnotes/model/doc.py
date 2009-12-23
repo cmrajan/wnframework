@@ -1,5 +1,8 @@
 import webnotes
+
 sql = webnotes.conn.sql
+
+from webnotes.utils import *
 
 class BaseDocType:
 	def __init__(self):
@@ -37,7 +40,7 @@ class Document:
 			self.loadfromdb(doctype, name)
 
 	def __nonzero__(self):
-		return False
+		return True
 
 	# Load Document
 	# -------------
@@ -118,8 +121,10 @@ class Document:
 	# --------
 	
 	def makenew(self, autoname, istable, case=''):
+		import webnotes.model.code
+	
 		global in_transaction
-		so = get_server_obj(self, [])
+		so = webnotes.model.code.get_server_obj(self, [])
 		started_transaction = 0
 		
 		self.localname = self.name
@@ -134,7 +139,7 @@ class Document:
 			self.name = am_prefix + '-' + str(am_id)
 		
 		elif so and hasattr(so, 'autoname'):
-			r = run_server_obj(so, 'autoname')
+			r = webnotes.model.code.run_server_obj(so, 'autoname')
 			if r:
 				return r
 
@@ -154,9 +159,9 @@ class Document:
 			self.name = make_autoname('#########', self.doctype)
 
 		if not self.owner:
-			self.owner = session['user']
+			self.owner = webnotes.session['user']
 
-		if db_exists(self.doctype, self.name):
+		if webnotes.conn.exists(self.doctype, self.name):
 			raise NameError, 'Name %s already exists' % self.name
 		
 		if not self.name:
@@ -174,7 +179,7 @@ class Document:
 		
 		sql("""insert into 
 			`tab%s` (name, owner, creation, modified, modified_by) 
-			 values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, session['user'], now(), now(), session['user']))
+			 values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
 
 
 	# Update Values
@@ -246,7 +251,7 @@ class Document:
 			update_str, values = [], []
 			# set modified timestamp
 			self.modified = now()
-			self.modified_by = session['user']
+			self.modified_by = webnotes.session['user']
 			for f in self.fields.keys():
 				if (not (f in ('doctype', 'name', 'perm', 'localname', 'creation'))) \
 					and (not f.startswith('__')): # fields not saved
@@ -315,7 +320,7 @@ class Document:
 		d.doctype = childtype
 		d.docstatus = 0;
 		d.name = ''
-		d.owner = session['user']
+		d.owner = webnotes.session['user']
 		
 		if local:
 			d.fields['__islocal'] = '1' # for Client to identify unsaved doc
@@ -369,10 +374,21 @@ def make_autoname(key, doctype=''):
 # -----------------------
 
 def getseries(key, digits, doctype=''):
-	if db_has_series(key, doctype):
-		n = db_series_next(key, doctype)
+	ttl = webnotes.conn.get_testing_tables()
+
+	# series created ?
+	if sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
+
+		# yes, update it
+		sql("update tabSeries set current = current+1 where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+
+		# find the series counter
+		r = sql("select current from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		n = r[0][0]
 	else:
-		db_make_series(key, doctype)
+	
+		# no, create it
+		sql("insert into tabSeries (name, current) values ('%s', 1)" % key, allow_testing = (doctype in ttl) and 0 or 1)
 		n = 1
 	return ('%0'+str(digits)+'d') % n
 

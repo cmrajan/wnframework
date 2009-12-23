@@ -33,7 +33,6 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
   <link rel="Shortcut Icon" href="/favicon.ico">
   
  <script language="JavaScript" src="js/wnf.compressed.js"></script>
- <script language="JavaScript" src="js/tiny_mce/tiny_mce_gzip.js"></script>
 
 <script type="text/javascript">
  window.dhtmlHistory.create({ debugMode: false });

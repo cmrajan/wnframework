@@ -26,6 +26,7 @@ in_files_main = [
        ,'webpage/loaders.js'
        ,'model/local_data.js'
        ,'model/doclist.js'
+       ,'tiny_mce/tiny_mce_gzip.js'
        ,'app.js'
      ]
 

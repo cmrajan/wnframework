@@ -237,3 +237,8 @@ function docstring(obj)  {
 
 function ie_refresh(e) { $dh(e); $ds(e); }
 
+function DocLink(p, doctype, name, onload) {
+	var a = $a(p,'span','link_type'); a.innerHTML = a.dn = name; a.dt = doctype;
+	a.onclick=function() { loaddoc(this.dt,this.dn,onload) }; return a;
+}
+var doc_link = DocLink;

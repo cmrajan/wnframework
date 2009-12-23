@@ -14,7 +14,7 @@ _f.FrmContainer.prototype.hide_head=function(){$dh(this.head);}
 _f.FrmContainer.prototype.make_toolbar=function(){this.btns={};var me=this;var makebtn=function(label,fn,bold){var btn=$a(me.button_area,'button');btn.l_area=$a(btn,'span');btn.l_area.innerHTML=label;btn.onclick=fn;if(bold)$y(btn.l_area,{fontWeight:'bold'});btn.show=function(){if(isFF)$y(this,{display:'-moz-inline-box'});else $y(this,{display:'inline-block'});}
 btn.hide=function(){$dh(this);}
 me.btns[label]=btn;}
-makebtn('Edit',function(){cur_frm.edit_doc()});makebtn('Save',function(){cur_frm.save('Save');},1);makebtn('Submit',function(){cur_frm.savesubmit();});makebtn('Cancel',function(){cur_frm.savecancel()});makebtn('Amend',function(){cur_frm.amend_doc()});me.tbarlinks.inp.onchange=function(){var v=sel_val(this);if(v=='New')new_doc();else if(v=='Refresh')cur_frm.reload_doc();else if(v=='Print')cur_frm.print_doc();else if(v=='Email')cur_frm.email_doc();else if(v=='Copy')cur_frm.copy_doc();}}
+makebtn('Edit',function(){cur_frm.edit_doc()});makebtn('Save',function(){cur_frm.save('Save');},1);makebtn('Submit',function(){cur_frm.savesubmit();});makebtn('Cancel',function(){cur_frm.savecancel()});makebtn('Amend',function(){cur_frm.amend_doc()});me.tbarlinks.inp.onchange=function(){var v=this.value;if(v=='New')new_doc();else if(v=='Refresh')cur_frm.reload_doc();else if(v=='Print')cur_frm.print_doc();else if(v=='Email')cur_frm.email_doc();else if(v=='Copy')cur_frm.copy_doc();this.value='Actions...';}}
 _f.FrmContainer.prototype.refresh_save_btns=function(){var frm=cur_frm;var p=frm.get_doc_perms();if(cur_frm.editable)this.btns['Edit'].hide();else this.btns['Edit'].show();if(cur_frm.editable&&cint(frm.doc.docstatus)==0&&p[WRITE])this.btns['Save'].show();else this.btns['Save'].hide();if(cur_frm.editable&&cint(frm.doc.docstatus)==0&&p[SUBMIT]&&(!frm.doc.__islocal))this.btns['Submit'].show();else this.btns['Submit'].hide();if(cur_frm.editable&&cint(frm.doc.docstatus)==1&&p[CANCEL])this.btns['Cancel'].show();else this.btns['Cancel'].hide();if(cint(frm.doc.docstatus)==2&&p[AMEND])this.btns['Amend'].show();else this.btns['Amend'].hide();}
 _f.FrmContainer.prototype.refresh_opt_btns=function(){var frm=cur_frm;var ol=['Actions...','New','Refresh'];if(!frm.meta.allow_print)ol.push('Print');if(!frm.meta.allow_email)ol.push('Email');if(!frm.meta.allow_copy)ol.push('Copy');empty_select(this.tbarlinks);add_sel_options(this.tbarlinks,ol,'Actions...');}
 _f.FrmContainer.prototype.show_toolbar=function(){for(var i=0;i<this.head_elements.length;i++)this.head_elements[i].is_inline?$di(this.head_elements[i]):$ds(this.head_elements[i]);this.refresh_save_btns();this.refresh_opt_btns();}
@@ -36,7 +36,7 @@ var frm=frms[dt];frm.show(dn);d.cur_frm=frm;d.dn=dn;d.set_title("Editing Row #"+
 _f.Frm=function(doctype,parent){this.docname='';this.doctype=doctype;this.display=0;this.in_dialog=false;var me=this;this.is_editable={};this.opendocs={};this.cur_section={};this.sections=[];this.grids=[];this.cscript={};this.parent=parent;if(!parent)this.parent=_f.frm_con.body;this.attachments={};this.last_comments={};this.n_comments={};frms[doctype]=this;this.setup_meta(doctype);rename_observers.push(this);}
 _f.Frm.prototype.rename_notify=function(dt,old,name){if(this.doctype!=dt)return;this.cur_section[name]=this.cur_section[old];delete this.cur_section[old];this.is_editable[name]=this.is_editable[old];delete this.is_editable[old];if(this.attachments[old]){this.attachments[name]=this.attachments[old];this.attachments[name]=null;for(var i in this.attachments[name]){this.attachments[name][i].docname=name;}}
 if(this.docname==old)
-this.docname=name;if(this&&this.opendocs[doc.localname]){local_dt[doc.doctype][doc.name]=local_dt[doc.doctype][doc.localname];local_dt[doc.doctype][doc.localname]=null;}
+this.docname=name;if(this&&this.opendocs[old]){local_dt[dt][name]=local_dt[dt][old];local_dt[dt][old]=null;}
 this.opendocs[old]=false;this.opendocs[name]=true;}
 _f.Frm.prototype.onhide=function(){if(_f.cur_grid_cell)_f.cur_grid_cell.grid.cell_deselect();}
 _f.Frm.prototype.setup_print=function(){var fl=getchildren('DocFormat',this.meta.name,'formats','DocType');var l=[];for(var i=0;i<fl.length;i++)l.push(fl[i].format);l.push('Standard');this.print_sel=new SelectWidget(null,l);this.print_sel.inp.value='Standard';}
@@ -96,8 +96,7 @@ if(!has_dep)return;var d=locals[me.doctype][me.docname];function all_dependants_
 var v=d[l[i].df.fieldname];if(v||(v==0&&!v.substr)){return false;}}}
 return true;}
 for(var i=me.fields.length-1;i>=0;i--){var f=me.fields[i];f.guardian_has_value=true;if(f.df.depends_on){var v=d[f.df.depends_on];if(f.df.depends_on.substr(0,3)=='fn:'){f.guardian_has_value=cur_frm.runclientscript(f.df.depends_on.substr(3),cur_frm.doctype,cur_frm.docname);}else{if(v||(v==0&&!v.substr)){}else{f.guardian_has_value=false;}}}
-f.dependencies_clear=all_dependants_clear(f);if(f.guardian_has_value){if(f.grid)f.grid.show();else $ds(f.wrapper);}else{if(f.grid)f.grid.hide();else $dh(f.wrapper);}
-if(!f.guardian_has_value&&!f.dependencies_clear){if(f.input)f.input.style.color="RED";}else{if(f.input)f.input.style.color="BLACK";}}}
+f.dependencies_clear=all_dependants_clear(f);if(f.guardian_has_value){if(f.grid)f.grid.show();else $ds(f.wrapper);}else{if(f.grid)f.grid.hide();else $dh(f.wrapper);}}}
 _f.Frm.prototype.setnewdoc=function(docname){if(this.opendocs[docname]){this.docname=docname;return;}
 Meta.make_local_dt(this.doctype,docname);this.docname=docname;var me=this;var viewname=docname;if(this.meta.issingle)
 viewname=this.doctype;var iconsrc='page.gif';if(this.meta.smallicon)
@@ -115,7 +114,7 @@ msgprint('Validation Error: '+validation_message);this.savingflag=false;return'E
 var ret_fn=function(r){cur_frm.refresh();if(call_back){if(call_back=='home'){loadpage('_home');return;}
 call_back();}}
 var me=this;var ret_fn_err=function(){var doc=locals[me.doctype][me.docname];me.savingflag=false;ret_fn();}
-this.savingflag=true;if(this.docname&&validated){return savedoc(this.doctype,this.docname,save_action,ret_fn,ret_fn_err);}}
+this.savingflag=true;if(this.docname&&validated){return this.savedoc(save_action,ret_fn,ret_fn_err);}}
 _f.Frm.prototype.runscript=function(scriptname,callingfield,onrefresh){var me=this;if(this.docname){var doclist=compress_doclist(make_doclist(this.doctype,this.docname));if(callingfield)callingfield.input.disabled=true;$c('runserverobj',{'docs':doclist,'method':scriptname},function(r,rtxt){if(onrefresh)onrefresh(r,rtxt);me.show();if(callingfield)callingfield.input.disabled=false;});}}
 _f.Frm.prototype.runclientscript=function(caller,cdt,cdn){var _dt=this.parent_doctype?this.parent_doctype:this.doctype;var _dn=this.parent_docname?this.parent_docname:this.docname;var doc=get_local(_dt,_dn);if(!cdt)cdt=this.doctype;if(!cdn)cdn=this.docname;var ret=null;try{if(this.cscript[caller])
 ret=this.cscript[caller](doc,cdt,cdn);if(this.cscript['custom_'+caller])
@@ -134,14 +133,15 @@ if(me.doc.__islocal){$c('webnotes.widgets.form.getdoctype',{'doctype':me.doctype
 $c('webnotes.widgets.form.getdoc',{'name':me.docname,'doctype':me.doctype,'getdoctype':1,'user':user},ret_fn,null,null,'Refreshing '+me.docname+'...');}}
 _f.Frm.prototype.check_required=function(dt,dn){var doc=locals[dt][dn];if(doc.docstatus>1)return true;var fl=fields_list[dt];if(!fl)return true;var all_clear=true;var errfld=[];for(var i=0;i<fl.length;i++){var key=fl[i].fieldname;var v=doc[key];if(fl[i].reqd&&is_null(v)){errfld[errfld.length]=fl[i].label;if(all_clear)all_clear=false;}}
 if(errfld.length)msgprint('<b>Following fields are required:</b>\n'+errfld.join('\n'));return all_clear;}
-_f.Frm.prototype.savedoc=function(dt,dn,save_action,onsave,onerr){var doc=locals[dt][dn];var doctype=locals['DocType'][dt];var tmplist=[];var doclist=make_doclist(dt,dn,1);var all_clear=true;if(save_action!='Cancel'){for(var n in doclist){var tmp=check_required(doclist[n].doctype,doclist[n].name);if(doclist[n].docstatus+''!='2'&&all_clear)
+_f.Frm.prototype.savedoc=function(save_action,onsave,onerr){var dt=this.doctype;var dn=this.docname
+var doc=locals[dt][dn];var doctype=locals['DocType'][dt];var tmplist=[];var doclist=make_doclist(dt,dn,1);var all_clear=true;if(save_action!='Cancel'){for(var n in doclist){var tmp=this.check_required(doclist[n].doctype,doclist[n].name);if(doclist[n].docstatus+''!='2'&&all_clear)
 all_clear=tmp;}}
 var f=frms[dt];if(!all_clear){if(f)f.savingflag=false;return'Error';}
-var _save=function(){var out=compress_doclist(doclist);$c('savedocs',{'docs':out,'docname':dn,'action':save_action,'user':user},function(r,rtxt){if(f){f.savingflag=false;}
+var _save=function(){var out=compress_doclist(doclist);$c('webnotes.widgets.form.savedocs',{'docs':out,'docname':dn,'action':save_action,'user':user},function(r,rtxt){if(f){f.savingflag=false;}
 if(r.saved){if(onsave)onsave(r);}else{if(onerr)onerr(r);}},function(){if(f){f.savingflag=false;}},0,(f?'Saving...':''));}
 if(doc.__islocal&&(doctype&&doctype.autoname&&doctype.autoname.toLowerCase()=='prompt')){var newname=prompt('Enter the name of the new '+dt,'');if(newname){doc.__newname=strip(newname);_save();}else{msgprint('Not Saved');onerr();}}else{_save();}}
-_f.Frm.prototype.savesubmit=function(){var answer=confirm("Permanently Submit "+cur_frm.docname+"?");if(answer)this.save_doc('Submit');}
-_f.Frm.prototype.savecancel=function(){var answer=confirm("Permanently Cancel "+cur_frm.docname+"?");if(answer)this.save_doc('Cancel');}
+_f.Frm.prototype.savesubmit=function(){var answer=confirm("Permanently Submit "+cur_frm.docname+"?");if(answer)this.save('Submit');}
+_f.Frm.prototype.savecancel=function(){var answer=confirm("Permanently Cancel "+cur_frm.docname+"?");if(answer)this.save('Cancel');}
 _f.Frm.prototype.amend_doc=function(){if(!this.fields_dict['amended_from']){alert('"amended_from" field must be present to do an amendment.');return;}
 var fn=function(newdoc){newdoc.amended_from=this.docname;if(this.fields_dict['amendment_date'])
 newdoc.amendment_date=dateutil.obj_to_str(new Date());}
@@ -395,23 +395,24 @@ this.hide=function(){$dh(me.wrapper);}
 this.show=function(){$ds(me.wrapper);}
 this.delbtn.onclick=this.remove;this.upload_div=$a(main_area,'div');this.download_div=$a(main_area,'div');var div=$a(this.upload_div,'div');div.innerHTML='<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:400px; height:100px; border:0px"></iframe>';var div=$a(this.upload_div,'div');div.innerHTML='<form method="POST" enctype="multipart/form-data" action="'+outUrl+'" target="RSIFrame"></form>';var ul_form=div.childNodes[0];var f_list=[];var inp_fdata=$a_input($a(ul_form,'span'),'file',{name:'filedata'});var inp=$a_input($a(ul_form,'span'),'hidden',{name:'cmd'});inp.value='uploadfile';var inp=$a_input($a(ul_form,'span'),'submit');inp.value='Upload';var inp=$a_input($a(ul_form,'span'),'hidden',{name:'doctype'});inp.value=frm.doctype;var inp=$a_input($a(ul_form,'span'),'hidden',{name:'docname'});inp.value=frm.docname;var inp=$a_input($a(ul_form,'span'),'hidden',{name:'at_id'});inp.value=at_id;this.download_link=$a(this.download_div,'a','link_type');this.refresh=function(){if(this.filename){$dh(this.upload_div);this.download_link.innerHTML=this.filename;this.download_link.href=outUrl+'?cmd=downloadfile&file_id='+this.fileid;this.download_link.target="_blank";$ds(this.download_div);}else{$ds(this.upload_div);$dh(this.download_div);}}}
 _f.file_upload_done=function(doctype,docname,fileid,filename,at_id){var at_id=cint(at_id);var frm=frms[doctype];var a=frm.attachments[docname][at_id];a.filename=filename;a.fileid=fileid;frm.sync_attachments(docname);a.refresh();var do_save=confirm('File Uploaded Sucessfully. You must save this document for the uploaded file to be registred. Save this document now?');if(do_save){var ret=frm.save('Save');if(ret=='Error')msgprint("error:The document was not saved. To make the attachment permanent, you must save the document before closing.");}else{msgprint("error:The document was not saved. To make the attachment permanent, you must save the document before closing.");}}
-function $c_get_values(args,doc,dt,dn,user_callback){var call_back=function(r,rt){if(!r.message)return;if(user_callback)user_callback(r.message);var fl=args.fields.split(',');for(var i in fl){locals[dt][dn][fl[i]]=r.message[fl[i]];if(args.table_field)
+$c_get_values=function(args,doc,dt,dn,user_callback){var call_back=function(r,rt){if(!r.message)return;if(user_callback)user_callback(r.message);var fl=args.fields.split(',');for(var i in fl){locals[dt][dn][fl[i]]=r.message[fl[i]];if(args.table_field)
 refresh_field(fl[i],dn,args.table_field);else
 refresh_field(fl[i]);}}
 $c('get_fields',args,call_back);}
-function get_server_fields(method,arg,table_field,doc,dt,dn,allow_edit,call_back){if(!allow_edit)freeze('Fetching Data...');$c('runserverobj',args={'method':method,'docs':compress_doclist([doc]),'arg':arg},function(r,rt){if(r.message){var d=locals[dt][dn];var field_dict=eval('var a='+r.message+';a');for(var key in field_dict){d[key]=field_dict[key];if(table_field)refresh_field(key,d.name,table_field);else refresh_field(key);}}
+get_server_fields=function(method,arg,table_field,doc,dt,dn,allow_edit,call_back){if(!allow_edit)freeze('Fetching Data...');$c('runserverobj',args={'method':method,'docs':compress_doclist([doc]),'arg':arg},function(r,rt){if(r.message){var d=locals[dt][dn];var field_dict=eval('var a='+r.message+';a');for(var key in field_dict){d[key]=field_dict[key];if(table_field)refresh_field(key,d.name,table_field);else refresh_field(key);}}
 if(call_back){doc=locals[doc.doctype][doc.name];call_back(doc,dt,dn);}
 if(!allow_edit)unfreeze();});}
-function set_multiple(dt,dn,dict,table_field){var d=locals[dt][dn];for(var key in dict){d[key]=dict[key];if(table_field)refresh_field(key,d.name,table_field);else refresh_field(key);}}
-function refresh_many(flist,dn,table_field){for(var i in flist){if(table_field)refresh_field(flist[i],dn,table_field);else refresh_field(flist[i]);}}
-function set_field_tip(n,txt){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.description=txt;if(cur_frm&&cur_frm.fields_dict){if(cur_frm.fields_dict[n])
+set_multiple=function(dt,dn,dict,table_field){var d=locals[dt][dn];for(var key in dict){d[key]=dict[key];if(table_field)refresh_field(key,d.name,table_field);else refresh_field(key);}}
+refresh_many=function(flist,dn,table_field){for(var i in flist){if(table_field)refresh_field(flist[i],dn,table_field);else refresh_field(flist[i]);}}
+set_field_tip=function(n,txt){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.description=txt;if(cur_frm&&cur_frm.fields_dict){if(cur_frm.fields_dict[n])
 cur_frm.fields_dict[n].comment_area.innerHTML=replace_newlines(txt);else
 errprint('[set_field_tip] Unable to set field tip: '+n);}}
-function refresh_field(n,docname,table_field){if(table_field){if(dialog_record&&dialog_record.display){if(dialog_record.cur_frm.fields_dict[n]&&dialog_record.cur_frm.fields_dict[n].refresh)
+refresh_field=function(n,docname,table_field){if(table_field){if(dialog_record&&dialog_record.display){if(dialog_record.cur_frm.fields_dict[n]&&dialog_record.cur_frm.fields_dict[n].refresh)
 dialog_record.cur_frm.fields_dict[n].refresh();}else{var g=_f.cur_grid_cell;if(g)var hc=g.grid.head_row.cells[g.cellIndex];if(g&&hc&&hc.fieldname==n&&g.row.docname==docname){hc.template.refresh();}else{cur_frm.fields_dict[table_field].grid.refresh_cell(docname,n);}}}else if(cur_frm&&cur_frm.fields_dict){if(cur_frm.fields_dict[n]&&cur_frm.fields_dict[n].refresh)
 cur_frm.fields_dict[n].refresh();}}
-function set_field_options(n,txt){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.options=txt;refresh_field(n);}
-function set_field_permlevel(n,level){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.permlevel=level;refresh_field(n);}
-function _hide_field(n,hidden){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.hidden=hidden;refresh_field(n);}
-function hide_field(n){if(cur_frm){if(n.substr)_hide_field(n,1);else{for(var i in n)_hide_field(n[i],1)}}}
-function unhide_field(n){if(cur_frm){if(n.substr)_hide_field(n,0);else{for(var i in n)_hide_field(n[i],0)}}}
+set_field_options=function(n,txt){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.options=txt;refresh_field(n);}
+set_field_permlevel=function(n,level){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.permlevel=level;refresh_field(n);}
+hide_field=function(n){function _hide_field(n,hidden){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.hidden=hidden;refresh_field(n);}
+if(cur_frm){if(n.substr)_hide_field(n,1);else{for(var i in n)_hide_field(n[i],1)}}}
+unhide_field=function(n){function _hide_field(n,hidden){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.hidden=hidden;refresh_field(n);}
+if(cur_frm){if(n.substr)_hide_field(n,0);else{for(var i in n)_hide_field(n[i],0)}}}

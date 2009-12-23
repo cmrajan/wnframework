@@ -725,12 +725,14 @@ SelectField.prototype.make_input = function() {
 		this.txt.onchange = function() {
 			if(me.validate)
 				me.validate();
-			me.set(me.txt.value); 
+			me.set(me.txt.value);
 			// IE grid disappears
 			if(isIE && me.in_grid) {
 				$dh(_f.cur_grid_cell.grid.wrapper);
 				$ds(_f.cur_grid_cell.grid.wrapper);
 			}
+			
+			me.run_trigger();
 		}
 	}
 

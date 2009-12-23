@@ -1,7 +1,7 @@
 // Client Side Scripting API
 // ======================================================================================
 
-function $c_get_values(args, doc, dt, dn, user_callback) {
+$c_get_values = function(args, doc, dt, dn, user_callback) {
 	var call_back = function(r,rt) {
 		if(!r.message)return;
 		if(user_callback) user_callback(r.message);
@@ -18,7 +18,7 @@ function $c_get_values(args, doc, dt, dn, user_callback) {
 	$c('get_fields',args,call_back);
 }
 
-function get_server_fields(method, arg, table_field, doc, dt, dn, allow_edit, call_back) {
+get_server_fields = function(method, arg, table_field, doc, dt, dn, allow_edit, call_back) {
 	if(!allow_edit)freeze('Fetching Data...');
 	$c('runserverobj', args={'method':method, 'docs':compress_doclist([doc]), 'arg':arg},
 	function(r, rt) {
@@ -41,7 +41,7 @@ function get_server_fields(method, arg, table_field, doc, dt, dn, allow_edit, ca
   );
 }
 
-function set_multiple(dt, dn, dict, table_field) {
+set_multiple = function (dt, dn, dict, table_field) {
 	var d = locals[dt][dn];
 	for(var key in dict) {
 		d[key] = dict[key];
@@ -50,14 +50,14 @@ function set_multiple(dt, dn, dict, table_field) {
 	}
 }
 
-function refresh_many(flist, dn, table_field) {
+refresh_many = function (flist, dn, table_field) {
 	for(var i in flist) {
 		if (table_field) refresh_field(flist[i], dn, table_field);
 		else refresh_field(flist[i]);
 	}
 }
 
-function set_field_tip(n,txt) {
+set_field_tip = function(n,txt) {
 	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
 	if(df)df.description = txt;
 
@@ -69,7 +69,7 @@ function set_field_tip(n,txt) {
 	}
 }
 
-function refresh_field(n, docname, table_field) {
+refresh_field = function(n, docname, table_field) {
 	if(table_field) { // for table
 		if(dialog_record && dialog_record.display) {
 			// in dialog
@@ -91,32 +91,34 @@ function refresh_field(n, docname, table_field) {
 	}
 }
 
-function set_field_options(n, txt) {
+set_field_options = function(n, txt) {
 	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
 	if(df)df.options = txt;
 	refresh_field(n);
 }
 
-function set_field_permlevel(n, level) {
+set_field_permlevel = function(n, level) {
 	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
 	if(df)df.permlevel = level;
 	refresh_field(n);
 }
 
-
-function _hide_field(n,hidden) {
-	var df = get_field(cur_frm.doctype, n, cur_frm.docname);
-	if(df)df.hidden = hidden; refresh_field(n);
-}
-
-function hide_field(n) {
+hide_field = function(n) {
+	function _hide_field(n,hidden) {
+		var df = get_field(cur_frm.doctype, n, cur_frm.docname);
+		if(df)df.hidden = hidden; refresh_field(n);
+	}	
 	if(cur_frm) {
 		if(n.substr) _hide_field(n,1);
 		else { for(var i in n)_hide_field(n[i],1) }
 	}
 }
 
-function unhide_field(n) {
+unhide_field = function(n) {
+	function _hide_field(n,hidden) {
+		var df = get_field(cur_frm.doctype, n, cur_frm.docname);
+		if(df)df.hidden = hidden; refresh_field(n);
+	}	
 	if(cur_frm) {
 		if(n.substr) _hide_field(n,0);
 		else { for(var i in n)_hide_field(n[i],0) }

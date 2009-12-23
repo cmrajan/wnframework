@@ -91,6 +91,56 @@ function loaddoc(doctype, name, onload, menuitem) {
 }
 
 
+// New Doc
+// -------------------------------------------------------------------------------
+
+
+function new_doc(doctype, onload) {	
+	if(!doctype) {
+		if(cur_frm)doctype = cur_frm.doctype; else return;
+	}
+	
+	var show_doc = function() {
+		frm = frms[doctype];
+		// load new doc	
+		if (frm.perm[0][CREATE]==1) {
+			if(frm.meta.issingle) {
+				var d = doctype;
+				LocalDB.set_default_values(locals[doctype][doctype]);
+			} else 
+				var d = LocalDB.create(doctype);
+				
+			if(onload)onload(d);
+			
+			nav_obj.open_notify('Form',doctype,d);
+			
+			frm.show(d);
+		} else {
+			msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');
+		}
+	}
+
+	var show_form = function() {
+		// load the frm container
+		if(!_f.frm_con) {
+			_f.frm_con = new _f.FrmContainer();
+		}
+
+		if(!frms[doctype]) 
+			_f.frm_con.add_frm(doctype, show_doc); // load
+		else 
+			show_doc(frms[doctype]); // directly
+		
+	}
+
+	// is libary loaded?
+	if(_f.FrmContainer) {
+		show_form();
+	} else {
+		$c_js('form.compressed.js', show_form);
+	}
+}
+var newdoc = new_doc;
 
 // Load Page
 // -------------------------------------------------------------------------------

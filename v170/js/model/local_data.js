@@ -296,15 +296,16 @@ var rename_observers = [];
 function notify_rename_observers(dt, old_name, new_name) {
 	// delete from local
 	try {
-		var old = locals[doc.doctype][doc.localname]; 
+		var old = locals[dt][old_name]; 
 		old.parent = null; old.__deleted = 1;
 	} catch(e) {
-		alert("[rename_from_local] No Document for: "+ doc.localname);
+		alert("[rename_from_local] No Document for: "+ old_name);
 	}
 
 	// everyone who observers			
 	for(var i=0; i<rename_observers.length;i++) {
-		rename_observers.length.rename_notify(dt, old_name, new_name);
+		if(rename_observers[i])
+			rename_observers[i].rename_notify(dt, old_name, new_name);
 	}	
 }
 

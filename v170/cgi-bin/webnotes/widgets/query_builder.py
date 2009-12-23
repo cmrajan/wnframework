@@ -9,7 +9,9 @@ def get_search_criteria_list(dt):
 	sc_list = sql("select criteria_name, doc_type from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s'" % (dt, dt))
 	return [list(s) for s in sc_list]
 
-
+def load_report_list():
+	webnotes.response['rep_list'] = server.get_search_criteria_list(form.getvalue('dt'))
+	
 # GET MATCH CONDITION
 # -------------------
 
