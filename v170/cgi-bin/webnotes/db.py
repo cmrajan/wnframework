@@ -109,7 +109,7 @@ class Database:
 		
 	def get_testing_tables(self):
 		if not self.testing_tables:
-			testing_tables = ['tab'+r[0] for r in sql('SELECT name from tabDocType where docstatus<2 and (issingle=0 or issingle is null)', allow_testing = 0)]
+			testing_tables = ['tab'+r[0] for r in self.sql('SELECT name from tabDocType where docstatus<2 and (issingle=0 or issingle is null)', allow_testing = 0)]
 			testing_tables+=['tabSeries','tabSingles'] # tabSessions is not included here
 		return self.testing_tables
 
@@ -125,9 +125,15 @@ class Database:
 			r = self.sql("select value from tabSingles where field=%s and doctype=%s", (fieldname, doctype))
 			return r and r[0][0] or None
 
-	def set(doc, field, val):
+	def set(self, doc, field, val):
 		self.sql("update `tab"+doc.doctype+"` set `"+field+"`=%s where name=%s", (val, doc.name))
 		doc.fields[field] = val
-				
+
+	def exists(self, dt, dn):
+		try:
+			return self.sql('select name from `tab%s` where name="%s"' % (dt, dn.replace('"',"'")))
+		except:
+			return None
+
 	def close(self):
 		self.conn.close()
