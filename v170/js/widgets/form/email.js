@@ -5,7 +5,7 @@ _e.email_as_field = 'email_id';
 _e.email_as_dt = 'Contact';
 _e.email_as_in = 'email_id,contact_name';
 
-function sendmail(emailto, emailfrom, cc, subject, message, fmt, with_attachments) {
+sendmail = function(emailto, emailfrom, cc, subject, message, fmt, with_attachments) {
 	var fn = function(html) {
 		$c('sendmail', {
 			'sendto':emailto, 
@@ -26,11 +26,6 @@ function sendmail(emailto, emailfrom, cc, subject, message, fmt, with_attachment
 	
 	// build print format
 	_p.build(fmt, fn);
-}
-_e.show_dialog = function() {
-	if(!_e.dialog) {
-		_e.make();	
-	}
 }
 
 _e.make = function() {
@@ -78,7 +73,7 @@ _e.make = function() {
 
 	d.make_body([
 		 ['Data','To','Example: abc@hotmail.com, xyz@yahoo.com']
-		,['Data','Format']
+		,['Select','Format']
 		,['Data','Subject']
 		,['Data','From','Optional']
 		,['Check','Send With Attachments','Will send all attached documents (if any)']
@@ -88,10 +83,12 @@ _e.make = function() {
 
 	d.widgets['From'].value = (user_email ? user_email:'');
 	
+	$td(d.rows['Format'].tab,0,1).cur_sel = d.widgets['Format'];
+	
     // ---- add auto suggest ---- 
     var opts = { script: '', json: true, maxresults: 10 };
     
-    var as = new bsn.AutoSuggest(d.widgets['To'], opts);
+    var as = new AutoSuggest(d.widgets['To'], opts);
     as.custom_select = function(txt, sel) {
       // ---- add to the last comma ---- 
       var r = '';

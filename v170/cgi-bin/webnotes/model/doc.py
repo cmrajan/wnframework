@@ -60,7 +60,7 @@ class Document:
 			if not dataset:
 				msgprint('%s %s does not exist' % (self.doctype, self.name))
 				raise Exception
-			self.loadfields(dataset, 0, webnotes.conn.cursor.description)
+			self.loadfields(dataset, 0, webnotes.conn.get_description())
 
 	# Load Fields from dataset
 	# ------------------------

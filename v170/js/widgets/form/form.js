@@ -130,10 +130,12 @@ _f.Frm.prototype.print_doc = function() {
 
 _f.Frm.prototype.email_doc = function() {
 	// make selector
+	if(!_e.dialog) _e.make();
+	
 	sel = this.print_sel;
 	var c = $td(_e.dialog.rows['Format'].tab,0,1);
 	
-	if(c.cur_sel)c.removeChild(c.cur_sel);
+	if(c.cur_sel)c.removeChild(c.cur_sel.wrapper);
 	c.appendChild(this.print_sel.wrapper);
 	c.cur_sel = this.print_sel.wrapper;
 
@@ -347,8 +349,10 @@ _f.Frm.prototype.setup_fields_std = function() {
 
 	if(fl[0]&&fl[0].fieldtype!="Section Break") {
 		this.layout.addrow(); // default section break
-		if(fl[0].fieldtype!="Column Break") // without column too
-			this.layout.addcell();
+		if(fl[0].fieldtype!="Column Break") {// without column too
+			var c = this.layout.addcell();
+			$y(c.wrapper, {padding: '8px'});			
+		}
 	}
 
 	var sec;
@@ -368,9 +372,10 @@ _f.Frm.prototype.setup_fields_std = function() {
 		
 		// default col-break after sec-break
 		if((f.fieldtype=='Section Break')&&(fl[i+1])&&(fl[i+1].fieldtype!='Column Break')) {
-			this.layout.addcell();
+			var c = this.layout.addcell();
+			$y(c.wrapper, {padding: '8px'});			
 		}
-	} 
+	}
 }
 
 _f.Frm.prototype.setup_template_layout = function() {

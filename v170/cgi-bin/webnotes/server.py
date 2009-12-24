@@ -121,22 +121,6 @@ def check_syntax(code):
 
 from webnotes.model.doc import *
 
-# Series
-# -------
-
-def db_has_series(name, doctype):
-	ttl = get_testing_tables()
-	return sql("select name from tabSeries where name='%s'" % name, allow_testing = (doctype in ttl) and 0 or 1)
-
-def db_series_next(name, doctype):
-	ttl = get_testing_tables()
-	sql("update tabSeries set current = current+1 where name='%s'" % name, allow_testing = (doctype in ttl) and 0 or 1)
-	r = sql("select current from tabSeries where name='%s'" % name, allow_testing = (doctype in ttl) and 0 or 1)
-	return r[0][0]
-
-def db_make_series(name, doctype):
-	ttl = get_testing_tables()
-	return sql("insert into tabSeries (name, current) values ('%s', 1)" % name, allow_testing = (doctype in ttl) and 0 or 1)
 	
 # Model
 # ------------

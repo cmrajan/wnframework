@@ -1,61 +1,113 @@
 # Set Column Types
 # ----------------
 
-def getcoldef(ftype):
+import webnotes
+
+sql = webnotes.conn.sql
+
+def getcoldef(ftype, length=''):
 	t=ftype.lower()
 	if t in ('date','int','text','time'):
 		dt = t
 	elif t in ('currency'): 
-		dt = 'decimal(14,2)' 
+		dt = 'decimal'
+		if not length: length = '14,2' 
 	elif t in ('float'): 
-		dt = 'decimal(14,6)' 
+		dt = 'decimal' 
+		if not length: length = '14,6' 
 	elif t == 'small text':
-		dt = 'text';
+		dt = 'text'
 	elif t == 'check':
-		dt = 'int(3)';
+		dt = 'int'
+		if not length: length = '1' 
 	elif t in ('long text', 'code', 'text editor'): 
 		dt = 'text';
 	elif t in ('data', 'link', 'password', 'select', 'read only'):
-		dt = 'varchar(180)';
+		dt = 'varchar';
+		if not length: length = '180' 
 	elif t == 'blob':
 		dt = 'longblob'
 	else: dt = ''
+	
+	if length:
+		dt += ('(%s)' % length)
+	
 	return dt
 
 # Add Columns In Database
 # -----------------------
 
-def db_get_newfields(doctype):
-	out = []
-	flist = sql("SELECT DISTINCT fieldname, fieldtype, label FROM tabDocField WHERE parent='%s'" % doctype)
+def validate_column_name(n):
+	n = n.replace(' ','_').strip().lower()
+	import re
+	if not re.match("[a-zA-Z_][a-zA-Z0-9_]*$", n):
+		webnotes.msgprint('err:%s is not a valid fieldname.<br>A valid name must contain letters / numbers / spaces.<br><b>Tip: </b>You can change the Label after the fieldname has been set' % n)
+		raise Exception
+	return n
+	
+def add_column(f, dt):		
+	ftype =  getcoldef(f[2], f[3])
+	if ftype:
+		fn = validate_column_name(f[1]) # name or label
+		sql("alter table `tab%s` add `%s` %s" % (dt, fn, ftype))
 
-	exlist = [e[0] for e in sql("DESC `tab%s`" % (doctype))]
-	
-	for f in flist:
-		if not (f[0] in exlist):
-			out.append(f)
-	return out
-	
-def addcolumns(doctype, userfields=[]):
-	
-	if userfields: 
-		addlist = userfields
-	else: 
-		addlist = db_get_newfields(doctype)
 		
-	for f in addlist:
-		ftype =  getcoldef(f[1])
-		if ftype: 
-			fn = f[0] # name or label
-			if not fn:
-				fn = f[2].strip().lower().replace(' ','_').replace('.','')
-				fn = fn.replace('-','_').replace('&','and').replace('(', '').replace(')','')
+# Update Columns In Database
+# -----------------------
 
-			sql("alter table `tab%s` add `%s` %s" % (doctype, fn, ftype))
+def validate_type_change(new, old):
+	if ((old.lower() in ['text','small text','code','text editor']) and (new.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old.lower() in ['data','select','link']) and (new.lower() in ['date','int','currency','float','time','table'])):
+		webnotes.msgprint('%s: Coversion from %s to %s is not allowed' % (new_fn, old_type, new_type_orig))
+		raise Exception		
 
-	if not userfields:
-		# update flags
-		sql(" UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent='%s' AND ((oldfieldname IS NULL) or (oldfieldname='')) " % (doctype))
+def change_column(f, dt, col_def):
+	if col_def:
+		sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], validate_column_name(f[1]), col_def))
+		webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], validate_column_name(f[1]), col_def))
+			
+def updatecolumns(doctype):
+	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
+		flist = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype FROM tabDocField WHERE parent = '%s'" % doctype)
+	else:
+		flist = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype FROM tabDocField WHERE parent = '%s'" % doctype)
+
+	# list of existing columns
+	cur_fields = sql("DESC `tab%s`" % (doctype))
+
+	old_fields = [f[0] for f in flist]
+
+	for f in flist:
+		change = 0
+
+		# not in current fields
+		if not (f[1] in [e[0] for e in cur_fields]):
+
+			# name changed
+			if f[0]: change = 1
+			
+			# new field
+			else: add_column(f, doctype)
+		
+		# type or length has changed
+		col_def = getcoldef(f[2], f[3])
+		
+		# find exisiting def
+		cur_def = ''
+		for e in cur_fields:
+			if e[0]==f[1]:
+				cur_def = e[1]
+		
+		# changed
+		if change or (cur_def and col_def.lower() != cur_def.lower()):
+			# validate type change
+			validate_type_change(f[2], f[4])
+			
+			change_column(f, doctype, col_def)
+	
+	# update the "old" columns
+	sql("start transaction")
+	sql("UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent= '%s'" % doctype)
+
 
 # Add Indices
 # -----------
@@ -85,36 +137,6 @@ def update_engine(doctype=None, engine='InnoDB'):
 	else:
 		for t in sql("show tables"):
 			sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
-		
-# Update Columns In Database
-# -----------------------
-
-def change_column(dt, old_fn, new_fn, new_type, old_type, new_type_orig):
-	if ((old_type.lower() in ['text','small text','code','text editor']) and (new_type_orig.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old_type.lower() in ['data','select','link']) and (new_type_orig.lower() in ['date','int','currency','float','time','table'])):
-		msgprint('%s: Coversion from %s to %s is not allowed' % (new_fn, old_type, new_type_orig))
-		raise Exception
-	try:
-		sql("alter table `tab%s` change `%s` `%s` %s" % (dt, old_fn, new_fn, new_type))
-		msgprint("%s: Changed %s to %s" % (new_fn, old_type, new_type_orig))
-	except:
-		pass
-
-			
-def updatecolumns(doctype):
-	# modify columns
-	modifylist = sql(" SELECT oldfieldname, fieldname, fieldtype, oldfieldtype FROM tabDocField WHERE parent = '%s' AND (fieldname!=oldfieldname OR fieldtype!=oldfieldtype) AND !(fieldname IS NULL OR fieldname='') AND !(fieldtype IS NULL or fieldtype='')" % doctype)
-	for f in modifylist:
-		change_column(doctype, f[0], f[1], getcoldef(f[2]), f[3], f[2])
-		sql("UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent= '%s'" % doctype)
-
-# Get Checkbox Value
-# -----------------------
-
-def getcheckval(d, t):
-	if d.fields.has_key(t):
-		if d.fields[t]=='0' or (not d.fields[t]): return 0
-		return 1
-	else: return 0
 
 # Make Database Changes
 # -----------------------
@@ -132,15 +154,14 @@ def create_table(dt):
 			parentfield varchar(120), 
 			parenttype varchar(120), 
 			idx int(8),
-			index parent(parent))""" % (dt))
+			index parent(parent)) ENGINE=InnoDB""" % (dt))
 
-def update_table(dt, userfields):
+def update_table(dt):
+
 	# create table
 	names = [rec[0].lower() for rec in sql('SHOW TABLES')]
-	if not (('tab'+dt).lower() in names):  create_table(dt)
-
-	# add columns
-	addcolumns(dt, userfields)
+	if not (('tab'+dt).lower() in names):  
+		create_table(dt)
 
 	# update columns
 	updatecolumns(dt)
@@ -148,13 +169,9 @@ def update_table(dt, userfields):
 	# update index
 	addindex(dt)
 
-	# update engine - always InnoDB
-	update_engine(dt, 'InnoDB')
-
-def updatedb(doctype, userfields = [], args = {}):
-	istable = getcheckval(doctype, 'istable')
-	issingle = getcheckval(doctype, 'issingle')
+def updatedb(doctype, args = {}):
+	issingle = sql("select issingle from tabDocType where name=%s", doctype.name)[0][0]
 
 	if not issingle:
-		update_table(doctype.name, userfields)
+		update_table(doctype.name)
 		

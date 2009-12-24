@@ -1,4 +1,4 @@
-_p.build_dialog = function() {
+_p.show_dialog = function() {
 	if(!_p.dialog) {
 		_p.make_dialog();
 	}
@@ -10,9 +10,9 @@ _p.make_dialog = function() {
 	$dh(d.wrapper);
 	d.make_body(
 		[['HTML','Select']
-		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), go); }]]);
+		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), _p.go); }]]);
 	
-	_p.print_doc_dialog = d;
+	_p.dialog = d;
 	d.onshow = function() {
 		var c = d.widgets['Select'];
 		if(c.cur_sel)c.removeChild(c.cur_sel);
@@ -33,7 +33,6 @@ _p.field_tab = function(layout_cell) {
 
 
 // start a layout
-
 
 _p.print_std = function() {
 	var dn = cur_frm.docname;
@@ -57,9 +56,13 @@ _p.print_std = function() {
 	}
 
 	// heading
-	layout.cur_row.header.innerHTML += '<div style="font-size: 18px; font-weight: bold; margin: 8px;">'+dt+' : '+dn+'</div>';
-
-	var fl = getchildren('DocField', dt, 'fields', 'DocType'); 
+	var h1 = $a(layout.cur_row.header, 'h1', '', {marginBottom:'8px'}); 
+	h1.innerHTML = dn;
+	
+	var h2 = $a(layout.cur_row.header, 'div', '', {marginBottom:'8px', paddingBottom:'8px', borderBottom:(layout.with_border ? '0px' : '1px solid #000' )});
+	h2.innerHTML = dt;
+	
+	var fl = getchildren('DocField', dt, 'fields', 'DocType');
 
 	if(fl[0]&&fl[0].fieldtype!="Section Break") {
 		layout.addrow(); // default section break
@@ -82,6 +85,10 @@ _p.print_std = function() {
 					layout.addcell(); }
 				if(f.label)
 					layout.cur_row.header.innerHTML = '<div class="sectionHeading">'+f.label+'</div>';
+				// border at bottonm
+				if(!layout.with_border) {
+					$y(layout.cur_row.wrapper, {borderBottom: '1px solid #000' });	
+				}
 				break;
 			 case 'Column Break': 
 				layout.addcell(f.width, f.label); 
@@ -116,12 +123,10 @@ _p.print_std = function() {
 			 case 'HTML': 
 			 	var tmp = $a(layout.cur_cell, 'div');
 			 	tmp.innerHTML = f.options;
-			 	if(datatables[f.label])
-			 		tmp.innerHTML = datatables[f.label].get_html();
 			 	break;
 			 case 'Code': 
 			 	var tmp = $a(layout.cur_cell, 'div');
-			 	var v=get_value(dt,dn,f.fieldname);
+			 	var v= _f.get_value(dt,dn,f.fieldname);
 			 	tmp.innerHTML = '<div>'+ f.label + ': </div>'
 			 		+ '<pre style="font-family: Courier, Fixed;">'+(v?v:'')+'</pre>';
 			 	break;
@@ -132,7 +137,11 @@ _p.print_std = function() {
 					// label
 					r.cells[0].innerHTML=f.label?f.label:f.fieldname;
 					
-					$s(r.cells[1], get_value(dt,dn,f.fieldname), f.fieldtype);
+					$s(r.cells[1], _f.get_value(dt,dn,f.fieldname), f.fieldtype);
+
+					// left align currency in normal display
+					if(f.fieldtype=='Currency')
+						$y(r.cells[1],{textAlign: 'left'});
 				}
 			}
 		}
@@ -154,20 +163,16 @@ _p.print_std = function() {
 	return html;
 }
 
-_p.print_style = ".datalabelcell {padding: 2px;width: 38%;vertical-align:top; }"
-	+".datainputcell { padding: 2px; width: 62%; text-align:left; }"
-	+".sectionHeading { font-size: 16px; font-weight: bold; margin: 8px; }"
+_p.print_style = ".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:top; }"
+	+".datainputcell { padding: 2px 0px; width: 62%; text-align:left; }"
+	+".sectionHeading { font-size: 16px; font-weight: bold; margin: 8px 0px }"
 	+".columnHeading { font-size: 14px; font-weight: bold; margin: 8px 0px; }"
-	+".sectionCell {padding: 3px; vertical-align: top; }"
-	+".pagehead { font-size: 16px; font-weight: bold; font-family: verdana; padding: 2px 10px 10px 0px; }"		
-	+".pagesubhead { font-size: 12px; font-weight: bold; font-family: verdana; padding: 2px 10px 10px 0px; }";
 
 _p.def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
 	+"\nbody { margin: 12px; }"
-	+"td {padding: 2px;}"
 	+"\npre { margin:0; padding:0;}"	
 	+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
-	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; }"
+	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"
 	+"\n.noborder td { vertical-align: top; }"
 
 _p.formats = {}
@@ -176,7 +181,7 @@ _p.build = function(fmtname, onload) {
 	if(!cur_frm) { alert('No Document Selected'); return; }
 	var doc = locals[cur_frm.doctype][cur_frm.docname];
 	if(fmtname=='Standard') {
-		onload(_p.render(print_std(), _p.print_style, doc, doc.name));
+		onload(_p.render(_p.print_std(), _p.print_style, doc, doc.name));
 	} else {
 		if(!_p.formats[fmtname]) // not loaded, get data
 			$c('get_print_format', {'name':fmtname }, 
@@ -230,7 +235,7 @@ _p.go = function(html) {
 	w.document.close();
 }
 
-function print_table(dt, dn, fieldname, tabletype, cols, head_labels, widths, condition, cssClass) {
+print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, condition, cssClass) {
 	var fl = fields_list[tabletype];
 	var ds = getchildren(tabletype, dn, fieldname, dt);
 	var tl = [];
@@ -260,6 +265,8 @@ function print_table(dt, dn, fieldname, tabletype, cols, head_labels, widths, co
 				$w(cell, fl[c].width);
 			if(widths)
 				$w(cell, widths[c]);
+			if(fl[c].fieldtype=='Currency')
+				$y(cell,{textAlign: 'right'});
 			cell.style.fontWeight = 'bold';
 		}
 		return t;

@@ -27,7 +27,6 @@ var pagewidth = 480;
 var NULL_CHAR = '^\5*';
 var startup_lst = [];
 var login_file = 'login.html';
-var datatables = {} // deprecated
 var __sid150; // session id required to store here for cross domain logins
 var tinyMCE;
 var editAreaLoader;
@@ -400,66 +399,6 @@ function execJS(node)
 
 function set_message(t) { byId('messages').innerHTML = t; }
 
-var known = {
-    0: 'zero',
-    1: 'one',
-    2: 'two',
-    3: 'three',
-    4: 'four',
-    5: 'five',
-    6: 'six',
-    7: 'seven',
-    8: 'eight',
-    9: 'nine',
-    10: 'ten',
-    11: 'eleven',
-    12: 'twelve',
-    13: 'thirteen',
-    14: 'fourteen',
-    15: 'fifteen',
-    16: 'sixteen',
-    17: 'seventeen',
-    18: 'eighteen',
-    19: 'nineteen',
-    20: 'twenty',
-    30: 'thirty',
-    40: 'forty',
-    50: 'fifty',
-    60: 'sixty',
-    70: 'seventy',
-    80: 'eighty',
-    90: 'ninety'
-    }
-
-function in_words(n) {
-    n=cint(n)
-    if(known[n]) return known[n];
-    var bestguess = n + '';
-    var remainder = 0
-    if(n<=20)
-    	alert('Error while converting to words');
-    else if(n<100) {
-        return in_words(Math.floor(n/10)*10) + '-' + in_words(n%10);
-    } else if(n<1000) {
-        bestguess= in_words(Math.floor(n/100)) + ' ' + 'hundred';
-        remainder = n%100;
-    } else if(n<100000) {
-        bestguess= in_words(Math.floor(n/1000)) + ' ' + 'thousand';
-        remainder = n%1000;
-    } else if(n < 10000000) {
-        bestguess= in_words(Math.floor(n/100000)) + ' ' + 'lakh';
-        remainder = n%100000;
-    } else {
-        bestguess= in_words(Math.floor(n/10000000)) + ' ' + 'crore'
-        remainder = n%10000000
-    }
-    if(remainder) {
-        if(remainder >= 100) comma = ','
-        else comma = ''
-        return bestguess + comma + ' ' + in_words(remainder);
-    } else {
-        return bestguess;
-    }
 }
 
 
@@ -1001,46 +940,6 @@ function rename_doc() {
 		function(r, rtxt) { f.refresh(); });
 	}
 }
-
-// NEW
-function new_doc(doctype, onload) {
-	loadfrm(function() { _new_doc(doctype, onload); });
-}
-
-function _new_doc(doctype, onload) {	
-	if(!doctype) {
-		if(cur_frm)doctype = cur_frm.doctype; else return;
-	}
-	
-	var fn = function() {
-		frm = frms[doctype];
-		// load new doc	
-		if (frm.perm[0][CREATE]==1) {
-			if(frm.meta.issingle) {
-				var d = doctype;
-				set_default_values(locals[doctype][doctype]);
-			} else 
-				var d = LocalDB.create(doctype);
-				
-			if(onload)onload(d);
-			nav_obj.open_notify('DocType',doctype,d);
-			frm.show(d);
-		} else {
-			msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');
-		}
-	}
-	
-	if(!frms[doctype]) frm_con.add_frm(doctype, fn); // load
-	else fn(frms[doctype]); // directly
-}
-var newdoc = new_doc;
-
-// RELOAD
-
-
-// LOADDOC
-
-
 
 
 window.onload = startup;

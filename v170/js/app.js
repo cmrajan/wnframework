@@ -31,9 +31,6 @@ var _p = {};
 // email
 var _e = {};
 
-// grid
-var _g = {};
-
 // report buidler
 var _r = {};
 
@@ -60,6 +57,7 @@ var set_field_permlevel;
 var hide_field;
 var unhide_field;
 var print_table;
+var sendmail;
 
 // icons
 var exp_icon = "images/ui/right-arrow.gif"; 

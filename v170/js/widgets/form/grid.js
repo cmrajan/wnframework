@@ -374,6 +374,10 @@ _f.Grid.prototype.remove_template = function(cell) {
 		cell.div.removeChild(hc.template.wrapper);
 	this.set_cell_value(cell);
 	hc.template.activated=0;
+	
+	if(isIE6) {
+		$dh(this.wrapper); $ds(this.wrapper);	
+	}
 
 }
 

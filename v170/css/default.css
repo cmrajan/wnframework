@@ -658,15 +658,6 @@ td.page_head {
 	border-collapse: collapse;
 }
 
-div.layoutDiv { display: none; }
-
-div.layout_row {
-}
-
-table.layout_row_table {
-	width: 100%;
-}
-table.layout_row_table td { }
 
 /* Section */
 .sectionHeading {

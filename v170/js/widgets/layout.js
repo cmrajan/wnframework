@@ -1,15 +1,12 @@
 function Layout(parent, width) { 
 	if(parent&&parent.substr) { parent = $i(parent); }
 
-	if(parent)
-		this.wrapper = $a(parent, 'div', 'layoutDiv');
-	else {
-		this.wrapper = document.createElement('div')
-		this.wrapper.className = 'layoutDiv';
-	}
+	this.wrapper = $a(parent, 'div', '', {display:'none'});
 
-	$w(this.wrapper, width?width:(pagewidth + 'px'));
-	this.width = this.wrapper.style.width;
+
+	if(width) {
+		this.width = this.wrapper.style.width;
+	}
 	
 	this.myrows = [];
 }
@@ -42,7 +39,7 @@ Layout.prototype.close_borders = function() {
 
 function LayoutRow(layout, parent) {
 	this.layout = layout;
-	this.wrapper = $a(parent,'div','layout_row');
+	this.wrapper = $a(parent,'div');
 	
 	// for sub rows
 	this.sub_wrapper = $a(this.wrapper,'div');
@@ -52,9 +49,9 @@ function LayoutRow(layout, parent) {
 		this.wrapper.style.borderBottom = '0px';
 	}
 	
-	this.header = $a(this.sub_wrapper, 'div');
+	this.header = $a(this.sub_wrapper, 'div','',{padding:(layout.with_border ? '0px 8px' : '0px')});
 	this.body = $a(this.sub_wrapper,'div');
-	this.table = $a(this.body, 'table', 'layout_row_table');
+	this.table = $a(this.body, 'table', '', {width:'100%', borderCollapse: 'collapse'});
 	this.row = this.table.insertRow(0);
 	
 	this.mycells = [];
@@ -81,16 +78,15 @@ function LayoutCell(layout, layoutRow, width) {
 	this.layout = layout;
 	var cidx = layoutRow.row.cells.length;
 	this.cell = layoutRow.row.insertCell(cidx);
-	//if((layout.with_border)&&(cidx>0)) 
-	//	layoutRow.row.cells[cidx-1].style.borderRight = '1px solid #000';
 
 	this.cell.style.verticalAlign = 'top';
 	if(width)
 		this.cell.style.width = width;
 	
-	var h = $a(this.cell, 'div');	
-	this.wrapper = $a(this.cell, 'div','',{padding:'8px'});
-	
+	var h = $a(this.cell, 'div','',{padding:(layout.with_border ? '0px 8px' : '0px')});	
+
+	this.wrapper = $a(this.cell, 'div','',{padding:(layout.with_border ? '8px' : '8px 0px')}); 
+
 	layout.cur_cell = this.wrapper;
 	layout.cur_cell.header = h;
 }
