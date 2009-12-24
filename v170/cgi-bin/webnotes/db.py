@@ -27,18 +27,14 @@ class Database:
 			self.use(defs.db_name)
 		
 	def connect(self):
-		self.conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
-		self.cursor = self.conn.cursor()
-		return self.cursor
+		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
+		self._cursor = self._conn.cursor()
+		return self._cursor
 	
 	def use(self, db_name):
-		self.conn.select_db(db_name)
+		self._conn.select_db(db_name)
 	
 	def check_transaction_status(self, query):
-		if self.in_transaction and query and query.strip().lower()=='start transaction':
-			msgprint("[Implicit Commit Error] START TRANSACTION in transaction without commit or rollback")
-			raise Exception
-
 		if query and query.strip().lower()=='start transaction':
 			self.in_transaction = 1
 
@@ -46,16 +42,25 @@ class Database:
 			self.in_transaction = 0
 	
 	def fetch_as_dict(self):
-		result = self.cursor.fetchall()
+		result = self._cursor.fetchall()
 		ret = []
 		for r in result:
 			dict = {}
 			for i in range(len(r)):
-				dict[self.cursor.description[i][0]] = r[i]
+				dict[self._cursor.description[i][0]] = r[i]
 			ret.append(dict)
 		return ret
 	
+	def validate_query(self, q):
+		cmd = q.strip().lower().split()[0]
+		if cmd in ['alter', 'drop', 'truncate'] and webnotes.user.name != 'Administrator':
+			webnotes.msgprint('Not allowed to execute query')
+			raise Execption
+	
 	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1):
+		# check security
+		#self.validate_query(query)
+	
 		# replace 'tab' by 'test' if testing
 		if self.is_testing and allow_testing:
 			query = self.replace_tab_by_test(query)
@@ -64,18 +69,21 @@ class Database:
 		self.check_transaction_status(query)
 		
 		# execute
-		if values != ():
-			self.cursor.execute(query, values)
+		if values:
+			self._cursor.execute(query, values)
 		else:
-			self.cursor.execute(query)	
+			self._cursor.execute(query)	
 
 		# scrub out put if required
 		if as_dict:
 			return self.fetch_as_dict()
 		elif as_list:
-			return self.convert_to_lists(self.cursor.fetchall())
+			return self.convert_to_lists(self._cursor.fetchall())
 		else:
-			return self.cursor.fetchall()
+			return self._cursor.fetchall()
+
+	def get_description(self):
+		return self._cursor.description
 
 	def convert_to_lists(self, res):
 		try: import decimal # for decimal Python 2.5 (?)
@@ -136,4 +144,4 @@ class Database:
 			return None
 
 	def close(self):
-		self.conn.close()
+		self._conn.close()
