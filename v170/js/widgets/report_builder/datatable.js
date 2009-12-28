@@ -1,6 +1,8 @@
 /// Data Table
 
-function DataTable(html_fieldname, dt, repname, hide_toolbar) {
+_r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
+	
+	
   var me = this;
   if(html_fieldname.substr) {
 	  var html_field = cur_frm.fields_dict[html_fieldname];
@@ -23,6 +25,7 @@ function DataTable(html_fieldname, dt, repname, hide_toolbar) {
   this.page_len = 50;
   this.repname = repname;
   this.dt = dt;
+  this.sort_labels = {};
   this.query = '';
   this.history = [];
   this.has_index = 1;
@@ -48,7 +51,7 @@ function DataTable(html_fieldname, dt, repname, hide_toolbar) {
   if(!hide_toolbar) this.make_toolbar(parent);
 
   this.wrapper = $a(parent, 'div', 'report_tab');
-  $h(this.wrapper, cint(pagewidth * 0.5) + 'px');
+  $h(this.wrapper, cint(screen.width * 0.4) + 'px');
 
   this.wrapper.onscroll = function() {scroll_head(this); }
   
@@ -61,7 +64,7 @@ function DataTable(html_fieldname, dt, repname, hide_toolbar) {
   this.fetching_tag = $a(this.wrapper, 'div', '', {height:'120px', background:'url("images/ui/square_loading.gif") center no-repeat', display:'none'});  
 }
 
-DataTable.prototype.add_icon = function(parent, imgsrc) {
+_r.DataTable.prototype.add_icon = function(parent, imgsrc) {
   var i = $a(parent, 'img');
   i.style.padding = '2px';
   i.style.cursor = 'pointer';
@@ -69,7 +72,7 @@ DataTable.prototype.add_icon = function(parent, imgsrc) {
   return i;
 }
 
-DataTable.prototype.make_toolbar = function(parent) {
+_r.DataTable.prototype.make_toolbar = function(parent) {
   var me = this;
   
   // headbar
@@ -103,14 +106,14 @@ DataTable.prototype.make_toolbar = function(parent) {
 
   // sort select
   $td(t,0,cnt).innerHTML = 'Sort By:'; $y($td(t,0,cnt),{textAlign:'right',paddingRight:'4px'});
-  this.sort_sel = $a($td(t,0,cnt+1), 'select');
-  $w(this.sort_sel, '100px');
-  //$p(this.sort_sel,2,210);
-  this.sort_sel.onchange = function() {
+  
+  this.sort_sel = new SelectWidget($td(t,0,cnt+1), [], 100);
+
+  this.sort_sel.inp.onchange = function() {
     me.start_rec = 1;
     me.run();
   }
-  select_register[select_register.length] = this.sort_sel;
+
   // sort order
   this.sort_icon = this.add_icon($td(t,0,cnt+2), 'arrow_down');
   this.sort_order = 'DESC';
@@ -126,18 +129,12 @@ DataTable.prototype.make_toolbar = function(parent) {
   // page len
 
   $td(t,0,cnt+3).innerHTML = 'Per Page:'; $y($td(t,0,cnt+3),{textAlign:'right',paddingRight:'4px'});  
-  var s = $a($td(t,0,cnt+4), 'select');
-  $w(s, '50px');
-  
-  s.options[s.options.length] = new Option('50', '50', false, true);
-  s.options[s.options.length] = new Option('100', '100', false, false);
-  s.options[s.options.length] = new Option('500', '500', false, false);
-  s.options[s.options.length] = new Option('1000', '1000', false, false);
+  var s = new SelectWidget($td(t,0,cnt+4), ['50','100','500','1000'], 70);
+  s.inp.value = '50';
 
-  s.onchange = function() { 
-  	me.page_len = flt(sel_val(this));
+  s.inp.onchange = function() { 
+  	me.page_len = flt(this.value);
   }
-  select_register[select_register.length] = s;
   this.page_len_sel = s;
 
   var c1 = $td(ht,0,1);
@@ -169,23 +166,27 @@ DataTable.prototype.make_toolbar = function(parent) {
 
 }
 
-
-DataTable.prototype.set_desc = function() {
+_r.DataTable.prototype.set_desc = function() {
 	this.sort_icon.src = 'images/icons/arrow_down.png'; this.sort_order='DESC';
 }
-DataTable.prototype.set_asc = function(icon) {
+_r.DataTable.prototype.set_asc = function(icon) {
 	this.sort_icon.src = 'images/icons/arrow_up.png'; this.sort_order='ASC'; 
 }
 
 ////
 
-DataTable.prototype.add_sort_option = function(label, val) {
+_r.DataTable.prototype.add_sort_option = function(label, val) {
+  if(!this.sort_labels[this.dt]) this.sort_labels[this.dt] = {};
+  
+  this.sort_labels[this.dt][label] = val;
+	
   var s = this.sort_sel;
-  s.options[s.options.length] = 
-	 new Option(label, val, false, s.options.length==0?true:false);
+  s.append(label);
+  if(!s.inp.value) s.inp.value = label;
+  
 }
 
-DataTable.prototype.update_query = function(no_limit) { 
+_r.DataTable.prototype.update_query = function(no_limit) { 
 
   // add sorting
   if(this.search_criteria && this.search_criteria.custom_query) {
@@ -193,7 +194,7 @@ DataTable.prototype.update_query = function(no_limit) {
   	// no sorting
   } else {
 	  this.query += NEWLINE 
-             + ' ORDER BY ' + sel_val(this.sort_sel)
+             + ' ORDER BY ' + this.sort_labels[this.dt][sel_val(this.sort_sel)]
              + ' ' + this.sort_order;
   }
   
@@ -206,23 +207,23 @@ DataTable.prototype.update_query = function(no_limit) {
 
 }
 
-DataTable.prototype._get_query = function(no_limit) {
+_r.DataTable.prototype._get_query = function(no_limit) {
 	$dh(this.no_data_tag);
 	this.show_query = 0;
   	if(this.make_query)this.make_query();
 	this.update_query(no_limit);
 }
 
-DataTable.prototype.run = function() {
+_r.DataTable.prototype.run = function() {
   if(this.validate && !this.validate())
     return;
 
-  if(search_page.cur_finder) {
-  	if(search_page.cur_finder.large_report == 1) {
+  if(_r.rb_con.cur_rb) {
+  	if(_r.rb_con.cur_rb.large_report == 1) {
   	  msgprint("This is a very large report and cannot be shown in the browser as it is likely to make your browser very slow.<br><br>Please click on 'Export' to open in a spreadsheet");
   	  return;
   	}
-  	search_page.cur_finder.mytabs.tabs['Result'].show();
+  	_r.rb_con.cur_rb.mytabs.tabs['Result'].show();
   }
   
   var me = this;
@@ -240,21 +241,20 @@ DataTable.prototype.run = function() {
   
   var args = { 
 			'query':me.query,
-			'report_name': 'DataTable', 
+			'report_name': '_r.DataTable', 
 			'show_deleted':1,
 			'sc_id':me.search_criteria ? me.search_criteria.name : '',
 			'filter_values':me.filter_vals ? docstring(me.filter_vals) : '',
-			'defaults':pack_defaults(),
 			'roles':'["'+user_roles.join('","')+'"]'
 		}
 
   if(this.is_simple) args.is_simple = 1;
 
-  $c('runquery', args, function(r,rt) {  $dh(me.fetching_tag); me.show_result(r,rt); });
+  $c('webnotes.widgets.query_builder.runquery', args, function(r,rt) {  $dh(me.fetching_tag); me.show_result(r,rt); });
   
 }
 
-DataTable.prototype.clear_all = function() {
+_r.DataTable.prototype.clear_all = function() {
 	// clear old
 	if(this.htab && this.htab.parentNode) {
 		this.htab.parentNode.removeChild(this.htab); delete this.htab; }
@@ -265,12 +265,12 @@ DataTable.prototype.clear_all = function() {
 	if(this.finder)this.finder.clear_graph();
 }
 
-DataTable.prototype.has_data = function() {
+_r.DataTable.prototype.has_data = function() {
 	if(this.htab && this.htab.rows.length)return 1;
 	else return 0;
 }
 
-DataTable.prototype.show_result = function(r, rt) {
+_r.DataTable.prototype.show_result = function(r, rt) {
 	// clear old
 	var me = this;
 	this.clear_all();
@@ -343,7 +343,7 @@ DataTable.prototype.show_result = function(r, rt) {
 	if(this.aftertableprint) this.aftertableprint(this.tab);
 }
 
-DataTable.prototype.get_col_width = function(i) {
+_r.DataTable.prototype.get_col_width = function(i) {
 	if(this.colwidths 
 		&& this.colwidths.length 
 			&& this.colwidths[i])
@@ -351,7 +351,7 @@ DataTable.prototype.get_col_width = function(i) {
 	else return '100px';
 }
 
-DataTable.prototype.make_head_tab = function(colnames) {
+_r.DataTable.prototype.make_head_tab = function(colnames) {
 	var r0 = this.htab.insertRow(0);
 	if(this.has_index) {
 		var c0 = r0.insertCell(0);
@@ -375,7 +375,7 @@ DataTable.prototype.make_head_tab = function(colnames) {
 	$w(this.tab, this.total_width + 'px');
 }
 
-DataTable.prototype.make_data_cell = function(ri, ci, val) {
+_r.DataTable.prototype.make_data_cell = function(ri, ci, val) {
   var row = this.tab.rows[ri];
   var c = row.insertCell(row.cells.length);
   
@@ -399,7 +399,7 @@ DataTable.prototype.make_data_cell = function(ri, ci, val) {
   $s(c.div, val, this.coltypes[ci], this.coloptions[ci])
 }
 
-DataTable.prototype.do_print = function() {
+_r.DataTable.prototype.do_print = function() {
 	this._get_query(true);  
 	
 	args = {
@@ -420,7 +420,7 @@ DataTable.prototype.do_print = function() {
 
 }
 
-DataTable.prototype.do_export = function() {
+_r.DataTable.prototype.do_export = function() {
 	this._get_query(true);
 
 	var me = this;
@@ -431,11 +431,11 @@ DataTable.prototype.do_export = function() {
 
 // Calculator 
 // ----------
-DataTable.prototype.do_calc = function() {
+_r.DataTable.prototype.do_calc = function() {
 	show_calc(this.tab, this.colnames, this.coltypes, 1);
 }
 
-DataTable.prototype.get_col_data = function(colname) {
+_r.DataTable.prototype.get_col_data = function(colname) {
 	var ci = 0;
 	if(!this.htab) return [];
     for(var i=1;i<this.htab.rows[0].cells.length;i++) {
@@ -453,7 +453,7 @@ DataTable.prototype.get_col_data = function(colname) {
 	return ret;
 }
 
-DataTable.prototype.get_html = function() {
+_r.DataTable.prototype.get_html = function() {
 	var w = document.createElement('div');
 	w = $a(w, 'div');
 	w.style.marginTop = '16px';

@@ -388,7 +388,9 @@ AutoSuggest.prototype.createList = function(arr) {
 		}
 	} else
 		this.iHigh = 0;
-	this.changeHighlight(40); // hilight first
+		
+	if(!this.iHigh)
+		this.changeHighlight(40); // hilight first
 	
 	// remove list after an interval
 	//

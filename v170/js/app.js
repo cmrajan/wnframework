@@ -1,5 +1,9 @@
 // App.js
 
+// constants
+var NEWLINE = '\n';
+
+// user
 var profile;
 var page_body;
 var session = {};
@@ -44,6 +48,7 @@ var widget_files = {
 	'ReportBuilder':'report_builder/report_builder.js'
 	,'_f.FrmContainer':'form.compressed.js'
 	,'_c.CalendarPopup':'widgets/form/date_picker.js'
+	,'_r.ReportContainer':'report.compressed.js'
 }
 
 // API globals

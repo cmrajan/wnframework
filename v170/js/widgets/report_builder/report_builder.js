@@ -1,8 +1,6 @@
 
-/// Report Page
-var ReportBuilder;
 
-function ReportContainer() {
+_r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
 	
 	
@@ -11,7 +9,7 @@ function ReportContainer() {
 
 	// tool bar
 
-	var div = $a(this.wrapper, 'div','',{margin:'0px 8px'});
+	var div = $a(this.wrapper, 'div');
 	var htab = make_table($a(div,'div','',{padding:'4px', backgroundColor:'#DDD'}), 1,2, '100%', ['80%','20%']);
 	
 	this.main_title = $a($td(htab,0,0),'h2','',{margin: '0px 4px', display:'inline'});
@@ -80,15 +78,15 @@ function ReportContainer() {
 		if(me.rb_dict[dt]){
 			me.rb_dict[dt].show(my_onload);
 		} else {
-			me.rb_dict[dt] = new ReportBuilder(me.rb_area, dt, my_onload);
+			me.rb_dict[dt] = new _r.ReportBuilder(me.rb_area, dt, my_onload);
 		}
 
 	}
 }
 
-var FILTER_SEP = '\1';
+_r.FILTER_SEP = '\1';
 
-function ReportBuilder(parent, doctype, onload) {
+_r.ReportBuilder = function(parent, doctype, onload) {
 	this.menuitems = {};
 	this.has_primary_filters = false;
 	this.doctype = doctype;
@@ -112,7 +110,7 @@ function ReportBuilder(parent, doctype, onload) {
 	this.make_save_criteria();
 }
 
-ReportBuilder.prototype.make_tabs = function() {
+_r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
 	this.mytabs = new TabbedPage(this.tab_wrapper);
 	this.mytabs.body_area.className = 'finder_body_area';
@@ -125,9 +123,9 @@ ReportBuilder.prototype.make_tabs = function() {
 	$dh(this.mytabs.tabs['Graph']);
 }
 
-ReportBuilder.prototype.make_body = function() {
+_r.ReportBuilder.prototype.make_body = function() {
 
-	search_page.main_title.innerHTML = this.doctype;
+	_r.rb_con.main_title.innerHTML = this.doctype;
 	this.mytabs.tabs['Result'].show();
 
 	var me = this;
@@ -145,7 +143,7 @@ ReportBuilder.prototype.make_body = function() {
 // Graph
 // -----
 
-ReportBuilder.prototype.make_graph = function() {
+_r.ReportBuilder.prototype.make_graph = function() {
 	var me = this;
 	this.graph_area = $a(this.mytabs.tabs['Graph'].tab_body, 'div', '');
 	this.mytabs.tabs['Graph'].onshow = function() {
@@ -153,12 +151,12 @@ ReportBuilder.prototype.make_graph = function() {
 	}
 }
 
-ReportBuilder.prototype.clear_graph = function() { 
+_r.ReportBuilder.prototype.clear_graph = function() { 
 	if(this.graph_div)$dh(this.graph_div);
 	this.graph_clear = 1; 
 }
 
-ReportBuilder.prototype.show_graph = function() {
+_r.ReportBuilder.prototype.show_graph = function() {
 	var me = this;
 	
 	if(isIE) {
@@ -259,7 +257,7 @@ ReportBuilder.prototype.show_graph = function() {
 // Saving of criteria
 // ------------------
 
-ReportBuilder.prototype.make_save_criteria = function() {
+_r.ReportBuilder.prototype.make_save_criteria = function() {
 	var me = this;
 	
 	// make_list
@@ -278,7 +276,7 @@ ReportBuilder.prototype.make_save_criteria = function() {
 // Save Criteria
 // -------------
 
-ReportBuilder.prototype.save_criteria = function(save_as) {
+_r.ReportBuilder.prototype.save_criteria = function(save_as) {
 	var overwrite = 0;
 	// is loaded?
 	if(this.current_loaded && (!save_as)) {
@@ -345,7 +343,7 @@ ReportBuilder.prototype.save_criteria = function(save_as) {
 	}
 }
 
-ReportBuilder.prototype.hide_all_filters = function() {
+_r.ReportBuilder.prototype.hide_all_filters = function() {
 	for(var i=0; i<this.filter_fields.length; i++) {
 		this.filter_fields[i].df.filter_hide = 1;
 	}
@@ -353,7 +351,7 @@ ReportBuilder.prototype.hide_all_filters = function() {
 
 // Load Criteria
 // -------------
-ReportBuilder.prototype.clear_criteria = function() {
+_r.ReportBuilder.prototype.clear_criteria = function() {
 	// clear all fields
 	// ----------------
 		
@@ -375,7 +373,7 @@ ReportBuilder.prototype.clear_criteria = function() {
 	
 	this.set_sort_options();
 	
-	search_page.main_title.innerHTML = this.doctype;
+	this.main_title.innerHTML = this.doctype;
 
 	// clear graph
 	// -----------
@@ -391,18 +389,18 @@ ReportBuilder.prototype.clear_criteria = function() {
 	this.refresh_filters();	
 }
 
-ReportBuilder.prototype.select_column = function(dt, label, value) {
+_r.ReportBuilder.prototype.select_column = function(dt, label, value) {
 	if(value==null)value = 1;
 	if(this.report_fields_dict[dt+'\1'+ label])
 		this.report_fields_dict[dt+'\1'+ label].checked = value;
 }
 
-ReportBuilder.prototype.set_filter = function(dt, label, value) {
+_r.ReportBuilder.prototype.set_filter = function(dt, label, value) {
 	if(this.filter_fields_dict[dt+'\1'+ label])
 		this.filter_fields_dict[dt+'\1'+ label].set_input(value);
 }
 
-ReportBuilder.prototype.load_criteria = function(criteria_name) {
+_r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	this.clear_criteria();	
 	
 	if(!this.sc_dict[criteria_name]) {
@@ -444,9 +442,9 @@ ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	this.set_criteria_sel(criteria_name);
 }
 
-ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
+_r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	// load additional fields sort option
-	search_page.main_title.innerHTML = criteria_name;
+	this.main_title.innerHTML = criteria_name;
 	
 	var sc = locals['Search Criteria'][this.sc_dict[criteria_name]];
 	if(sc && sc.add_col)
@@ -478,7 +476,7 @@ ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 // Create the filter UI and column selection UI
 // --------------------------------------------
 
-ReportBuilder.prototype.setup_filters = function() {
+_r.ReportBuilder.prototype.setup_filters = function() {
 
 	function can_dt_be_submitted(dt) {
 		var plist = getchildren('DocPerm', dt, 'permissions', 'DocType');
@@ -557,7 +555,7 @@ ReportBuilder.prototype.setup_filters = function() {
 	$ds(me.body);
 }
 
-ReportBuilder.prototype.refresh_filters = function() {
+_r.ReportBuilder.prototype.refresh_filters = function() {
 	// called after customization
 	for(var i=0; i<this.filter_fields.length; i++) {
 		var f = this.filter_fields[i];
@@ -585,7 +583,7 @@ ReportBuilder.prototype.refresh_filters = function() {
 	}
 }
 
-ReportBuilder.prototype.add_filter = function(f) {
+_r.ReportBuilder.prototype.add_filter = function(f) {
 	if(this.filter_fields_dict[f.parent + '\1' + f.label]) {
 		// exists
 		this.filter_fields_dict[f.parent + '\1' + f.label].df = f; // reset properties
@@ -595,13 +593,13 @@ ReportBuilder.prototype.add_filter = function(f) {
 	}
 }
 
-ReportBuilder.prototype.add_field = function(f, dt, in_primary) {
+_r.ReportBuilder.prototype.add_field = function(f, dt, in_primary) {
 	var me = this;
 	
 	// make a field object
 	var add_field = function(f, dt, parent) {
 		var tmp = make_field(f, dt, parent, me, false);
-		tmp.in_filter = true;
+		tmp.not_in_form = true;
 		tmp.refresh();
 		me.filter_fields[me.filter_fields.length] = tmp;
 		me.filter_fields_dict[f.parent + '\1' + f.label] = tmp;
@@ -680,10 +678,11 @@ ReportBuilder.prototype.add_field = function(f, dt, in_primary) {
 	
 }
 
-ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
+_r.ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 	var me = this; 
 	
-	if(search_page.sel)search_page.sel.value = dt;
+	if(page_body.wntoolbar && page_body.wntoolbar.rb_sel)
+		page_body.wntoolbar.rb_sel.value = dt;
 
 	var t1 = $a($a(me.builder_area,'div'), 'table', 'builder_tab');
 
@@ -752,7 +751,7 @@ ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 	me.set_sort_options();
 }
 
-ReportBuilder.prototype.set_sort_options = function(l) {
+_r.ReportBuilder.prototype.set_sort_options = function(l) {
 	var sl = this.orig_sort_list;
 	
 	empty_select(this.dt.sort_sel);
@@ -764,15 +763,13 @@ ReportBuilder.prototype.set_sort_options = function(l) {
 }
 
 
-ReportBuilder.prototype.make_filters = function(onload) {
+_r.ReportBuilder.prototype.make_filters = function(onload) {
 	// load doctype
 	var me = this;
 	
 	if(!locals['DocType'][this.doctype]) {
-		freeze('Loading Report...');
-		$c('getdoctype', args = {'doctype': this.doctype, 'with_parent':1 }, 
+		$c('webnotes.widgets.form.getdoctype', args = {'doctype': this.doctype, 'with_parent':1 }, 
 			function(r,rt) { 
-				unfreeze();
 				if(r.parent_dt)me.parent_dt = r.parent_dt;
 				me.setup_filters();
 				if(onload)onload(me);
@@ -793,7 +790,7 @@ ReportBuilder.prototype.make_filters = function(onload) {
 // Make the SQL query
 // ------------------
 
-ReportBuilder.prototype.make_datatable = function() {
+_r.ReportBuilder.prototype.make_datatable = function() {
 	var me = this;
 	
 	this.dt_area = $a(this.mytabs.tabs['Result'].tab_body, 'div', 'finder_dt_area');
@@ -823,7 +820,7 @@ ReportBuilder.prototype.make_datatable = function() {
 	this.show_query.checked = false;
 
 	
-	this.dt = new DataTable(this.dt_area, '');
+	this.dt = new _r.DataTable(this.dt_area, '');
 	this.dt.finder = this;
 	this.dt.make_query = function() {
 		// attach report script functions

@@ -62,9 +62,11 @@ Field.prototype.get_status = function() {
 	if(this.not_in_form) {
 		return 'Write';
 	}
-	
+		
 	var fn = this.df.fieldname?this.df.fieldname:this.df.label;
 	this.df = get_field(this.doctype, fn, this.docname);
+
+	if(!this.df.permlevel) this.df.permlevel = 0;
 
 	var p = this.perm[this.df.permlevel];
 	var ret;

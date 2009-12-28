@@ -2,25 +2,41 @@
 // -------------------------------------------------------------------------------
 
 function loadreport(dt, rep_name, onload, menuitem) {
-	var cb2 = function() { _loadreport(dt, rep_name, onload, menuitem); }
-
-	if(Finder) { cb2(); }
-	else loadscript('js/widgets/report_table.js', cb2);
-}
-function _loadreport(dt, rep_name, onload, menuitem) {
-	search_page.set_dt(dt, function(finder) { 
-		if(rep_name) {
-			var t = finder.current_loaded;
-			finder.load_criteria(rep_name);
-			if(onload)onload(finder);
-			if(menuitem) finder.menuitems[rep_name] = menuitem;
-			if((finder.dt) && (!finder.dt.has_data() || finder.current_loaded!=t))finder.dt.run();
-			if(finder.menuitems[rep_name]) finder.menuitems[rep_name].show_selected();
+	var show_report_builder = function(rb_con) {
+		if(!_r.rb_con) {
+			// first load
+			_r.rb_con = rb_con;
 		}
-		nav_obj.open_notify('Report',dt,rep_name);
-	} );
-	if(cur_page!='_search')loadpage('_search');
+		
+		_r.rb_con.set_dt(dt, function(rb) { 
+			if(rep_name) {
+				var t = finder.current_loaded;
+				rb.load_criteria(rep_name);
+
+				// call onload
+				if(onload)
+					onload(rb);
+					
+				// set menu item
+				if(menuitem) rb.menuitems[rep_name] = menuitem;
+
+				// if loaded, then run
+				if((rb.dt) && (!rb.dt.has_data() || rb.current_loaded!=t))
+					rb.dt.run();
+				
+				// high light menu item
+				if(rb.menuitems[rep_name]) 
+					rb.menuitems[rep_name].show_selected();
+			}
+			nav_obj.open_notify('Report',dt,rep_name);
+		} );
+		
+		// show
+		page_body.change_to('Report Builder');
+	}
+	new_widget('_r.ReportContainer', show_report_builder, 1);
 }
+
 
 // Load Doc
 // -------------------------------------------------------------------------------

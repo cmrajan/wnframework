@@ -40,6 +40,10 @@ def load_comments(dt, dn):
 
 #===========================================================================================
 
+def get_parent_dt(dt):
+	parent_dt = webnotes.conn.sql('select parent from tabDocField where fieldtype="Table" and options="%s" and (parent not like "old_parent:%%") limit 1' % dt)
+	return parent_dt and parent_dt[0][0] or ''
+
 def getdoctype():
 	# load parent doctype too
 	from webnotes.model.doctype import get
@@ -51,7 +55,7 @@ def getdoctype():
 
 	# with parent (called from report builder)
 	if with_parent:
-		parent_dt = self.get_parent_dt()
+		parent_dt = get_parent_dt(dt)
 		if parent_dt:
 			doclist = get(parent_dt)
 			webnotes.response['parent_dt'] = parent_dt

@@ -49,11 +49,11 @@ out_file_form = 'form.compressed.js';
 
 in_files_report = [
 	'widgets/report_builder/bargraph.js'
-	'widgets/report_builder/report_builder.js'
-	'widgets/report_builder/datatable.js'
+	,'widgets/report_builder/report_builder.js'
+	,'widgets/report_builder/datatable.js'
 ]
 
-out_file_report = 'report_builder.compressed.js'
+out_file_report = 'report.compressed.js'
 
 #in_files_main += in_files_form
 

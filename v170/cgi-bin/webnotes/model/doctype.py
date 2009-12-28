@@ -18,6 +18,7 @@ class _DocType:
 		return modified, is_modified, cache_modified	
 
 	def get_parent_dt(self):
+		# really required??? --- check
 		parent_dt = sql('select parent from tabDocField where fieldtype="Table" and options="%s" and (parent not like "old_parent:%%") limit 1' % self.name)
 		return parent_dt and parent_dt[0][0] or ''
 
