@@ -74,15 +74,12 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 	<div id="dialog_message"></div>
 </div>
 
-<div id="caldiv"></div>
-
 <div id="floating_message">
 	<table><tr>
 	<td id="fm_content"></div>
 	<td id="fm_cancel" class="link_type">Cancel</td>
 	</tr></table>
 </div>
-
 </body>
 </html>
 '''

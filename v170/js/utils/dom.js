@@ -244,10 +244,10 @@ function objpos(obj){
   while (obj){ 
   	acc_lefts += obj.offsetLeft; acc_tops += obj.offsetTop;
 
-	if(isIE) {
-	    if (obj!= window.document.body){
-    		acc_tops -= obj.scrollTop; acc_lefts -= obj.scrollLeft;
-    	}
+	/*if(isIE) {
+	    //if (obj!= window.document.body){
+    	//	acc_tops -= obj.scrollTop; acc_lefts -= obj.scrollLeft;
+    	//}
     } else { // only for ff
 	    var op = obj.offsetParent
 	    var scr_obj = obj;
@@ -257,7 +257,7 @@ function objpos(obj){
 		    acc_lefts -= scr_obj.scrollLeft;
 			scr_obj = scr_obj.parentNode;
 		}
-	}
+	}*/
 	obj = obj.offsetParent;
   }
   co.x=acc_lefts, co.y=acc_tops; return co;

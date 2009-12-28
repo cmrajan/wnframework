@@ -16,6 +16,9 @@ var selector;
 var keypress_observers = [];
 var click_observers = [];
 
+// ***** TEMP ********
+var user_fmt = 'dd-MM-yyyy';
+
 // ui
 var top_index=91;
 
@@ -33,6 +36,15 @@ var _e = {};
 
 // report buidler
 var _r = {};
+
+// calendar 
+var _c = {};
+
+var widget_files = {
+	'ReportBuilder':'report_builder/report_builder.js'
+	,'_f.FrmContainer':'form.compressed.js'
+	,'_c.CalendarPopup':'widgets/form/date_picker.js'
+}
 
 // API globals
 var frms={};
@@ -87,7 +99,6 @@ function startup() {
 	}
 	
 	var setup_history = function(r) {
-	
 		rename_observers.push(nav_obj);
 	}
 	

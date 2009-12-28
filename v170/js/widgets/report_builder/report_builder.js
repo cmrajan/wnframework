@@ -2,13 +2,16 @@
 /// Report Page
 var ReportBuilder;
 
-function ReportPage(parent) {
+function ReportContainer() {
+	this.wrapper = page_body.add_page("Report Builder", function() { });
+	
+	
 	var me = this;
-	this.finders = {};
+	this.rb_dict = {};
 
 	// tool bar
 
-	var div = $a(parent, 'div','',{margin:'0px 8px'});
+	var div = $a(this.wrapper, 'div','',{margin:'0px 8px'});
 	var htab = make_table($a(div,'div','',{padding:'4px', backgroundColor:'#DDD'}), 1,2, '100%', ['80%','20%']);
 	
 	this.main_title = $a($td(htab,0,0),'h2','',{margin: '0px 4px', display:'inline'});
@@ -33,18 +36,18 @@ function ReportPage(parent) {
 		// save
 		var savebtn = $a(this.button_area2,'span','link_type',{marginRight:'8px'});
 		savebtn.innerHTML = 'Save';
-		savebtn.onclick = function() {if(me.cur_finder) me.cur_finder.save_criteria(); };
+		savebtn.onclick = function() {if(me.cur_rb) me.cur_rb.save_criteria(); };
 		
 		// advanced
 		var advancedbtn = $a(this.button_area2,'span','link_type');
 		advancedbtn.innerHTML = 'Advanced';
 		advancedbtn.onclick = function() { 
-			if(me.cur_finder) {
-				if(!me.cur_finder.current_loaded) {
+			if(me.cur_rb) {
+				if(!me.cur_rb.current_loaded) {
 					msgprint("error:You must save the report before you can set Advanced features");
 					return;
 				}
-				loaddoc('Search Criteria', me.cur_finder.sc_dict[me.cur_finder.current_loaded]);
+				loaddoc('Search Criteria', me.cur_rb.sc_dict[me.cur_rb.current_loaded]);
 			}
 		};
 	}
@@ -52,32 +55,32 @@ function ReportPage(parent) {
 	// buttons
 	var runbtn = $a(this.button_area, 'button');
 	runbtn.innerHTML = 'Run'.bold();
-	runbtn.onclick = function() { if(me.cur_finder){
-		me.cur_finder.dt.start_rec = 1;
-		me.cur_finder.dt.run();} 
+	runbtn.onclick = function() { if(me.cur_rb){
+		me.cur_rb.dt.start_rec = 1;
+		me.cur_rb.dt.run();} 
 	}
 	$dh(this.button_area);
 	
-	this.finder_area = $a(parent, 'div');
+	this.rb_area = $a(this.wrapper, 'div');
 
 	// set a type
 	this.set_dt = function(dt, onload) {
 		// show finder
 		$dh(me.home_area);
-		$ds(me.finder_area);
+		$ds(me.rb_area);
 		$ds(me.button_area);
 		my_onload = function(f) {
-			me.cur_finder = f;
-			me.cur_finder.mytabs.tabs['Result'].show();
+			me.cur_rb = f;
+			me.cur_rb.mytabs.tabs['Result'].show();
 			if(onload)onload(f);
 		}
 	
-		if(me.cur_finder)
-			me.cur_finder.hide();
-		if(me.finders[dt]){
-			me.finders[dt].show(my_onload);
+		if(me.cur_rb)
+			me.cur_rb.hide();
+		if(me.rb_dict[dt]){
+			me.rb_dict[dt].show(my_onload);
 		} else {
-			me.finders[dt] = new ReportBuilder(me.finder_area, dt, my_onload);
+			me.rb_dict[dt] = new ReportBuilder(me.rb_area, dt, my_onload);
 		}
 
 	}
@@ -650,14 +653,14 @@ ReportBuilder.prototype.add_field = function(f, dt, in_primary) {
 
 		var my_div = $a(cell,'div','',{});
 	
-		// from date
+		// from value
 		var f1 = copy_dict(f);
 		f1.label = f1.label + ' >=';
 		var tmp1 = add_field(f1, dt, my_div);
 		tmp1.sql_condition = '>=';
 		tmp1.bound = 'lower';
 
-		// to date
+		// to value
 		var f2 = copy_dict(f);
 		f2.label = f2.label + ' <=';
 		var tmp2 = add_field(f2, dt, my_div);

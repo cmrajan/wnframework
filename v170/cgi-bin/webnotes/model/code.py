@@ -5,6 +5,10 @@ from webnotes.utils import *
 from webnotes.model.doc import *
 from webnotes.model.doclist import getlist
 from webnotes.model.db_schema import updatedb
+
+set = webnotes.conn.set
+sql = webnotes.conn.sql
+get_value = webnotes.conn.get_value
 	
 def execute(code, doc=None, doclist=[]):
 	# execute it

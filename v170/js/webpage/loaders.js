@@ -35,10 +35,10 @@ function loaddoc(doctype, name, onload, menuitem) {
 		return;
 	}
 
-	var show_form = function() {
+	var show_form = function(f) {
 		// load the frm container
-		if(!_f.frm_con) {
-			_f.frm_con = new _f.FrmContainer();
+		if(!_f.frm_con && f) {
+			_f.frm_con = f; //new _f.FrmContainer();
 		}		
 		
 		// case A - frm not loaded
@@ -81,13 +81,9 @@ function loaddoc(doctype, name, onload, menuitem) {
 			msgprint('error:There where errors while loading ' + doctype + ',' + name);
 		}
 	}
-	
-	// is libary loaded?
-	if(_f.FrmContainer) {
-		show_form();
-	} else {
-		$c_js('form.compressed.js', show_form)
-	}
+		
+	//// is libary loaded?
+	new_widget('_f.FrmContainer', show_form, 1);
 }
 
 
@@ -133,12 +129,7 @@ function new_doc(doctype, onload) {
 		
 	}
 
-	// is libary loaded?
-	if(_f.FrmContainer) {
-		show_form();
-	} else {
-		$c_js('form.compressed.js', show_form);
-	}
+	new_widget('_f.FrmContainer', show_form, 1);
 }
 var newdoc = new_doc;
 

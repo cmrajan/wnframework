@@ -14,7 +14,6 @@ in_files_main = [
        ,'widgets/autosuggest.js'
        ,'widgets/select.js'
        ,'widgets/form/fields.js'
-       ,'widgets/form/date_picker.js'
        ,'webpage/wntoolbar.js'
        ,'webpage/history.js'
        ,'webpage/search.js'
@@ -47,6 +46,14 @@ in_files_form = [
 ]
 
 out_file_form = 'form.compressed.js';
+
+in_files_report = [
+	'widgets/report_builder/bargraph.js'
+	'widgets/report_builder/report_builder.js'
+	'widgets/report_builder/datatable.js'
+]
+
+out_file_report = 'report_builder.compressed.js'
 
 #in_files_main += in_files_form
 

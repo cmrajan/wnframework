@@ -528,17 +528,17 @@ _f.Frm.prototype.refresh = function(no_script) {
 			this.set_heading();
 		}
 
+		// refresh fields		
 		this.refresh_tabs();
 		this.refresh_fields();
 		this.refresh_dependency();
+		if(this.meta.allow_attach) this.refresh_attachments();
 
+		// layout
 		if(this.layout) this.layout.show();
 
-		if(this.meta.allow_attach) this.refresh_attachments();
-		
-		// in the end, show
+		// show the record
 		if(!this.display) this.show(this.docname, 1);
-		
 	} 
 	//set_frame_dims();
 }

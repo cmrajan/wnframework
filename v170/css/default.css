@@ -80,94 +80,12 @@ div.no_script {
 	top: 2px;
 }
 
-#user_div {
-	position: absolute;
-	right: 240px;
-	padding: 2px 10px 2px 2px;
-	top: 2px;
-	text-align: right;
-}
-
-#testing_div {
-	position: absolute;
-	right: 360px;
-	padding: 2px 10px 2px 2px;
-	color: RED;
-	top: 15px;
-	display: none;
-}
-
-.logout_link { font-size: 11px; }
-#user_id { margin-right: 4px; font-size: 11px; }
-
-.about_link {
-	position: absolute;
-	top: 2px;
-	width: 80px;
-	height: 20px;
-	left: 8px;
-	font-size:11px;
-	background:url('../images/ui/webnotes20x80-1.gif') no-repeat;
-	cursor:pointer;
-}
-
-div#qsearch_sel, div#qsearch_btn {
-	position: absolute;
-	height: 22px;
-	right: 108px;
-	padding: 2px;
-	text-align: right;
-}
-
-div#qsearch_sel {
-	top: 1px;
-}
-
-div#qsearch_btn {
-	top: 1px;
-	right: 50px;
-	padding: 1px;
-}
-div#qsearch_btn button {
-	font-size: 11px;
-	margin: 0px;
-	width: 56px;
-}
-div#qsearch_sel select {
-	font-size: 11px;
-	margin: 0px;
-	width: 100px;
-}
-
-select#form_newsel {
-	width: 140px;
-}
-
-div.top_bar {
-	border-bottom: 1px solid #CCC;
-	height: 24px;
-	background-color: #FFF;
-}
-
-div#footer_div {
-}
-
-div.footer_wrapper { padding: 24px; }
-div.footer_wrapper { font-size: 11px; }
-div.footer_wrapper table { table-layout: fixed; }
-div.footer_wrapper td { padding-bottom: 4px; }
 
 div#head_div { background-color: #FFF; }
 
 #head_banner { background-color: #FFF; }
 
-div#topmenu_div {
-	position: absolute;
-	top: 1px;
-	left: 100px;
-	width: 400px;
-	z-index: 30;
-}
+/******** Menus - menu.js ************/
 
 ul.menu_toolbar {
 	z-index: 30;
@@ -216,32 +134,6 @@ div.dd_item {
 	background-color: #FFF;
 }
 div.dd_item_mo { background-color: #FE8; }
-
-#main_div { 
-}
-
-#main_table {
-	width: 100%;
-	border-collapse: collapse;
-	table-layout: fixed;
-}
-
-
-#menu_div {	
-}
-
-#center_div { 
-}
-
-div.center_area { 
-	background-color:#FFF;
-}
-
-div.container_div { display: none; }
-
-div.container_head { }
-
-div.container_body { }
 
 .app_frame {
 	width: 100%;
@@ -381,12 +273,8 @@ div.frm_heading {
 	width: 100%;
 }
 
-
 div.frm_body {
 	/*background-color: #FFF;*/
-}
-
-div.frm_tab_area {
 }
 
 div.frm_tip_box {
@@ -413,68 +301,6 @@ div.dialog_frm {
 	overflow: auto;
 	margin: 10px;
 }
-
-/* ROUND CORER */
-
-div.rcwrapper {
-	position: relative;
-	width: 100%;
-	height: 100%;
-}
-
-div.rctext {
-	padding: 4px 6px;
-}
-
-div.rctl {
-	position:absolute;
-	top: 0px;
-	left: 0px;
-	width: 8px;
-	height: 8px;
-	background: url('../images/ui/rc-tl.gif') top left no-repeat;
-}
-
-div.rctr {
-	position:absolute;
-	top: 0px;
-	right: 0px;
-	width: 8px;
-	height: 8px;
-	background: url('../images/ui/rc-tr.gif') top right no-repeat;
-}
-
-div.rcbl {
-	position:absolute;
-	left: 0px;
-	bottom: 0px;
-	width: 8px;
-	height: 8px;
-	background: url('../images/ui/rc-bl.gif') bottom left no-repeat;
-}
-
-div.rcbr {
-	position:absolute;
-	bottom: 0px;
-	right: 0px;
-	width: 8px;
-	height: 8px;
-	background: url('../images/ui/rc-br.gif') bottom right no-repeat;
-}
-
-/* MAIN */
-
-#main_tab {
-	border-collapse: collapse;
-}
-
-
-#menu_area {
-}
-
-/* PAGING */
-
-
 
 /* TABS */
 
@@ -619,46 +445,6 @@ div.attach_area table {
 	margin-right: 3px;
 }
 
-.btn_disabled {
-	/*border: 1px solid #CDCDCD;*/
-	color: #999;
-	/*font-weight: bold;*/
-	margin: 2px;
-	/*background: url('../images/ui/btn-back.gif') top repeat-x;	*/
-}
-
-.spacer4 { height: 4px; }
-.spacer8 { height: 8px; }
-.spacer12 { height: 12px; }
-
-/* HOME */
-
-.msg_text {
-	padding: 10px 16px 4px 4px;
-	color: #444;
-}
-.msg_footer {
-	color: #888;
-	padding: 0px 16px 4px 20px;
-	border-bottom: 1px solid #ABABAB;
-}
-
-#menutree {
-	overflow: hidden;
-}
-
-/* Dashboard */
-
-td.page_head {
-	width: 50%; background-color: #DDD; font-size: 14px; font-weight: bold;
-	padding: 4px;
-}
-
-.page_head table {
-	border-collapse: collapse;
-}
-
-
 /* Section */
 .sectionHeading {
 	font-size: 18px;
@@ -743,7 +529,6 @@ div.time_field select{
 	position: relative;
 	overflow: auto;
 	border: 1px solid #AAA;
-	height: 80px;
 	width: 100%;
 	margin-bottom: 8px;
 	background-color: #fff;	
@@ -1335,7 +1120,7 @@ A.cpTodayText { color:black; }
 .cpTodayTextDisabled { color:#D0D0D0; }
 .cpBorder { border:solid thin #808080; width: 144px; }
 
-#caldiv {
+.caldiv {
 	position:absolute;
 	visibility:hidden;
 	background-color:white;

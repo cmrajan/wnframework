@@ -13,6 +13,7 @@ _f.Grid.prototype.init = function(parent, row_height) {
 	} else {
 		this.make_ui_simple(parent);
 	}
+		
 	// Sr No
 	this.insert_column('', '', 'Int', 'Sr', '50px', '', [1,0,0]);
 	this.total_width = 50;
@@ -27,8 +28,9 @@ _f.Grid.prototype.make_ui = function(parent) {
 	$td(ht,0,1).style.textAlign = 'right';
 	this.tbar_div = $a($td(ht,0,1), 'div', 'grid_tbarlinks');
 	this.tbar_tab = make_table(this.tbar_div,1,4,'100%',['25%','25%','25%','25%']);	
-	
+			
 	this.wrapper = $a(parent, 'div', 'grid_wrapper');
+
 	$h(this.wrapper, cint(screen.width * 0.5) + 'px');
 
 	this.head_wrapper = $a(this.wrapper, 'div', 'grid_head_wrapper');
@@ -63,11 +65,11 @@ _f.Grid.prototype.make_ui_simple = function(parent) {
 	this.tab_wrapper = $a(this.wrapper, 'div','grid_tab_wrapper_simple');	
 	this.tab = $a(this.tab_wrapper, 'table', 'grid_table');
 
-	var me = this;	
+	var me = this;
+	
 }
 
 _f.Grid.prototype.show = function() { 
-	$ds(this.wrapper);
 	if(this.can_add_rows) {
 		if(this.is_scrolltype)$ds(this.tbar_div);
 		else $ds(this.btn_area);
@@ -75,6 +77,7 @@ _f.Grid.prototype.show = function() {
 		if(this.is_scrolltype)$dh(this.tbar_div);
 		else $dh(this.btn_area);
 	}
+	$ds(this.wrapper);
 }
 _f.Grid.prototype.hide = function() { 
 	$dh(this.wrapper); $dh(this.tbar_div); 

@@ -342,14 +342,25 @@ DateField.prototype.make_input = function() {
 	makeinput_popup(this, 'images/icons/calendar.gif');
 	var me = this;
 
-	me.btn.onclick = function() {
-		hide_selects();
-		var user_fmt = me.user_fmt.replace('mm', 'MM');
-		if(!cal)cal = new CalendarPopup('caldiv');
-		cal.select(me.txt, me.txt.getAttribute('id'), user_fmt);
-		if(isIE) {
+	me.show_cal = function(cal) {
+
+		if(cal)_c.cal = cal; // set as global
+		
+		_c.cal.select(me.txt, me.txt.getAttribute('id'), user_fmt);
+		if(isIE && window.event) {
     		window.event.cancelBubble = true;
 	 	   	window.event.returnValue = false;
+		}
+	}
+
+	me.btn.onclick = function() {
+		if(_c.cal_displayed) {
+			// hide if shown
+			_c.cal.hidePopup();	
+		} else {
+			hide_selects();
+			var user_fmt = me.user_fmt.replace('mm', 'MM');
+			new_widget('_c.CalendarPopup', me.show_cal, 1);
 		}
 	}
 	

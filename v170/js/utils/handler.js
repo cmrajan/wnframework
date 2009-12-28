@@ -126,6 +126,68 @@ function $c_js(fn, callback) {
 	req.send(makeArgString({filename:fn})); 
 }
 
+var load_queue = {};
+var currently_loading = {};
+var widgets = {};
+var single_widgets = {};
+
+// load a widget on demand
+// --------------------------------------------------------------
+function new_widget(widget, callback, single_type) {
+	var namespace = '';
+	var widget_name = widget;
+	
+	if(widget.search(/\./) != -1) {
+		namespace = widget.split('.')[0];
+		widget_name = widget.split('.')[1];
+	}
+
+	var widget_loaded = function() {		
+		currently_loading[widget] = 0;
+		for(var i in load_queue[widget]) {
+			// callback
+			load_queue[widget][i](create_widget());
+		}
+
+		// clear the queue
+		load_queue[widget] = [];
+	}
+
+	var create_widget = function() {
+		if(single_type && single_widgets[widget_name]) 
+			return null;
+		
+		if(namespace)
+			var w = new window[namespace][widget_name]();
+		else
+			var w = new window[widget_name]();
+		
+		// add to singles
+		if(single_type) 
+			single_widgets[widget_name] = w;
+			
+		return w;
+	}
+	
+	if(namespace ? window[namespace][widget_name] : window[widget_name]) {
+		// loaded?
+		callback(create_widget());
+	} else {
+
+		// loading in process
+		if(!load_queue[widget]) load_queue[widget] = [];
+		load_queue[widget].push(callback);
+		
+		// load only if not currently loading
+		if(!currently_loading[widget]) {
+			$c_js(widget_files[widget], widget_loaded);
+		}
+
+		// flag it as loading
+		currently_loading[widget] = 1;	
+	}
+}
+
 function makeArgString(dict) {
 	var varList = [];
 
