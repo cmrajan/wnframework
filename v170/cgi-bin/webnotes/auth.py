@@ -53,7 +53,7 @@ class Authentication:
 		if (form.getvalue('cmd')=='login') or (not self.load_session(self.cookies.get('sid') or self.form.getvalue('sid'))):
 
 			if form.getvalue('acx'):
-				self.set_db(form.getvalue('acx'))
+				self.conn = self.set_db(form.getvalue('acx'))
 				
 			self.login() or self.login(as_guest = True)
 		
