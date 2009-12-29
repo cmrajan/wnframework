@@ -148,7 +148,7 @@ img.src=repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s',{fn:user_img[username],
 if(user_img[username])
 set_it();else
 $c('webnotes.profile.get_user_img',{username:username},function(r,rt){user_img[username]=r.message;set_it();},null,1);}
-var outUrl="cgi-bin/run.cgi";var NULL_CHAR='^\5*';function checkResponse(r,on_timeout,no_spinner,freeze_msg){try{if(r.readyState==4&&r.status==200)return true;else return false;}catch(e){msgprint("error:Request timed out, try again");if(on_timeout)
+var outUrl="index.cgi";var NULL_CHAR='^\5*';function checkResponse(r,on_timeout,no_spinner,freeze_msg){try{if(r.readyState==4&&r.status==200)return true;else return false;}catch(e){msgprint("error:Request timed out, try again");if(on_timeout)
 on_timeout();hide_loading();if(freeze_msg)
 unfreeze();return false;}}
 var pending_req=0;function newHttpReq(){if(!isIE)
@@ -163,8 +163,8 @@ function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){if(doclist.s
 function $c_graph(img,control_dt,method,arg){img.src=outUrl+'?'+makeArgString({cmd:'get_graph',dt:control_dt,method:method,arg:arg});}
 function my_eval(co){var w=window;if(!w.execScript){if(/Gecko/.test(navigator.userAgent)){eval(co,w);}else{eval.call(w,co);}}else{w.execScript(co);}}
 function $c_js(fn,callback){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,function(){},1,null)){if(req.responseText.substr(0,9)=='Not Found'){alert(req.responseText);return;}
-my_eval(req.responseText);callback();}}
-req.onreadystatechange=ret_fn;req.open("POST",'cgi-bin/getjsfile.cgi',true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");req.send(makeArgString({filename:fn}));}
+hide_loading();my_eval(req.responseText);callback();}}
+req.onreadystatechange=ret_fn;req.open("POST",'cgi-bin/getjsfile.cgi',true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");req.send(makeArgString({filename:fn}));set_loading();}
 var load_queue={};var currently_loading={};var widgets={};var single_widgets={};function new_widget(widget,callback,single_type){var namespace='';var widget_name=widget;if(widget.search(/\./)!=-1){namespace=widget.split('.')[0];widget_name=widget.split('.')[1];}
 var widget_loaded=function(){currently_loading[widget]=0;for(var i in load_queue[widget]){load_queue[widget][i](create_widget());}
 load_queue[widget]=[];}

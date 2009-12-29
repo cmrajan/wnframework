@@ -1,6 +1,6 @@
 // My HTTP Request
 
-var outUrl = "cgi-bin/run.cgi";
+var outUrl = "index.cgi";
 var NULL_CHAR = '^\5*';
 
 // check response of HTTP request, only if ready
@@ -114,6 +114,7 @@ function $c_js(fn, callback) {
 				alert(req.responseText);
 				return;	
 			}
+			hide_loading();
 			my_eval(req.responseText);
 			callback();
 		}
@@ -124,6 +125,7 @@ function $c_js(fn, callback) {
 	req.setRequestHeader("ENCTYPE", "multipart/form-data");
 	req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 	req.send(makeArgString({filename:fn})); 
+	set_loading();
 }
 
 var load_queue = {};

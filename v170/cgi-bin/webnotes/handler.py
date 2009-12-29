@@ -1,9 +1,9 @@
-import cgi, Cookie, sys, time, os
+import Cookie, sys, time, os
 import webnotes
 import webnotes.defs
 import webnotes.utils
 
-form = webnotes.form = cgi.FieldStorage()
+form = webnotes.form
 cookies = Cookie.SimpleCookie()
 
 out = webnotes.response
