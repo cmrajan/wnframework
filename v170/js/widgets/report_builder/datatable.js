@@ -57,7 +57,7 @@ _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
   if(!hide_toolbar) this.make_toolbar(parent);
 
   this.wrapper = $a(parent, 'div', 'report_tab');
-  $h(this.wrapper, cint(screen.width * 0.4) + 'px');
+  $h(this.wrapper, cint(screen.height * 0.6) + 'px');
 
   this.wrapper.onscroll = function() {_r.scroll_head(this); }
   
@@ -67,7 +67,7 @@ _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
   this.no_data_tag = $a(this.wrapper, 'div', 'report_no_data');
   this.no_data_tag.innerHTML = 'No Records Found';
 
-  this.fetching_tag = $a(this.wrapper, 'div', '', {height:'120px', background:'url("images/ui/square_loading.gif") center no-repeat', display:'none'});  
+  this.fetching_tag = $a(this.wrapper, 'div', '', {height:'100%', background:'url("images/ui/square_loading.gif") center no-repeat', display:'none'});  
 }
 
 _r.DataTable.prototype.add_icon = function(parent, imgsrc) {

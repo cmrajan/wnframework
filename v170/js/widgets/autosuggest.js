@@ -350,7 +350,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	//
 	
 	var mywid = cint(this.fld.offsetWidth);
-	if(this.fixed_options) {
+	if(this.oP.fixed_options) {
 		mywid += 20;
 	}
 	

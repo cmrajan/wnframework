@@ -77,8 +77,6 @@ _r.ReportContainer = function() {
 			me.cur_rb.hide();
 		if(me.rb_dict[dt]){
 			me.rb_dict[dt].show(my_onload);
-			// reset
-			me.rb_dict[dt].reset_report();
 		} else {
 			me.rb_dict[dt] = new _r.ReportBuilder(me.rb_area, dt, my_onload);
 		}

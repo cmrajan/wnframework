@@ -146,7 +146,7 @@ function WNToolbar(parent) {
 	this.setup_report_builder = function() {
 		this.rb_sel = new SelectWidget($td(this.model_tab, 0, 1), profile.can_get_report);
 		this.rb_sel.inp.value = 'Report Builder...';
-		this.rb_sel.inp.onchange = function() { loadreport(me.rb_sel.inp.value); this.value = 'Report Builder...'; }
+		this.rb_sel.inp.onchange = function() { loadreport(me.rb_sel.inp.value, null, null, 1); this.value = 'Report Builder...'; }
 	}
 
 	// Setup Search

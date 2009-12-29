@@ -43,7 +43,7 @@ def startup():
 	webnotes.response['sysdefaults'] = webnotes.utils.get_defaults()
 	webnotes.response['n_online'] = int(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0] or 0)
 	webnotes.response['docs'] = doclist
-	webnotes.response['home_page'] = home_page
+	webnotes.response['home_page'] = home_page or ''
 	webnotes.response['start_items'] = webnotes.widgets.menus.get_menu_items()
 	webnotes.session['data']['profile'] = webnotes.response['profile']
 

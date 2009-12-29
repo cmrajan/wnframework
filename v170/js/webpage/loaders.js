@@ -1,7 +1,7 @@
 // Load Report
 // -------------------------------------------------------------------------------
 
-function loadreport(dt, rep_name, onload, menuitem) {
+function loadreport(dt, rep_name, onload, menuitem, from_toolbar) {
 	var show_report_builder = function(rb_con) {
 		if(!_r.rb_con) {
 			// first load
@@ -19,6 +19,11 @@ function loadreport(dt, rep_name, onload, menuitem) {
 					
 				// set menu item
 				if(menuitem) rb.menuitems[rep_name] = menuitem;
+
+				// reset if from toolbar
+				if(from_toolbar) {
+					rb.reset_report();
+				}
 
 				// if loaded, then run
 				if((rb.dt) && (!rb.dt.has_data() || rb.current_loaded!=t))
