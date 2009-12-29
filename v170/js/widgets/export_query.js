@@ -1,5 +1,5 @@
 var export_dialog;
-function export_ask_for_max_rows(query, callback) {
+function export_query(query, callback) {
 
 	if(!export_dialog) {
 		var d = new Dialog(400, 300, "Export...");
@@ -41,15 +41,11 @@ function open_url_post(URL, PARAMS) {
 
 function export_csv(q, report_name, sc_id, is_simple, filter_values, colnames) {
 	var args = {}
-	args.cmd = 'runquery_csv';
-	args.__account = account_id;
-	if(__sid150) args.sid150 = __sid150;
+	args.cmd = 'webnotes.widgets.query_builder.runquery_csv';
     if(is_simple) args.simple_query = q; else args.query = q;
     args.sc_id = sc_id ? sc_id : '';
     args.filter_values = filter_values ? filter_values: '';
     if(colnames) args.colnames = colnames.join(',');
 	args.report_name = report_name ? report_name : '';
-	args.defaults = pack_defaults();
-	args.roles = '["'+user_roles.join('","')+'"]';
 	open_url_post(outUrl, args);
 }

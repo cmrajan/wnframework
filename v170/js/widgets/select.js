@@ -12,7 +12,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 		this.body_tab = make_table(this.wrapper, 1, 2, cint(width) + 'px', [(cint(width)-18) + 'px', '18px'],{border:'1px solid #AAA'});
 	
 		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: (cint(width)-20) + 'px', border:'0px', padding:'2px'});
-				
+		
 		this.btn = $a($td(this.body_tab, 0, 1), 'img', '', {cursor:'pointer', margin:'2px'});
 		this.btn.src = 'images/ui/down-arrow.gif';
 		this.btn.onclick = function() {
@@ -21,7 +21,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 				return;
 			}
 			me.inp.focus();
-			me.as.createList(me.as.aSug); 
+			me.as.createList(me.as.aSug);
 		}
 
 		if(!editable) {

@@ -10,9 +10,9 @@ _r.ReportContainer = function() {
 	// tool bar
 
 	var div = $a(this.wrapper, 'div');
-	var htab = make_table($a(div,'div','',{padding:'4px', backgroundColor:'#DDD'}), 1,2, '100%', ['80%','20%']);
+	var htab = make_table($a(div,'div','',{padding:'6px 8px 4px 8px', backgroundColor:'#DFD'}), 1,2, '100%', ['80%','20%']);
 	
-	this.main_title = $a($td(htab,0,0),'h2','',{margin: '0px 4px', display:'inline'});
+	this.main_title = $a($td(htab,0,0),'div','',{fontFamily:'Helvetica', display:'inline', fontSize:'24px'});
 		
 	// close button
 	$y($td(htab,0,1),{textAlign:'right'});
@@ -63,10 +63,10 @@ _r.ReportContainer = function() {
 
 	// set a type
 	this.set_dt = function(dt, onload) {
-		// show finder
 		$dh(me.home_area);
 		$ds(me.rb_area);
 		$ds(me.button_area);
+
 		my_onload = function(f) {
 			me.cur_rb = f;
 			me.cur_rb.mytabs.tabs['Result'].show();
@@ -77,6 +77,8 @@ _r.ReportContainer = function() {
 			me.cur_rb.hide();
 		if(me.rb_dict[dt]){
 			me.rb_dict[dt].show(my_onload);
+			// reset
+			me.rb_dict[dt].reset_report();
 		} else {
 			me.rb_dict[dt] = new _r.ReportBuilder(me.rb_area, dt, my_onload);
 		}
@@ -373,7 +375,7 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 	
 	this.set_sort_options();
 	
-	this.main_title.innerHTML = this.doctype;
+	_r.rb_con.main_title.innerHTML = this.doctype;
 
 	// clear graph
 	// -----------
@@ -444,7 +446,7 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 
 _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	// load additional fields sort option
-	this.main_title.innerHTML = criteria_name;
+	_r.rb_con.innerHTML = criteria_name;
 	
 	var sc = locals['Search Criteria'][this.sc_dict[criteria_name]];
 	if(sc && sc.add_col)
@@ -461,13 +463,13 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	}
 	this.set_sort_options(new_sl);
 	if(sc && sc.sort_by) {
-		this.dt.sort_sel.value = sc.sort_by;
+		this.dt.sort_sel.inp.value = sc.sort_by;
 	}
 	if(sc && sc.sort_order) {
 		sc.sort_order=='ASC' ? this.dt.set_asc() : this.dt.set_desc();
 	}
 	if(sc && sc.page_len) {
-		this.dt.page_len_sel.value = sc.page_len;
+		this.dt.page_len_sel.inp.value = sc.page_len;
 	}
 	this.current_loaded = criteria_name;
 }
@@ -707,7 +709,7 @@ _r.ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 		var f=fl[i];
 		
 		// add to filter
-		if(f && cint(f.search_index)) {
+		if(f && (cint(f.search_index) || cint(f.in_filter))) {
 			me.add_field(f, dt, in_list(sf_list, f.fieldname));
 		}
 		
@@ -726,18 +728,13 @@ _r.ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 			row.insertCell(0); row.insertCell(1);
 			$w(row, '10%');
 
-			if(isIE) {
-				row.cells[0].innerHTML = '<input type="checkbox" style="border: 0px;">'; // IE fix
-				var chk = row.cells[0].childNodes[0];
-			} else {
-				var chk = $a(row.cells[0], 'input'); 
-				chk.setAttribute('type', 'checkbox');
-			}
+			var chk = $a_input(row.cells[0], 'checkbox');
+			$y(chk, {marginRight: '2px', border:'0px'});
 
-			chk.style.marginRight = '2px';
 			chk.df = f;
 			if(f.search_index || f.in_search) {
-				chk.checked = true;
+				chk.checked = 1;
+				chk.selected_by_default = 1;
 			}
 			me.report_fields.push(chk);
 			me.report_fields_dict[f.parent + '\1' + f.label] = chk;
@@ -786,6 +783,24 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 	}
 }
 
+
+_r.ReportBuilder.prototype.reset_report = function() {
+	this.clear_criteria();
+	this.set_filter(this.doctype, 'Saved', 1);
+	this.set_filter(this.doctype, 'Submitted', 1);
+	this.set_filter(this.doctype, 'Cancelled', 0);
+	
+	for(var i=0; i<this.report_fields.length; i++) {
+		if(this.report_fields[i].selected_by_default)
+			this.report_fields[i].checked = 1;
+	}
+	this.dt.clear_all();
+	
+	this.dt.sort_sel.inp.value = 'ID';
+	this.dt.page_len_sel.inp.value = '50';
+	this.dt.set_desc();
+}
+
 //
 // Make the SQL query
 // ------------------
@@ -802,13 +817,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 	this.clear_btn = $a(clear_area, 'button');
 	this.clear_btn.innerHTML = 'Clear Settings';
 	this.clear_btn.onclick = function() {
-		me.clear_criteria();
-		me.set_filter(me.doctype, 'Saved', 1);
-		me.set_filter(me.doctype, 'Submitted', 1);
-		me.set_filter(me.doctype, 'Cancelled', 0);
-		me.select_column(me.doctype, 'ID');
-		me.select_column(me.doctype, 'Owner');
-		me.dt.clear_all();
+		me.reset_report();
 	}
 
 	var div = $a(this.mytabs.tabs['Result'].tab_body, 'div');

@@ -5,7 +5,6 @@ var NEWLINE = '\n';
 
 // user
 var profile;
-var page_body;
 var session = {};
 var account_name;
 var is_testing = false;
@@ -15,6 +14,9 @@ var user_roles;
 var user_fullname;
 var user_email;
 var user_img = {};
+var home_page;
+
+var page_body;
 var pscript = {};
 var selector; 
 var keypress_observers = [];
@@ -49,6 +51,7 @@ var widget_files = {
 	,'_f.FrmContainer':'form.compressed.js'
 	,'_c.CalendarPopup':'widgets/form/date_picker.js'
 	,'_r.ReportContainer':'report.compressed.js'
+	,'_p.PrintQuery':'widgets/print_query.js'
 }
 
 // API globals
@@ -76,6 +79,7 @@ var unhide_field;
 var print_table;
 var sendmail;
 
+
 // icons
 var exp_icon = "images/ui/right-arrow.gif"; 
 var min_icon = "images/ui/down-arrow.gif";
@@ -99,6 +103,7 @@ function startup() {
 		user_email = profile.email;
 		profile.start_items = r.start_items;
 		account_name = r.account_name;
+		home_page = r.home_page;
 
 		sys_defaults = r.sysdefaults;		
 	}
@@ -120,7 +125,9 @@ function startup() {
 					click_observers[i].notify_click(ev, target);
 			}
 		});
-
+		if(isIE) {
+			$op($i('dialog_back'), 60);
+		}
 	}
 	
 	var callback = function(r,rt) {
@@ -138,9 +145,27 @@ function startup() {
 		
 		$dh('startup_div');
 		$ds('body_div');
+		
+		if(home_page) {
+			loadpage(home_page);
+		}
 	}
 	$c('startup',{},callback,null,1);
 	
+}
+
+// default print style
+_p.def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
+	+"\nbody { margin: 12px; }"
+	+"\npre { margin:0; padding:0;}"	
+	+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
+	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"
+	+"\n.noborder td { vertical-align: top; }"
+
+_p.go = function(html) {
+	var w = window.open('');
+	w.document.write(html);
+	w.document.close();
 }
 
 window.onload = startup;

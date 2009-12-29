@@ -153,7 +153,14 @@ Listing.prototype.do_print = function() {
 		check_limit:1,
 		is_simple:1
 	}
-	print_query(args);
+	
+	new_widget('_p.PrintQuery', function(w) {
+		// global
+		if(!_p.print_query) 
+			_p.print_query = w;
+		
+		_p.print_query.show_dialog(args);	
+	}, 1);
 }
 
 Listing.prototype.do_calc = function() {
@@ -343,7 +350,7 @@ Listing.prototype.do_export = function() {
 	else {
 		for(var i=1;i<this.colnames.length;i++) cn.push(this.colnames[i]); // Ignore the SR label
 	}
-	var q = export_ask_for_max_rows(this.query, function(query) { export_csv(query, this.head_text, null, 1, null, cn); });
+	var q = export_query(this.query, function(query) { export_csv(query, this.head_text, null, 1, null, cn); });
 }
 
 Listing.prototype.build_query = function() {

@@ -3,6 +3,8 @@
 //
 
 var cur_dialog;
+var top_index=91;
+
 function Dialog(w, h, title, content) {
 	this.wrapper = $a('dialogs', 'div', 'dialog_wrapper');
 	this.w = w;

@@ -168,13 +168,6 @@ _p.print_style = ".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:to
 	+".sectionHeading { font-size: 16px; font-weight: bold; margin: 8px 0px }"
 	+".columnHeading { font-size: 14px; font-weight: bold; margin: 8px 0px; }"
 
-_p.def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
-	+"\nbody { margin: 12px; }"
-	+"\npre { margin:0; padding:0;}"	
-	+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
-	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"
-	+"\n.noborder td { vertical-align: top; }"
-
 _p.formats = {}
 
 _p.build = function(fmtname, onload) {
@@ -227,12 +220,6 @@ _p.render = function(body, style, doc, title) {
 		+tmp_html
 		+ block.innerHTML
 		+'</body></html>';
-}
-
-_p.go = function(html) {
-	var w = window.open('');
-	w.document.write(html);
-	w.document.close();
 }
 
 print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, condition, cssClass) {

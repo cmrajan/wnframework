@@ -138,7 +138,11 @@ function $a_input(p, in_type, attributes, cs) {
 function $dh(d) { if(d && d.substr)d=$i(d); if(d && d.style.display.toLowerCase() != 'none') d.style.display = 'none'; }
 function $ds(d) { if(d && d.substr)d=$i(d); if(d && d.style.display.toLowerCase() != 'block') d.style.display = 'block'; }
 function $di(d) { if(d && d.substr)d=$i(d); if(d)d.style.display = 'inline'; }
-function $i(id) { if(!id) return null; if(id && id.appendChild)return id; return document.getElementById(id); }
+function $i(id) { 
+	if(!id) return null; 
+	if(id && id.appendChild)return id; // already an element
+	return document.getElementById(id); 
+}
 function $t(parent, txt) { 	if(parent.substr)parent = $i(parent); return parent.appendChild(document.createTextNode(txt)); }
 function $w(e,w) { if(e && e.style && w)e.style.width = w; }
 function $h(e,h) { if(e && e.style && h)e.style.height = h; }

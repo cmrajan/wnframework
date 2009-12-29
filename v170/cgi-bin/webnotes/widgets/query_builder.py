@@ -10,7 +10,7 @@ def get_search_criteria_list(dt):
 	return [list(s) for s in sc_list]
 
 def load_report_list():
-	webnotes.response['rep_list'] = server.get_search_criteria_list(form.getvalue('dt'))
+	webnotes.response['rep_list'] = get_search_criteria_list(form.getvalue('dt'))
 	
 # GET MATCH CONDITION
 # -------------------
@@ -191,7 +191,8 @@ def runquery(q='', ret=0, from_export=0):
 
 		out['n_values'] = webnotes.utils.cint(sql(qm)[0][0])
 
-def runquery_csv(form, session):
+def runquery_csv():
+	from webnotes.utils import getCSVelement
 
 	# run query
 	res = runquery(from_export = 1)

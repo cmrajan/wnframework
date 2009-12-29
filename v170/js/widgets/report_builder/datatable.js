@@ -1,5 +1,11 @@
 /// Data Table
 
+
+_r.scroll_head = function(ele) {
+	var h = ele.childNodes[0];
+	h.style.top = cint(ele.scrollTop) + 'px';
+}
+
 _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
 	
 	
@@ -53,7 +59,7 @@ _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
   this.wrapper = $a(parent, 'div', 'report_tab');
   $h(this.wrapper, cint(screen.width * 0.4) + 'px');
 
-  this.wrapper.onscroll = function() {scroll_head(this); }
+  this.wrapper.onscroll = function() {_r.scroll_head(this); }
   
   this.hwrapper = $a(this.wrapper, 'div', 'report_head_wrapper');
   this.twrapper = $a(this.wrapper, 'div', 'report_tab_wrapper');
@@ -176,7 +182,8 @@ _r.DataTable.prototype.set_asc = function(icon) {
 ////
 
 _r.DataTable.prototype.add_sort_option = function(label, val) {
-  if(!this.sort_labels[this.dt]) this.sort_labels[this.dt] = {};
+  if(!this.sort_labels[this.dt]) 
+  	this.sort_labels[this.dt] = {};
   
   this.sort_labels[this.dt][label] = val;
 	
@@ -416,15 +423,21 @@ _r.DataTable.prototype.do_print = function() {
 		filter_values : docstring(this.filter_vals),
 		finder: this.finder ? this.finder : null
 	};
-	print_query(args);
-
+	
+	new_widget('_p.PrintQuery', function(w) {
+		// global
+		if(!_p.print_query) 
+			_p.print_query = w;
+		
+		_p.print_query.show_dialog(args);	
+	}, 1);
 }
 
 _r.DataTable.prototype.do_export = function() {
 	this._get_query(true);
 
 	var me = this;
-	export_ask_for_max_rows(this.query, function(q) {
+	export_query(this.query, function(q) {
 		export_csv(q, (me.rep_name?me.rep_name:me.dt), (me.search_criteria?me.search_criteria.name:''), me.is_simple, docstring(me.filter_vals));	
 	});
 }
@@ -432,7 +445,7 @@ _r.DataTable.prototype.do_export = function() {
 // Calculator 
 // ----------
 _r.DataTable.prototype.do_calc = function() {
-	show_calc(this.tab, this.colnames, this.coltypes, 1);
+	_r.show_calc(this.tab, this.colnames, this.coltypes, 1);
 }
 
 _r.DataTable.prototype.get_col_data = function(colname) {

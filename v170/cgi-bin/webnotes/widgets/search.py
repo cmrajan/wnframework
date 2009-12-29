@@ -47,11 +47,13 @@ def get_std_fields_list(dt, key):
 	return ['`tab%s`.`%s`' % (dt, f.strip()) for f in sflist]
 
 def build_for_autosuggest(res):
+	from webnotes.utils import cstr
+	
 	results = []
 	for r in res:
 		info = ''
 		if len(r) > 1:
-			info = ','.join([server.cstr(t) for t in r[1:]])
+			info = ','.join([cstr(t) for t in r[1:]])
 			if len(info) > 30:
 				info = info[:30] + '...'
 				
@@ -80,7 +82,7 @@ def search_link():
 		res = webnotes.widgets.query_builder.runquery(q, ret=1)
 
 	# make output
-	out['results'] = build_for_autosuggest(res)
+	webnotes.response['results'] = build_for_autosuggest(res)
 	
 def search_widget():
 	import webnotes.widgets.query_builder

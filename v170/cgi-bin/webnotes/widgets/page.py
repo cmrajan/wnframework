@@ -27,6 +27,9 @@ class Page:
 		if doc.fields.get('content') and doc.content.startswith('#python'):
 			doc.__content = webnotes.model.code.execute(doc.content)
 		return doclist
-	
+		
 def get(name):
 	return Page(name).load()
+
+def getpage():
+	webnotes.response['docs'] = get(webnotes.form.getvalue('name'))

@@ -449,7 +449,7 @@ LinkField.prototype.make_input = function() {
 		maxresults: 10,
 		link_field: me
 	};
-	var as = new AutoSuggest(me.txt.id, opts);
+	var as = new AutoSuggest(me.txt, opts);
 	
 }
 LinkField.prototype.set_get_query = function() { 
@@ -724,6 +724,8 @@ SelectField.prototype.make_input = function() {
 	var opt=[];
 	
 	if(this.not_in_form && (!this.df.single_select)) {
+
+		// multiple select
 		this.input = $a(this.input_area, 'select');
 		this.input.multiple = true;
 		this.input.style.height = '4em';
@@ -732,6 +734,8 @@ SelectField.prototype.make_input = function() {
 		lab.style.fontSize = '9px';
 		lab.style.color = '#999';
 	} else {
+
+		// Single select
 		this.input = new SelectWidget(this.input_area, []);	
 		this.txt = this.input.inp;
 		this.btn = this.input.btn;
@@ -757,14 +761,15 @@ SelectField.prototype.make_input = function() {
 		me.options_list = me.df.options?me.df.options.split('\n'):[];
 		
 		// add options
-		this.input.set_options(me.options_list);
+		add_sel_options(this.input, me.options_list);
+		
 	}
 	
 	this.onrefresh = function() {
 		this.refresh_options();
 
 		if(this.not_in_form) {
-			this.txt.value = '';
+			this.input.value = '';
 			return;
 		}
 		
@@ -915,9 +920,6 @@ function makeinput_popup(me, iconsrc, iconsrc1) {
 	if(me.df.colour)
 		me.txt.style.background = '#'+me.df.colour.split(':')[1];
 	me.txt.name = me.df.fieldname;
-	tmpid++;
-	me.txt.setAttribute('id', 'idx'+tmpid);
-	me.txt.id = 'idx'+tmpid;
 
 	me.setdisabled = function(tf) { me.txt.disabled = tf; }
 }

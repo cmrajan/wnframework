@@ -3,6 +3,13 @@ search_fields = {};
 // Search Selector 2.0
 // -------------------
 
+function setlinkvalue(name) {
+	selector.hide();
+	selector.input.set(name);// in local
+	selector.input.set_input(name); // on screen
+	if(selector.input.txt)selector.input.txt.onchange();
+}
+
 function makeselector2() {
 	var d = new Dialog(640,440, 'Search');
 

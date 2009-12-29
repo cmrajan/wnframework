@@ -10,15 +10,6 @@ def getdoc():
 	if form.getvalue('doctype'):
 		doclist = load_single_doc(form.getvalue('doctype'), form.getvalue('name'), (form.getvalue('user') or webnotes.session['user']))
 
-		# execute page
-		#import webnotes.utils
-		#if form.getvalue('doctype')=='Page' and webnotes.utils.cint(form.getvalue('is_page'))==1:
-			# check for import
-		#	doclist[0].__script = server.page_import(doclist[0].script)
-			
-		#	if doclist[0].fields.get('content') and doclist[0].content.startswith('#python'):
-		#		doclist[0].__content = server.exec_page(doclist[0].content)
-
 	# add tweets and n of comments
 	load_comments(doclist[0].doctype, doclist[0].name)
 

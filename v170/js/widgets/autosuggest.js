@@ -19,7 +19,7 @@ function AutoSuggest(id, param) {
 		,delay:1000, offsety:-5, shownoresults: true, noresults: "No results!", maxheight: 250
 		,cache: true, maxentries: 25, fixed_options: false, xdelta: 5, ydelta: 5
 	}
-	
+		
 	for (k in def)
 	{
 		if (typeof(this.oP[k]) != typeof(def[k]))
@@ -34,7 +34,7 @@ function AutoSuggest(id, param) {
 	//DOM.addEvent( this.fld, 'keyup', function(ev){ return me.onKeyPress(ev); } );
 		
 	this.fld.onkeypress 	= function(ev){ if(!selector.display) return p.onKeyPress(ev); };
-	//this.fld.onkeyup 		= function(ev){ if(!selector.display) return p.onKeyUp(ev); };
+	this.fld.onkeyup 		= function(ev){ if(!selector.display) return p.onKeyUp(ev); };
 	
 	this.fld.setAttribute("autocomplete","off");
 };
@@ -48,12 +48,12 @@ AutoSuggest.prototype.init = function() {
 
 }
 
-
 AutoSuggest.prototype.onKeyPress = function(ev)
 {
 	
-	var ev = (window.event) ? window.event : ev;
-	key = ev.keyCode ? ev.keyCode : ev.charCode;
+	var key = (window.event) ? window.event.keyCode : ev.keyCode;
+	//var ev = (window.event) ? window.event : ev;
+	//var key = ev.keyCode ? ev.keyCode : ev.charCode;
 
 	// set responses to keydown events in the field
 	// this allows the user to use the arrow keys to scroll through the results
@@ -62,9 +62,6 @@ AutoSuggest.prototype.onKeyPress = function(ev)
 	//
 	var RETURN = 13;
 	var TAB = 9;
-	var ESC = 27;
-	var ARRUP = 38; var ARRDN = 40;
-	var bubble = 1;
 	var ESC = 27;
 		
 	var bubble = 1;
@@ -82,24 +79,39 @@ AutoSuggest.prototype.onKeyPress = function(ev)
 		case ESC:
 			this.clearSuggestions(); 
 			break;
+
+	}
+
+	return bubble;
+}
+
+AutoSuggest.prototype.onKeyUp = function(ev)
+{
+	
+	var key = (window.event) ? window.event.keyCode : ev.keyCode;
+	//var ev = (window.event) ? window.event : ev;
+	//var key = ev.keyCode ? ev.keyCode : ev.charCode;
+
+	var ARRUP = 38; var ARRDN = 40;
+	var bubble = 1;
+		
+	switch(key) {
 		case ARRUP:
 			this.changeHighlight(key);
 			bubble = 0; 
 			break;
+			
 		case ARRDN:
 			this.changeHighlight(key);
 			bubble = 0; 
 			break;
-		case ESC:
-			this.clearSuggestions(); 
-			break;
 		default:
 			if(this.oP.fixed_options)
-				this.find_nearest(key);
+				this.find_nearest(key);	
 			else
 				this.getSuggestions(this.fld.value);
 	}
-
+	
 	return bubble;
 }
 
@@ -153,7 +165,6 @@ AutoSuggest.prototype.find_nearest = function (key) {
 
 AutoSuggest.prototype.getSuggestions = function (val)
 {
-	
 	// if input stays the same, do nothing
 	if (val == this.sInp) return 0;
 	
@@ -218,12 +229,11 @@ AutoSuggest.prototype.doAjaxRequest = function (input)
 		if(cur_frm)var doc = locals[cur_frm.doctype][cur_frm.docname];
 		q = this.oP.link_field.get_query(doc);
 	}
-	$c('search_link', args={
+	$c('webnotes.widgets.search.search_link', args={
 		'txt': this.fld.value, 
 		'dt':this.oP.link_field.df.options,
-		'defaults':pack_defaults(),
-		'query':q,
-		'roles':'["'+user_roles.join('","')+'"]' }, function(r,rt) {
+		'query':q  }
+		, function(r,rt) {
 		me.setSuggestions(r, rt, input);
 	});
 	
@@ -340,7 +350,11 @@ AutoSuggest.prototype.createList = function(arr) {
 	//
 	
 	var mywid = cint(this.fld.offsetWidth);
-	if(cint(mywid) < 100) mywid = 100;
+	if(this.fixed_options) {
+		mywid += 20;
+	}
+	
+	if(cint(mywid) < 70) mywid = 70;
 	var left = pos.x - ((mywid - this.fld.offsetWidth)/2);
 	if(left<0) {
 		mywid = mywid + (left/2); left = 0;

@@ -338,7 +338,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 		//this.wrapper.style.borderTop = '3px solid #CCC';
 	
 	// bg colour
-	if(this.meta.colour) this.layout.wrapper.style.background = '#'+this.meta.colour.split(':')[1];
+	if(this.meta.colour) 
+		this.layout.wrapper.style.backgroundColor = '#'+this.meta.colour.split(':')[1];
 	
 	// create fields
 	this.setup_fields_std();

@@ -34,20 +34,22 @@ def startup():
 	cp = doclist[0]
 	
 	doclist += webnotes.model.doctype.get('Event')
+	home_page = webnotes.user.get_home_page()
+
+	if home_page:
+		doclist += webnotes.widgets.page.get(home_page)
 
 	webnotes.response['account_name'] = cp.account_id or ''
 	webnotes.response['sysdefaults'] = webnotes.utils.get_defaults()
 	webnotes.response['n_online'] = int(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0] or 0)
 	webnotes.response['docs'] = doclist
-	webnotes.response['home_page'] = webnotes.widgets.page.get(webnotes.user.get_home_page())
+	webnotes.response['home_page'] = home_page
 	webnotes.response['start_items'] = webnotes.widgets.menus.get_menu_items()
 	webnotes.session['data']['profile'] = webnotes.response['profile']
 
 def cleanup_docs():
 	if out.get('docs'):
 		out['docs'] = webnotes.model.doclist.compress(out['docs'])
-	if out.get('home_page'):
-		out['home_page'] = webnotes.model.doclist.compress(out['home_page'])
 		
 def set_timezone():
 	import os

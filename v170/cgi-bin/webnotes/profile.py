@@ -166,6 +166,10 @@ class Profile:
 		self.defaults = d['defaults']
 
 def get_user_img():
+	if not webnotes.form.getvalue('username'):
+		webnotes.response['message'] = 'no_img'
+		return
+	
 	f = webnotes.conn.sql("select file_list from tabProfile where name=%s", webnotes.form.getvalue('username',''))
 	if f and f[0][0]:
 		webnotes.response['message'] = f[0][0].split(',')[1]

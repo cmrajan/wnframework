@@ -151,3 +151,46 @@ var newdoc = new_doc;
 
 // Load Page
 // -------------------------------------------------------------------------------
+
+var pscript={};
+var cur_page;
+function loadpage(page_name, call_back, menuitem) {
+	if(page_name=='_home')
+		page_name = home_page;
+	var fn = function(r,rt) {
+		if(page_body.pages[page_name]) {
+			// loaded
+			var p = page_body.pages[page_name]
+			
+			// call refresh
+			try {
+				if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](menuitem); // onload
+			} catch(e) { 
+				submit_error(e); 
+			}
+		} else {
+			// new page
+			var p = render_page(page_name, menuitem);
+			if(menuitem) p.menuitem = menuitem;
+			if(!p)return;
+		}
+
+		// show
+		page_body.change_to(page_name);
+		
+		// select menu
+		if(p.menuitem) p.menuitem.show_selected();
+
+		// execute callback
+		cur_page=page_name;
+		if(call_back)call_back();
+
+		// update "back"		
+		nav_obj.open_notify('Page',page_name,'');
+	}
+	
+	if(get_local('Page', page_name) || page_body.pages[page_name]) 
+		fn();
+	else 
+		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn );
+}

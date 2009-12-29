@@ -1,11 +1,11 @@
 // Calculator 
 // ----------
-var calc_dialog;
-function show_calc(tab, colnames, coltypes, add_idx) {
+_r.calc_dialog = null;
+_r.show_calc = function(tab, colnames, coltypes, add_idx) {
 	if(!add_idx) add_idx = 0;
 	if(!tab || !tab.rows.length) { msgprint("No Data"); return; }
 	
-	if(!calc_dialog) {
+	if(!_r.calc_dialog) {
 		var d = new Dialog(400,400,"Calculator")
 		d.make_body([
 			['Select','Column']
@@ -39,14 +39,14 @@ function show_calc(tab, colnames, coltypes, add_idx) {
 			d.widgets['Average'].value = fmt_money(sum / this.datatab.rows.length);
 			d.widgets['Min'].value = fmt_money(minv);
 			d.widgets['Max'].value = fmt_money(maxv);
-			calc_dialog = d;
+			_r.calc_dialog = d;
 		}
 		d.onshow = function() {
 			// set columns
 			var cl = []; 
-			for(var i in calc_dialog.colnames) {
-				if(in_list(['Currency','Int','Float'],calc_dialog.coltypes[i])) 
-					cl.push(calc_dialog.colnames[i]);
+			for(var i in _r.calc_dialog.colnames) {
+				if(in_list(['Currency','Int','Float'],_r.calc_dialog.coltypes[i])) 
+					cl.push(_r.calc_dialog.colnames[i]);
 			}
 			if(!cl.length) {
 				this.hide();
@@ -55,13 +55,14 @@ function show_calc(tab, colnames, coltypes, add_idx) {
 			}
 			var s = this.widgets['Column'];
 			empty_select(s);
-			add_sel_options(s, cl); s.selectedIndex = 0;
+			add_sel_options(s, cl);
+			s.inp.value = cl[0];
 			this.set_calc();
 		}
-		calc_dialog = d;
+		_r.calc_dialog = d;
 	}
-	calc_dialog.datatab = tab;
-	calc_dialog.colnames = colnames;
-	calc_dialog.coltypes = coltypes;
-	calc_dialog.show();
+	_r.calc_dialog.datatab = tab;
+	_r.calc_dialog.colnames = colnames;
+	_r.calc_dialog.coltypes = coltypes;
+	_r.calc_dialog.show();
 }

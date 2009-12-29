@@ -2,62 +2,27 @@
 
 var pages=[];
 function Page(page_name, content) {	
+	var me = this;
 	this.name = page_name;
-	this.cont = new Container(page_name);
-	this.cont.init();
-	if(content)this.cont.body.innerHTML = content;
-	pages[page_name] = this;
-	if(page_name == home_page)pages['_home'] = this;
-	this.cont.page = this;
-	this.cont.onshow = function() {
-		try {
-			if(pscript['onshow_'+this.page.name]) pscript['onshow_'+this.page.name](); // onload
-		} catch(e) { submit_error(e); }
-		set_title(this.page.name);
-	}
-	return this;
-}
 
-var pscript={};
-var cur_page;
-function loadpage(page_name, call_back, menuitem) {
-	//if(cur_page==page_name) return;
-	if(page_name=='_home')page_name = home_page;
-	var fn = function(r,rt) {
-		if(pages[page_name]) {
-			// loaded
-			var p = pages[page_name]
-			
-			// call refresh
-			try {
-				if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](menuitem); // onload
-			} catch(e) { 
-				submit_error(e); 
-			}
-		} else {
-			// new page
-			var p = render_page(page_name, menuitem);
-			if(menuitem) p.menuitem = menuitem;
-			if(!p)return;
-		}
-
-		// show
-		p.cont.show();
+	this.onshow = function() {
+		// default set_title
+		set_title(me.name);
 		
-		// select menu
-		if(p.menuitem) p.menuitem.show_selected();
-
-		// execute callback
-		cur_page=page_name;
-		if(call_back)call_back();
-
-		// update "back"		
-		if(page_name!='_search')
-			nav_obj.open_notify('Page',page_name,'');
+		// onshow
+		try {
+			if(pscript['onshow_'+me.name]) pscript['onshow_'+me.name](); // onload
+		} catch(e) { submit_error(e); }
 	}
+
+	this.cont = page_body.add_page(page_name, this.onshow);
+	if(content)
+		this.cont.innerHTML = content;
+
+	if(page_name == home_page)
+		pages['_home'] = this;
 	
-	if(get_local('Page', page_name) || pages[page_name]) fn();
-	else $c('getdoc', {'name':page_name, 'doctype':"Page", 'user':user, 'is_page':1}, fn);
+	return this;
 }
 
 function render_page(page_name, menuitem) {
@@ -74,9 +39,11 @@ function render_page(page_name, menuitem) {
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
 	if(script)
 		try { eval(script); } catch(e) { submit_error(e); }		
-		
+	
+	// create page
 	var p = new Page(page_name, pdoc.__content?pdoc.__content:pdoc.content);
 
+	// run onload
 	try {
 		if(pscript['onload_'+page_name]) pscript['onload_'+page_name](menuitem); // onload
 	} catch(e) { submit_error(e); }
@@ -88,5 +55,5 @@ function refresh_page(page_name) {
 	var fn = function(r, rt) {
 		render_page(page_name)	
 	}
-	$c('getdoc', {'name':page_name, 'doctype':"Page", 'user':user, 'is_page':1}, fn)
+	$c('webnotes.widgets.page.getpage', {'name':page_name}, fn);
 }

@@ -3,7 +3,7 @@
 import webnotes
 
 def getCSVelement(v):
-	v = server.cstr(v)
+	v = cstr(v)
 	if not v: return ''
 	if (',' in v) or ('\n' in v) or ('"' in v):
 		if '"' in v: v = v.replace('"', '""')

@@ -15,9 +15,8 @@ function freeze(msg, do_freeze) {
 	} 
 	
 	// blur
-	hide_selects();	
 	$ds($i('dialog_back'));
-	$h($i('dialog_back'), document.body.offsetHeight+'px');
+	$y($i('dialog_back'), {height: document.body.offsetHeight+'px'});
 	fcount++;
 	frozen = 1;
 }

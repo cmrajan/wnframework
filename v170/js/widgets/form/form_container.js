@@ -10,13 +10,13 @@ _f.FrmContainer = function() {
 
 _f.FrmContainer.prototype.make_head = function() {
 	var me = this;
-	this.bg_color = '#EEF';
+	this.bg_color = '#DDF';
 	this.head = $a(this.wrapper, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px'});
 	this.body = $a(this.wrapper,'div');
 
 	// Row 1
 	// ------------------
-	this.tbartab = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: this.bg_color, borderBottom:'1px solid #AAF', paddingTop:'2px'});
+	this.tbartab = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: this.bg_color, paddingTop:'2px'});
 
 	// left side - headers
 	// -------------------

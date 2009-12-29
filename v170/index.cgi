@@ -53,6 +53,8 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 	</tr></table>
 </div>
 
+
+
 <div id="body_div"> 
 
 	<!--static (no script) content-->
@@ -66,13 +68,12 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 		</div>
 	</div>
 
-	<div id="dialog_back">
-	</div>
 </div>
 	
 <div id="dialogs">
 	<div id="dialog_message"></div>
 </div>
+<div id="dialog_back"></div>
 
 <div id="floating_message">
 	<table><tr>
@@ -80,6 +81,8 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 	<td id="fm_cancel" class="link_type">Cancel</td>
 	</tr></table>
 </div>
+
+
 </body>
 </html>
 '''

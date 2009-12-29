@@ -1,6 +1,6 @@
 
 _f.FrmContainer=function(){this.wrapper=page_body.add_page("Forms",function(){});$dh(this.wrapper);this.make_head();this.make_toolbar();}
-_f.FrmContainer.prototype.make_head=function(){var me=this;this.bg_color='#EEF';this.head=$a(this.wrapper,'div','',{borderBottom:'1px solid #AAA',margin:'0px'});this.body=$a(this.wrapper,'div');this.tbartab=make_table($a(this.head,'div'),1,2,'100%',['50%','50%'],{backgroundColor:this.bg_color,borderBottom:'1px solid #AAF',paddingTop:'2px'});$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 8px'});this.main_title=$a($td(this.tbartab,0,0),'div','',{fontFamily:'Helvetica',margin:'0px 8px 0px 0px',display:'inline',fontSize:'24px'});this.sub_title=$a($td(this.tbartab,0,0),'div','',{display:'inline'});this.sub_title.is_inline=1;this.status_title=$a($td(this.tbartab,0,0),'span','',{marginLeft:'8px'});this.status_title.is_inline=1;this.tbar_div=$a($td(this.tbartab,0,1),'div','',{marginRight:'8px',textAlign:'right'})
+_f.FrmContainer.prototype.make_head=function(){var me=this;this.bg_color='#DDF';this.head=$a(this.wrapper,'div','',{borderBottom:'1px solid #AAA',margin:'0px'});this.body=$a(this.wrapper,'div');this.tbartab=make_table($a(this.head,'div'),1,2,'100%',['50%','50%'],{backgroundColor:this.bg_color,paddingTop:'2px'});$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 8px'});this.main_title=$a($td(this.tbartab,0,0),'div','',{fontFamily:'Helvetica',margin:'0px 8px 0px 0px',display:'inline',fontSize:'24px'});this.sub_title=$a($td(this.tbartab,0,0),'div','',{display:'inline'});this.sub_title.is_inline=1;this.status_title=$a($td(this.tbartab,0,0),'span','',{marginLeft:'8px'});this.status_title.is_inline=1;this.tbar_div=$a($td(this.tbartab,0,1),'div','',{marginRight:'8px',textAlign:'right'})
 var tab2=make_table(this.tbar_div,1,4,'400px',['60px','120px','160px','60px'],{textAlign:'center',padding:'3px',verticalAlign:'middle'});$y(tab2,{cssFloat:'right'});$y($td(tab2,0,0),{textAlign:'right'});var comm_img=$a($td(tab2,0,0),'img','',{marginRight:'4px',paddingTop:'2px'});comm_img.src='images/icons/comments.gif';var c=$td(tab2,0,1);this.comments_btn=$a(c,'div','link_type',{padding:'0px 2px',position:'relative',display:'inline'});$y(c,{textAlign:'left'});this.comments_btn.dropdown=new DropdownMenu(c,'240px');$y(this.comments_btn.dropdown.body,{height:'400px'});c.set_unselected=function(){tweet_dialog.hide();}
 this.comments_btn.onmouseover=function(){$y(c,{backgroundColor:'#F8F8FF'});if(me.doc.__islocal){return;}
 this.dropdown.body.appendChild(tweet_dialog);this.dropdown.show();tweet_dialog.show();}
@@ -62,7 +62,8 @@ $dh(this.tip_box);}
 _f.Frm.prototype.setup_meta=function(){this.meta=get_local('DocType',this.doctype);this.perm=get_perm(this.doctype);this.setup_print();}
 _f.Frm.prototype.setup_std_layout=function(){if(this.in_dialog)$w(this.wrapper,'500px');this.header=$a(this.wrapper,'div','frm_header');this.heading=$a(this.header,'div','frm_heading');this.tab_wrapper=$a(this.header,'div');$dh(this.tab_wrapper);if(this.meta.section_style=='Tray'){var t=$a(this.wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});var r=t.insertRow(0);var c=r.insertCell(0);c.className='frm_tray_area';this.tray_area=c;this.body=$a(r.insertCell(1),'div','frm_body');}else{this.body=$a(this.wrapper,'div','frm_body');}
 this.tip_wrapper=$a(this.body,'div');if(this.in_dialog)this.meta.hide_heading=1;this.layout=new Layout(this.body,'100%');this.setup_tips();if(this.meta.section_style=='Tabbed')
-this.setup_tabs();if(this.meta.colour)this.layout.wrapper.style.background='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
+this.setup_tabs();if(this.meta.colour)
+this.layout.wrapper.style.backgroundColor='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
 _f.Frm.prototype.setup_fields_std=function(){var fl=fields_list[this.doctype];if(fl[0]&&fl[0].fieldtype!="Section Break"){this.layout.addrow();if(fl[0].fieldtype!="Column Break"){var c=this.layout.addcell();$y(c.wrapper,{padding:'8px'});}}
 var sec;for(var i=0;i<fl.length;i++){var f=fl[i];var fn=f.fieldname?f.fieldname:f.label;var fld=make_field(f,this.doctype,this.layout.cur_cell,this);this.fields[this.fields.length]=fld;this.fields_dict[fn]=fld;if(sec)sec.fields[sec.fields.length]=fld;if(f.fieldtype=='Section Break')
 sec=fld;if((f.fieldtype=='Section Break')&&(fl[i+1])&&(fl[i+1].fieldtype!='Column Break')){var c=this.layout.addcell();$y(c.wrapper,{padding:'8px'});}}}
@@ -318,12 +319,6 @@ _p.print_style=".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:top;
 +".datainputcell { padding: 2px 0px; width: 62%; text-align:left; }"
 +".sectionHeading { font-size: 16px; font-weight: bold; margin: 8px 0px }"
 +".columnHeading { font-size: 14px; font-weight: bold; margin: 8px 0px; }"
-_p.def_print_style="html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
-+"\nbody { margin: 12px; }"
-+"\npre { margin:0; padding:0;}"
-+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
-+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"
-+"\n.noborder td { vertical-align: top; }"
 _p.formats={}
 _p.build=function(fmtname,onload){if(!cur_frm){alert('No Document Selected');return;}
 var doc=locals[cur_frm.doctype][cur_frm.docname];if(fmtname=='Standard'){onload(_p.render(_p.print_std(),_p.print_style,doc,doc.name));}else{if(!_p.formats[fmtname])
@@ -340,7 +335,6 @@ return'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/h
 +tmp_html
 +block.innerHTML
 +'</body></html>';}
-_p.go=function(html){var w=window.open('');w.document.write(html);w.document.close();}
 print_table=function(dt,dn,fieldname,tabletype,cols,head_labels,widths,condition,cssClass){var fl=fields_list[tabletype];var ds=getchildren(tabletype,dn,fieldname,dt);var tl=[];var make_table=function(fl){var w=document.createElement('div');var t=$a(w,'table',(cssClass?cssClass:'simpletable'));t.wrapper=w;$w(t,'100%');t.insertRow(0);var c_start=0;if(fl[0]=='SR'){t.rows[0].insertCell(0).innerHTML=head_labels?head_labels[0]:' ';$w(t.rows[0].cells[0],'30px');c_start=1;}
 for(var c=c_start;c<fl.length;c++){var cell=t.rows[0].insertCell(c);if(head_labels)
 cell.innerHTML=head_labels[c];else

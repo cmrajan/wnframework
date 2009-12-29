@@ -1,5 +1,6 @@
 html { 
 	margin: 0px;
+	height: 100%;
 }
 
 body {	
@@ -8,6 +9,7 @@ body {
 	font-size: 12px;
 	color: #222;
 	background: url(foo) fixed;
+	height: 100%;
 }
 
 
@@ -52,7 +54,6 @@ div.fix_ff_cursor { overflow: auto; }
 div.comment { color: #777; }
 
 div#body_div {
-	position: relative;
 	display: none;
 }
 
@@ -244,7 +245,6 @@ div.tbar_btn_disabled {
 /* FORMS */
 
 div.frm_wrapper {
-	position: relative;
 	margin: 2px;
 	margin-bottom: 32px;
 	/*border: 4px solid #EEE;*/
@@ -741,9 +741,9 @@ div.report_tab_wrapper table, div.report_head_wrapper table {
 }
 
 div.report_tab_wrapper table td, div.report_head_wrapper table td {
-	border-left: 1px solid #CCC;
-	border-right: 1px solid #CCC;
-	border-bottom: 1px solid #CCC;
+	border-left: 1px solid #AAA;
+	border-right: 1px solid #AAA;
+	border-bottom: 1px solid #AAA;
 	overflow: hidden;
 	padding: 0px;
 }
@@ -1035,7 +1035,6 @@ div.dialog_head {
 }
 
 div.dialog_body {
-	/*border: 1px solid #CCC;*/
 	padding-bottom: 16px;
 }
 
@@ -1047,11 +1046,13 @@ div#dialog_back {
 	width: 100%;
 	background-color: #EEE;
 	opacity: 0.6;
-	z-index: 80;
+	z-index: 50;
 	text-align: center;
+	height: 100%;
 }
 
 div#dialogs {
+	z-index: 90;
 	position: absolute;
 	top: 0px;
 	left: 0px;

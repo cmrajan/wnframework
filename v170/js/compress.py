@@ -13,6 +13,7 @@ in_files_main = [
        ,'widgets/tabbedpage.js'
        ,'widgets/autosuggest.js'
        ,'widgets/select.js'
+       ,'widgets/export_query.js'
        ,'widgets/form/fields.js'
        ,'webpage/wntoolbar.js'
        ,'webpage/history.js'
@@ -23,6 +24,7 @@ in_files_main = [
        ,'webpage/error_console.js'
        ,'webpage/about.js'
        ,'webpage/loaders.js'
+       ,'webpage/page.js'
        ,'model/local_data.js'
        ,'model/doclist.js'
        ,'tiny_mce/tiny_mce_gzip.js'
@@ -51,6 +53,7 @@ in_files_report = [
 	'widgets/report_builder/bargraph.js'
 	,'widgets/report_builder/report_builder.js'
 	,'widgets/report_builder/datatable.js'
+	,'widgets/report_builder/calculator.js'
 ]
 
 out_file_report = 'report.compressed.js'

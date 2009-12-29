@@ -1,6 +1,11 @@
-var print_dialog;
-function show_print_dialog(args) {
-	if(!print_dialog) {
+_p.PrintQuery = function() { 
+	this.args = {};
+}
+_p.PrintQuery.prototype.show_dialog = function(args) {
+	this.args = args;
+	var me = this;
+	
+	if(!this.dialog) {
 		var d = new Dialog(400, 300, "Print");
 		d.make_body([
 			['Data', 'Max rows', 'Blank to print all rows'],
@@ -8,23 +13,22 @@ function show_print_dialog(args) {
 			['Button', 'Go'],
 		]);	
 		d.widgets['Go'].onclick = function() {
-			print_dialog.hide();
-			go_print_query(print_dialog.args, cint(print_dialog.widgets['Max rows'].value), cint(print_dialog.widgets['Rows per page'].value))
+			d.hide();
+			me.render(cint(d.widgets['Max rows'].value), cint(d.widgets['Rows per page'].value))
 		}
 		d.onshow = function() {
 			this.widgets['Rows per page'].value = '35';
 			this.widgets['Max rows'].value = '500';
 		}
-		print_dialog = d;
+		this.dialog = d;
 	}
-	print_dialog.args = args;
-	print_dialog.show();
+	this.dialog.show();
 }
 
-function print_query(args) { show_print_dialog(args); }
-
-function go_print_query(args, max_rows, page_len) {
+_p.PrintQuery.prototype.render = function(max_rows, page_len) {
  //q, title, colnames, colwidths, coltypes, has_index, check_limit, is_simple
+	var me = this;
+	var args = me.args;
  
 	// limit for max rows
     if(cint(max_rows)!=0) args.query += ' LIMIT 0,' + cint(max_rows);
@@ -63,35 +67,32 @@ function go_print_query(args, max_rows, page_len) {
 		
 		var tl = []
 		for(var st=0; st< r.values.length; st = st + page_len) {
-			tl.push(print_query_table(r, st, page_len, has_heading, args.finder))
+			tl.push(me.build_table(r, st, page_len, has_heading, args.rb))
 		}
 		
 		var html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
 			+ '<html><head>'
 			+'<title>'+args.title+'</title>'
-			+'<style>'+def_print_style+'</style>'
+			+'<style>'+_p.def_print_style+'</style>'
 			+'</head><body>'
 			+ (r.header_html ? r.header_html : '')
 			+ tl.join('\n<div style="page-break-after: always;"></div>\n')
 			+ (r.footer_html ? r.footer_html : '')
 			+'</body></html>';
-		print_go(html)    
+		_p.go(html)    
 	}
 	var out_args = copy_dict(args);
 	if(args.is_simple) {
 		out_args.simple_query = args.query;
 		delete out_args.query;
-	} else {
-		out_args.defaults = pack_defaults();
-		out_args.roles = '["'+user_roles.join('","')+'"]';
 	}
 	// add filter values
 	if(args.filter_values) 
 		out_args.filter_values = args.filter_values;
-	$c('runquery', out_args, callback);
+	$c('webnotes.widgets.query_builder.runquery', out_args, callback);
 }
 
-function print_query_table(r, start, page_len, has_heading, finder) {
+_p.PrintQuery.prototype.build_table = function(r, start, page_len, has_heading, rb) {
 	// print a table
 	var div = document.createElement('div');
 	
@@ -142,8 +143,8 @@ function print_query_table(r, start, page_len, has_heading, finder) {
 		}
 	}
 
-	if(finder && finder.aftertableprint) {
-		finder.aftertableprint(t);
+	if(rb && rb.aftertableprint) {
+		rb.aftertableprint(t);
 	}
 		
 	if(r.page_template) return repl(r.page_template, {table:div.innerHTML});
