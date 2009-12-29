@@ -22,7 +22,7 @@ class _DocType:
 		parent_dt = sql('select parent from tabDocField where fieldtype="Table" and options="%s" and (parent not like "old_parent:%%") limit 1' % self.name)
 		return parent_dt and parent_dt[0][0] or ''
 
-	def _get_client_script(match):
+	def _get_client_script(self, match):
 		name = match.group('name')
 		csc = webnotes.conn.get_value('DocType',name,'client_script_core')
 		cs = webnotes.conn.get_value('DocType',name,'client_script')

@@ -111,7 +111,6 @@ class Authentication:
 		if res:
 			c =  webnotes.db.Database(user = res[0][1] or res[0][0])
 			c.use(res[0][0])
-			webnotes.response['db'] = res[0][0]
 		else:
 			c =  webnotes.db.Database(use_default = 1)
 		return c
