@@ -415,15 +415,15 @@ Finder.prototype.setup_filters = function() {
 	
 	// default filters
 	var fl = [
-		{'fieldtype':'Data', 'label':'ID', 'fieldname':'name', 'search_index':1, 'parent':dt},
-		{'fieldtype':'Data', 'label':'Created By', 'fieldname':'owner', 'search_index':1, 'parent':dt},
+		{'fieldtype':'Data', 'label':'ID', 'fieldname':'name', 'search_index':1, 'parent':dt, 'in_filter':1},
+		{'fieldtype':'Data', 'label':'Created By', 'fieldname':'owner', 'search_index':1, 'parent':dt, 'in_filter':1},
 	];
 
 	// can this be submitted?
 	if(can_dt_be_submitted(dt)) {
-		fl[fl.length] = {'fieldtype':'Check', 'label':'Saved', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt};
-		fl[fl.length] = {'fieldtype':'Check', 'label':'Submitted', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt};
-		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'parent':dt};
+		fl[fl.length] = {'fieldtype':'Check', 'label':'Saved', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt, 'in_filter':1};
+		fl[fl.length] = {'fieldtype':'Check', 'label':'Submitted', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt, 'in_filter':1};
+		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'parent':dt, 'in_filter':1};
 	}
 	
 	// Add columns of parent doctype
