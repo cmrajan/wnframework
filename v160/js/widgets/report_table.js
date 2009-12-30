@@ -624,7 +624,7 @@ Finder.prototype.make_filter_fields = function(fl, dt) {
 		var f=fl[i];
 		
 		// add to filter
-		if(f && (cint(f.search_index) || cint(f.in_filter))) {
+		if(f && cint(f.in_filter)) {
 			me.add_field(f, dt, in_list(sf_list, f.fieldname));
 		}
 		
@@ -653,7 +653,7 @@ Finder.prototype.make_filter_fields = function(fl, dt) {
 
 			chk.style.marginRight = '2px';
 			chk.df = f;
-			if(f.search_index || f.in_search) {
+			if(f.in_filter || f.in_search) {  // need changes
 				chk.checked = true;
 			}
 			me.report_fields.push(chk);
