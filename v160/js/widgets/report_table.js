@@ -624,7 +624,7 @@ Finder.prototype.make_filter_fields = function(fl, dt) {
 		var f=fl[i];
 		
 		// add to filter
-		if(f && cint(f.search_index)) {
+		if(f && (cint(f.search_index) || cint(f.in_filter))) {
 			me.add_field(f, dt, in_list(sf_list, f.fieldname));
 		}
 		
