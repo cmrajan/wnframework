@@ -49,19 +49,20 @@ nav_obj.show_last_open = function() {
 
 var _history_current;
 function historyChange(newLocation, historyData) {
-		
-	if(window.location.href.search('iwebnotes.com')!=-1) return; // no history for iwebnotes
+	t = newLocation.split('/');
+
+	for(var i=0;i<t.length;i++) 
+		t[i] = decodeURIComponent(t[i]);
+
+	// re-opening the same page?
+	if(nav_obj.ol.length) {
+		var c = nav_obj.ol[nav_obj.ol.length-1];
 	
-	t = t.split('/');
-
-	for(var i=0;i<t.length;i++) t[i] = decodeURIComponent(t[i]);
-
-	var c = nav_obj.ol[nav_obj.ol.length-1];
-
-	if(t.length==2)	{
-		if(c[0]==t[0] && c[1]==t[1]) return;
-	} else {
-		if(c[0]==t[0] && c[1]==t[1] && c[2]==t[2]) return;
+		if(t.length==2)	{
+			if(c[0]==t[0] && c[1]==t[1]) return;
+		} else {
+			if(c[0]==t[0] && c[1]==t[1] && c[2]==t[2]) return;
+		}
 	}
 	
 	if(t[0]=='Form') {
@@ -77,5 +78,4 @@ function historyChange(newLocation, historyData) {
 		_history_current = newLocation;
 		loadapp(t[1]);
 	}
-	
 };

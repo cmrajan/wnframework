@@ -232,7 +232,7 @@ _f.Grid.prototype.set_cell_value = function(cell) {
 			ed.src = 'images/icons/page.gif'; ed.onclick = function() { 
 				_f.cur_grid = me;
 				_f.cur_grid_ridx = this.cell.row.rowIndex;
-				edit_record(me.doctype, this.cell.row.docname);				
+				_f.edit_record(me.doctype, this.cell.row.docname);				
 			}
 			
 			if(!me.is_scrolltype) {

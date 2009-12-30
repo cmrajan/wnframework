@@ -249,8 +249,9 @@ Field.prototype.run_trigger = function() {
 			this.report.run();
 		return;
 	}
-	if(this.df.trigger=='Client')
+	if(this.df.trigger=='Client') {
 		cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
+	}
 	cur_frm.refresh_dependency();
 	this.refresh_label_icon();
 }

@@ -225,3 +225,8 @@ class Authentication:
 				cookies[cookie[0].strip()] = cookie[1].strip()
 				
 		return cookies
+
+	def logout(self):
+		webnotes.conn.sql('delete from tabSessions where sid="%s"' % webnotes.session['sid'])
+		self.out_cookies['sid'] = ''
+		self.out_cookies['remember_me'] = ''

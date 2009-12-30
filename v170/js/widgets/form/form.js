@@ -2,19 +2,19 @@
 // Open the Form in a Dialog
 _f.frm_dialog = null;
 _f.edit_record = function(dt, dn) {
-	var d = _f.frm_dialog;
-	if(!d) {
-		d = new Dialog(640, 400, 'Edit Row');
-		d.body_wrapper = $a(frm_dialog.body, 'div', 'dialog_frm');
-		d.done_btn = $a($a(frm_dialog.body, 'div', '', {margin:'8px'}),'button');
-		d.done_btn.innerHTML = 'Done'; frm_dialog.done_btn.onclick = function() { frm_dialog.hide() }
+	if(!_f.frm_dialog) {
+		var d = new Dialog(640, 400, 'Edit Row');
+		d.body_wrapper = $a(d.body, 'div', 'dialog_frm');
+		d.done_btn = $a($a(d.body, 'div', '', {margin:'8px'}),'button');
+		d.done_btn.innerHTML = 'Done'; d.done_btn.onclick = function() { _f.frm_dialog.hide() }
 		d.onhide = function() {
-			if(cur_grid)
-				cur_grid.refresh_row(cur_grid_ridx, frm_dialog.dn);
+			if(_f.cur_grid)
+				_f.cur_grid.refresh_row(_f.cur_grid_ridx, _f.frm_dialog.dn);
 		}
 		_f.frm_dialog = d;
 	}
-	
+	var d = _f.frm_dialog;
+		
 	if(!frms[dt]) {
 		var f = new _f.Frm(dt, d.body_wrapper);
 		f.parent_doctype = cur_frm.doctype;
@@ -30,7 +30,7 @@ _f.edit_record = function(dt, dn) {
 
 	d.cur_frm = frm;
 	d.dn = dn;
-	d.set_title("Editing Row #" + (cur_grid_ridx+1));
+	d.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
 	d.show();
 }
 
@@ -406,7 +406,7 @@ _f.Frm.prototype.setup_template_layout = function() {
 
 _f.Frm.prototype.setup_client_script = function() {
 	// setup client obj
-	if(this.meta.client_script_core || this.meta.client_script || this.meta.__client_script) {
+	if(this.meta.client_script_core || this.meta.client_script || this.meta._client_script) {
 		this.runclientscript('setup', this.doctype, this.docname);
 	}
 	this.script_setup = 1;
@@ -813,7 +813,7 @@ _f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 
 	if(caller && caller.toLowerCase()=='setup') {
 		var doctype = get_local('DocType', this.doctype);
-		var cs = doctype.__client_script ? doctype.__client_script : (doctype.client_script_core + doctype.client_script);
+		var cs = doctype._client_script ? doctype._client_script : (doctype.client_script_core + doctype.client_script);
 		if(cs) {
 			try {
 				var tmp = eval(cs);
@@ -833,7 +833,6 @@ _f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 	}
 	return ret;
 }
-
 
 // ======================================================================================
 

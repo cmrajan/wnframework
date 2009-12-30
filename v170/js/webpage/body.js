@@ -47,8 +47,10 @@ function Body() {
 		this.cp = locals['Control Panel']['Control Panel'];
 
 		// core areas;
-		this.wntoolbar = new WNToolbar($i('body_div'));
-
+		if(!user_defaults.hide_webnotes_toolbar) {
+			this.wntoolbar = new WNToolbar($i('body_div'));
+		}
+		
 		this.wrapper = $a($i('body_div'),'div');
 		this.header = $a(this.wrapper, 'div');
 		this.topmenu = $a(this.wrapper, 'div');

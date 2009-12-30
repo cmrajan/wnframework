@@ -248,20 +248,21 @@ function objpos(obj){
   while (obj){ 
   	acc_lefts += obj.offsetLeft; acc_tops += obj.offsetTop;
 
-	/*if(isIE) {
-	    //if (obj!= window.document.body){
-    	//	acc_tops -= obj.scrollTop; acc_lefts -= obj.scrollLeft;
-    	//}
+	if(isIE) {
+	    if (obj!= window.document.body){
+    		//acc_tops -= obj.scrollTop; 
+    		acc_lefts -= obj.scrollLeft;
+    	}
     } else { // only for ff
 	    var op = obj.offsetParent
 	    var scr_obj = obj;
 	    
 	    while(scr_obj&&(scr_obj!=op)&&(scr_obj!=window.document.body)) { // scan all elements for scrolls
-		    acc_tops -= scr_obj.scrollTop; 
+		    //acc_tops -= scr_obj.scrollTop; 
 		    acc_lefts -= scr_obj.scrollLeft;
 			scr_obj = scr_obj.parentNode;
 		}
-	}*/
+	}
 	obj = obj.offsetParent;
   }
   co.x=acc_lefts, co.y=acc_tops; return co;
@@ -300,4 +301,15 @@ function set_user_img(img, username) {
 		set_it();
 	else
 		$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
+}
+
+function get_url_param(name) {
+	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regex = new RegExp( regexS );
+	var results = regex.exec( window.location.href );
+	if( results == null )
+		return "";
+	else
+		return results[1];
 }

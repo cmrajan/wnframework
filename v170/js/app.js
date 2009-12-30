@@ -2,6 +2,7 @@
 
 // constants
 var NEWLINE = '\n';
+var login_file = 'index.cgi';
 
 // user
 var profile;
@@ -146,12 +147,27 @@ function startup() {
 		$dh('startup_div');
 		$ds('body_div');
 		
-		if(home_page) {
+		var t = to_open();
+		if(t) {
+			historyChange(t);
+		} else if(home_page) {
 			loadpage(home_page);
 		}
 	}
 	$c('startup',{},callback,null,1);
 	
+}
+
+function to_open() {
+	if(get_url_param('page'))
+		return get_url_param('page');
+	if(document.location.href.search('#')!=-1) {
+		return document.location.href.split('#')[1];
+	}
+}
+
+function logout() {
+	$c('logout', args = {}, function() { window.location.reload(); });
 }
 
 // default print style

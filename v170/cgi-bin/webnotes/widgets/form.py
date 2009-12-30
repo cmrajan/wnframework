@@ -19,7 +19,6 @@ def getdoc():
 
 	webnotes.response['docs'] = doclist
 
-
 def load_comments(dt, dn):
 	try:
 		tag = dt + '/' + dn
@@ -37,7 +36,7 @@ def get_parent_dt(dt):
 
 def getdoctype():
 	# load parent doctype too
-	from webnotes.model.doctype import get
+	import webnotes.model.doctype
 	
 	form, doclist = webnotes.form, []
 	
@@ -48,11 +47,11 @@ def getdoctype():
 	if with_parent:
 		parent_dt = get_parent_dt(dt)
 		if parent_dt:
-			doclist = get(parent_dt)
+			doclist = webnotes.model.doctype.get(parent_dt)
 			webnotes.response['parent_dt'] = parent_dt
 	
 	if not doclist:
-		doclist = get(dt)
+		doclist = webnotes.model.doctype.get(dt)
 	
 	# if single, send the record too
 	if doclist[0].issingle:

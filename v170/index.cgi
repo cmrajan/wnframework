@@ -28,7 +28,8 @@ try:
 		import webnotes.widgets.page_body
 
 		auth_obj = webnotes.auth.Authentication(webnotes.form, {}, {})
-		content_html = 'No Content' #webnotes.widgets.page_body.get_static_content()
+		import os
+		content_html = webnotes.widgets.page_body.get_static_content()
 	
 		print "Content-Type: text/html"
 		print

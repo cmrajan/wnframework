@@ -77,7 +77,7 @@ class Profile:
 		try:
 			hpl = webnotes.conn.sql("select role, home_page from `tabDefault Home Page` where parent='Control Panel' order by idx asc")
 			for h in hpl:
-				if h[0] in webnotes.session['data']['roles']:
+				if h[0] in self.get_roles():
 					return h[1]
 		except:
 			pass

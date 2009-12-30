@@ -106,10 +106,12 @@ AutoSuggest.prototype.onKeyUp = function(ev)
 			bubble = 0; 
 			break;
 		default:
-			if(this.oP.fixed_options)
-				this.find_nearest(key);	
-			else
-				this.getSuggestions(this.fld.value);
+			if(key!=13) {
+				if(this.oP.fixed_options)
+					this.find_nearest(key);	
+				else
+					this.getSuggestions(this.fld.value);
+			}
 	}
 	
 	return bubble;
@@ -393,6 +395,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	//
 	
 	// if value, then hilight value
+	this.iHigh = 0;
 	if(this.oP.fixed_options && this.fld.value) {
 		for(var i=0; i<this.aSug.length; i++) {
 			if(this.aSug[i].value == this.fld.value) {
@@ -400,8 +403,8 @@ AutoSuggest.prototype.createList = function(arr) {
 				break;
 			}
 		}
-	} else
-		this.iHigh = 0;
+	}
+		
 		
 	if(!this.iHigh)
 		this.changeHighlight(40); // hilight first

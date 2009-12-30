@@ -43,14 +43,14 @@ class _DocType:
 
 	def _build_client_script(self, doclist):
 		client_script = str(doclist[0].client_script_core or '') + '\n' + str(doclist[0].client_script or '')
-	
+		
 		if client_script:
 			import re
 			p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
 	
 			# load it in __client_script as it will not interfere with the doctype
-			doclist[0].__client_script = p.sub(self._get_client_script, client_script)
-
+			doclist[0]._client_script = p.sub(self._get_client_script, client_script)
+			
 	def _load_select_options(self, doclist):
 		for d in doclist:
 			if d.doctype=='DocField' and d.fieldtype=='Select' and d.options and d.options[:5].lower()=='link:':
@@ -102,4 +102,7 @@ class _DocType:
 		return doclist
 
 def get(dt):
-	return _DocType(dt).make_doclist()
+	doclist = _DocType(dt).make_doclist()
+		
+	return doclist
+	

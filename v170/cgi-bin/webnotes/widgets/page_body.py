@@ -54,6 +54,11 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 </body>
 </html>
 '''
+def get_page_content(page_name):
+	pass
+
+def get_doc_content(dt, dn):
+	pass
 
 def get_static_content():
 	import webnotes

@@ -65,6 +65,9 @@ def runserverobj():
 	import webnotes.widgets.form
 	webnotes.widgets.form.runserverobj()
 
+def logout():
+	auth_obj.logout()
+
  # ------------------------------------------------------------------------------------
 
 def get_print_format(form, session):
@@ -481,14 +484,6 @@ def save_log(t, errtype = ''):
 		l.save(1)
 	except: #bc
 		pass
-
-# Logout
-# ------
-
-def logout(form, session):
-	server.delete_session()
-	cookies['sid150'] = ''
-	cookies['remember_me'] = ''
 
 # ----------------
 # Loading

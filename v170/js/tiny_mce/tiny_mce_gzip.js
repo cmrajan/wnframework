@@ -23,6 +23,10 @@ var tinyMCE_GZ = {
 			if (n.src && n.src.indexOf('tiny_mce') != -1)
 				t.baseURL = n.src.substring(0, n.src.lastIndexOf('/'));
 		}
+		
+		// our folder is always js
+		t.baseURL = 'js/tiny_mce';
+		
 		if (!t.coreLoaded)
 			t.loadScripts(1, s.themes, s.plugins, s.languages, cb, sc);
 	},
@@ -53,6 +57,8 @@ var tinyMCE_GZ = {
 		x.open('GET', t.baseURL + '/' + s.page_name + '?' + q, !!cb);
 //		x.setRequestHeader('Content-Type', 'text/javascript');
 		x.send('');
+
+		//alert(t.baseURL + '/' + s.page_name + '?' + q);
 
 		// Handle asyncronous loading
 		if (cb) {
