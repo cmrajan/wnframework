@@ -2198,6 +2198,7 @@ DateField.prototype.validate = function(v) {
 	return v;
 };
 
+var _last_link_value=null;
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
@@ -2214,9 +2215,21 @@ LinkField.prototype.make_input = function() {
 	}
 
 	me.txt.onchange = function() { 
-		me.set(me.txt.value); 
-		me.run_trigger();
+		// check values are not set in quick succession due to un intentional event call
+		if(_last_link_value)
+			return
+			
+		if(me.as && me.as.ul) {
+			// still setting value
+		} else {
+			me.set(me.txt.value);
+			_last_link_value = me.txt.value
+			setTimeout('_last_link_value=null', 100);
+			
+			me.run_trigger();
+		}
 	}
+	
 	me.input.set_input = function(val) {
 		if(val==undefined)val='';
 		me.txt.value = val;
@@ -2245,7 +2258,7 @@ LinkField.prototype.make_input = function() {
 		maxresults: 10,
 		link_field: me
 	};
-	var as = new bsn.AutoSuggest(me.txt.id, opts);
+	this.as = new bsn.AutoSuggest(me.txt.id, opts);
 	
 }
 LinkField.prototype.set_get_query = function() { 
