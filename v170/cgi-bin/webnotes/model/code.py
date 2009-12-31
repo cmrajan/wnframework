@@ -23,19 +23,23 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	import marshal
 	dt = basedoctype and basedoctype or doc.doctype
 
-	ex_code = ''
+	# default code (if none is present
+	ex_code = '''
+class DocType:
+	def __init__(self, d, dl):
+		self.doc, self.doclist = d, dl'''
+
 	sc_compiled = webnotes.conn.get_value('DocType', dt, 'server_code_compiled')
 	if sc_compiled:
 		ex_code = marshal.loads(sc_compiled)
 	if not sc_compiled:
 		sc_core = cstr(webnotes.conn.get_value('DocType', dt, 'server_code_core'))
 		sc = cstr(webnotes.conn.get_value('DocType', dt, 'server_code'))
-		ex_code = sc_core + sc
+		
+		if sc_core or sc:
+			ex_code = sc_core + sc
 	
-	if ex_code:
-		return execute(ex_code, doc, doclist)
-	else:
-		return None
+	return execute(ex_code, doc, doclist)
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:

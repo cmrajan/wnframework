@@ -347,3 +347,10 @@ Meta.set_field_property=function(fn, key, val, doc) {
 		alert("Client Script Error: Unknown values for " + doc.name + ',' + fn +'.'+ key +'='+ val);
 	}
 }
+
+// Global methods for API
+// ======================================================================================
+
+var getchildren = LocalDB.getchildren;
+var get_field = Meta.get_field;
+var createLocal = LocalDB.create;

@@ -1,8 +1,7 @@
-
-
 _r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
 	
+	$dh(this.wrapper);
 	
 	var me = this;
 	this.rb_dict = {};
@@ -68,9 +67,12 @@ _r.ReportContainer = function() {
 		$ds(me.button_area);
 
 		my_onload = function(f) {
-			me.cur_rb = f;
-			me.cur_rb.mytabs.tabs['Result'].show();
-			if(onload)onload(f);
+			if(!f.forbidden) {
+				me.cur_rb = f;
+				me.cur_rb.mytabs.tabs['Result'].show();
+	
+				if(onload)onload(f);	
+			}
 		}
 	
 		if(me.cur_rb)
@@ -90,6 +92,8 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 	this.menuitems = {};
 	this.has_primary_filters = false;
 	this.doctype = doctype;
+	this.forbidden = 0;
+
 	var me = this;
 
 	this.fn_list = ['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];
@@ -757,6 +761,20 @@ _r.ReportBuilder.prototype.set_sort_options = function(l) {
 	}
 }
 
+_r.ReportBuilder.prototype.validate_permissions = function(onload) {
+	this.perm = get_perm(this.parent_dt ? this.parent_dt : this.doctype);
+	if(!this.perm[0][READ]) {
+		this.forbidden = 1;
+		if(user=='Guest') {
+			msgprint('You must log in to view this page');
+		} else {
+			msgprint('No Read Permission');
+		}
+		nav_obj.show_last_open();
+		return 0;
+	}
+	return 1;
+}
 
 _r.ReportBuilder.prototype.make_filters = function(onload) {
 	// load doctype
@@ -766,6 +784,8 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 		$c('webnotes.widgets.form.getdoctype', args = {'doctype': this.doctype, 'with_parent':1 }, 
 			function(r,rt) { 
 				if(r.parent_dt)me.parent_dt = r.parent_dt;
+				if(!me.validate_permissions()) 
+					return;
 				me.setup_filters();
 				if(onload)onload(me);
 			} );
@@ -776,6 +796,9 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 			if(f.fieldtype=='Table' && f.options==this.doctype)
 				this.parent_dt = f.parent;
 		}
+		if(!me.validate_permissions()) 
+			return;
+		me.validate_permissions();
 		me.setup_filters();
 		if(onload)onload(me);
 	}

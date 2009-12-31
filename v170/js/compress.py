@@ -1,5 +1,6 @@
 in_files_main = [
-       'utils/rsh.compressed.js'
+       ,'utils/rsh.compressed.js'
+       ,'globals.js'
        ,'utils/datatype.js'
        ,'utils/browser_detect.js'
        ,'utils/datetime.js'

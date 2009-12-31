@@ -3,23 +3,25 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 <head id="head">
 <!-- Web Notes Framework : www.webnotesframework.org -->
 
-  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-  <title>Main Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <meta name="robots" content="index, follow" />
+  <meta name="keywords" content="%(keywords)s" />
+  <meta name="description" content="%(site_description)s" />
+  <meta name="generator" content="Web Notes Framework Version v170 - Open Source Web Application Framework" />  
+  
+  <title>%(title)s</title>
   <link type="text/css" rel="stylesheet" href="css/default.css?v=1.6.0">
   <link type="text/css" rel="stylesheet" href="css/user.css?v=1.6.0">
   <link rel="Shortcut Icon" href="/favicon.ico">
   
- <script language="JavaScript" src="js/wnf.compressed.js"></script>
+  <script language="JavaScript" src="js/wnf.compressed.js"></script>
 
-<script type="text/javascript">
- window.dhtmlHistory.create({ debugMode: false });
-</script>
-
+  <script type="text/javascript">
+    window.dhtmlHistory.create({ debugMode: false });
+  </script>
 </head>
 <body>
-<div id="startup_div">
-
-</div>
+<div id="startup_div"></div>
 
 <!-- Main Starts -->
 
@@ -54,64 +56,85 @@ out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR
 </body>
 </html>
 '''
-def get_page_content(page_name):
-	pass
+
+import webnotes
+
+def get_page_content(page):
+	try:
+		content = webnotes.conn.sql("select content, static_content from tabPage where name=%s", page)
+		if content:
+			content = content[0][1] or content[0][0]
+	except:
+		content = webnotes.conn.sql("select content from tabPage where name=%s", page)
+		if content:
+			content = content[0][0]
+	
+	# title
+	try:
+		title = webnotes.conn.sql("select page_title from tabPage where name=%s", page)[0][0]
+	except:
+		title = page
+	
+	# dynamic (scripted) content
+	if content and content.startswith('#python'):
+		content = webnotes.model.code.execute(content)
+
+	return title, content
 
 def get_doc_content(dt, dn):
-	pass
+	import webnotes.model.code
+	
+	if dt in webnotes.user.get_read_list():
+		# generate HTML
+		do = webnotes.model.code.get_obj(dt, dn, with_children = 1)
+		if hasattr(do, 'to_html'):
+			return (dt + '-' + dn), do.to_html()
+		else:
+			import webnotes.model.doclist
+			return (dt + '-' + dn), webnotes.model.doclist.to_html(do.doclist)
+	else:
+		return 'Forbidden - 404', '<h1>Forbidden - 404</h1>'
 
 def get_static_content():
-	import webnotes
 	import webnotes.widgets.page
 
 	form = webnotes.form
+	page_url = form.getvalue('page', '')
+	
+	if page_url:
+		page_url = page_url.split('/')
 		
-	page = form.getvalue('page', '')
-	if not page: # load from control panel
-		page =  webnotes.user.get_home_page()
-		
-	# Create Search Engine Friendly Pages
-	# -----------------------------------
-		
+	else:
+		page_url = ['Page', webnotes.user.get_home_page()]
+			
 	links_html = content = ''
 	
-	if page:
-		# load the content
-		# ----------------
-		try:
-			content = webnotes.conn.sql("select content, static_content from tabPage where name=%s", page)
-			if content:
-				content = content[0][1] or content[0][0]
-		except:
-			content = webnotes.conn.sql("select content from tabPage where name=%s", page)
-			if content:
-				content = content[0][0]
-					
-		if content and content.startswith('#python'):
-			content = webnotes.widgets.page.exec_page(content, form)
-		content = '' # temp fix for id issues
+	# generate the page
+	# -----------------	
+	if page_url[0] == 'Page':
+		title, content = get_page_content(page_url[1])
 		
-	# load the links
-	# --------------
+	elif page_url[0] == 'Form' and len(page_url)==3:
+		title, content = get_doc_content(page_url[1], page_url[2])
 		
-	# load root links
-	try:
-		mc = webnotes.model.code.get_obj('Menu Control')
-		ml = mc.get_children('', 'Page', ['Guest'])
-		
-		if page:
-			# load child links to the current page	
-			parent_node = webnotes.conn.sql("select name from `tabMenu Item` where link_id=%s and menu_item_type='Page'", page)
-			ml += mc.get_children('', 'Page', ['Guest'])
-			
-		links_html = '<br>'.join(['<a href="index.cgi?page=%s&page_content=%s">%s</a>' % (m['link_id'], m['link_content'], m['link_id']) for m in ml])
-		
-	except:
-		pass
-		
-	if content:
-		content_html = content
 	else:
-		content_html = '<h2>Page "%s" not found</h2>' % page
+		title, content = get_page_content(webnotes.user.get_home_page())
+		
 
-	return content_html
+	# generate links
+	# --------------
+	content_html = content
+
+	return title, content_html
+	
+def get():
+	title, content = get_static_content()
+	keywords = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
+	site_description = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+	
+	return out % {
+		'title':title
+		,'content':content
+		,'keywords':keywords
+		,'site_description':site_description
+	}

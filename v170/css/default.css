@@ -36,6 +36,9 @@ table { padding: 0px; }
 
 td { padding:0px; margin: 0px; vertical-align: top; }
 
+table.simpletable { border-collapse: collapse; margin-bottom: 10px;}
+table.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }
+
 div.fix_ff_cursor { overflow: auto; }
 
 /* STARTUP */

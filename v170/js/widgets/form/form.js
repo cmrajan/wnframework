@@ -433,7 +433,7 @@ _f.Frm.prototype.setup = function() {
 	if(this.meta.allow_attach)
 		this.setup_attach();
 
-	this.setup_done = true;	
+	this.setup_done = true;
 }
 
 // ======================================================================================
@@ -492,16 +492,24 @@ _f.Frm.prototype.refresh = function(no_script) {
 		var dn = this.parent_docname?this.parent_docname : this.docname;
 		this.perm = get_perm(dt, dn);
 				  
+	  	if(!this.perm[0][READ]) { 
+			if(user=='Guest') {
+				msgprint('You must log in to view this page');
+			} else {
+				msgprint('No Read Permission');
+			}
+	 		nav_obj.show_last_open(); 
+	  		return; 
+	  	}
+
 		// do setup
 		if(!this.setup_done) this.setup();
 
-		// client script must be called after "setup" - there is no fields_dict attached to the frm otherwise
+		// client script must be called after "setup" - there are no fields_dict attached to the frm otherwise
 		if(!this.script_setup)
 			this.setup_client_script();
 
 		this.runclientscript('set_perm',dt,dn);
-
-	  	if(!this.perm[0][READ]) { msgprint('No Read Permission'); nav_obj.show_last_open(); return; }
 	
 		// set doc
 		this.doc = get_local(this.doctype, this.docname);	  

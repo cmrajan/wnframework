@@ -16,7 +16,7 @@ function loadreport(dt, rep_name, onload, menuitem, from_toolbar) {
 				// call onload
 				if(onload)
 					onload(rb);
-					
+
 				// set menu item
 				if(menuitem) rb.menuitems[rep_name] = menuitem;
 
@@ -32,12 +32,15 @@ function loadreport(dt, rep_name, onload, menuitem, from_toolbar) {
 				// high light menu item
 				if(rb.menuitems[rep_name]) 
 					rb.menuitems[rep_name].show_selected();
+
 			}
-			nav_obj.open_notify('Report',dt,rep_name);
+			
+			// show
+			if(!rb.forbidden) {
+				page_body.change_to('Report Builder');
+				nav_obj.open_notify('Report',dt,rep_name);
+			}
 		} );
-		
-		// show
-		page_body.change_to('Report Builder');
 	}
 	new_widget('_r.ReportContainer', show_report_builder, 1);
 }

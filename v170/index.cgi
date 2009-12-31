@@ -26,15 +26,14 @@ try:
 		# Page Call
 		import webnotes.auth
 		import webnotes.widgets.page_body
+		import webnotes.profile
 
 		auth_obj = webnotes.auth.Authentication(webnotes.form, {}, {})
-		import os
-		content_html = webnotes.widgets.page_body.get_static_content()
 	
 		print "Content-Type: text/html"
 		print
-		print webnotes.widgets.page_body.out % {'content':content_html}
-			
+		print webnotes.widgets.page_body.get()
+
 except Exception, e:
 	print "Content-Type: text/html"
 	print

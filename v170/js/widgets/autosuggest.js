@@ -17,7 +17,7 @@ function AutoSuggest(id, param) {
 	var k, def = {
 		minchars:1, meth:"get", varname:"input", className:"autosuggest", timeout:2000
 		,delay:1000, offsety:-5, shownoresults: true, noresults: "No results!", maxheight: 250
-		,cache: true, maxentries: 25, fixed_options: false, xdelta: 5, ydelta: 5
+		,cache: true, maxentries: 25, fixed_options: false, xdelta: 0, ydelta: 5
 	}
 		
 	for (k in def)
@@ -494,9 +494,9 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 {
 	if (this.iHigh) {
 		if(this.custom_select)
-			this.sInp = this.fld.value = this.custom_select(this.fld.value, this.aSug[ this.iHigh-1 ].value);
+			this.sInp = this.custom_select(this.fld.value, this.aSug[ this.iHigh-1 ].value);
 		else
-			this.sInp = this.fld.value = this.aSug[ this.iHigh-1 ].value;
+			this.sInp = this.aSug[ this.iHigh-1 ].value;
 		
 		// move cursor to end of input (safari)
 		//
@@ -515,6 +515,7 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 		if (typeof(this.oP.callback) == "function")
 			this.oP.callback( this.aSug[this.iHigh-1] );
 			
+		this.fld.value = this.sInp;
 		if (this.fld.onchange)
 			this.fld.onchange();
 	}
@@ -538,7 +539,7 @@ AutoSuggest.prototype.clearSuggestions = function () {
 	if (this.body) { $dh(this.body); delete this.body; }
 	if(this.ul)
 		delete this.ul;
-		
+	this.iHigh = 0;
 	cur_autosug = null;
 };
 

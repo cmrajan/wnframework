@@ -79,9 +79,10 @@ if(docname)this.docname=docname;$ds(this.wrapper);this.display=1;if(!this.in_dia
 _f.Frm.prototype.defocus_rest=function(){mclose();if(_f.cur_grid_cell)_f.cur_grid_cell.grid.cell_deselect();cur_page=null;}
 _f.Frm.prototype.get_doc_perms=function(){var p=[0,0,0,0,0,0];for(var i=0;i<this.perm.length;i++){if(this.perm[i]){if(this.perm[i][READ])p[READ]=1;if(this.perm[i][WRITE])p[WRITE]=1;if(this.perm[i][SUBMIT])p[SUBMIT]=1;if(this.perm[i][CANCEL])p[CANCEL]=1;if(this.perm[i][AMEND])p[AMEND]=1;}}
 return p;}
-_f.Frm.prototype.refresh=function(no_script){if(this.docname){var dt=this.parent_doctype?this.parent_doctype:this.doctype;var dn=this.parent_docname?this.parent_docname:this.docname;this.perm=get_perm(dt,dn);if(!this.setup_done)this.setup();if(!this.script_setup)
-this.setup_client_script();this.runclientscript('set_perm',dt,dn);if(!this.perm[0][READ]){msgprint('No Read Permission');nav_obj.show_last_open();return;}
-this.doc=get_local(this.doctype,this.docname);if(!this.opendocs[this.docname]){this.setnewdoc(this.docname);}
+_f.Frm.prototype.refresh=function(no_script){if(this.docname){var dt=this.parent_doctype?this.parent_doctype:this.doctype;var dn=this.parent_docname?this.parent_docname:this.docname;this.perm=get_perm(dt,dn);if(!this.perm[0][READ]){if(user=='Guest'){msgprint('You must log in to view this page');}else{msgprint('No Read Permission');}
+nav_obj.show_last_open();return;}
+if(!this.setup_done)this.setup();if(!this.script_setup)
+this.setup_client_script();this.runclientscript('set_perm',dt,dn);this.doc=get_local(this.doctype,this.docname);if(!this.opendocs[this.docname]){this.setnewdoc(this.docname);}
 if(this.doc.__islocal)this.is_editable[this.docname]=1;this.editable=this.is_editable[this.docname];if(!this.in_dialog){set_title(this.meta.issingle?this.doctype:this.docname);if(!no_script)this.runclientscript('refresh');page_body.change_to('Forms');_f.frm_con.refresh_toolbar();if(page_body.wntoolbar)page_body.wntoolbar.rdocs.add(this.doctype,this.docname,1);this.set_heading();}
 this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();if(this.layout)this.layout.show();if(!this.display)this.show(this.docname,1);}}
 _f.Frm.prototype.refresh_tabs=function(){var me=this;if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed'){for(var i in me.sections){me.sections[i].hide();}

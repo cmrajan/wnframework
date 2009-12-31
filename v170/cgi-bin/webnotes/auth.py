@@ -54,7 +54,7 @@ class Authentication:
 
 			if form.getvalue('acx'):
 				self.conn = self.set_db(form.getvalue('acx'))
-				
+			
 			self.login() or self.login(as_guest = True)
 		
 		if not self.session: 
@@ -67,9 +67,8 @@ class Authentication:
 		webnotes.conn = self.conn
 		webnotes.session = self.session
 		webnotes.user = webnotes.profile.Profile()
-		webnotes.form = self.form
 
-		if self.session.get('data') and webnotes.session['data'].get('profile'):
+		if webnotes.session['data'].get('profile'):
 			webnotes.user.load_from_session(webnotes.session['data']['profile'])
 		
 		# clear defs password - for security

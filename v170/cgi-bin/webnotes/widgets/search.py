@@ -76,7 +76,7 @@ def search_link():
 	query = webnotes.form.getvalue('query')
 	
 	if query:
-		res = sql(scrub_custom_query(query,txt))
+		res = webnotes.conn.sql(scrub_custom_query(query,txt))
 	else:
 		q = make_query(', '.join(get_std_fields_list(dt, 'name')), dt, 'name', txt, '0', '10')
 		res = webnotes.widgets.query_builder.runquery(q, ret=1)

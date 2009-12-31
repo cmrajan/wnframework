@@ -102,3 +102,36 @@ def getchildren(name, childtype, field='', parenttype=''):
 		d.loadfields(dataset, i, webnotes.conn.get_description())
 		l.append(d)
 	return l
+
+
+def _make_html(doc, link_list):
+
+	from webnotes.utils import cstr
+	out = '<table class="simpletable">'
+	for k in doc.fields.keys():
+		v = cstr(doc.fields[k])
+		
+		# link field
+		if v and (k in link_list.keys()):
+			dt = link_list[k]
+			if dt.startswith('link:'):
+				dt = dt[5:]
+			v = '<a href="index.cgi?page=Form/%s/%s">%s</a>' % (dt, v, v) 
+			
+		out += '\t<tr><td>%s</td><td>%s</td></tr>\n' % (cstr(k), v)
+		
+	out += '</table>'
+	return out
+
+def to_html(doclist):
+	out = ''
+	link_lists = {}
+	
+	for d in doclist:
+		if not link_lists.get(d.doctype):
+			link_lists[d.doctype] = d.make_link_list()
+
+		out += _make_html(d, link_lists[d.doctype])
+		
+	return out
+	
