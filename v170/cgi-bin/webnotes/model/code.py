@@ -9,6 +9,9 @@ from webnotes.model.db_schema import updatedb
 set = webnotes.conn.set
 sql = webnotes.conn.sql
 get_value = webnotes.conn.get_value
+convert_to_lists = webnotes.conn.convert_to_lists
+version = 'v170'
+NEWLINE = '\n'
 	
 def execute(code, doc=None, doclist=[]):
 	# execute it

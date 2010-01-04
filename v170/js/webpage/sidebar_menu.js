@@ -3,16 +3,16 @@ function SidebarMenu() {
 	this.menu_items = {};	
 	this.menu_lists = {};
 	this.menu_dt_details = {};
-	this.menu_page = new Page('_menu');
-	this.menu_page.cont.onshow = function() {
-		if(sidebar_menu.cur_node) sidebar_menu.cur_node.show_selected();
-	}
-	this.wrapper = $a(this.menu_page.cont.body,'div','',{margin:'8px'});
+	this.menu_page = page_body.add_page('Document Browser', function() {
+		if(sidebar_menu.cur_node) sidebar_menu.cur_node.show_selected();		
+	})
+
+	this.wrapper = $a(this.menu_page,'div','',{margin:'8px'});
 	this.head = $a(this.wrapper, 'div', 'standard_title');
 	this.body = $a(this.wrapper, 'div');
   
 	// make tree
-	this.tree_wrapper = $a($i('menu_div'),'div','center_area',{padding:'4px',paddingBottom:'0px',marginRight:'0px'});
+	this.tree_wrapper = $a(page_body.left_sidebar,'div','',{padding:'4px',paddingBottom:'0px',marginRight:'0px'});
 	this.menu_tree = new Tree($a(this.tree_wrapper,'div'),'100%',1);
 }
 
@@ -110,7 +110,6 @@ SidebarMenu.prototype.make_menu = function(parent_node) {
 SidebarMenu.prototype.show_listing = function(mid) {
   // get DocType Details
   // -------------------
-  loadpage('_menu');
   var me = sidebar_menu;
   var mi = me.menu_items[mid];
   if(!me.menu_dt_details[mid]) {
@@ -133,7 +132,7 @@ SidebarMenu.prototype.show_listing = function(mid) {
     lst.opts = {
 		cell_style : {padding:'3px 2px',borderBottom:'1px dashed #CCC'},
 		alt_cell_style : {backgroundColor:'#FFFFFF'},
-		head_style : {height:'20px',overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'1px'},
+		head_style : {height:'22px',overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},
 		head_main_style : {padding:'0px'},
 		hide_export : 1,
 		hide_print : 1,
@@ -159,8 +158,7 @@ SidebarMenu.prototype.show_listing = function(mid) {
       for(var i=0;i<this.cl.length;i++) fl.push(q.table+'.`'+this.cl[i][0]+'`')
       q.fields = fl.join(', ');
       q.conds = q.table + '.docstatus < 2 ';
-      this.sort_order = in_list(this.coltypes, 'Date') ? 'DESC' : 'ASC';
-      this.sort_by = 'name';
+      
       this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
       this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
     }
@@ -172,34 +170,35 @@ SidebarMenu.prototype.show_listing = function(mid) {
       lst.colnames[i+1] = lst.cl[i][1];
       lst.coltypes[i+1] = lst.cl[i][2];
       lst.coloptions[i+1] = lst.cl[i][3];
+      
+      lst.add_sort(i+1, lst.cl[i][0]);
     }
 
     lst.make($a(this.body, 'div', '', {display:'none'}));
 
     var sf = me.menu_dt_details[mi.name].filters;
     for(var i=0;i< sf.length;i++) {
-      if(in_list(['Int','Currency','Float','Date'], sf[i][2])) {
-        lst.add_filter('From '+sf[i][1], sf[i][2], sf[i][3], mi.link_id, sf[i][0], '>=');
-        lst.add_filter('To '+sf[i][1], sf[i][2], sf[i][3], mi.link_id, sf[i][0], '<=');
+      var fname = sf[i][0]; var label = sf[i][1]; var ftype = sf[i][2]; var fopts = sf[i][3];
+
+      if(in_list(['Int','Currency','Float','Date'], ftype)) {
+        lst.add_filter('From '+label, ftype, fopts, mi.link_id, fname, '>=');
+        lst.add_filter('To '+label, ftype, fopts, mi.link_id, fname, '<=');
       } else {
-        lst.add_filter(sf[i][1], sf[i][2], sf[i][3], mi.link_id, sf[i][0], (in_list(['Data','Text','Link'], sf[i][2]) ? 'LIKE' : ''));
+        lst.add_filter(label, ftype, fopts, mi.link_id, fname, (in_list(['Data','Text','Link'], ftype) ? 'LIKE' : ''));
       }
     }
-
     me.menu_lists[mi.name] = lst;
+    
+    // default sort
+    lst.set_default_sort('name', in_list(lst.coltypes, 'Date') ? 'DESC' : 'ASC')
     lst.run();
   }
 
   $ds(me.menu_lists[mi.name].wrapper);
+  page_body.change_to('Document Browser');
+
   me.cur_menu_lst = me.menu_lists[mi.name];
   
 }
 var sidebar_menu;
-function setup_side_bar() {
-  if(!left_sidebar_width) return;
-  sidebar_menu = new SidebarMenu();	
-  sidebar_menu.make_menu('');
-}
-
-startup_lst[startup_lst.length] = setup_side_bar;
 

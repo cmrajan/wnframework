@@ -744,10 +744,8 @@ SelectField.prototype.make_input = function() {
 		this.input = $a(this.input_area, 'select');
 		this.input.multiple = true;
 		this.input.style.height = '4em';
-		var lab = $a(this.input_area, 'div');
+		var lab = $a(this.input_area, 'div', {fontSize:'9px',color:'#999'});
 		lab.innerHTML = '(Use Ctrl+Click to select multiple or de-select)'
-		lab.style.fontSize = '9px';
-		lab.style.color = '#999';
 	} else {
 
 		// Single select
@@ -797,7 +795,7 @@ SelectField.prototype.make_input = function() {
 	
 	this.input.set_input=function(v) {
 		if(!v) {
-			if(!me.not_in_form) {
+			if(!me.input.multiple) {
 				if(me.docname) { // if called from onload without docname being set on fields
 					if(me.df.options) {
 						me.set(me.options_list[0]);
@@ -813,7 +811,7 @@ SelectField.prototype.make_input = function() {
 		}
 	}
 	this.get_value= function() {
-		if(me.not_in_form) {
+		if(me.input.multiple) {
 			var l = [];
 			for(var i=0;i<me.input.options.length; i++ ) {
 				if(me.input.options[i].selected)l[l.length] = me.input.options[i].value;

@@ -13,6 +13,8 @@
 **/
 function Body() { 
 	var me = this;
+	this.left_sidebar = null;
+	this.right_sidebar = null;
 
 	this.no_of_columns = function() {
 		var n = 1;
@@ -32,17 +34,26 @@ function Body() {
 			var c = 0;
 			if(cint(this.cp.left_sidebar_width)) {
 				this.left_sidebar = $td(this.body_table, 0, c);
+				$y(this.left_sidebar, {width:cint(this.cp.left_sidebar_width) + 'px'});
 				c++;
 			}
 			this.center = $td(this.body_table, 0, c);
 			c++;
 			if(cint(this.cp.right_sidebar_width)) {
 				this.right_sidebar = $td(this.body_table, 0, c);
+				$y(this.left_sidebar, {width:cint(this.cp.right_sidebar_width) + 'px'})
 				c++;
 			}			
 		}
 	}
-	
+
+	this.setup_sidebar_menu = function() {
+		if(this.left_sidebar){
+			sidebar_menu = new SidebarMenu();
+			sidebar_menu.make_menu('');
+		}
+	}
+		
 	this.setup = function() {
 		this.cp = locals['Control Panel']['Control Panel'];
 
@@ -76,6 +87,7 @@ function Body() {
 		var c = $a(this.center, 'div');
 		if(onshow) c.onshow = onshow;
 		this.pages[label] = c;
+		$dh(c);
 		return c
 	}
 	

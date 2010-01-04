@@ -63,9 +63,14 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		has_col = true;
 		var col = this.df.colour.split(':')[1];
 		if(col!='FFF') {
+			//if(!_f.section_border)
+			//	_f.section_border = RUZEE.ShadedBorder.create({ corner:4, border: 0 });
+
+			//_f.section_border.render(this.row.sub_wrapper);
+			
 			$y(this.row.sub_wrapper, {
 				margin:'8px', padding: '0px'
-				,border:('1px solid #' + get_darker_shade(col, 0.75))
+				//,border:('1px solid #' + get_darker_shade(col, 0.75))
 				//,borderBottom:('2px solid #' + get_darker_shade(col))
 				,backgroundColor: ('#' + col)}
 			);

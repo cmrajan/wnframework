@@ -41,6 +41,7 @@ function Listing(head_text, no_index, no_loading) {
 	this.filters = {};
 	this.sort_list = {};
 	this.sort_order_dict = {};
+	this.sort_heads = {};
 	
 	this.is_std_query = false;
 	this.server_call = null;
@@ -278,9 +279,10 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	var d2= $a(c,'div');
 	
 	// create the filter
-	if(ftype=='Text')ftype='Data';
+	if(in_list(['Text', 'Small Text', 'Code', 'Text Editor'],ftype)) 
+		ftype='Data';
 	var inp = make_field({fieldtype:ftype, 'label':label, 'options':options}, '', d2, this, 0, 1);
-	inp.in_filter = 1;
+	inp.not_in_form = 1;
 	inp.report = this;
 
 	// filter style
@@ -288,7 +290,9 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	inp.parent_cell = c;
 	inp.parent_tab = this.input_tab;
 	$y(inp.wrapper,{width:'140px'});
-	inp.refresh();$y(inp.input,{width:'100%'});
+	inp.refresh();
+	if(!inp.input.custom_select)
+		$y(inp.input,{width:'100%'});
 	inp.tn = tname; inp.fn = fname; inp.condition = cond;
 	
 	var me = this;
@@ -308,39 +312,77 @@ Listing.prototype.remove_all_filters = function() {
 	$dh(this.filter_wrapper);
 }
 
-Listing.prototype.add_sort = function(ci, field_name) { this.sort_list[ci]=field_name;	}
+Listing.prototype.add_sort = function(ci, fname) { this.sort_list[ci]=fname;	}
 Listing.prototype.has_data = function() { return this.n_records; }
 
-Listing.prototype.set_default_sort = function(fieldname, sort_order) {
+Listing.prototype.set_default_sort = function(fname, sort_order) {
 	this.sort_order = sort_order;
-	this.sort_order_dict[fieldname] = sort_order;
-	this.sort_by = fieldname;
+	this.sort_order_dict[fname] = sort_order;
+	this.sort_by = fname;
+	if(this.sort_heads[fname])
+		this.sort_heads[fname].set_sorting_as(sort_order);
 }
-Listing.prototype.set_sort = function(cell, ci, field_name) {
+Listing.prototype.set_sort = function(cell, ci, fname) {
 	var me = this;
 	$y(cell.sort_cell,{width:'18px'});
+
 	cell.sort_img = $a(cell.sort_cell, 'img');
-	cell.sort_img.src = 'images/icons/sort_desc.gif';
-	cell.field_name = field_name;
+	cell.fname = fname;
 	$dh(cell.sort_img);
 
-	$y(cell.label_cell,{textDecoration:'underline',color:'#44A',cursor:'pointer'});
-
-	cell.onmouseover = function() { $di(this.sort_img); }
-	cell.onmouseout = function() { $dh(this.sort_img); }
-	cell.onclick = function() {
-		me.sort_by = this.field_name;
-		if(me.sort_order_dict[field_name]=='ASC') { 
-			me.sort_order = 'ASC'; 
-			me.sort_order_dict[field_name] = 'DESC';
-			this.sort_img.src = 'images/icons/sort_desc.gif';
-		} else { 
-			me.sort_order = 'DESC'; 
-			me.sort_order_dict[field_name] = 'ASC'; 
-			this.sort_img.src = 'images/icons/sort_asc.gif';
+	cell.set_sort_img = function(order) {
+		var t = 'images/icons/sort_desc.gif';
+		if(order=='ASC') {
+			t = 'images/icons/sort_asc.gif';
 		}
+		this.sort_img.src = t;		
+	}
+
+	cell.set_sorting_as = function(order) {
+		// set values for query building
+		me.sort_order = order;
+		me.sort_by = this.fname
+		me.sort_order_dict[this.fname] = order;
+
+		// set the image
+		this.set_sort_img(order)
+		
+		// deselect active
+		if(me.cur_sort) {
+			$y(me.cur_sort, {backgroundColor:"#FFF"});
+			$dh(me.cur_sort.sort_img);
+		}
+		
+		// set at active
+		me.cur_sort = this;
+		$y(this, {backgroundColor:"#DDF"});
+		$di(this.sort_img);
+	}
+
+	$y(cell.label_cell,{color:'#44A',cursor:'pointer'});
+
+	// set default image
+	cell.set_sort_img(me.sort_order_dict[fname] ? me.sort_order_dict[fname] : 'ASC');
+		
+		
+	cell.onmouseover = function() { 
+		$di(this.sort_img); 
+	}
+	
+	cell.onmouseout = function() { 
+		if(this != me.cur_sort) 
+			$dh(this.sort_img); 
+	}
+	
+	cell.onclick = function() {
+		// switch
+		this.set_sorting_as((me.sort_order_dict[fname]=='ASC') ? 'DESC' : 'ASC');
+		
+		// run
 		me.run();
 	}
+	
+	this.sort_heads[fname] = cell;
 }
 Listing.prototype.do_export = function() {
 	this.build_query();
@@ -380,7 +422,7 @@ Listing.prototype.build_query = function() {
 
 	// add sorting
 	if(this.sort_by && this.sort_order) {
-		this.query += NEWLINE + ' ORDER BY ' + this.sort_by + ' ' + this.sort_order;
+		this.query += NEWLINE + ' ORDER BY `' + this.sort_by + '` ' + this.sort_order;
 	}
 	if(this.show_query) msgprint(this.query);
 }
@@ -444,12 +486,10 @@ Listing.prototype.run = function(from_page) {
 	if(this.server_call) 
 		{ this.server_call(this, call_back); }
 	else {
-		args={query_max: this.query_max
-			,'defaults':pack_defaults()
-			,'roles':'["'+user_roles.join('","')+'"]'}
+		args={ query_max: this.query_max }
 		if(this.is_std_query) args.query = q;
 		else args.simple_query = q;
-		$c('runquery', args, call_back, null, this.no_loading);
+		$c('webnotes.widgets.query_builder.runquery', args, call_back, null, this.no_loading);
 	}
 }
 
@@ -477,9 +517,15 @@ Listing.prototype.make_result_tab = function(nr) {
 	$y(t,{borderCollapse:'collapse'});
 	
 	// display headings
-	if(has_headrow) 
+	if(has_headrow) {
 		this.make_headings(t,nr,nc);
-
+		
+		// hilight sorted cell
+		if(this.sort_by && this.sort_heads[this.sort_by]) {
+			this.sort_heads[this.sort_by].set_sorting_as(this.sort_order);
+		}
+	}
+	
 	for(var ri=(has_headrow?1:0); ri<t.rows.length; ri++) {
 		for(var ci=0; ci<t.rows[ri].cells.length; ci++) {
 			if(this.opts.cell_style)$y($td(t,ri,ci), this.opts.cell_style);

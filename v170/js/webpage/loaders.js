@@ -202,3 +202,23 @@ function loadpage(page_name, call_back, menuitem) {
 	else 
 		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn );
 }
+
+// Load Script
+// -------------------------------------------------------------------------------
+
+function loadscript(src, call_back) {
+	set_loading();
+	var script = $a('head','script');
+	script.type = 'text/javascript';
+	script.src = src;
+	script.onload = function() { 
+		if(call_back)call_back(); hide_loading(); 
+	}
+	// IE 6 & 7
+	script.onreadystatechange = function() {
+		if (this.readyState == 'complete' || this.readyState == 'loaded') {
+			hide_loading();
+			call_back();
+		}
+	}
+}

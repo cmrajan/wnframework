@@ -21,6 +21,8 @@ var selector;
 var keypress_observers = [];
 var click_observers = [];
 
+var editAreaLoader;
+
 // ***** TEMP ********
 var user_fmt = 'dd-MM-yyyy';
 
@@ -72,7 +74,6 @@ var hide_field;
 var unhide_field;
 var print_table;
 var sendmail;
-
 
 // icons
 var exp_icon = "images/ui/right-arrow.gif"; 
