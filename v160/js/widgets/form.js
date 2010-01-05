@@ -3185,7 +3185,7 @@ function print_std() {
 		else
 			var f = fl[i];
 			
-		if(!f.print_hide){
+		if(!cint(f.print_hide)){
 			switch(f.fieldtype){
 			 case 'Section Break':
 				layout.addrow();

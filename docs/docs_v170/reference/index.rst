@@ -6,8 +6,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   Authentication<model/auth>
-   Database<model/db>
+   Authentication<auth>
+   Database<db>
    
 Indices and tables
 ==================

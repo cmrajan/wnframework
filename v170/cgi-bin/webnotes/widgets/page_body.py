@@ -1,4 +1,4 @@
-out = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head id="head">
 <!-- Web Notes Framework : www.webnotesframework.org -->
@@ -132,7 +132,7 @@ def get():
 	keywords = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
 	site_description = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
 	
-	return out % {
+	return index_template % {
 		'title':title
 		,'content':content
 		,'keywords':keywords

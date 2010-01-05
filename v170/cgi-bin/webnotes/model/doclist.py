@@ -70,7 +70,7 @@ def validate_links_doclist(doclist):
 		if not ref.get(d.doctype):
 			ref[d.doctype] = d.make_link_list()
 			
-	err_list += d.validate_links(ref[d.doctype])
+		err_list += d.validate_links(ref[d.doctype])
 	return ', '.join(err_list)
 	
 # Get list of field values

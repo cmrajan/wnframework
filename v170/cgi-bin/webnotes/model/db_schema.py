@@ -37,7 +37,7 @@ def getcoldef(ftype, length=''):
 # Add Columns In Database
 # -----------------------
 
-def validate_column_name(n):
+def _validate_column_name(n):
 	n = n.replace(' ','_').strip().lower()
 	import re
 	if not re.match("[a-zA-Z_][a-zA-Z0-9_]*$", n):
@@ -45,25 +45,25 @@ def validate_column_name(n):
 		raise Exception
 	return n
 	
-def add_column(f, dt):		
+def _add_column(f, dt):		
 	ftype =  getcoldef(f[2], f[3])
 	if ftype:
-		fn = validate_column_name(f[1]) # name or label
+		fn = _validate_column_name(f[1]) # name or label
 		sql("alter table `tab%s` add `%s` %s" % (dt, fn, ftype))
 
 		
 # Update Columns In Database
 # -----------------------
 
-def validate_type_change(new, old):
+def _validate_type_change(new, old):
 	if ((old.lower() in ['text','small text','code','text editor']) and (new.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old.lower() in ['data','select','link']) and (new.lower() in ['date','int','currency','float','time','table'])):
 		webnotes.msgprint('%s: Coversion from %s to %s is not allowed' % (new_fn, old_type, new_type_orig))
 		raise Exception		
 
-def change_column(f, dt, col_def):
+def _change_column(f, dt, col_def):
 	if col_def:
-		sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], validate_column_name(f[1]), col_def))
-		webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], validate_column_name(f[1]), col_def))
+		sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], _validate_column_name(f[1]), col_def))
+		webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
 			
 def updatecolumns(doctype):
 	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
@@ -86,7 +86,7 @@ def updatecolumns(doctype):
 			if f[0]: change = 1
 			
 			# new field
-			else: add_column(f, doctype)
+			else: _add_column(f, doctype)
 		
 		# type or length has changed
 		col_def = getcoldef(f[2], f[3])
@@ -100,9 +100,9 @@ def updatecolumns(doctype):
 		# changed
 		if change or (cur_def and col_def.lower() != cur_def.lower()):
 			# validate type change
-			validate_type_change(f[2], f[4])
+			_validate_type_change(f[2], f[4])
 			
-			change_column(f, doctype, col_def)
+			_change_column(f, doctype, col_def)
 	
 	# update the "old" columns
 	sql("start transaction")
@@ -112,7 +112,7 @@ def updatecolumns(doctype):
 # Add Indices
 # -----------
 
-def addindex(doctype):
+def updateindex(doctype):
 	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE search_index=1 and parent='%s'" % doctype)
 	for f in addlist:
 		try:
@@ -138,9 +138,6 @@ def update_engine(doctype=None, engine='InnoDB'):
 		for t in sql("show tables"):
 			sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
 
-# Make Database Changes
-# -----------------------
-
 def create_table(dt):
 	sql("""
 		create table `tab%s` (
@@ -156,7 +153,11 @@ def create_table(dt):
 			idx int(8),
 			index parent(parent)) ENGINE=InnoDB""" % (dt))
 
-def update_table(dt):
+def updatedb(dt):
+
+	# if single type, nothing to do
+	if sql("select issingle from tabDocType where name=%s", doctype.name)[0][0]:
+		return
 
 	# create table
 	names = [rec[0].lower() for rec in sql('SHOW TABLES')]
@@ -167,11 +168,4 @@ def update_table(dt):
 	updatecolumns(dt)
 
 	# update index
-	addindex(dt)
-
-def updatedb(doctype, args = {}):
-	issingle = sql("select issingle from tabDocType where name=%s", doctype.name)[0][0]
-
-	if not issingle:
-		update_table(doctype.name)
-		
+	updateindex(dt)		

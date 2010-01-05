@@ -9,7 +9,43 @@ standardized `DocType` class that has the methods of any DocType. When an object
 `get_obj` method, it creates an instance of the `DocType` class of that particular DocType and sets the 
 `doc` and `doclist` attributes that represent the fields (properties) of that record.
 
-Following modules are declared for backward compatibility
+methods in following modules are imported for backward compatibility
+
+	* webnotes.*
+	* webnotes.utils.*
+	* webnotes.model.doc.*
+	* webnotes.model.doclist.*
+
+Global Properties / Methods (generally) used in server side scripts
+-------------------------------------------------------------------
+
+.. attribute:: version
+
+   "v170"
+
+.. attribute:: NEWLINE
+
+	"\n" - used in plug in scripts
+
+.. method:: set 
+
+   Same as `webnotes.conn.set`
+   Sets a value 
+  
+.. method:: sql(query, values=(), as_dict = 0, as_list = 0, allow_testing = 1)
+
+   Same as `webnotes.conn.sql`
+
+.. method:: get_value
+
+   Sames as `webnotes.conn.get_value`
+
+.. method:: convert_to_lists
+
+	Same as `webnotes.conn.convert_to_lists`
+
+Module Methods
+--------------
 
 .. method:: execute(code, doc=None, doclist=[])
    
@@ -26,5 +62,7 @@ Following modules are declared for backward compatibility
       
 .. method:: run_server_obj(server_obj, method_name, arg=None)
 
-   Executes a method from the given server_obj
+   Executes a method (`method_name`) from the given object (`server_obj`)
    
+
+

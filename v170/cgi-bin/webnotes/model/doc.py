@@ -120,7 +120,7 @@ class Document:
 	# Make New
 	# --------
 	
-	def makenew(self, autoname, istable, case=''):
+	def _makenew(self, autoname, istable, case=''):
 		import webnotes.model.code
 	
 		global in_transaction
@@ -196,7 +196,7 @@ class Document:
 
 				# validate links
 				if link_list and link_list.get(f):
-					self.fields[f] = self.validate_link(link_list[f], self.fields[f])
+					self.fields[f] = self._validate_link(link_list[f], self.fields[f])
 
 				if self.fields[f]==None:
 					update_str.append("(%s,%s,NULL)")
@@ -218,14 +218,14 @@ class Document:
 			# validate links
 			old_val = self.fields[f]
 			if link_list and link_list.get(f):
-				self.fields[f] = self.validate_link(link_list[f], self.fields[f])
+				self.fields[f] = self._validate_link(link_list[f], self.fields[f])
 
 			if old_val and not self.fields[f]:
 				err_list.append(old_val)
 				
 		return err_list
 
-	def make_link_list(self):
+	def _make_link_list(self):
 		res = sql("""
 			SELECT fieldname, options
 			FROM tabDocField
@@ -235,7 +235,7 @@ class Document:
 		for i in res: link_list[i[0]] = i[1]
 		return link_list
 	
-	def validate_link(self, dt, dn):
+	def _validate_link(self, dt, dn):
 		if not dt: return dn
 		if dt.lower().startswith('link:'):
 			dt = dt[5:]
@@ -258,7 +258,7 @@ class Document:
 					
 					# validate links
 					if link_list and link_list.get(f):
-						self.fields[f] = self.validate_link(link_list[f], self.fields[f])
+						self.fields[f] = self._validate_link(link_list[f], self.fields[f])
 
 					if self.fields[f]==None:
 						update_str.append("`%s`=NULL" % f)
@@ -286,14 +286,14 @@ class Document:
 
 		# make new		
 		if new or (not new and self.fields.get('__islocal')) and (not res.get('issingle')):
-			r = self.makenew(res.get('autoname'), res.get('istable'), res.get('name_case'))
+			r = self._makenew(res.get('autoname'), res.get('istable'), res.get('name_case'))
 			if r: 
 				return r
 
-		self.update_values(res.get('issingle'), check_links and self.make_link_list() or {}, ignore_fields)
-		self.clear_temp_fields()
+		self.update_values(res.get('issingle'), check_links and self._make_link_list() or {}, ignore_fields)
+		self._clear_temp_fields()
 		
-	def clear_temp_fields(self):
+	def _clear_temp_fields(self):
 		# clear temp stuff
 		keys = self.fields.keys()
 		for f in keys:

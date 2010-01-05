@@ -7,7 +7,7 @@
 database object --- conn
 ------------------------
 
-.. class:: Database(self, host='', user='', password='', use_default = 0):
+.. class:: Database(host='', user='', password='', use_default = 0):
 
    Open a database connection with the given parmeters, if use_default is True, use the
    login details from `defs.py`. This is called by the request handler and is accessible using
@@ -53,7 +53,7 @@ database object --- conn
    
       Internal - get results as dictionary
 	
-   .. method:: sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1)
+   .. method:: sql(query, values=(), as_dict = 0, as_list = 0, allow_testing = 1)
    
       Execute a `query`, with given `values`
       returns as a dictionary if as_dict = 1
