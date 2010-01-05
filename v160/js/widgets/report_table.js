@@ -1259,7 +1259,7 @@ DataTable.prototype.show_result = function(r, rt) {
 	}
   
 	// has next page?
-	if(this.rset.length && this.rset.length==this.page_len)this.has_next = true;
+	if(this.rset.length && this.rset.length >= this.page_len)this.has_next = true;
 
 	// style
 	if(r.style) {
