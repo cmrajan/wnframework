@@ -46,17 +46,17 @@ def log(event, details):
 # Date and Time
 # -------------
 
-def getdate(docdate):
+def getdate(string_date):
 	import datetime
-	t = docdate.split('-')
+	t = string_date.split('-')
 	if len(t)==3:
 		return datetime.date(cint(t[0]), cint(t[1]), cint(t[2]))
 	else:
 		return ''
 
-def add_days(docdate, days):
+def add_days(string_date, days):
 	import datetime
-	d = getdate(docdate)
+	d = getdate(string_date)
 	return (d + datetime.timedelta(days)).strftime('%Y-%m-%d')
 
 def now():
@@ -79,23 +79,13 @@ def get_last_day(dt):
 	return get_first_day(dt, 0, 1) + datetime.timedelta(-1)
 
 user_format = None
-def formatdate(dt):
+def formatdate(string_date):
 	global user_format
 	if not user_format:
 		user_format = Document('Control Panel', 'Control Panel').date_format
-	d = dt.split('-')
+	d = string_date.split('-')
 	out = user_format
 	return out.replace('dd', ('%.2i' % cint(d[2]))).replace('mm', ('%.2i' % cint(d[1]))).replace('yyyy', d[0])
-
-
-def now():
-	import time
-	return time.strftime('%Y-%m-%d %H:%M:%S')
-	
-def nowdate():
-	import time
-	return time.strftime('%Y-%m-%d')
-
 	
 def dict_to_str(args, sep='&'):
 	import urllib

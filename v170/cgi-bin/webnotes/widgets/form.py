@@ -138,6 +138,10 @@ def runserverobj():
 				doclist.append(doc)	
 	
 		so = webnotes.model.code.get_server_obj(main_doc, doclist)
+
+	# check integrity
+	if not check_integrity(so.doc):
+		return
 				
 	if so:
 		try:
@@ -195,6 +199,25 @@ def _do_action(doc, doclist, so, method_name, docstatus):
 		for d in [doc] + doclist:
 			set(d, 'docstatus', docstatus)
 
+def check_integrity(doc):
+	import webnotes
+
+	# check for integrity / transaction safety
+	res = webnotes.conn.sql('SELECT issingle FROM tabDocType WHERE name="%s"' % doc.doctype)
+	if res:
+		is_single = res[0][0]
+	else:
+		webnotes.errprint('DocType not found "%s"' % doc.doctype)
+		return
+		
+	if (not is_single) and (not doc.fields.get('__islocal')):
+		tmp = webnotes.conn.sql('SELECT modified FROM `tab%s` WHERE name="%s"' % (doc.doctype, doc.name))
+		if tmp and str(tmp[0][0]) != str(doc.modified):
+			webnotes.msgprint('Document has been modified after you have opened it. To maintain the integrity of the data, you will not be able to save your changes. Please refresh this document. [%s/%s]' % (tmp[0][0], doc.modified))
+			return 0
+			
+	return 1
+
 def savedocs():
 	import webnotes.model.doclist
 	
@@ -216,19 +239,9 @@ def savedocs():
 	# get server object	
 	server_obj = get_server_obj(doc, doclist)
 	
-	# check for integrity / transaction safety
-	res = sql('SELECT issingle FROM tabDocType WHERE name="%s"' % doc.doctype)
-	if res:
-		is_single = res[0][0]
-	else:
-		webnotes.errprint('DocType not found "%s"' % doc.doctype)
+	# check integrity
+	if not check_integrity(doc):
 		return
-		
-	if (not is_single) and (not doc.fields.get('__islocal')):
-		tmp = sql('SELECT modified FROM `tab%s` WHERE name="%s"' % (doc.doctype, doc.name))
-		if tmp and str(tmp[0][0]) != str(doc.modified):
-			webnotes.msgprint('Document has been modified after you have opened it. To maintain the integrity of the data, you will not be able to save your changes. Please refresh this document. [%s/%s]' % (tmp[0][0], doc.modified))
-			return
 	
 	# validate links
 	ret = webnotes.model.doclist.validate_links_doclist([doc] + doclist)

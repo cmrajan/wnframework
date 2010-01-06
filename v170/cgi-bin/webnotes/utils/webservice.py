@@ -1,15 +1,15 @@
 import webnotes.utils
 
 class FrameworkServer:
-	def __init__(self, wserver, path, user='', password='', account='', cookies={}, opts={}, https = 0):
+	def __init__(self, remote_host, path, user='', password='', account='', cookies={}, opts={}, https = 0):
 		# validate
-		if not (wserver and path):
+		if not (remote_host and path):
 			raise Exception, "Server address and path necessary"
 
 		if not ((user and password) or (cookies)):
 			raise Exception, "Either cookies or user/password necessary"
 	
-		self.wserver = wserver
+		self.remote_host = remote_host
 		self.path = path
 		self.cookies = cookies
 		self.webservice_method='POST'
@@ -36,12 +36,10 @@ class FrameworkServer:
 			if ret.get('message') and ret.get('message')!='Logged In':
 				raise Exception, ret.get('message')
 				
-			self.set_cookies(res)
+			self._set_cookies(res)
 
 			self.account_id = cookies.get('account_id')
 			self.sid = cookies.get('sid')
-
-			self.set_cookies(res)
 	
 	def http_get_response(self, method, args):
 		# get response from remote server
@@ -49,8 +47,6 @@ class FrameworkServer:
 		import httplib, urllib		
 
 		args['cmd'] = method
-		if self.account_id:
-			args['__account'] = self.account_id
 
 		headers = {}
 		if self.cookies:
@@ -62,14 +58,16 @@ class FrameworkServer:
 			headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
 		
 		if self.https:
-			conn = httplib.HTTPSConnection(self.wserver)	
+			conn = httplib.HTTPSConnection(self.remote_host)	
 		else:
-			conn = httplib.HTTPConnection(self.wserver)	
-		conn.request(self.webservice_method, "%s/cgi-bin/run.cgi" % self.path, urllib.urlencode(args), headers=headers)
+			conn = httplib.HTTPConnection(self.remote_host)	
+			
+		import os
+		conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
 	
 		return conn.getresponse()
 	
-	def set_cookies(self, res):
+	def _set_cookies(self, res):
 		h = res.getheader('set-cookie')
 		if h:
 			h=h.replace(',',';')
