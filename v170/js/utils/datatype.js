@@ -152,45 +152,6 @@ function repl(s, dict) {
 	for(key in dict) s = repl_all(s, '%('+key+')s', dict[key]);
 	return s;
 }
-//function pwd validator
-function validatePassword (pw, options) {
-
-	// default options (allows any password)
-	var o = {
-		lower:    0,
-		upper:    0,
-		alpha:    0, /* lower + upper */
-		numeric:  0,
-		special:  0,
-		length:   [0, Infinity],
-		custom:   [ /* regexes and/or functions */ ],
-		badWords: [],
-		badSequenceLength: 0,
-		noQwertySequences: false,
-		noSequential:      false
-	};
-
-	for (var property in options)
-		o[property] = options[property];
-
-	var	re = {
-			lower:   /[a-z]/g,
-			upper:   /[A-Z]/g,
-			alpha:   /[A-Z]/gi,
-			numeric: /[0-9]/g,
-			special: /[\W_]/g
-		},
-		rule, i;
-
-	// enforce min/max length
-	if (pw.length < o.length[0] || pw.length > o.length[1]) {
-		$i('pwd_new').innerHTML = 'Password must be atleast 6 characters long.';
-	} else if(!/[A-Z]/.test(pw) || !/[0-9]/.test(pw) || !/[a-z]/.test(pw)) {
-		$i('pwd_new').innerHTML = 'Password must contain atleast one capital letter, one small letter and one number.';
-	} else {
-		$i('pwd_new').innerHTML = '';
-	}
-}
 
 ///// dict type
 

@@ -7,7 +7,7 @@ _e.email_as_in = 'email_id,contact_name';
 
 sendmail = function(emailto, emailfrom, cc, subject, message, fmt, with_attachments) {
 	var fn = function(html) {
-		$c('sendmail', {
+		$c('webnotes.utils.email_lib.send_form', {
 			'sendto':emailto, 
 			'sendfrom': emailfrom?emailfrom:'',
 			'cc':cc?cc:'',
@@ -116,7 +116,7 @@ _e.make = function() {
         }
         as.createList(as.aSug);
       }
-      $c('get_contact_list',{'select':_e.email_as_field, 'from':_e.email_as_dt, 'where':_e.email_as_in, 'txt':(last_txt ? strip(last_txt) : '%')},call_back);
+      $c('webnotes.utils.email_lib.get_contact_list',{'select':_e.email_as_field, 'from':_e.email_as_dt, 'where':_e.email_as_in, 'txt':(last_txt ? strip(last_txt) : '%')},call_back);
       return;
     }
 	

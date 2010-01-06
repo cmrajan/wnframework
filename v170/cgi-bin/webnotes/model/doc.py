@@ -225,7 +225,7 @@ class Document:
 				
 		return err_list
 
-	def _make_link_list(self):
+	def make_link_list(self):
 		res = sql("""
 			SELECT fieldname, options
 			FROM tabDocField
@@ -290,7 +290,7 @@ class Document:
 			if r: 
 				return r
 
-		self.update_values(res.get('issingle'), check_links and self._make_link_list() or {}, ignore_fields)
+		self.update_values(res.get('issingle'), check_links and self.make_link_list() or {}, ignore_fields)
 		self._clear_temp_fields()
 		
 	def _clear_temp_fields(self):

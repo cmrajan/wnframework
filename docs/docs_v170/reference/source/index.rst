@@ -14,6 +14,8 @@ Contents:
    concepts
    server_side_api
    server_side_internals
+   client_side_widgets
+   javascript_utils
    glossary
 
 Indices and tables

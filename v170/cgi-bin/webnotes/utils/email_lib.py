@@ -128,9 +128,10 @@ def validate_email_add(email_str):
 	return re.match("^[a-zA-Z0-9._%-]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email_str)
 	
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
-	from email_lib import Email
+	import webnotes	
+	
 	if not sender:
-		sender = get_value('Control Panel',None,'auto_email_id')
+		sender = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
 	email = EMail(sender, recipients, subject)
 	email.cc = cc
 	if msg: email.set_message(msg)
@@ -139,5 +140,53 @@ def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc
 	for a in attach:
 		email.attach(a)
 
-	email.set_message(get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')
+	email.set_message(webnotes.conn.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')
 	email.send()
+
+def get_contact_list(form, session):
+	import webnotes
+
+	cond = ['`%s` like "%s%%"' % (f, webnotes.form.getvalue('txt')) for f in webnotes.form.getvalue('where').split(',')]
+	cl = webnotes.conn.sql("select `%s` from `tab%s` where %s" % (
+  			 webnotes.form.getvalue('select')
+			,webnotes.form.getvalue('from')
+			,' OR '.join(cond)
+		)
+	)
+	webnotes.response['cl'] = filter(None, [c[0] for c in cl])
+
+# Send Form
+# ----------
+def send_form():
+	import webnotes
+	from webnotes.utils import cint
+
+	form = webnotes.form
+
+	recipients = form.getvalue('sendto')
+	subject = form.getvalue('subject')
+	sendfrom = form.getvalue('sendfrom')
+	
+	# get attachments
+	al = []
+	if cint(form.getvalue('with_attachments')):
+		al = webnotes.conn.sql('select file_list from `tab%s` where name="%s"' % (form.getvalue('dt'), form.getvalue('dn')))
+		if al:
+			al = al[0][0].split('\n')
+	if recipients:
+		recipients = recipients.replace(';', ',')
+		recipients = recipients.split(',')
+
+		if not sendfrom:
+			sendfrom = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
+		email = EMail(sendfrom, recipients, subject)
+		email.cc = [form.getvalue('cc'),]
+
+		email.set_message(form.getvalue('message') or 'No text')
+		email.set_message(form.getvalue('body'))
+		
+		for a in al:
+			email.attach(a.split(',')[0])
+
+		email.send()
+	webnotes.msgprint('Sent')
