@@ -7,6 +7,7 @@ in_files_main = [
        ,'utils/dom.js'
        ,'utils/handler.js'
        ,'utils/msgprint.js'
+       ,'utils/json.js'
        #,'utils/shadedborder.js'
        ,'widgets/dialog.js'
        ,'widgets/listing.js'

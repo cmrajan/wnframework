@@ -37,10 +37,10 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 	var req=newHttpReq();
 	ret_fn=function() {
 		if (checkResponse(req, on_timeout, no_spinner, freeze_msg)) {
-			var rtxt = req.responseText;
 			if(!no_spinner)hide_loading(); // Loaded
-			rtxt = rtxt.replace(/'\^\\x05\*'/g, 'null');
-			//alert(rtxt);
+
+			var rtxt = req.responseText;
+						
 			var r = eval("var a="+rtxt+";a")
 			if(r.exc && r.__redirect_login) {
 				msgprint(r.exc, 0, function() { document.location = login_file });
@@ -61,7 +61,6 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 	req.setRequestHeader("ENCTYPE", "multipart/form-data");
 	req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 	args['cmd']=command;
-	//alert(makeArgString(args));
 	req.send(makeArgString(args)); 
 	if(!no_spinner)set_loading(); // Loading
 	if(freeze_msg)freeze(freeze_msg,1);

@@ -10,37 +10,43 @@ function compress_doclist(list) {
 			for(key in fields[o.doctype]) { // all other values
 				if((!in_list(fl, key)) && (!in_list(no_value_fields, fields[o.doctype][key].fieldtype))) {
 					fl[fl.length] = key; // save value list
-					tfl[tfl.length] = key.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+					tfl[tfl.length] = key //.replace(/'/g, "\\'").replace(/\n/g, "\\n");
 				}
 			}
 			flx[o.doctype] = fl;
-			kl[o.doctype] = "['"+tfl.join("', '")+"']";
+			
+			kl[o.doctype] = tfl //"['"+tfl.join("', '")+"']";
 		}
 		var nl = [];
 		var fl = flx[o.doctype];
 		// check all
 		for(var j=0;j<fl.length;j++) {
 			var v = o[fl[j]];
-			if(v==null) 
-				v = NULL_CHAR;
-			if(typeof(v)==typeof(1)) { // for numbers
+			nl.push(v);
+			/*if(typeof(v)==typeof(1)) { // for numbers
 				nl[nl.length] = v+'';
+			} else if(v==null) {
+				nl[nl.length] = 
 			} else {
 	   			v = v+''; // convert to string
-				nl[nl.length] = "'"+v.replace(/'/g, "\\'").replace(/\n/g, "\\n")+"'";
-   			}
+				nl[nl.length] = v //"'"+v.replace(/'/g, "\\'").replace(/\n/g, "\\n")+"'";
+   			}*/
 		}
-		vl[vl.length] = '['+nl.join(', ')+']';
+		vl.push(nl);
+		//vl[vl.length] = '['+nl.join(', ')+']';
 	}
-	var sk = [];
-	var kls = [];
-	for(key in kl) kls[kls.length] = "'"+key+"':" + kl[key];
+	//var sk = [];
+	//var kls = [];
+	//for(key in kl) kls[kls.length] = "'"+key+"':" + kl[key];
 
-	var kls = '{'+kls.join(',')+'}';
-	var vl = '['+vl.join(',')+']';
+	//var kls = '{'+kls.join(',')+'}';
+	//var vl = '['+vl.join(',')+']';
 	
 	//alert("{'_vl':"+vl+",'_kl':"+kls+"}");
-	return "{'_vl':"+vl+",'_kl':"+kls+"}";
+		
+	return JSON.stringify({'_vl':vl, '_kl':kl});
+	
+	//return "{'_vl':"+vl+",'_kl':"+kls+"}";
 }
 
 function expand_doclist(docs) {

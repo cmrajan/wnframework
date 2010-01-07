@@ -153,10 +153,11 @@ def create_table(dt):
 			idx int(8),
 			index parent(parent)) ENGINE=InnoDB""" % (dt))
 
-def updatedb(dt):
+def updatedb(doctype):
+	dt = doctype.name
 
 	# if single type, nothing to do
-	if sql("select issingle from tabDocType where name=%s", doctype.name)[0][0]:
+	if sql("select issingle from tabDocType where name=%s", dt)[0][0]:
 		return
 
 	# create table

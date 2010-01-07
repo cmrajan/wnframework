@@ -597,14 +597,21 @@ else:
 		out['server_messages'] = '\n----------------\n'.join(webnotes.message_log)
 
 	cleanup_docs()
+	
+	out['enc'] = sys.getdefaultencoding()
 
-	str_out = str(out)
-
-	if acceptsGzip and len(str_out)>512:
+	# Convert to JSON
+	# ---------------
+	import json
+	str_out = json.dumps(out)
+	
+	if 0 and acceptsGzip and len(str_out)>512:
 		out_buf = compressBuf(str_out)
 		print "Content-Encoding: gzip"
 		print "Content-Length: %d" % (len(out_buf))
-	print "Content-Type: text/html"
+		
+	print "Content-Type: text/html; Charset: ISO-8859-1"
+	
 	if cookies:
 		if webnotes.add_cookies: cookes.update(webnotes.add_cookies)
 		print cookies

@@ -32,6 +32,7 @@ var datatables = {} // deprecated
 var __sid150; // session id required to store here for cross domain logins
 var tinyMCE;
 var editAreaLoader;
+var PramukhPhoneticHandler;
 
 // Globals
 var calendar; var Calendar; 

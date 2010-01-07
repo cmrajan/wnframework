@@ -84,3 +84,13 @@ Glossary
       tabular reports from DocType. You can select the columns of the report as well as filter the report
       on columns that have the `in_filter` property set
       
+   Search Criteria
+      Saved settings of the `Report Builder`. This can be used for "one-click" reports. Scripting and other
+      settings can also be done in the Search Criteria
+      
+   Locals
+      A local dictionary (object) in the browser that maintains all records (or metadata) loaded from the server. The format is
+      locals[`DocType`][`name`]. If an object is loaded in the current session, then it will be present in the
+      locals object (dictionary)
+      
+   

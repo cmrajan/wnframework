@@ -2,8 +2,6 @@ import webnotes
 import webnotes.model
 import webnotes.model.doc
 
-NULL_CHAR = '^\5*'
-
 def xzip(a,b):
 	d = {}
 	for i in range(len(a)):
@@ -12,10 +10,9 @@ def xzip(a,b):
 	
 def expand(docs):
 	import string
-	
-	N1 = "'" + NULL_CHAR + "'"
-	N2 = '"' + NULL_CHAR + '"'
-	docs = eval(docs.replace(chr(0),'').replace(N1, 'None').replace(N2, 'None'))
+	import json
+
+	docs = json.loads(docs)
 	clist = []
 	for d in docs['_vl']:
 		doc = xzip(docs['_kl'][d[0]], d);
@@ -33,17 +30,19 @@ def compress(doclist):
 		dt = d['doctype']
 		if not (dt in kl.keys()):
 			fl = d.keys()
+			forbidden = ['server_code_compiled']
 			nl = ['doctype','localname','__oldparent','__unsaved']
 			for f in fl:
-				if not (f in nl): nl.append(f)
+				if not (f in nl) and not (f in forbidden):
+					nl.append(f)
 			kl[dt] = nl
+
 		## values
 		fl = kl[dt]
 		nl = []
 		for f in fl:
 			v = d.get(f)
-			if v==None:
-				v=NULL_CHAR
+
 			if type(v)==long:
 				v=int(v)
 			nl.append(v)
