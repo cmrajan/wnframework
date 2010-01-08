@@ -68,17 +68,6 @@ def runserverobj():
 def logout():
 	auth_obj.logout()
 
- # ------------------------------------------------------------------------------------
-
-def get_print_format(form, session):
-	out['message'] = server.get_print_format(form.getvalue('name'))
-
-def rename(form, session):
-	if form.getvalue('dt') and form.getvalue('old') and form.getvalue('new'):
-		server.rename(form.getvalue('dt'), form.getvalue('old'), form.getvalue('new'))
-		
-		getdoc(form, session)
-
 
 # DocType Mapper
 # --------------
@@ -93,7 +82,19 @@ def dt_map(form, session):
 	dm = server.get_obj('DocType Mapper', from_doctype +'-' + to_doctype)
 	doclist = dm.dt_map(from_doctype, to_doctype, from_docname, server.Document(fielddata = dt_list[0]), [], from_to_list)
 	
-	out['docs'] = server.compress_doclist(doclist)
+	out['docs'] = doclist
+
+ # ------------------------------------------------------------------------------------
+
+def get_print_format(form, session):
+	out['message'] = server.get_print_format(form.getvalue('name'))
+
+def rename(form, session):
+	if form.getvalue('dt') and form.getvalue('old') and form.getvalue('new'):
+		server.rename(form.getvalue('dt'), form.getvalue('old'), form.getvalue('new'))
+		
+		getdoc(form, session)
+
 
 # Get Fields
 # ----------

@@ -44,6 +44,7 @@ _f.Frm = function(doctype, parent) {
 	this.opendocs = {};
 	this.cur_section = {};
 	this.sections = [];
+	this.sections_by_label = {};
 	this.grids = [];
 	this.cscript = {};
 	this.parent = parent;
@@ -250,6 +251,8 @@ _f.Frm.prototype.set_last_comment = function() {
 // ======================================================================================
 
 _f.Frm.prototype.set_section = function(sec_id) {
+	if(!this.sections[sec_id].show) return; // Simple type
+	
 	this.sections[this.cur_section[this.docname]].hide();
 	this.sections[sec_id].show();
 	this.cur_section[this.docname] = sec_id;
@@ -365,10 +368,11 @@ _f.Frm.prototype.setup_fields_std = function() {
 		this.fields[this.fields.length] = fld;
 		this.fields_dict[fn] = fld;
 
-		// Add to section break for check mandatory
-		if(sec)sec.fields[sec.fields.length] = fld;
+		// Add to section break so that this section can be shown when there is an error
+		if(this.meta.section_style != 'Simple')
+			fld.parent_section = sec;
 		
-		if(f.fieldtype=='Section Break')
+		if(f.fieldtype=='Section Break' && f.options != 'Simple')
 			sec = fld;
 		
 		// default col-break after sec-break
@@ -950,9 +954,23 @@ _f.Frm.prototype.check_required = function(dt, dn) {
 	for(var i=0;i<fl.length;i++) {
 		var key = fl[i].fieldname;
 		var v = doc[key];
-		
+				
 		if(fl[i].reqd && is_null(v)) {
 			errfld[errfld.length] = fl[i].label;
+			
+			// show as red
+			var f = this.fields_dict[fl[i].fieldname];
+			if(f) {
+				// in form
+				f.set_as_error(1);
+				
+				// switch to section
+				if(!this.error_in_section && f.parent_section) {
+					cur_frm.set_section(f.parent_section.sec_id);
+					this.error_in_section = 1;
+				}
+			}
+			
 			if(all_clear)all_clear = false;
 		}
 	}
@@ -970,6 +988,7 @@ _f.Frm.prototype.savedoc = function(save_action, onsave, onerr) {
 	// make doc list
 	var doclist = make_doclist(dt, dn, 1);
 	var all_clear = true;
+	this.error_in_section = 0;
 	
 	if(save_action!='Cancel') {
 		for(var n in doclist) {
@@ -1053,7 +1072,7 @@ _f.set_value = function(dt, dn, fn, v) {
 	var d = locals[dt][dn];
 
 	if(!d) 
-		show_alert('Trying to set a value for "'+dt+','+dn+'" which is not found');
+		msgprint('error:Trying to set a value for "'+dt+','+dn+'" which is not found');
 	if(d[fn] != v) {
 		d[fn] = v;
 		d.__unsaved = 1;

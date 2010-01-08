@@ -37,7 +37,7 @@ function is_null(v) {
 	if(v==null) {
 		return 1
 	} else if(v==0) {
-		if((v+'').length==1) return 0;
+		if((v+'').length>=1) return 0;
 		else return 1;
 	} else {
 		return 0
@@ -58,7 +58,10 @@ function $s(ele, v, ftype, fopt) {
 		doc_link(ele, fopt, v);
 	} else if(ftype =='Currency') {
 		ele.style.textAlign = 'right';
-		ele.innerHTML = fmt_money(v);
+		if(is_null(v))
+			ele.innerHTML = '';
+		else
+			ele.innerHTML = fmt_money(v);
 	} else if(ftype =='Int') {
 		ele.style.textAlign = 'right';
 		ele.innerHTML = v;

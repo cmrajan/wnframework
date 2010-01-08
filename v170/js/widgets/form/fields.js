@@ -57,6 +57,9 @@ Field.prototype.set_label = function() {
 	}
 }
 
+// Field Refresh
+// --------------------------------------------------------------------------------------------
+
 Field.prototype.get_status = function() {
 	// if used in filters
 	if(this.not_in_form) {
@@ -104,35 +107,7 @@ Field.prototype.get_status = function() {
 	return ret;
 }
 
-// for grids (activate against a particular record in the table
-Field.prototype.activate = function(docname) {
-	this.docname = docname;
-	this.refresh();
 
-	if(this.input) {
-		this.input.isactive = true;
-		var v = _f.get_value(this.doctype, this.docname, this.df.fieldname);
-		this.last_value=v;
-		// set input value
-
-		if(this.input.onchange && this.input.value!=v) {
-			if(this.validate)
-				this.input.value = this.validate(v);
-			else 
-				this.input.value = (v==null)?'':v;
-			if(this.format_input)this.format_input();
-		}
-		
-		if(this.input.focus){
-			try{this.input.focus();} catch(e){} // IE Fix - Unexpected call???
-		}		
-	}
-	if(this.txt) {
-		try{this.txt.focus();} catch(e){} // IE Fix - Unexpected call???
-		this.txt.isactive = true;
-		this.btn.isactive = true;
-	}
-}
 Field.prototype.refresh_mandatory = function() { 
 	if(this.not_in_form)return;
 
@@ -214,6 +189,9 @@ Field.prototype.refresh_label_icon = function() {
 	} else { $dh(this.label_icon) }
 }
 
+// Set / display values
+// --------------------------------------------------------------------------------------------
+
 Field.prototype.set = function(val) {
 	// not in form
 	if(this.not_in_form)
@@ -249,9 +227,14 @@ Field.prototype.run_trigger = function() {
 			this.report.run();
 		return;
 	}
-	if(this.df.trigger=='Client') {
-		cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
-	}
+
+	if(this.df.reqd && !is_null(this.get_value()))
+		this.set_as_error(0);
+
+	//if(this.df.trigger=='Client') { - No longer mandatory
+	cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
+	//}
+
 	cur_frm.refresh_dependency();
 	this.refresh_label_icon();
 }
@@ -268,6 +251,50 @@ Field.prototype.set_disp = function(val) {
 	this.set_disp_html(val);
 }
 
+Field.prototype.set_as_error = function(set) { 
+	if(this.in_grid || this.not_in_form) return;
+	
+	var w = this.txt ? this.txt : this.input;
+	if(set) {
+		$y(w, {border: '2px solid RED'});
+		
+	} else {
+		$y(w, {border: '1px solid #888'});	
+	}
+}
+
+// Show in GRID
+// --------------------------------------------------------------------------------------------
+
+// for grids (activate against a particular record in the table
+Field.prototype.activate = function(docname) {
+	this.docname = docname;
+	this.refresh();
+
+	if(this.input) {
+		this.input.isactive = true;
+		var v = _f.get_value(this.doctype, this.docname, this.df.fieldname);
+		this.last_value=v;
+		// set input value
+
+		if(this.input.onchange && this.input.value!=v) {
+			if(this.validate)
+				this.input.value = this.validate(v);
+			else 
+				this.input.value = (v==null)?'':v;
+			if(this.format_input)this.format_input();
+		}
+		
+		if(this.input.focus){
+			try{this.input.focus();} catch(e){} // IE Fix - Unexpected call???
+		}		
+	}
+	if(this.txt) {
+		try{this.txt.focus();} catch(e){} // IE Fix - Unexpected call???
+		this.txt.isactive = true;
+		this.btn.isactive = true;
+	}
+}
 // ======================================================================================
 
 function DataField() { } DataField.prototype = new Field();
@@ -518,12 +545,16 @@ FloatField.prototype.format_input = function() {
 function CurrencyField() { } CurrencyField.prototype = new DataField();
 CurrencyField.prototype.format_input = function() { 
 	var v = fmt_money(this.input.value); 
-	if(!flt(this.input.value)) v = ''; // blank in filter
+	if(this.not_in_form) {
+		if(!flt(this.input.value)) v = ''; // blank in filter
+	}
 	this.input.value = v;
 }
 
 CurrencyField.prototype.validate = function(v) { 
-	if(v==null || v=='')return 0; return flt(v,2); 
+	if(v==null || v=='')
+		return 0; 
+	return flt(v,2); 
 }
 CurrencyField.prototype.set_disp = function(val) { 
 	var v = fmt_money(val); 

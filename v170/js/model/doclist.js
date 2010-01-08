@@ -14,8 +14,7 @@ function compress_doclist(list) {
 				}
 			}
 			flx[o.doctype] = fl;
-			
-			kl[o.doctype] = tfl //"['"+tfl.join("', '")+"']";
+			kl[o.doctype] = tfl
 		}
 		var nl = [];
 		var fl = flx[o.doctype];
@@ -23,30 +22,11 @@ function compress_doclist(list) {
 		for(var j=0;j<fl.length;j++) {
 			var v = o[fl[j]];
 			nl.push(v);
-			/*if(typeof(v)==typeof(1)) { // for numbers
-				nl[nl.length] = v+'';
-			} else if(v==null) {
-				nl[nl.length] = 
-			} else {
-	   			v = v+''; // convert to string
-				nl[nl.length] = v //"'"+v.replace(/'/g, "\\'").replace(/\n/g, "\\n")+"'";
-   			}*/
 		}
 		vl.push(nl);
-		//vl[vl.length] = '['+nl.join(', ')+']';
 	}
-	//var sk = [];
-	//var kls = [];
-	//for(key in kl) kls[kls.length] = "'"+key+"':" + kl[key];
-
-	//var kls = '{'+kls.join(',')+'}';
-	//var vl = '['+vl.join(',')+']';
-	
-	//alert("{'_vl':"+vl+",'_kl':"+kls+"}");
 		
 	return JSON.stringify({'_vl':vl, '_kl':kl});
-	
-	//return "{'_vl':"+vl+",'_kl':"+kls+"}";
 }
 
 function expand_doclist(docs) {

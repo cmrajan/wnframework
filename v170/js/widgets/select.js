@@ -9,7 +9,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 		
 		this.wrapper = $a(parent, 'div', '', {width: (cint(width)+2) + 'px', display: 'inline'});
 		
-		this.body_tab = make_table(this.wrapper, 1, 2, cint(width) + 'px', [(cint(width)-18) + 'px', '18px'],{border:'1px solid #AAA'});
+		this.body_tab = make_table(this.wrapper, 1, 2, cint(width) + 'px', [(cint(width)-18) + 'px', '18px'],{border:'1px solid #888'});
 	
 		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: (cint(width)-20) + 'px', border:'0px', padding:'2px'});
 		

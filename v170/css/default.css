@@ -16,7 +16,7 @@ input, select, button { font-size: 12px; font-family: Arial; }
 
 li { margin: 4px; }
 
-input { margin: 0px; border: 1px solid #AAA; padding: 1px; }
+input { margin: 0px; border: 1px solid #888; padding: 1px; }
 
 h1 { margin: 8px 0px; padding: 0px; }
 h2 { margin: 8px 0px; padding: 0px; font-size: 18px; }
@@ -28,7 +28,7 @@ pre { margin: 0px; padding: 0px; }
 
 button { margin: 2px; margin-left: 0px; }
 
-select { border: 1px solid #AAA; }
+select { border: 1px solid #888; }
 
 textarea { font-family: Arial, Sans; height: 120px; width: 90%; overflow-x: auto; border: 1px solid #AAA; font-size: 12px; }
 

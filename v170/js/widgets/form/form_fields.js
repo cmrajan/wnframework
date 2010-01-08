@@ -110,7 +110,6 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 
 _f.cur_sec_header = null;
 _f.SectionBreak.prototype.make_body = function() {
-	this.fields = [];
 	if((!this.perm[this.df.permlevel]) || (!this.perm[this.df.permlevel][READ]) || this.df.hidden) {
 		// no display
 		return;
@@ -123,6 +122,7 @@ _f.SectionBreak.prototype.make_body = function() {
 			// IE full page ??
 			this.sec_id = this.frm.sections.length;
 			this.frm.sections[this.sec_id] = this;
+			this.frm.sections_by_label[me.df.label] = this;
 			
 			this.mytab = this.frm.tabs.add_tab(me.df.label, 
 				function() { me.frm.set_section(me.sec_id);});
@@ -145,6 +145,7 @@ _f.SectionBreak.prototype.make_body = function() {
 		if(this.df.options!='Simple') {
 			this.sec_id = this.frm.sections.length;
 			this.frm.sections[this.sec_id] = this;
+			this.frm.sections_by_label[me.df.label] = this;
 			
 			var w=$a(this.frm.tray_area, 'div');
 			this.header = $a(w, 'div', 'sec_tray_tab');

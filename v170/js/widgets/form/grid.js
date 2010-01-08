@@ -350,7 +350,7 @@ _f.grid_refresh_date = function() {
 	_f.grid_date_cell.grid.set_cell_value(_f.grid_date_cell);
 }
 _f.grid_refresh_field = function(temp, input) {
-	if(input.value! = _f.get_value(temp.doctype, temp.docname, temp.df.fieldname))
+	if(input.value != _f.get_value(temp.doctype, temp.docname, temp.df.fieldname))
 		if(input.onchange)input.onchange();
 }
 

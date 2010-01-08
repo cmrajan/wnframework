@@ -57,7 +57,8 @@ String
 
    Python-like string replacement. Example::
    
-   s = repl("Hello %(name)s, welcome to %(location)s", {name:'ABC', location:'Mumbai'});
+     s = repl("Hello %(name)s, welcome to %(location)s", {name:'ABC', location:'Mumbai'});
+   
 .. function:: esc_quotes(s) 
 
    Returns string with single quote ' escaped
@@ -83,7 +84,7 @@ String
 
    Python-like string replacement. Example::
    
-   s = repl("Hello %(name)s, welcome to %(location)s", {name:'ABC', location:'Mumbai'});
+     s = repl("Hello %(name)s, welcome to %(location)s", {name:'ABC', location:'Mumbai'});
 
 
 Lists
@@ -114,7 +115,7 @@ Dictionaries
 
 .. function:: values(obj)
 
-   Python-like function returns keys of a dictionary
+   Python-like function returns values of a dictionary
 
 .. function:: copy_dict(d) 
 
@@ -143,7 +144,7 @@ Datatype Conversion
 
    Convert number to string with commas for thousands, millions etc and 2 decimals. Example::
    
-   fmt_money(2324); // equals '2,324.00'
+     fmt_money(2324); // equals '2,324.00'
 
 .. function:: is_null(v) 
 
