@@ -80,10 +80,11 @@ def get_last_day(dt):
 
 user_format = None
 def formatdate(string_date):
+	
 	global user_format
 	if not user_format:
-		user_format = Document('Control Panel', 'Control Panel').date_format
-	d = string_date.split('-')
+		user_format = webnotes.conn.get_value('Control Panel', None, 'date_format')
+	d = string_date.split('-');
 	out = user_format
 	return out.replace('dd', ('%.2i' % cint(d[2]))).replace('mm', ('%.2i' % cint(d[1]))).replace('yyyy', d[0])
 	
