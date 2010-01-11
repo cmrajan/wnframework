@@ -104,6 +104,14 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 		
 	from webnotes import *
 	from webnotes.utils import *
+	from webnotes.model.doc import *
+	from webnotes.model.doclist import getlist
+	from webnotes.model.db_schema import updatedb
+
+	set = webnotes.conn.set
+	sql = webnotes.conn.sql
+	get_value = webnotes.conn.get_value
+	convert_to_lists = webnotes.conn.convert_to_lists
 
 	exec str(code)
 	
