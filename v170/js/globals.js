@@ -43,6 +43,7 @@ var _e = {};
 
 // report buidler
 var _r = {};
+var FILTER_SEP = '\1';
 
 // calendar 
 var _c = {};

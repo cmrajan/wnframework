@@ -86,8 +86,6 @@ _r.ReportContainer = function() {
 	}
 }
 
-_r.FILTER_SEP = '\1';
-
 // ===================================================================================
 
 _r.ReportBuilder = function(parent, doctype, onload) {
