@@ -267,7 +267,10 @@ _r.DataTable.prototype.run = function() {
 
   if(this.is_simple) args.is_simple = 1;
 
-  $c('webnotes.widgets.query_builder.runquery', args, function(r,rt) {  $dh(me.fetching_tag); me.show_result(r,rt); });
+  $c('webnotes.widgets.query_builder.runquery', args, function(r,rt) {  
+  	$dh(me.fetching_tag); 
+  	me.show_result(r,rt); 
+  });
   
 }
 

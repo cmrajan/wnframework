@@ -62,7 +62,7 @@ def get_parent_dt(dt):
 def get_sql_meta(tl):
 	meta = {}
 	for dt in tl:
-		meta[dt] = {'owner':('Owner', '', '', '100'), 'creation':('Created On', 'Date', '', '100'), 'modified':('Modified On', 'Date', '', '100'), 'modified_by':('Modified By', '', '', '100')}
+		meta[dt] = {'owner':('Owner', '', '', '100'), 'creation':('Created on', 'Date', '', '100'), 'modified':('Last modified on', 'Date', '', '100'), 'modified_by':('Modified By', '', '', '100')}
 
 		# for table doctype, the ID is the parent id
 		pdt = get_parent_dt(dt)
@@ -137,6 +137,11 @@ def runquery(q='', ret=0, from_export=0):
 
 		tl, fl= get_sql_tables(q), get_sql_fields(q)
 		meta = get_sql_meta(tl)
+		
+		if webnotes.user.name == 'Administrator':
+			webnotes.msgprint(tl)
+			webnotes.msgprint(fl)		
+			webnotes.msgprint(meta)
 		
 		for f in fl:
 			if meta.has_key(f[0]) and meta[f[0]].has_key(f[1]):
