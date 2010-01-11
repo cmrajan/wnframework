@@ -654,7 +654,7 @@ function SelectField(){}SelectField.prototype=new Field();SelectField.prototype.
 me.validate();me.set(me.txt.value);if(isIE&&me.in_grid){$dh(_f.cur_grid_cell.grid.wrapper);$ds(_f.cur_grid_cell.grid.wrapper);}
 me.run_trigger();}}
 this.refresh_options=function(options){if(options)
-me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];add_sel_options(this.input,me.options_list);}
+me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];empty_select(this.input);add_sel_options(this.input,me.options_list);}
 this.onrefresh=function(){this.refresh_options();if(this.not_in_form){this.input.value='';return;}
 if(_f.get_value)
 var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);else

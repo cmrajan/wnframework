@@ -805,6 +805,7 @@ SelectField.prototype.make_input = function() {
 		me.options_list = me.df.options?me.df.options.split('\n'):[];
 		
 		// add options
+		empty_select(this.input);
 		add_sel_options(this.input, me.options_list);
 		
 	}
