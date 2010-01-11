@@ -840,11 +840,12 @@ SelectField.prototype.make_input = function() {
 			if(me.options_list && in_list(me.options_list, v)) {
 				if(me.input.multiple) {
 					for(var i=0; i<me.input.options.length; i++) {
-						if(me.input.options[i].value == v)
+						me.input.options[i].selected = 0;
+						if(me.input.options[i].value && me.input.options[i].value == v)
 							me.input.options[i].selected = 1;
 					}
 				} else {
-					me.input.value = v;
+					me.txt.value = v;
 				}
 			}
 		}

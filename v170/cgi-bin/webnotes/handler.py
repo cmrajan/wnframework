@@ -514,7 +514,8 @@ else:
 				sql("COMMIT")
 		except:
 			webnotes.errprint(webnotes.utils.getTraceback())
-			sql("ROLLBACK")
+			if (webnotes.conn.in_transaction): 
+				sql("ROLLBACK")
 
 		# update session
 		auth_obj.update()
