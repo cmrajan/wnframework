@@ -31,9 +31,9 @@ _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
   this.page_len = 50;
   this.repname = repname;
   this.dt = dt;
+  this.no_limit = false;
   this.sort_labels = {};
   this.query = '';
-  this.history = [];
   this.has_index = 1;
   this.has_headings = 1;  //this.sort_options = {};
   
@@ -76,6 +76,16 @@ _r.DataTable.prototype.add_icon = function(parent, imgsrc) {
   i.style.cursor = 'pointer';
   i.setAttribute('src', 'images/icons/'+imgsrc+'.gif');
   return i;
+}
+
+_r.DataTable.prototype.set_no_limit = function(v) {
+	if(v) {
+		this.no_limit = 1;
+		$dh(this.page_len_sel.wrapper);
+	} else {
+		this.no_limit = 0;
+		$ds(this.page_len_sel.wrapper);		
+	}
 }
 
 _r.DataTable.prototype.make_toolbar = function(parent) {
@@ -205,7 +215,7 @@ _r.DataTable.prototype.update_query = function(no_limit) {
              + ' ' + this.sort_order;
   }
   
-  if(no_limit) return;
+  if(no_limit || this.no_limit) return;
   
   // add paging  
   this.query += ' LIMIT ' + (this.start_rec-1) + ',' + this.page_len;
@@ -268,8 +278,7 @@ _r.DataTable.prototype.clear_all = function() {
 	if(this.tab && this.tab.parentNode) {
 		this.tab.parentNode.removeChild(this.tab); delete this.tab; }
 	$dh(this.no_data_tag);
-	// clear graph in finder
-	if(this.finder)this.finder.clear_graph();
+
 }
 
 _r.DataTable.prototype.has_data = function() {
@@ -306,8 +315,15 @@ _r.DataTable.prototype.show_result = function(r, rt) {
 	
 		// data
 	 	var start = this.start_rec;
+	 	
+		// show max 1000
+	 	var rset_len = this.rset.length;
+	 	if(rset_len > 1000) {
+	 		msgprint("Showing only 1000 records out of " + rset_len + ". Use 'Export' to see all records");
+	 		rset_len = 1000;
+	 	}
 	  
-		for(var vi=0;vi<this.rset.length;vi++) {
+		for(var vi=0; vi<rset_len; vi++) {
 			var row = this.tab.insertRow(vi);
 			// for script
 
@@ -328,7 +344,7 @@ _r.DataTable.prototype.show_result = function(r, rt) {
 				for(var ci=0;ci< this.colnames.length;ci++) {
 					row.data[this.colnames[ci]] = this.rset[vi][ci];
 					row.data_cells[this.colnames[ci]] = row.cells[ci+1];
-				}
+				}f
 				this.afterrowprint(row);
 			}
 		}

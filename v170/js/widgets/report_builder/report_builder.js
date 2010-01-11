@@ -88,12 +88,17 @@ _r.ReportContainer = function() {
 
 _r.FILTER_SEP = '\1';
 
+// ===================================================================================
+
 _r.ReportBuilder = function(parent, doctype, onload) {
 	this.menuitems = {};
 	this.has_primary_filters = false;
 	this.doctype = doctype;
 	this.forbidden = 0;
 
+	this.filter_fields = [];
+	this.filter_fields_dict = {};
+	
 	var me = this;
 
 	this.fn_list = ['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];
@@ -114,6 +119,8 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 	this.make_save_criteria();
 }
 
+// -------------------------------------------------------------------------------------
+
 _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
 	this.mytabs = new TabbedPage(this.tab_wrapper);
@@ -122,10 +129,10 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 	this.mytabs.add_tab('Result');
 	this.mytabs.add_tab('More Filters');
 	this.mytabs.add_tab('Select Columns');
-	this.mytabs.add_tab('Graph');
 	
-	$dh(this.mytabs.tabs['Graph']);
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.make_body = function() {
 
@@ -134,132 +141,14 @@ _r.ReportBuilder.prototype.make_body = function() {
 
 	var me = this;
 	
-	// filters broken into - primary - in searchfields and others
-	this.pri_filter_fields_area = $a(this.mytabs.tabs['Result'].tab_body, 'div', 'finder_filter_area');
-
-	this.filter_area = $a(this.mytabs.tabs['More Filters'].tab_body, 'div', 'finder_filter_area');
-	this.builder_area = $a(this.mytabs.tabs['Select Columns'].tab_body, 'div', 'finder_builder_area');
-
-	this.make_graph();
 	this.make_save_criteria();
-}
-
-// Graph
-// -----
-
-_r.ReportBuilder.prototype.make_graph = function() {
-	var me = this;
-	this.graph_area = $a(this.mytabs.tabs['Graph'].tab_body, 'div', '');
-	this.mytabs.tabs['Graph'].onshow = function() {
-		me.show_graph();
-	}
-}
-
-_r.ReportBuilder.prototype.clear_graph = function() { 
-	if(this.graph_div)$dh(this.graph_div);
-	this.graph_clear = 1; 
-}
-
-_r.ReportBuilder.prototype.show_graph = function() {
-	var me = this;
-	
-	if(isIE) {
-		$dh(me.mytabs.tabs['Graph'].tab_body);
-		$ds(me.mytabs.tabs['Graph'].tab_body);
-	}
-	
-	var show_no_graph = function() {
-		if(!me.no_graph) {
-			me.no_graph = $a(me.mytabs.tabs['Graph'].tab_body, 'div');
-			me.no_graph.style.margin = '16px';
-			me.no_graph.innerHTML = 'No Graph Defined';
-		}
-		$ds(me.no_graph);
-		return;
-	}
-	
-	if(!me.current_loaded) {
-		show_no_graph();
-		return;
-	}
-	var sc = get_local('Search Criteria', me.sc_dict[me.current_loaded]);
-	if(!sc || !sc.graph_series) {
-		show_no_graph();
-		return;
-	}
-
-	// get series lables
-	var series = me.dt.get_col_data(sc.graph_series);
-	if(series.length>100) return; //No graph more than 100 cols
-
-	for(var i=0;i<series.length;i++) {
-		if(series[i].length > 14)series[i] = series[i].substr(0,14)+'...';
-	}
-
-	var ht = (series.length * 20);
-
-	// if exsts then, dont redraw
-	if(!this.graph_clear) return;
-
-	if(ht<400)ht=400;
-
-	if(!me.graph_div) {
-		me.graph_div = $a(me.graph_area, 'div');
-		me.graph_div.style.position = 'relative';
-		me.graph_div.style.border = '2px solid #AAA';
-		me.graph_div.style.marginTop = '16px';
-	}
-	$ds(me.graph_div);
-	$dh(me.no_graph);
-
-	// get values
-	var values = me.dt.get_col_data(sc.graph_values);
-	for(var i=0;i<values.length;i++) {
-		values[i] = flt(values[i]);	
-	}
-
-	$h(me.graph_div, ht + 'px');
-	if(!me.graphobj) {
-		me.graphobj = new GraphViewer(me.graph_div);
-	}
-	var g = me.graphobj;
-	g.clear();
-	g.set_title('');
-	if(series.length<16) g.set_vertical();
-	else g.set_horizontal();
-	
-	// graph settings
-	g.series1_color = '#AAF';
-	g.series1_border_color = '#88A';
-
-	g.series2_color = '#AFA';
-	g.series2_border_color = '#8A8';
-
-	g.series3_color = '#FAA';
-	g.series3_border_color = '#88A';
-
-	if(me.graph_settings)me.graph_settings(g);
-	
-	// heights		
-	$h(g.main_area, (ht - 160) + 'px');
-	$h(g._y_labels, (ht - 160) + 'px');
-
-	g._x_name.style.top = (ht - 40) + 'px';
-	g._x_labels.style.top = (ht - 80) + 'px';
-
-	g.xtitle = sc.graph_series;
-	g.ytitle = sc.graph_values;
-	
-	g.xlabels = series;
-	g.add_series(sc.graph_values, g.series1_color, values, g.series1_border_color);
-	g.refresh();
-	this.graph_clear = 0;
-	
+	this.column_picker = new _r.ReportColumnPicker(this);
+	this.report_filters = new _r.ReportFilters(this);
 }
 
 //
 // Saving of criteria
-// ------------------
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.make_save_criteria = function() {
 	var me = this;
@@ -278,7 +167,7 @@ _r.ReportBuilder.prototype.make_save_criteria = function() {
 }
 
 // Save Criteria
-// -------------
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.save_criteria = function(save_as) {
 	var overwrite = 0;
@@ -306,14 +195,11 @@ _r.ReportBuilder.prototype.save_criteria = function(save_as) {
 
 	var cl = []; var fl = {};
 	
-	// save fields
-	for(var i=0;i<this.report_fields.length;i++) {
-		var chk = this.report_fields[i];
-		if(chk.checked) {
-			cl[cl.length] = chk.df.parent + '\1' + chk.df.label;
-		}
-	}
-	
+	// save columns
+	var t = this.column_picker.get_selected();
+	for(var i=0;i<t.length;i++)
+		cl.push(t[i].parent + '\1' + t[i].label);
+		
 	// save filters
 	for(var i=0;i<this.filter_fields.length;i++) {
 		var t = this.filter_fields[i];
@@ -343,9 +229,11 @@ _r.ReportBuilder.prototype.save_criteria = function(save_as) {
 		msgprint('Filters and Columns Synchronized. You must also "Save" the Search Criteria to update');
 		loaddoc('Search Criteria', this.sc_dict[this.current_loaded]);
 	} else {
-		savedoc(doc.doctype, doc.name, 'Save',fn);
+		save_doclist(doc.doctype, doc.name, 'Save', fn);
 	}
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.hide_all_filters = function() {
 	for(var i=0; i<this.filter_fields.length; i++) {
@@ -353,15 +241,19 @@ _r.ReportBuilder.prototype.hide_all_filters = function() {
 	}
 }
 
+// -------------------------------------------------------------------------------------
+
+_r.ReportBuilder.prototype.run = function() {
+	this.dt.run();
+}
+
 // Load Criteria
-// -------------
+// -------------------------------------------------------------------------------------
+
 _r.ReportBuilder.prototype.clear_criteria = function() {
-	// clear all fields
-	// ----------------
-		
-	for(var i=0; i<this.report_fields.length; i++) {
-		this.report_fields[i].checked = false;
-	}
+
+	this.column_picker.clear();	
+	this.column_picker.set_defaults();
 
 	// clear filters
 	// -------------
@@ -379,10 +271,6 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 	
 	_r.rb_con.main_title.innerHTML = this.doctype;
 
-	// clear graph
-	// -----------
-	this.clear_graph();
-	
 	this.current_loaded = null;
 	this.customized_filters = null;
 	this.sc = null;
@@ -390,19 +278,25 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 
 	for(var i in this.fn_list) this[this.fn_list[i]] = null; // clear custom functions
 	
-	this.refresh_filters();	
+	this.report_filters.refresh();	
+	this.column_picker.refresh();
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.select_column = function(dt, label, value) {
 	if(value==null)value = 1;
-	if(this.report_fields_dict[dt+'\1'+ label])
-		this.report_fields_dict[dt+'\1'+ label].checked = value;
+	this.column_picker.set(dt, label, value);
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.set_filter = function(dt, label, value) {
 	if(this.filter_fields_dict[dt+'\1'+ label])
 		this.filter_fields_dict[dt+'\1'+ label].set_input(value);
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	this.clear_criteria();	
@@ -422,10 +316,11 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	}
 
 	// refresh fiters
-	this.refresh_filters();
+	this.report_filters.refresh();
 	
 	// set fields
 	// ----------
+	this.column_picker.clear();
 	var cl = this.sc.columns.split(',');
 	for(var c=0;c<cl.length;c++) {
 		var key = cl[c].split('\1');
@@ -434,7 +329,6 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 
 	// set filters
 	// -----------
-
 	var fl = eval('var a='+this.sc.filters+';a');
 	for(var n in fl) {
 		if(fl[n]) {
@@ -445,6 +339,8 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	}
 	this.set_criteria_sel(criteria_name);
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	// load additional fields sort option
@@ -478,7 +374,7 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 
 //
 // Create the filter UI and column selection UI
-// --------------------------------------------
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.setup_filters = function() {
 
@@ -494,15 +390,13 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 	me.make_body();
 
 	var dt = me.parent_dt?me.parent_dt:me.doctype;
-	me.report_fields = [];
-	me.filter_fields = [];
-	me.report_fields_dict = {};
-	me.filter_fields_dict = {};
-	
+
 	// default filters
 	var fl = [
 		{'fieldtype':'Data', 'label':'ID', 'fieldname':'name', 'search_index':1, 'parent':dt},
-		{'fieldtype':'Data', 'label':'Created By', 'fieldname':'owner', 'search_index':1, 'parent':dt},
+		{'fieldtype':'Data', 'label':'Owner', 'fieldname':'owner', 'search_index':1, 'parent':dt},
+		{'fieldtype':'Date', 'label':'Created on', 'fieldname':'creation', 'search_index':0, 'parent':dt},
+		{'fieldtype':'Date', 'label':'Last modified on', 'fieldname':'modified', 'search_index':0, 'parent':dt},
 	];
 
 	// can this be submitted?
@@ -512,80 +406,29 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'parent':dt};
 	}
 	
-	// Add columns of parent doctype
-	// -----------------------------
 	me.make_datatable();
 
-	// select all button
-	// -----------------
-	me.select_all = $a($a(me.builder_area,'div','',{padding:'8px 0px'}),'button');
-	me.select_all.innerHTML = 'Select / Unselect All';
-	me.select_all.onclick = function() {
-		var do_select = 1;
-		if(me.report_fields[0].checked) do_select = 0;
-		for(var i in me.report_fields) { me.report_fields[i].checked = do_select };
-	}
-
-	// Make fields and selectors
-
+	// Add columns of parent doctype
 	me.orig_sort_list = [];
-
 	if(me.parent_dt) {
-		var lab = $a(me.filter_area,'div','filter_dt_head');
-		lab.innerHTML = 'Filters for ' + me.parent_dt;
-
-		var lab = $a(me.builder_area,'div','builder_dt_head');
-		lab.innerHTML = 'Select columns for ' + me.parent_dt;
-				
-		me.make_filter_fields(fl, me.parent_dt); // make for parent
+		me.setup_doctype(fl, me.parent_dt); 
 		var fl = [];
 	}
 
 	// Add columns of selected doctype
-	// -------------------------------
-
-	var lab = $a(me.filter_area,'div','filter_dt_head');
-	lab.innerHTML = 'Filters for ' + me.doctype;
-	
-	var lab = $a(me.builder_area,'div','builder_dt_head');
-	lab.innerHTML = 'Select columns for ' + me.doctype;
-
-	me.make_filter_fields(fl, me.doctype); // make for the table
+	me.setup_doctype(fl, me.doctype); 
 
 	// hide primary filters if not fields
-	if(!this.has_primary_filters) $dh(this.pri_filter_fields_area);
+	if(!this.has_primary_filters) 
+		$dh(this.report_filters.first_page_filter);
+
+	this.column_picker.refresh();
 
 	// show body
 	$ds(me.body);
 }
 
-_r.ReportBuilder.prototype.refresh_filters = function() {
-	// called after customization
-	for(var i=0; i<this.filter_fields.length; i++) {
-		var f = this.filter_fields[i];
-		
-		// is hidden ?
-		if(f.df.filter_hide) { $dh(f.wrapper); }
-		else $ds(f.wrapper);
-		
-		// is bold?
-		if(f.df.bold) { if(f.label_cell) $y(f.label_cell, {fontWeight:'bold'}) }
-		else { if(f.label_cell) $y(f.label_cell, {fontWeight:'normal'}) }
-		
-		// set default value
-		if(f.df['report_default']) 
-			f.set_input(f.df['report_default']);
-			//f.set_input(LocalDB.get_default_value(f.df.fieldname, f.df.fieldtype, f.df['default']));
-			
-		// show in first page?
-		if(f.df.in_first_page) {
-			f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);
-			this.pri_filter_fields_area.appendChild(f.df.filter_cell);
-			this.has_primary_filters = 1;
-			$ds(this.pri_filter_fields_area);
-		}
-	}
-}
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.add_filter = function(f) {
 	if(this.filter_fields_dict[f.parent + '\1' + f.label]) {
@@ -593,106 +436,26 @@ _r.ReportBuilder.prototype.add_filter = function(f) {
 		this.filter_fields_dict[f.parent + '\1' + f.label].df = f; // reset properties
 	} else {
 		f.custom = 1;
-		this.add_field(f, f.parent);
+		this.report_filters.add_field(f, f.parent);
 	}
 }
 
-_r.ReportBuilder.prototype.add_field = function(f, dt, in_primary) {
-	var me = this;
-	
-	// make a field object
-	var add_field = function(f, dt, parent) {
-		var tmp = make_field(f, dt, parent, me, false);
-		tmp.not_in_form = true;
-		tmp.refresh();
-		me.filter_fields[me.filter_fields.length] = tmp;
-		me.filter_fields_dict[f.parent + '\1' + f.label] = tmp;
-		return tmp;	
-	}
-	
-	// insert in (parent element)
-	if(f.in_first_page) in_primary = true;
-	
-	var fparent = this.filter_fields_area;
-	if(in_primary) { fparent = this.pri_filter_fields_area; this.has_primary_filters = 1; }
-	
-	// label
-	// --- ability to insert
-	if(f.on_top) {
-		var cell = document.createElement('div');
-		fparent.insertBefore(cell, fparent.firstChild);
-		$y(cell,{width:'70%'});
-	} else if(f.insert_before) {
-		var cell = document.createElement('div');
-		fparent.insertBefore(cell, fparent[f.df.insert_before].filter_cell);
-		$y(cell,{width:'70%'});		
-	}
-	else
-		var cell = $a(fparent, 'div', '', {width:'70%'});
+// -------------------------------------------------------------------------------------
 
-	f.filter_cell = cell;
-		
-	// make field
-	if(f.fieldtype=='Date') {
-		
-		var my_div = $a(cell,'div','',{});
-		
-		// from date
-		var f1 = copy_dict(f);
-		f1.label = 'From ' + f1.label;
-		var tmp1 = add_field(f1, dt, my_div);
-		tmp1.sql_condition = '>=';
-		tmp1.bound = 'lower';
-
-		// to date
-		var f2 = copy_dict(f);
-		f2.label = 'To ' + f2.label;
-		var tmp2 = add_field(f2, dt, my_div);
-		tmp2.sql_condition = '<=';
-		tmp2.bound = 'upper';
-						
-	} else if(in_list(['Currency', 'Int', 'Float'], f.fieldtype)) {
-
-		var my_div = $a(cell,'div','',{});
-	
-		// from value
-		var f1 = copy_dict(f);
-		f1.label = f1.label + ' >=';
-		var tmp1 = add_field(f1, dt, my_div);
-		tmp1.sql_condition = '>=';
-		tmp1.bound = 'lower';
-
-		// to value
-		var f2 = copy_dict(f);
-		f2.label = f2.label + ' <=';
-		var tmp2 = add_field(f2, dt, my_div);
-		tmp2.sql_condition = '<=';
-		tmp2.bound = 'upper';		
-	} else {
-		var tmp = add_field(f, dt, cell);
-	}
-	
-	// add to datatable sort
-	if(f.fieldname != 'docstatus')
-		me.orig_sort_list[me.orig_sort_list.length] = [f.label, '`tab' + f.parent + '`.`' + f.fieldname + '`'];
-			
-	// check saved
-	if(f.def_filter)
-		tmp.input.checked = true;
-	
-}
-
-_r.ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
+_r.ReportBuilder.prototype.setup_doctype = function(fl, dt) {
 	var me = this; 
 	
+	// set value in Toolbar
 	if(page_body.wntoolbar && page_body.wntoolbar.rb_sel)
 		page_body.wntoolbar.rb_sel.value = dt;
 
-	var t1 = $a($a(me.builder_area,'div'), 'table', 'builder_tab');
+	// set labels
+	var lab = $a(me.filter_area,'div','filter_dt_head');
+	lab.innerHTML = 'Filters for ' + dt;
 
-	// filter fields area
-	this.filter_fields_area = $a(me.filter_area,'div');
-
+	var lab = $a(me.picker_area,'div','builder_dt_head');
+	lab.innerHTML = 'Select columns for ' + dt;
+		
 	// get fields
 	var dt_fields = fields_list[dt];
 	for(var i=0;i<dt_fields.length;i++) {
@@ -703,8 +466,6 @@ _r.ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 	var sf_list = locals.DocType[dt].search_fields ? locals.DocType[dt].search_fields.split(',') : [];
 	for(var i in sf_list) sf_list[i] = strip(sf_list[i]);
 	
-	this.ftab_cidx = 1; var bidx = 2;
-
 	// make fields
 	for(var i=0;i<fl.length;i++) {
 	
@@ -712,43 +473,18 @@ _r.ReportBuilder.prototype.make_filter_fields = function(fl, dt) {
 		
 		// add to filter
 		if(f && (cint(f.search_index) || cint(f.in_filter))) {
-			me.add_field(f, dt, in_list(sf_list, f.fieldname));
+			me.report_filters.add_field(f, dt, in_list(sf_list, f.fieldname));
 		}
 		
 		// add to column selector (builder) 
 		if(f && !in_list(no_value_fields, f.fieldtype) && f.fieldname != 'docstatus' && (!f.report_hide)) {
-
-			// add filter table cell ** for 3-col layout
-			if(bidx==2) {
-				var br = t1.insertRow(t1.rows.length);br.insertCell(0);br.insertCell(1);br.insertCell(2);
-				bidx = 0;
-			} else { bidx++; }
-
-			var div = $a(br.cells[bidx], 'div', 'builder_field');
-			var t2 = $a(div, 'table');
-			var row = t2.insertRow(0);
-			row.insertCell(0); row.insertCell(1);
-			$w(row, '10%');
-
-			var chk = $a_input(row.cells[0], 'checkbox');
-			$y(chk, {marginRight: '2px', border:'0px'});
-
-			chk.df = f;
-			if(f.search_index || f.in_search) {
-				chk.checked = 1;
-				chk.selected_by_default = 1;
-			}
-			me.report_fields.push(chk);
-			me.report_fields_dict[f.parent + '\1' + f.label] = chk;
-			
-			row.cells[1].innerHTML = f.label;
-			row.cells[1].style.fontSize = '11px';
-			
-			// if in searchfield check
+			me.column_picker.add_field(f);
 		}
 	}
 	me.set_sort_options();
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.set_sort_options = function(l) {
 	var sl = this.orig_sort_list;
@@ -760,6 +496,8 @@ _r.ReportBuilder.prototype.set_sort_options = function(l) {
 		this.dt.add_sort_option(sl[i][0], sl[i][1]);
 	}
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.validate_permissions = function(onload) {
 	this.perm = get_perm(this.parent_dt ? this.parent_dt : this.doctype);
@@ -775,6 +513,8 @@ _r.ReportBuilder.prototype.validate_permissions = function(onload) {
 	}
 	return 1;
 }
+
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.make_filters = function(onload) {
 	// load doctype
@@ -804,6 +544,7 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 	}
 }
 
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.reset_report = function() {
 	this.clear_criteria();
@@ -811,20 +552,18 @@ _r.ReportBuilder.prototype.reset_report = function() {
 	this.set_filter(this.doctype, 'Submitted', 1);
 	this.set_filter(this.doctype, 'Cancelled', 0);
 	
-	for(var i=0; i<this.report_fields.length; i++) {
-		if(this.report_fields[i].selected_by_default)
-			this.report_fields[i].checked = 1;
-	}
+	this.column_picker.set_defaults();
 	this.dt.clear_all();
 	
 	this.dt.sort_sel.inp.value = 'ID';
 	this.dt.page_len_sel.inp.value = '50';
+	this.dt.set_no_limit(0);
 	this.dt.set_desc();
 }
 
 //
 // Make the SQL query
-// ------------------
+// -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.make_datatable = function() {
 	var me = this;
@@ -883,14 +622,11 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		if(sc && sc.dis_filters)
 			var dis_filters_list = sc.dis_filters.split('\n');
 		
-		
-		for(var i=0;i<me.report_fields.length;i++) {
-			var chk = me.report_fields[i];
-			if(chk.checked) {
-				fl[fl.length] = table_name(chk.df.parent)+'.`'+chk.df.fieldname+'`';
-			}
+		var t = me.column_picker.get_selected();
+		for(var i=0;i<t.length;i++) {
+			fl.push(table_name(t[i].parent) + '.`'+t[i].fieldname+'`');
 		}
-		
+				
 		// advanced - additional fields
 		if(sc && sc.add_col) {
 			var adv_fl = sc.add_col.split('\n');
@@ -1035,5 +771,336 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		// report name
 		if(me.current_loaded) this.rep_name = me.current_loaded;
 		else this.rep_name = me.doctype;
+	}
+}
+
+// Report Filter
+// ===================================================================================
+
+_r.ReportFilters = function(rb) {
+	this.rb = rb;
+
+	// filters broken into - primary - in searchfields and others
+	this.first_page_filter = $a(rb.mytabs.tabs['Result'].tab_body, 'div', 'finder_filter_area');
+	this.filter_area = $a(rb.mytabs.tabs['More Filters'].tab_body, 'div', 'finder_filter_area');
+
+	// filter fields area
+	this.filter_fields_area = $a(this.filter_area,'div');
+
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportFilters.prototype.refresh = function() {
+	// called after customization
+	var fl = this.rb.filter_fields
+	
+	for(var i=0; i<fl.length; i++) {
+		var f = fl[i];
+		
+		// is hidden ?
+		if(f.df.filter_hide) { 
+			$dh(f.wrapper); 
+		} else {
+			$ds(f.wrapper);
+		}
+		
+		// is bold?
+		if(f.df.bold) { 
+			if(f.label_cell) 
+				$y(f.label_cell, {fontWeight:'bold'}) 
+		} else { 
+			if(f.label_cell) $y(f.label_cell, {fontWeight:'normal'}) 
+		}
+		
+		// set default value
+		if(f.df['report_default']) 
+			f.set_input(f.df['report_default']);
+			
+		// show in first page?
+		if(f.df.in_first_page) {
+			f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);
+			this.first_page_filter.appendChild(f.df.filter_cell);
+			this.rb.has_primary_filters = 1;
+			$ds(this.first_page_filter);
+		}
+	}
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportFilters.prototype.add_date_field = function(cell, f, dt) {
+	var my_div = $a(cell,'div','',{});
+	
+	// from date
+	var f1 = copy_dict(f);
+	f1.label = 'From ' + f1.label;
+	var tmp1 = this.make_field_obj(f1, dt, my_div);
+	tmp1.sql_condition = '>=';
+	tmp1.bound = 'lower';
+
+	// to date
+	var f2 = copy_dict(f);
+	f2.label = 'To ' + f2.label;
+	var tmp2 = this.make_field_obj(f2, dt, my_div);
+	tmp2.sql_condition = '<=';
+	tmp2.bound = 'upper';
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportFilters.prototype.add_numeric_field = function(cell, f, dt) {
+	var my_div = $a(cell,'div','',{});
+	
+	// from value
+	var f1 = copy_dict(f);
+	f1.label = f1.label + ' >=';
+	var tmp1 = this.make_field_obj(f1, dt, my_div);
+	tmp1.sql_condition = '>=';
+	tmp1.bound = 'lower';
+
+	// to value
+	var f2 = copy_dict(f);
+	f2.label = f2.label + ' <=';
+	var tmp2 = this.make_field_obj(f2, dt, my_div);
+	tmp2.sql_condition = '<=';
+	tmp2.bound = 'upper';		
+}
+
+// make a field object
+_r.ReportFilters.prototype.make_field_obj = function(f, dt, parent) {
+	var tmp = make_field(f, dt, parent, this.rb, false);
+	tmp.not_in_form = true;
+	tmp.refresh();
+	this.rb.filter_fields[this.rb.filter_fields.length] = tmp;
+	this.rb.filter_fields_dict[f.parent + '\1' + f.label] = tmp;
+	return tmp;	
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportFilters.prototype.add_field = function(f, dt, in_primary) {
+	var me = this;
+		
+	// insert in (parent element)
+	if(f.in_first_page) in_primary = true;
+	
+	var fparent = this.filter_fields_area;
+	if(in_primary) { 
+		fparent = this.first_page_filter; 
+		this.rb.has_primary_filters = 1; 
+	}
+	
+	// label
+	// --- ability to insert
+	if(f.on_top) {
+		var cell = document.createElement('div');
+		fparent.insertBefore(cell, fparent.firstChild);
+		$y(cell,{width:'70%'});
+
+	} else if(f.insert_before) {
+		var cell = document.createElement('div');
+		fparent.insertBefore(cell, fparent[f.df.insert_before].filter_cell);
+		$y(cell,{width:'70%'});		
+	}
+
+	else
+		var cell = $a(fparent, 'div', '', {width:'70%'});
+
+	f.filter_cell = cell;
+		
+	// make field
+	if(f.fieldtype=='Date') {
+		// date field
+		this.add_date_field(cell, f, dt);
+	} else if(in_list(['Currency', 'Int', 'Float'], f.fieldtype)) {
+		// numeric
+		this.add_numeric_field(cell, f, dt);
+	} else {
+		var tmp = this.make_field_obj(f, dt, cell);
+	}
+	
+	// add to datatable sort
+	if(f.fieldname != 'docstatus')
+		me.rb.orig_sort_list.push([f.label, '`tab' + f.parent + '`.`' + f.fieldname + '`']);
+			
+	// check saved
+	if(f.def_filter)
+		tmp.input.checked = true;
+}
+
+// Column Picker
+// ===================================================================================
+
+_r.ReportColumnPicker = function(rb) {
+	this.rb = rb;
+	this.picker_area = $a(this.rb.mytabs.tabs['Select Columns'].tab_body, 'div', 'finder_picker_area');
+	
+	this.all_fields = [];
+	this.sel_idx = 0;
+	
+	this.make_body();
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.make_body = function() {
+
+	var t = make_table(this.picker_area, 1, 3, '100%', ['33%','34%','33%'], {verticalAlign:'middle', textAlign:'center'});
+
+	// all fields
+	$a($td(t,0,0), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Columns';
+	this.unsel_fields = $a($td(t,0,0), 'select', '', {height:'200px', width:'80%', border:'1px solid #AAA'});
+	this.unsel_fields.multiple = true;
+
+	// buttons
+	var me = this;
+	this.add_all = $a($a($td(t,0,1), 'div'), 'button', '', {width:'40px'});
+	this.add_all.innerHTML = '&gt;&gt;';
+	this.add_all.onclick = function() { me.move(me.unsel_fields, 'add', 1); }
+
+	this.add_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'90px'});
+	this.add_btn.innerHTML = '<b>Add &gt;</b>';
+	this.add_btn.onclick = function() { me.move(me.unsel_fields, 'add'); }
+		
+	this.remove_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'90px'});
+	this.remove_btn.innerHTML = '<b>&lt; Remove</b>';
+	this.remove_btn.onclick = function() { me.move(me.sel_fields, 'remove'); }
+
+	this.remove_all = $a($a($td(t,0,1), 'div'), 'button', '', {width:'40px'});
+	this.remove_all.innerHTML = '&lt;&lt;';
+	this.remove_all.onclick = function() { me.move(me.sel_fields, 'remove', 1); }
+
+	// multiple fields
+	$a($td(t,0,2), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Seleted Columns';
+	this.sel_fields = $a($td(t,0,2), 'select', '', {height:'200px', width:'80%', border:'1px solid #AAA'});
+	this.sel_fields.multiple = true;
+
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.set_options = function(s, l) {
+	empty_select(s);
+
+	for(var i=0; i<l.length; i++) {
+		var v = l[i].df.parent + '.' + l[i].df.label;
+		var o = new Option (v, v, false, false);
+		o.field = l[i];
+		s.options[s.options.length] = o;
+	}
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.move = function(s, type, all) {
+	for(var i=0;i<s.options.length; i++ ) {
+		if(s.options[i].selected || all) {
+			if(type=='add') {
+				s.options[i].field.selected = 1;
+				s.options[i].field.sel_idx = this.sel_idx;
+				this.sel_idx++;
+			} else {
+				s.options[i].field.selected = 0;
+				s.options[i].field.sel_idx = 0;
+				this.sel_idx--;
+			}
+		}
+	}
+	this.refresh();
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.refresh = function() {
+	
+	// separate
+	var ul = []; var sl=[];
+	for(var i=0; i<this.all_fields.length; i++) {
+		if(this.all_fields[i].selected) {
+			sl.push(this.all_fields[i]);
+		} else {
+			ul.push(this.all_fields[i]);
+		}
+	}
+	
+	// sort by field idx
+	ul.sort(function(a,b){return (cint(a.df.idx)-cint(b.df.idx))});
+	
+	// sort by order in which they were selected
+	sl.sort(function(a,b){return (cint(a.sel_idx)-cint(b.sel_idx))})
+
+	// re-number selected
+	for(var i=0; i<sl.length; i++) { sl[i].sel_idx = i; }
+	
+	// add options
+	this.set_options(this.unsel_fields, ul);
+	this.set_options(this.sel_fields, sl);
+
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.clear = function() {
+	this.sel_idx = 0;
+	for(var i=0; i<this.all_fields.length; i++) {
+		this.all_fields[i].selected = 0;	
+	}
+	this.refresh();
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.get_selected = function() {
+	var sl = [];
+	for(var i=0; i<this.all_fields.length; i++) {
+		var o = this.all_fields[i];
+		if(o.selected) {
+			sl[sl.length] = o.df;
+			o.df.sel_idx = o.sel_idx;
+		}
+	}
+	return sl.sort(function(a,b){return (cint(a.sel_idx)-cint(b.sel_idx))});
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.set_defaults = function() {
+	for(var i=0; i<this.all_fields.length; i++) {
+		if(this.all_fields[i].selected_by_default)
+			this.all_fields[i].selected = 1;
+	}
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.add_field = function(f) {
+	// column picker
+	if(!f.label) return;
+	
+	var by_default = (f.search_index || f.in_filter) ? 1 : 0;
+	
+	this.all_fields.push({
+		selected:by_default
+		,df:f
+		,sel_idx: (by_default ? this.sel_idx : 0)
+		,selected_by_default : by_default
+	});
+
+	this.sel_idx += by_default;
+
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.set = function(dt, label, selected) {
+	for(var i=0; i<this.all_fields.length; i++) {
+		if(this.all_fields[i].df.parent == dt && this.all_fields[i].df.label==label) {
+			this.all_fields[i].selected = selected;
+			this.all_fields[i].sel_idx = this.sel_idx;
+			this.sel_idx += cint(selected);
+			this.refresh();
+			return;
+		}
 	}
 }

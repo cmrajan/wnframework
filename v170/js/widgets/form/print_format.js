@@ -177,7 +177,7 @@ _p.build = function(fmtname, onload) {
 		onload(_p.render(_p.print_std(), _p.print_style, doc, doc.name));
 	} else {
 		if(!_p.formats[fmtname]) // not loaded, get data
-			$c('get_print_format', {'name':fmtname }, 
+			$c('webnotes.widgets.form.get_print_format', {'name':fmtname }, 
 				function(r,t) { 
 					_p.formats[fmtname] = r.message;
 					onload(_p.render(_p.formats[fmtname], '', doc, doc.name)); 

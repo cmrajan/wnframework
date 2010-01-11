@@ -7,3 +7,4 @@ API for client side widgets
 
   autosuggest
   form_widget
+  report_builder

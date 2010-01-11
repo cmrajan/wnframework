@@ -819,8 +819,7 @@ table.filter_tab td {
 	width: 50%;
 }
 
-div.finder_builder_area {
-	position: relative;
+div.finder_picker_area {
 	padding: 16px;
 	padding-top: 6px;
 	border:1px solid #AB8;

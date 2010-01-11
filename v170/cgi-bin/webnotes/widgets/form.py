@@ -10,23 +10,11 @@ def getdoc():
 	if form.getvalue('doctype'):
 		doclist = load_single_doc(form.getvalue('doctype'), form.getvalue('name'), (form.getvalue('user') or webnotes.session['user']))
 
-	# add tweets and n of comments
-	load_comments(doclist[0].doctype, doclist[0].name)
-
 	if form.getvalue('getdoctype'):
 		import webnotes.model.doctype
 		doclist += webnotes.model.doctype.get(form.getvalue('doctype'))
 
 	webnotes.response['docs'] = doclist
-
-def load_comments(dt, dn):
-	try:
-		tag = dt + '/' + dn
-		webnotes.response['n_tweets'] = server.cint(sql("select count(*) from tabTweet where tag=%s", (tag))[0][0] or 0)
-		lc = webnotes.conn.sql("select creation,`by`,comment from tabTweet where tag=%s order by name desc limit 1", tag)
-		webnotes.response['last_comment'] = lc and [server.cstr(t) for t in lc[0]] or []
-	except: 
-		pass
 
 #===========================================================================================
 
@@ -96,12 +84,9 @@ def load_single_doc(dt, dn, user):
 def get_search_criteria(dt):
 	# load search criteria for reports (all)
 	dl = []
-	try: # bc
-		sc_list = webnotes.conn.sql("select name from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s' and (disabled!=1 OR disabled IS NULL)" % (dt, dt))
-		for sc in sc_list:
-			dl += webnotes.model.doc.get('Search Criteria', sc[0])
-	except Exception, e:
-		pass # no search criteria
+	sc_list = webnotes.conn.sql("select name from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s' and (disabled!=1 OR disabled IS NULL)" % (dt, dt))
+	for sc in sc_list:
+		dl += webnotes.model.doc.get('Search Criteria', sc[0])
 	return dl
 
 # Runserverobj - run server calls from form
@@ -319,3 +304,42 @@ def savedocs():
 		webnotes.msgprint('Did not save')
 		webnotes.errprint(webnotes.utils.getTraceback())
 		raise e
+
+# Print Format
+#===========================================================================================
+def _get_print_format(match):
+	name = match.group('name')
+	content = sql('select html from `tabPrint Format` where name="%s"' % name)
+	return content and content[0][0] or ''
+
+def get_print_format(name):
+	import re
+	import webnotes
+
+	html = webnotes.conn.sql('select html from `tabPrint Format` where name="%s"' % webnotes.form.getvalue('name'))
+	html = html and html[0][0] or ''
+
+	p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
+	if html:
+		out_html = p.sub(_get_print_format, html)
+		
+	webnotes.response['message'] = out_html
+	
+
+
+# Get Fields - Counterpart to $c_get_fields
+#===========================================================================================
+def get_fields():
+	import webotes
+	r = {}
+	args = {
+		'select':form.getvalue('select')
+		,'from':form.getvalue('from')
+		,'where':form.getvalue('where')
+	}
+	ret = webnotes.conn.sql("select %(select)s from `%(from)s` where %(where)s limit 1" % args)
+	if ret:
+		fl, i = webnotes.form.getvalue('fields').split(','), 0
+		for f in fl:
+			r[f], i = ret[0][i], i+1
+	webnotes.response['message']=r

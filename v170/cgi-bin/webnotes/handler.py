@@ -73,21 +73,26 @@ def logout():
 # --------------
 
 def dt_map(form, session):
-	dt_list = server.expand_doclist(form.getvalue('docs'))
+	import webnotes
+	import webnotes.model.doclist
+	from webnotes.model.code import get_obj
+	from webnotes.model.doc import Document
+	
+	form = webnotes.form
+	
+	dt_list = webnotes.model.doclist.expand_doclist(form.getvalue('docs'))
 	from_doctype = form.getvalue('from_doctype')
 	to_doctype = form.getvalue('to_doctype')
 	from_docname = form.getvalue('from_docname')
 	from_to_list = form.getvalue('from_to_list')
 	
-	dm = server.get_obj('DocType Mapper', from_doctype +'-' + to_doctype)
-	doclist = dm.dt_map(from_doctype, to_doctype, from_docname, server.Document(fielddata = dt_list[0]), [], from_to_list)
+	dm = get_obj('DocType Mapper', from_doctype +'-' + to_doctype)
+	doclist = dm.dt_map(from_doctype, to_doctype, from_docname, Document(fielddata = dt_list[0]), [], from_to_list)
 	
 	out['docs'] = doclist
 
  # ------------------------------------------------------------------------------------
 
-def get_print_format(form, session):
-	out['message'] = server.get_print_format(form.getvalue('name'))
 
 def rename(form, session):
 	if form.getvalue('dt') and form.getvalue('old') and form.getvalue('new'):
@@ -95,23 +100,6 @@ def rename(form, session):
 		
 		getdoc(form, session)
 
-
-# Get Fields
-# ----------
-
-def get_fields(form, session):
-	r = {}
-	args = {
-		'select':form.getvalue('select')
-		,'from':form.getvalue('from')
-		,'where':form.getvalue('where')
-	}
-	ret = sql("select %(select)s from `%(from)s` where %(where)s limit 1" % args)
-	if ret:
-		fl, i = form.getvalue('fields').split(','), 0
-		for f in fl:
-			r[f], i = ret[0][i], i+1
-	out['message']=r
 
 # File Upload
 # -----------

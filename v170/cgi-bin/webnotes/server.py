@@ -82,21 +82,6 @@ from webnotes.utils import *
 # MODEL
 #-----------------
 
-def _get_print_format(match):
-	name = match.group('name')
-	content = sql('select html from `tabPrint Format` where name="%s"' % name)
-	return content and content[0][0] or ''
-
-def get_print_format(name):
-	import re
-
-	html = sql('select html from `tabPrint Format` where name="%s"' % name)
-	html = html and html[0][0] or ''
-
-	p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
-	if html:
-		out_html = p.sub(_get_print_format, html)
-	return out_html
 
 # Run Script
 # ----------

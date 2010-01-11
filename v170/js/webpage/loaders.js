@@ -10,7 +10,7 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 		
 		_r.rb_con.set_dt(dt, function(rb) { 
 			if(rep_name) {
-				var t = finder.current_loaded;
+				var t = rb.current_loaded;
 				rb.load_criteria(rep_name);
 
 				// call onload

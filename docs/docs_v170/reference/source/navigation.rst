@@ -1,6 +1,13 @@
 Page Structure and Navigation
 =============================
 
+Page Structure
+--------------
+
+.. data:: page_body
+
+.. class:: 
+
 Opening existing resources (Pages, Forms etc)
 ---------------------------------------------
 

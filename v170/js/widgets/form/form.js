@@ -253,7 +253,8 @@ _f.Frm.prototype.set_last_comment = function() {
 _f.Frm.prototype.set_section = function(sec_id) {
 	if(!this.sections[sec_id].show) return; // Simple type
 	
-	this.sections[this.cur_section[this.docname]].hide();
+	if(this.sections[this.cur_section[this.docname]])
+		this.sections[this.cur_section[this.docname]].hide();
 	this.sections[sec_id].show();
 	this.cur_section[this.docname] = sec_id;
 }
@@ -942,98 +943,9 @@ _f.Frm.prototype.reload_doc = function() {
 
 // ======================================================================================
 
-_f.Frm.prototype.check_required = function(dt, dn) {
-	var doc = locals[dt][dn];
-	if(doc.docstatus>1)return true;
-	var fl = fields_list[dt];
-	
-	if(!fl)return true; // no doctype loaded
-	
-	var all_clear = true;
-	var errfld = [];
-	for(var i=0;i<fl.length;i++) {
-		var key = fl[i].fieldname;
-		var v = doc[key];
-				
-		if(fl[i].reqd && is_null(v)) {
-			errfld[errfld.length] = fl[i].label;
-			
-			// show as red
-			var f = this.fields_dict[fl[i].fieldname];
-			if(f) {
-				// in form
-				f.set_as_error(1);
-				
-				// switch to section
-				if(!this.error_in_section && f.parent_section) {
-					cur_frm.set_section(f.parent_section.sec_id);
-					this.error_in_section = 1;
-				}
-			}
-			
-			if(all_clear)all_clear = false;
-		}
-	}
-	if(errfld.length)msgprint('<b>Following fields are required:</b>\n' + errfld.join('\n'));
-	return all_clear;
-}
-
 _f.Frm.prototype.savedoc = function(save_action, onsave, onerr) {
-	var dt = this.doctype; var dn = this.docname
-	var doc = locals[dt][dn];
-	var doctype = locals['DocType'][dt];
-	
-	var tmplist = [];
-	
-	// make doc list
-	var doclist = make_doclist(dt, dn, 1);
-	var all_clear = true;
 	this.error_in_section = 0;
-	
-	if(save_action!='Cancel') {
-		for(var n in doclist) {
-			// type / mandatory checking
-			var tmp = this.check_required(doclist[n].doctype, doclist[n].name);
-			if(doclist[n].docstatus+''!='2'&&all_clear) // if not deleted
-				all_clear = tmp;
-		}
-	}
-		
-	var f = frms[dt];
-	if(!all_clear) { // has errors
-		if(f)f.savingflag = false;
-		return 'Error';
-	}
-	
-	var _save = function() {
-		var out = compress_doclist(doclist);
-		//if(user=='Administrator')errprint(out);
-		
-		$c('webnotes.widgets.form.savedocs', {'docs':out, 'docname':dn, 'action': save_action, 'user':user }, 
-			function(r, rtxt) {
-				if(f){ f.savingflag = false;}
-				if(r.saved) {
-					if(onsave)onsave(r);
-				} else {
-					if(onerr)onerr(r);
-				}
-			}, function() {
-				if(f){ f.savingflag = false; } /*time out*/ 
-			},0,(f ? 'Saving...' : '')
-		);
-	}
-
-	// ask for name
-	if(doc.__islocal && (doctype && doctype.autoname && doctype.autoname.toLowerCase()=='prompt')) {
-		var newname = prompt('Enter the name of the new '+ dt, '');
-		if(newname) { 
-				doc.__newname = strip(newname); _save();
-		} else {
-			msgprint('Not Saved'); onerr();
-		}
-	} else {
-		_save();
-	}
+	save_doclist(this.doctype, this.docname, save_action, onsave, onerr);
 }
 
 _f.Frm.prototype.savesubmit = function() {

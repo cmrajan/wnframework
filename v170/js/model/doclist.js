@@ -42,3 +42,98 @@ function zip(k,v) {
 	}
 	return obj;
 }
+
+function save_doclist(dt, dn, save_action, onsave, onerr) {
+	var doc = locals[dt][dn];
+	var doctype = locals['DocType'][dt];
+	
+	var tmplist = [];
+	
+	// make doc list
+	var doclist = make_doclist(dt, dn, 1);
+	var all_clear = true;
+	
+	if(save_action!='Cancel') {
+		for(var n in doclist) {
+			// type / mandatory checking
+			var tmp = check_required(doclist[n].doctype, doclist[n].name);
+			if(doclist[n].docstatus+''!='2'&&all_clear) // if not deleted
+				all_clear = tmp;
+		}
+	}
+		
+	var f = frms[dt];
+	if(!all_clear) { // has errors
+		if(f)f.savingflag = false;
+		return 'Error';
+	}
+	
+	var _save = function() {
+		var out = compress_doclist(doclist);
+		//if(user=='Administrator')errprint(out);
+		
+		$c('webnotes.widgets.form.savedocs', {'docs':out, 'docname':dn, 'action': save_action, 'user':user }, 
+			function(r, rtxt) {
+				if(f){ f.savingflag = false;}
+				if(r.saved) {
+					if(onsave)onsave(r);
+				} else {
+					if(onerr)onerr(r);
+				}
+			}, function() {
+				if(f){ f.savingflag = false; } /*time out*/ 
+			},0,(f ? 'Saving...' : '')
+		);
+	}
+
+	// ask for name
+	if(doc.__islocal && (doctype && doctype.autoname && doctype.autoname.toLowerCase()=='prompt')) {
+		var newname = prompt('Enter the name of the new '+ dt, '');
+		if(newname) { 
+				doc.__newname = strip(newname); _save();
+		} else {
+			msgprint('Not Saved'); onerr();
+		}
+	} else {
+		_save();
+	}
+}
+
+function check_required(dt, dn) {
+	var doc = locals[dt][dn];
+	if(doc.docstatus>1)return true;
+	var fl = fields_list[dt];
+	
+	if(!fl)return true; // no doctype loaded
+	
+	var all_clear = true;
+	var errfld = [];
+	for(var i=0;i<fl.length;i++) {
+		var key = fl[i].fieldname;
+		var v = doc[key];
+				
+		if(fl[i].reqd && is_null(v)) {
+			errfld[errfld.length] = fl[i].label;
+			
+			// Bring to front "Section"
+			if(cur_frm) {
+				// show as red
+				var f = cur_frm.fields_dict[fl[i].fieldname];
+				if(f) {
+					// in form
+					f.set_as_error(1);
+					
+					// switch to section
+					if(!cur_frm.error_in_section && f.parent_section) {
+						cur_frm.set_section(f.parent_section.sec_id);
+						cur_frm.error_in_section = 1;
+					}
+				}
+			}
+						
+			if(all_clear)all_clear = false;
+		}
+	}
+	if(errfld.length)msgprint('<b>Following fields are required:</b>\n' + errfld.join('\n'));
+	return all_clear;
+}
