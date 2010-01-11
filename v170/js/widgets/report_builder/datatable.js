@@ -230,7 +230,8 @@ _r.DataTable.prototype.update_query = function(no_limit) {
 _r.DataTable.prototype._get_query = function(no_limit) {
 	$dh(this.no_data_tag);
 	this.show_query = 0;
-  	if(this.make_query)this.make_query();
+  	if(this.make_query)
+  		this.make_query();
 	this.update_query(no_limit);
 }
 

@@ -588,8 +588,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 	div.style.marginTop = '8px';
 
 	var d = $a(div, 'div');
-	d.innerHTML = '<input type="checkbox" style="border: 0px;"> Show Query'; // IE fix
-	this.show_query = d.childNodes[0];
+	this.show_query = $a_input(d, 'checkbox');
 	this.show_query.checked = false;
 
 	

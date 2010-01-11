@@ -89,7 +89,7 @@ if(!me.validate_permissions())
 return;me.validate_permissions();me.setup_filters();if(onload)onload(me);}}
 _r.ReportBuilder.prototype.reset_report=function(){this.clear_criteria();this.set_filter(this.doctype,'Saved',1);this.set_filter(this.doctype,'Submitted',1);this.set_filter(this.doctype,'Cancelled',0);this.column_picker.set_defaults();this.dt.clear_all();this.dt.sort_sel.inp.value='ID';this.dt.page_len_sel.inp.value='50';this.dt.set_no_limit(0);this.dt.set_desc();}
 _r.ReportBuilder.prototype.make_datatable=function(){var me=this;this.dt_area=$a(this.mytabs.tabs['Result'].tab_body,'div','finder_dt_area');var clear_area=$a(this.mytabs.tabs['Result'].tab_body,'div');clear_area.style.marginTop='8px';clear_area.style.textAlign='right';this.clear_btn=$a(clear_area,'button');this.clear_btn.innerHTML='Clear Settings';this.clear_btn.onclick=function(){me.reset_report();}
-var div=$a(this.mytabs.tabs['Result'].tab_body,'div');div.style.marginTop='8px';var d=$a(div,'div');d.innerHTML='<input type="checkbox" style="border: 0px;"> Show Query';this.show_query=d.childNodes[0];this.show_query.checked=false;this.dt=new _r.DataTable(this.dt_area,'');this.dt.finder=this;this.dt.make_query=function(){var report=me;if(me.current_loaded&&me.sc_dict[me.current_loaded])
+var div=$a(this.mytabs.tabs['Result'].tab_body,'div');div.style.marginTop='8px';var d=$a(div,'div');this.show_query=$a_input(d,'checkbox');this.show_query.checked=false;this.dt=new _r.DataTable(this.dt_area,'');this.dt.finder=this;this.dt.make_query=function(){var report=me;if(me.current_loaded&&me.sc_dict[me.current_loaded])
 var sc=get_local('Search Criteria',me.sc_dict[me.current_loaded]);if(sc)me.dt.search_criteria=sc;else me.dt.search_criteria=null;if(sc&&sc.server_script)me.dt.server_script=sc.server_script;else me.dt.server_script=null;for(var i=0;i<me.fn_list.length;i++){if(me[me.fn_list[i]])me.dt[me.fn_list[i]]=me[me.fn_list[i]];else me.dt[me.fn_list[i]]=null;}
 var fl=[];var docstatus_cl=[];var cl=[];var table_name=function(t){return'`tab'+t+'`';}
 var dis_filters_list=[];if(sc&&sc.dis_filters)
@@ -181,7 +181,8 @@ _r.DataTable.prototype.update_query=function(no_limit){if(this.search_criteria&&
 if(no_limit||this.no_limit){if(this.show_query)alert(this.query);return;}
 this.query+=' LIMIT '+(this.start_rec-1)+','+this.page_len;if(this.show_query)
 alert(this.query);}
-_r.DataTable.prototype._get_query=function(no_limit){$dh(this.no_data_tag);this.show_query=0;if(this.make_query)this.make_query();this.update_query(no_limit);}
+_r.DataTable.prototype._get_query=function(no_limit){$dh(this.no_data_tag);this.show_query=0;if(this.make_query)
+this.make_query();this.update_query(no_limit);}
 _r.DataTable.prototype.run=function(){if(this.validate&&!this.validate())
 return;if(_r.rb_con.cur_rb){if(_r.rb_con.cur_rb.large_report==1){msgprint("This is a very large report and cannot be shown in the browser as it is likely to make your browser very slow.<br><br>Please click on 'Export' to open in a spreadsheet");return;}
 _r.rb_con.cur_rb.mytabs.tabs['Result'].show();}
