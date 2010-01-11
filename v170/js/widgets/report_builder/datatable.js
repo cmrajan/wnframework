@@ -215,7 +215,10 @@ _r.DataTable.prototype.update_query = function(no_limit) {
              + ' ' + this.sort_order;
   }
   
-  if(no_limit || this.no_limit) return;
+  if(no_limit || this.no_limit) {
+    if(this.show_query) alert(this.query);
+  	return;
+  }
   
   // add paging  
   this.query += ' LIMIT ' + (this.start_rec-1) + ',' + this.page_len;

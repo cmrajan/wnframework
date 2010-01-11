@@ -178,7 +178,8 @@ this.sort_labels[this.dt]={};this.sort_labels[this.dt][label]=val;var s=this.sor
 _r.DataTable.prototype.update_query=function(no_limit){if(this.search_criteria&&this.search_criteria.custom_query){}else{this.query+=NEWLINE
 +' ORDER BY '+this.sort_labels[this.dt][sel_val(this.sort_sel)]
 +' '+this.sort_order;}
-if(no_limit||this.no_limit)return;this.query+=' LIMIT '+(this.start_rec-1)+','+this.page_len;if(this.show_query)
+if(no_limit||this.no_limit){if(this.show_query)alert(this.query);return;}
+this.query+=' LIMIT '+(this.start_rec-1)+','+this.page_len;if(this.show_query)
 alert(this.query);}
 _r.DataTable.prototype._get_query=function(no_limit){$dh(this.no_data_tag);this.show_query=0;if(this.make_query)this.make_query();this.update_query(no_limit);}
 _r.DataTable.prototype.run=function(){if(this.validate&&!this.validate())
