@@ -707,7 +707,7 @@ this.setup_new=function(){this.new_sel=new SelectWidget($td(this.model_tab,0,0),
 this.setup_report_builder=function(){this.rb_sel=new SelectWidget($td(this.model_tab,0,1),profile.can_get_report.sort());this.rb_sel.inp.value='Report Builder...';this.rb_sel.inp.onchange=function(){loadreport(me.rb_sel.inp.value,null,null,1);this.value='Report Builder...';}}
 this.setup_search=function(){this.search_sel=new SelectWidget($td(this.model_tab,0,2),[]);this.search_sel.inp.value='Search...';$y($td(this.model_tab,0,3),{paddingTop:'0px'});this.search_btn=$a($td(this.model_tab,0,3),'button');this.search_btn.innerHTML='Search';function open_quick_search(){if(me.search_sel.inp.value)
 selector.set_search(me.search_sel.inp.value);me.search_sel.disabled=1;selector.show();}
-me.search_sel.set_options(profile.can_read);me.search_sel.inp.onchange=function(){open_quick_search();this.value='Search...';}
+me.search_sel.set_options(profile.can_read.sort());me.search_sel.inp.onchange=function(){open_quick_search();this.value='Search...';}
 this.search_btn.onclick=function(){open_quick_search();}
 makeselector();}
 this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px',paddingLeft:'16px',textAlign:'right'});var t=make_table(w,1,3,null,[null,null,null],{padding:'2px 6px',borderLeft:'1px solid #CCC',fontSize:'13px'});$y($td(t,0,0),{border:'0px'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';$td(t,0,2).innerHTML='<span class="link_type" onclick="logout()">Logout</span>';}

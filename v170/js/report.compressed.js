@@ -48,7 +48,7 @@ _r.ReportBuilder.prototype.hide_all_filters=function(){for(var i=0;i<this.filter
 _r.ReportBuilder.prototype.run=function(){this.dt.run();}
 _r.ReportBuilder.prototype.clear_criteria=function(){this.column_picker.clear();this.column_picker.set_defaults();for(var i=0;i<this.filter_fields.length;i++){this.filter_fields[i].df.filter_hide=0;this.filter_fields[i].df.ignore=0;if(this.filter_fields[i].df.custom)
 this.filter_fields[i].df.filter_hide=1;this.filter_fields[i].set_input(null);}
-this.set_sort_options();_r.rb_con.main_title.innerHTML=this.doctype;this.current_loaded=null;this.customized_filters=null;this.sc=null;this.has_index=1;this.has_headings=1;for(var i in this.fn_list)this[this.fn_list[i]]=null;this.report_filters.refresh();this.column_picker.refresh();}
+this.set_sort_options();_r.rb_con.main_title.innerHTML=this.doctype;this.current_loaded=null;this.customized_filters=null;this.sc=null;this.has_index=1;this.has_headings=1;for(var i in this.fn_list)this[this.fn_list[i]]=null;$ds(this.mytabs.tabs['Select Columns']);$ds(this.mytabs.tabs['More Filters']);this.report_filters.refresh();this.column_picker.refresh();}
 _r.ReportBuilder.prototype.select_column=function(dt,label,value){if(value==null)value=1;this.column_picker.set(dt,label,value);}
 _r.ReportBuilder.prototype.set_filter=function(dt,label,value){if(this.filter_fields_dict[dt+'\1'+label])
 this.filter_fields_dict[dt+'\1'+label].set_input(value);}
@@ -58,7 +58,7 @@ this.report_filters.refresh();this.column_picker.clear();var cl=this.sc.columns.
 var fl=eval('var a='+this.sc.filters+';a');for(var n in fl){if(fl[n]){var key=n.split('\1');if(key[1]=='docstatus'){}
 this.set_filter(key[0],key[1],fl[n]);}}
 this.set_criteria_sel(criteria_name);}
-_r.ReportBuilder.prototype.set_criteria_sel=function(criteria_name){_r.rb_con.innerHTML=criteria_name;var sc=locals['Search Criteria'][this.sc_dict[criteria_name]];if(sc&&sc.add_col)
+_r.ReportBuilder.prototype.set_criteria_sel=function(criteria_name){_r.rb_con.main_title.innerHTML=criteria_name;var sc=locals['Search Criteria'][this.sc_dict[criteria_name]];if(sc&&sc.add_col)
 var acl=sc.add_col.split('\n');else
 var acl=[];var new_sl=[];for(var i=0;i<acl.length;i++){var tmp=acl[i].split(' AS ');if(tmp[1]){var t=eval(tmp[1]);new_sl[new_sl.length]=[t,"`"+t+"`"];}}
 this.set_sort_options(new_sl);if(sc&&sc.sort_by){this.dt.sort_sel.inp.value=sc.sort_by;}

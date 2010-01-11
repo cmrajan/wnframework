@@ -166,7 +166,7 @@ function WNToolbar(parent) {
 			selector.show();
 		}
 
-		me.search_sel.set_options(profile.can_read);
+		me.search_sel.set_options(profile.can_read.sort());
 		me.search_sel.inp.onchange = function() { open_quick_search(); this.value = 'Search...'; }
 		
 		this.search_btn.onclick = function() { open_quick_search(); }	

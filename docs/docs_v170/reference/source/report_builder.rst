@@ -55,6 +55,10 @@ Example::
      
      // remove limts - show all records
      this.dt.set_no_limit(1);
+
+     // hide tabs
+     $dh(this.mytabs.tabs['Select Columns'])   
+     
    }
 
 Scrubbing / modifying data from the query
@@ -159,6 +163,13 @@ Report Builder Class
    .. data:: dt
    
       Reference to the :class:`_r.Datatable` object of the Report Builder
+      
+   .. data:: mytabs
+   
+      `TabbedPage` object representing the tabs of the Report Builder. This can be used to hide / show
+      tabs from the Client Script in the report like::
+      
+             $dh(this.mytabs.tabs['Select Columns'])   
       
    .. function:: customize_filters(report)
    

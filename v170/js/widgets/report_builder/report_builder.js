@@ -276,6 +276,12 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 
 	for(var i in this.fn_list) this[this.fn_list[i]] = null; // clear custom functions
 	
+	// show all tabs
+	// -------------
+	
+	$ds(this.mytabs.tabs['Select Columns']);
+	$ds(this.mytabs.tabs['More Filters']);
+	
 	this.report_filters.refresh();	
 	this.column_picker.refresh();
 }
@@ -342,7 +348,7 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 
 _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	// load additional fields sort option
-	_r.rb_con.innerHTML = criteria_name;
+	_r.rb_con.main_title.innerHTML = criteria_name;
 	
 	var sc = locals['Search Criteria'][this.sc_dict[criteria_name]];
 	if(sc && sc.add_col)

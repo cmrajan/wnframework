@@ -101,7 +101,8 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 	for c in colnames:
 		col_idx[c] = i
 		i+=1
-		
+	
+	# load globals (api)
 	from webnotes import *
 	from webnotes.utils import *
 	from webnotes.model.doc import *
@@ -117,7 +118,7 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 	
 	if out!=None:
 		res = out
-		
+
 	return res, style, header_html, footer_html, page_template
 
 #####
