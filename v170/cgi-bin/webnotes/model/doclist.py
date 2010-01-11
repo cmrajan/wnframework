@@ -10,7 +10,10 @@ def xzip(a,b):
 	
 def expand(docs):
 	import string
-	import json
+	try:
+		import json
+	except:
+		import simplejson as json # python 2.4
 
 	docs = json.loads(docs)
 	clist = []

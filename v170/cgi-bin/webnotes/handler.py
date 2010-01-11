@@ -587,11 +587,13 @@ else:
 
 	cleanup_docs()
 	
-	out['enc'] = sys.getdefaultencoding()
-
 	# Convert to JSON
 	# ---------------
-	import json
+	try:
+		import json
+	except: # python 2.4
+		import simplejson as json
+		
 	str_out = json.dumps(out)
 	
 	if 0 and acceptsGzip and len(str_out)>512:
