@@ -35,6 +35,8 @@ def getmatchcondition(dt, ud, ur):
 def get_sql_tables(q):
 	if q.find('WHERE') != -1:
 		tl = q.split('FROM')[1].split('WHERE')[0].split(',')
+	elif q.find('GROUP BY') != -1:
+		tl = q.split('FROM')[1].split('GROUP BY')[0].split(',')
 	else:
 		tl = q.split('FROM')[1].split('ORDER BY')[0].split(',')
 	return [t.strip().strip('`')[3:] for t in tl]
