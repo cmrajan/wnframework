@@ -179,8 +179,7 @@ _r.DataTable.prototype.update_query=function(no_limit){if(this.search_criteria&&
 +' ORDER BY '+this.sort_labels[this.dt][sel_val(this.sort_sel)]
 +' '+this.sort_order;}
 if(no_limit||this.no_limit){if(this.show_query)alert(this.query);return;}
-this.query+=' LIMIT '+(this.start_rec-1)+','+this.page_len;if(this.show_query)
-alert(this.query);}
+this.query+=' LIMIT '+(this.start_rec-1)+','+this.page_len;alert(this.query);}
 _r.DataTable.prototype._get_query=function(no_limit){$dh(this.no_data_tag);this.show_query=0;if(this.make_query)
 this.make_query();this.update_query(no_limit);}
 _r.DataTable.prototype.run=function(){if(this.validate&&!this.validate())

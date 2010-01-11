@@ -222,7 +222,7 @@ _r.DataTable.prototype.update_query = function(no_limit) {
   
   // add paging  
   this.query += ' LIMIT ' + (this.start_rec-1) + ',' + this.page_len;
-  if(this.show_query)
+  //if(this.show_query)
 	alert(this.query);
 
 }
