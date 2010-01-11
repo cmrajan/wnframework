@@ -115,6 +115,7 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 	sql = webnotes.conn.sql
 	get_value = webnotes.conn.get_value
 	convert_to_lists = webnotes.conn.convert_to_lists
+	NEWLINE = '\n'
 
 	exec str(code)
 	
@@ -139,11 +140,6 @@ def runquery(q='', ret=0, from_export=0):
 
 		tl, fl= get_sql_tables(q), get_sql_fields(q)
 		meta = get_sql_meta(tl)
-		
-		if webnotes.user.name == 'Administrator':
-			webnotes.msgprint(tl)
-			webnotes.msgprint(fl)		
-			webnotes.msgprint(meta)
 		
 		for f in fl:
 			if meta.has_key(f[0]) and meta[f[0]].has_key(f[1]):
