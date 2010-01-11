@@ -839,12 +839,12 @@ SelectField.prototype.make_input = function() {
 		} else {
 			if(me.options_list && in_list(me.options_list, v)) {
 				if(me.input.multiple) {
-					for(var i=0; i<me.txt.options.length; i++) {
-						if(me.txt.options[i].value == v)
-							me.txt.options[i].selected = 1;
+					for(var i=0; i<me.input.options.length; i++) {
+						if(me.input.options[i].value == v)
+							me.input.options[i].selected = 1;
 					}
 				} else {
-					me.txt.value = v;
+					me.input.value = v;
 				}
 			}
 		}
