@@ -57,7 +57,7 @@ function historyChange(newLocation, historyData) {
 	// re-opening the same page?
 	if(nav_obj.ol.length) {
 		var c = nav_obj.ol[nav_obj.ol.length-1];
-	
+
 		if(t.length==2)	{
 			if(c[0]==t[0] && c[1]==t[1]) return;
 		} else {

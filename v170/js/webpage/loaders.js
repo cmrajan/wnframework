@@ -170,6 +170,9 @@ function loadpage(page_name, call_back, menuitem) {
 			// loaded
 			var p = page_body.pages[page_name]
 			
+			// show
+			page_body.change_to(page_name);
+
 			// call refresh
 			try {
 				if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](menuitem); // onload
@@ -183,9 +186,6 @@ function loadpage(page_name, call_back, menuitem) {
 			if(!p)return;
 		}
 
-		// show
-		page_body.change_to(page_name);
-		
 		// select menu
 		if(p.menuitem) p.menuitem.show_selected();
 
@@ -193,7 +193,7 @@ function loadpage(page_name, call_back, menuitem) {
 		cur_page=page_name;
 		if(call_back)call_back();
 
-		// update "back"		
+		// update "back"
 		nav_obj.open_notify('Page',page_name,'');
 	}
 	
