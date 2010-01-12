@@ -314,8 +314,8 @@ class Document:
 			childtype = db_getchildtype(self.doctype, fieldname)
 	
 		d = Document()
-		d.parent = parent.name
-		d.parenttype = parent.doctype
+		d.parent = self.name
+		d.parenttype = self.doctype
 		d.parentfield = fieldname
 		d.doctype = childtype
 		d.docstatus = 0;
