@@ -21,6 +21,7 @@ function Dialog(w, h, title, content) {
 
 	this.onshow = '';
 	this.oncancel = '';
+	this.no_cancel_flag = 0; // allow to cancel
 	this.display = false;
 	var me = this;
 	
@@ -47,6 +48,11 @@ Dialog.prototype.make_head = function(title) {
 		me.hide();
 	}
 	this.cancel_img = img;
+}
+
+Dialog.prototype.no_cancel = function() {
+	$dh(this.cancel_img);
+	this.no_cancel_flag = 1;	
 }
 
 Dialog.prototype.show = function() {
@@ -81,10 +87,6 @@ Dialog.prototype.hide = function() {
 }
 
 Dialog.prototype.set_title = function(title) { if(!title)title=''; this.title_text.innerHTML = title.bold(); }
-
-// to add widget dialog.make_body([[type,label,comment/ onclick],..])
-// this.widgets[label] will be the widget
-// types - Data, Select, HTML, Button, Text
 
 Dialog.prototype.make_body = function(content) {
 	this.rows = {}; this.widgets = {};
@@ -156,6 +158,7 @@ Dialog.prototype.make_row = function(d) {
 // Close dialog on Escape
 keypress_observers.push(new function() {
 	this.notify_keypress = function(kc) {
-		if(cur_dialog && kc==27) cur_dialog.hide();
+		if(cur_dialog && kc==27 && !cur_dialog.no_cancel_flag) 
+			cur_dialog.hide();
 	}
 });

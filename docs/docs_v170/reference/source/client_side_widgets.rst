@@ -5,6 +5,10 @@ API for client side widgets
 
 .. toctree::
 
-  autosuggest
   form_widget
   report_builder
+  dialog
+  listing
+  tree
+  tabbed_page
+  autosuggest

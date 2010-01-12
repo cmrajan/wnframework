@@ -93,4 +93,13 @@ Glossary
       locals[`DocType`][`name`]. If an object is loaded in the current session, then it will be present in the
       locals object (dictionary)
       
-   
+   Standard Query
+      A standardized way to write a SQL query for the query_builder. This will automatically add conditions
+      relating to `match` permissions.
+      
+      For a standard query, 
+      
+      * All SQL keywords must be capitalized
+      * All columms must be written as `tablename`.`colname`
+      
+      

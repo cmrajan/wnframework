@@ -2,10 +2,10 @@
 // -----------------------
 
 list_opts = {
-	cell_style : {padding:'3px 2px',borderRight:'1px solid #CCC'},
+	cell_style : {padding:'3px 2px'},
 	alt_cell_style : {backgroundColor:'#F2F2FF'},
-	head_style : {backgroundColor:'#F2F2F2',height:'20px',overflow:'hidden',verticalAlign:'middle',textAlign:'center',fontWeight:'bold',padding:'1px'},
-	head_main_style : {padding:'0px', borderRight:'1px solid #CCC'},
+	head_style : {height:'20px',overflow:'hidden',verticalAlign:'middle',textAlign:'center',fontWeight:'bold',padding:'1px',fontSize:'13px'},
+	head_main_style : {padding:'0px'},
 	hide_export : 0,
 	hide_print : 0,
 	hide_refresh : 0,

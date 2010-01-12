@@ -1,5 +1,5 @@
-:mod:`autosuggest` --- Autosuggest Widget
-=========================================
+Autosuggest
+===========
 
 Adapted from: Timothy Groves - http://www.brandspankingnew.net
    

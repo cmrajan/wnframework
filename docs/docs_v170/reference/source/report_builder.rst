@@ -1,7 +1,7 @@
 Report Builder
 ==============
 
-The Report Builder structure is as follows
+The Report Builder structure is as follows::
 
    +- Report Builder Container
       |

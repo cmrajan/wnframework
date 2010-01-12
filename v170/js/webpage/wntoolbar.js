@@ -15,7 +15,7 @@ function WNToolbar(parent) {
 		
 		// model tab
 		$y($td(this.body_tab, 0, 1),{paddingTop:'3px', paddingBottom:'0px'});
-		this.model_tab = make_table($td(this.body_tab,0,1), 1, 4, null, ['140px','140px','140px','80px'], {padding:'2px'});
+		this.model_tab = make_table($td(this.body_tab,0,1), 1, 4, null, ['140px','140px','140px'], {padding:'2px'});
 		
 		this.menu = new MenuToolbar($td(this.body_tab,0,0));
 		this.setup_home();
@@ -157,7 +157,6 @@ function WNToolbar(parent) {
 		this.search_sel = new SelectWidget($td(this.model_tab, 0, 2), []);
 		this.search_sel.inp.value = 'Search...';
 		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
-		this.search_btn = $a($td(this.model_tab, 0, 3), 'button'); this.search_btn.innerHTML = 'Search';
 		
 		function open_quick_search() {
 			if(me.search_sel.inp.value)
@@ -169,7 +168,6 @@ function WNToolbar(parent) {
 		me.search_sel.set_options(profile.can_read.sort());
 		me.search_sel.inp.onchange = function() { open_quick_search(); this.value = 'Search...'; }
 		
-		this.search_btn.onclick = function() { open_quick_search(); }	
 		makeselector();
 	}
 	

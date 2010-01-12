@@ -250,6 +250,11 @@ function makeselector() {
 		// for field type, return field name
 		var get_sf_fieldname = function(v) {
 			var lf = search_fields[d.sel_type];
+			
+			// still loading options
+			if(!lf)
+				return 'name'
+				
 			for(var i=0; i<lf.length; i++) if(lf[i][1]==v) return lf[i][0];
 		}		
 
