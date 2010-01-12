@@ -333,7 +333,7 @@ class Document:
 		return d
 
 def addchild(parent, fieldname, childtype = '', local=0, doclist=None):
-	parent.addchild(fieldname, childtype, local, doclist)
+	return parent.addchild(fieldname, childtype, local, doclist)
 
 # Remove Child
 # ------------
