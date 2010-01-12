@@ -41,16 +41,6 @@ table.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px;
 
 div.fix_ff_cursor { overflow: auto; }
 
-/* STARTUP */
-
-#startup_div {
-	font-size: 14px;
-	width: 600px;
-	margin: auto;	
-	padding-top: 220px;
-	text-align: center;
-}
-
 /* --- Layout --- */
 
 div.comment { color: #777; }

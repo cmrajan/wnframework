@@ -21,7 +21,7 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   </script>
 </head>
 <body>
-<div id="startup_div"></div>
+<div id="startup_div" style="padding: 8px; font-size: 14px;">Loading...</div>
 
 <!-- Main Starts -->
 
