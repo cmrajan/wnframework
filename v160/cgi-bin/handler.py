@@ -1658,6 +1658,10 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='login'):
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# register
 	# ----------------------------------
+	
+	if form.has_key('ac'):
+		set_db_name(form.getvalue('ac'))
+	
 	sql("START TRANSACTION")
 	try:
 		out['message'] = server.get_obj('Profile Control').prelogin(form) or ''
@@ -1677,7 +1681,7 @@ else:
 		if incookies.has_key('dbx') and incookies['dbx']:
 			server.db_name = incookies['dbx']
 			server.db_login = incookies['dbx']
-			
+
 	# sid & app id is given
 	# ---------------------
 
@@ -1687,7 +1691,6 @@ else:
 			dbx = str(server.decrypt(form.getvalue('__account')))
 			server.db_name = dbx
 			server.db_login = dbx
-		
 
 	# load session
 	if sid:
