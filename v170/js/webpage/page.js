@@ -35,13 +35,16 @@ function render_page(page_name, menuitem) {
 	// style
 	if(pdoc.style) set_style(pdoc.style)
 
+	// create page
+	var p = new Page(page_name, pdoc.__content?pdoc.__content:pdoc.content);
+
 	// script
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
 	if(script)
 		try { eval(script); } catch(e) { submit_error(e); }		
-	
-	// create page
-	var p = new Page(page_name, pdoc.__content?pdoc.__content:pdoc.content);
+
+	// change
+	page_body.change_to(page_name);	
 
 	// run onload
 	try {
