@@ -91,6 +91,21 @@ def dt_map(form, session):
 	
 	out['docs'] = doclist
 
+# Load Month Events
+# -----------------
+
+def load_month_events():
+	import webnotes
+	form = webnotes.form
+
+	mm = form.getvalue('month')
+	yy = form.getvalue('year')
+	m_st = str(yy) + '-' + str(mm) + '-01'
+	m_end = str(yy) + '-' + str(mm) + '-31'
+
+	import webnotes.widgets.event
+	webnotes.response['docs'] = webnotes.widgets.event.get_cal_events(m_st, m_end)
+	
  # ------------------------------------------------------------------------------------
 
 
@@ -251,16 +266,7 @@ def get_template(form, session):
 
 
 				
-# Load Month Events
-# -----------------
 
-def load_month_events(form, session):
-	mm = form.getvalue('month')
-	yy = form.getvalue('year')
-	m_st = str(yy) + '-' + str(mm) + '-01'
-	m_end = str(yy) + '-' + str(mm) + '-31'
-
-	out['docs'] = server.compress_doclist(server.get_cal_events(m_st, m_end))
 
 
 # Reset Password
