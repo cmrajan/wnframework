@@ -107,11 +107,10 @@ class Profile:
 		return pwd
 
 	def reset_password(self):
-	
-		pwd = random_password()
+		pwd = self.get_random_password()
 		
 		# get profile
-		profile = webnotes.conn.sql("SELECT name, email FROM tabProfile WHERE name=%s OR email=%s",(self.name, self.name))
+		profile = webnotes.conn.sql("SELECT name, email, first_name, last_name FROM tabProfile WHERE name=%s OR email=%s",(self.name, self.name))
 		
 		if not profile:
 			raise Exception, "Profile %s not found" % self.name
@@ -119,8 +118,13 @@ class Profile:
 		# update tab Profile
 		webnotes.conn.sql("UPDATE tabProfile SET password=password(%s) WHERE name=%s", (pwd, profile[0][0]))
 		
-		# send email
-
+		self.send_email("Password Reset", "<p>Dear %s%s,</p><p>your password has been changed to %s</p><p>[Automatically Generated]</p>" % (profile[0][2], (profile[0][3] and (' ' + profile[0][3]) or ''), pwd), profile[0][1])
+		
+	def send_email(self, subj, mess, email):
+		import webnotes.utils.email_lib
+		
+		webnotes.utils.email_lib.sendmail(email, message=mess, subject=subj)
+	
 	# update recent documents
 	def update_recent(self, dt, dn):
 		if not (dt in ['Print Format', 'Start Page', 'Event', 'ToDo Item', 'Search Criteria']) and not webnotes.is_testing:

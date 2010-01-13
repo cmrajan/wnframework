@@ -186,10 +186,11 @@ def set_default(key, val):
 		d.save()
 
 # Get File
+# -------------------
 
 def get_file(fname):
 	in_fname = fname
-	if db_exists('File',fname):
+	if webnotes.conn.exists('File',fname):
 		fname = webnotes.conn.sql("select file_list from tabFile where name=%s", fname)
 		fname = fname and fname[0][0]
 		fname = fname.split(NEWLINE)[0].split(',')[1]

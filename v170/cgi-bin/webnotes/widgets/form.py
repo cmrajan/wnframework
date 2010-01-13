@@ -325,7 +325,12 @@ def get_print_format(name):
 		
 	webnotes.response['message'] = out_html
 	
+# remove attachment
+#===========================================================================================
 
+def remove_attach():
+	fid = webnotes.form.getvalue('fid')
+	sql('delete from `tabFile Data` where name="%s"' % fid)
 
 # Get Fields - Counterpart to $c_get_fields
 #===========================================================================================

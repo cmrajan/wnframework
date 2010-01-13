@@ -132,7 +132,7 @@ _f.FileField = function(parent, at_id, frm, addlink) {
 			me.wrapper.style.display = 'none';
 			var fid = frm.attachments[frm.docname][me.at_id].fileid;
 			if(fid) {
-				$c('remove_attach', args = {'fid': fid}, function(r,rt) { } );
+				$c('webnotes.widgets.form.remove_attach', args = {'fid': fid}, function(r,rt) { } );
 			}
 	
 			delete frm.attachments[frm.docname][me.at_id];
@@ -152,7 +152,7 @@ _f.FileField = function(parent, at_id, frm, addlink) {
 	this.download_div = $a(main_area, 'div');
 
 	var div = $a(this.upload_div, 'div');
-	div.innerHTML = '<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:400px; height:100px; border:0px"></iframe>';
+	div.innerHTML = '<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:0px; height:0px; border:0px"></iframe>';
 
 	// upload form
 	var div = $a(this.upload_div,'div');
@@ -180,7 +180,7 @@ _f.FileField = function(parent, at_id, frm, addlink) {
 		if (this.filename) {
 			$dh(this.upload_div);
 			this.download_link.innerHTML = this.filename;
-			this.download_link.href = outUrl + '?cmd=downloadfile&file_id='+this.fileid;
+			this.download_link.href = outUrl + '?cmd=get_file&fname='+this.fileid;
 
 			this.download_link.target = "_blank";
 			$ds(this.download_div);

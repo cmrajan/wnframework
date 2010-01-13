@@ -44,7 +44,11 @@ database object --- conn
    .. method:: use(db_name)
    
       `USE` db_name
-      
+   
+   .. method:: set_db(account)
+   
+      Switch to database of given `account`
+   
    .. method:: check_transaction_status(query)
    
       Update *in_transaction* and check if "START TRANSACTION" is not called twice

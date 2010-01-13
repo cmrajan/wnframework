@@ -153,7 +153,7 @@ def uploadfile():
 
 		webnotes.response['result'] = """
 		<script type='text/javascript'>
-			window.parent.file_upload_done('%s', '%s', '%s', '%s', '%s');
+			window.parent._f.file_upload_done('%s', '%s', '%s', '%s', '%s');
 			window.parent._f.frms['%s'].show_doc('%s');
 		</script>""" % (dt, dn, f.name, f.file_name.replace("'", "\\'"), at_id, dt, dn)
 	else:
@@ -180,38 +180,27 @@ def upload_many(form, session):
 %s""" % (cp.upload_callback(webnotes.form), '\n----\n'.join(webnotes.message_log).replace("'", "\'"), '\n----\n'.join(webnotes.debug_log).replace("'", "\'").replace("\n","<br>"))
 	webnotes.response['type'] = 'iframe'
 
-def remove_attach(form, session):
-	fid = form.getvalue('fid')
-	sql('delete from `tabFile Data` where name="%s"' % fid)
-	
-def downloadfile(form, session):
-	fid = form.getvalue('file_id')
-	res = sql("select file_name, `blob_content` from `tabFile Data` where name = '%s'" % fid)
+
+# File download
+# ------------------------------------------------------------------------------------
+def get_file():
+
+	res = webnotes.utils.get_file(form.getvalue('fname'))
 	if res:
-		out['type'] = 'download'
-		out['filename'] = res[0][0]
+		webnotes.response['type'] = 'download'
+		webnotes.response['filename'] = res[0][0]
 		if hasattr(res[0][1], 'tostring'):
-			out['filecontent'] = res[0][1].tostring()
+			webnotes.response['filecontent'] = res[0][1].tostring()
 		else: 
-			out['filecontent'] = res[0][1]
-	else:
-		webnotes.msgprint('Unknown file id')
-
-def get_file(form, session):
-
-	res = server.get_file(form.getvalue('fname'))
-	if res:
-		out['type'] = 'download'
-		out['filename'] = res[0][0]
-		out['filecontent'] = res[0][1].tostring()
+			webnotes.response['filecontent'] = res[0][1]
 	else:
 		webnotes.msgprint('[get_file] Unknown file name')
 		
 # Get Graph
-# ------------------
+# ------------------------------------------------------------------------------------
+def get_graph():
+	form = webnotes.form
 
-
-def get_graph(form, session):
 	import StringIO
 	f = StringIO.StringIO()
 
@@ -221,69 +210,44 @@ def get_graph(form, session):
 	plt.savefig(f)
 
 	# stream out
-	out['type'] = 'download'
-	out['filename'] = server.random_password() + '.png'
-	out['filecontent'] = f.getvalue()
-
-
+	webnotes.response['type'] = 'download'
+	webnotes.response['filename'] = webnotes.user.get_random_password() + '.png'
+	webnotes.response['filecontent'] = f.getvalue()
 
 # Reset Password
-# --------------
+# ------------------------------------------------------------------------------------
 
-def reset_password(form, session):
+def reset_password():
+	form = webnotes.form
+	
 	act = form.getvalue('account', '')
 	user = form.getvalue('user', '')
 	if act:
-		set_db_name(act)
-	
+		webnotes.conn.set_db(act)
 	try:
-		server.reset_password(user)
+		webnotes.user.reset_password(user)
 		webnotes.msgprint("Password has been reset and sent to your email id.")
 	except Exception, e:
 		webnotes.msgprint(str(e))
 
-# Check Password
-# --------------
-
-def update_password(form, session):
-	if sql("SELECT name FROM tabProfile WHERE password='%s' AND name='%s'" % (form.getvalue('newpwd'), form.getvalue('user'))):
-		sql("UPDATE tabProfile SET password='%s' WHERE name='%s'" % (form.getvalue('oldpwd'), form.getvalue('user')))
-		webnotes.msgprint('Password Reset')
-	else:
-		webnotes.msgprint('Old Password is not correct. Did not reset!')
-
 # Testing
-# -------
+# ------------------------------------------------------------------------------------
 
 def start_test(form,session):
-	session['data']['__testing'] = 1
+	webnotes.session['data']['__testing'] = 1
 
 def end_test(form,session):
-	session['data']['__testing'] = 0
+	webnotes.session['data']['__testing'] = 0
 
 def setup_test(form, session):
-	names = server.get_testing_tables()
+	sql = webnotes.conn.sql
+	names = webnotes.conn.get_testing_tables()
 	for n in names:
 		ntest = 'test'+n[3:]
 		if n.startswith('tab'):
 			sql("DROP TABLE IF EXISTS `%s`" % ntest)
 			sql("CREATE TABLE `%s` LIKE `%s`" % (ntest, n), allow_testing = 0)
 			sql("INSERT INTO `%s` SELECT * FROM `%s`" % (ntest, n), allow_testing = 0)
-
-# Export
-# ------
-
-def export_data(form, session):
-	c = server.getcursor()
-	c.execute("select * from `tab%s`" % form.getvalue('dt'))
-	dataset = c.fetchall()
-	
-	l = []
-	for r in dataset:			
-		l.append(','.join([getCSVelement(i) for i in r]))
-	
-	txt = '\n'.join(l)
-	out['export_data'] = (','.join([i[0] for i in c.description])) + '\n' + ('\n'.join(l))
 
 # Module Exchange
 # ---------------
@@ -364,7 +328,6 @@ def import_docs(form, session):
 	if form.getvalue('tar'):
 		server.use_account(ac_name = form.getvalue('tar'))
 	webnotes.msgprint(server.import_docs(eval(form.getvalue('data'))))
-
 
 # -------------
 # Create Backup

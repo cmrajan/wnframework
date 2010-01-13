@@ -1,26 +1,5 @@
 #!/usr/bin/python
 
-# Copyright 2005-2008, Rushabh Mehta (RMEHTA _AT_ GMAIL) 
-#
-#   Web Notes Framework is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    For a copy of the GNU General Public License see 
-#    <http://www.gnu.org/licenses/>.
-#    
-#    Web Notes Framework is also available under a commercial license with
-#    patches, upgrades and support. For more information see 
-#    <http://webnotestech.com>
-#
-
-
 try:
 
 	import sys, os
@@ -37,28 +16,16 @@ try:
 		return body
 
 	import cgi
-	from webnotes import server
+	import webnotes
 	
 	form = cgi.FieldStorage()
 	n = form.getvalue('name')
 
-	if form.getvalue('ac'):
-		ac = form.getvalue('ac')
-	else:
-		ac = 'accounts'
+	# authenticate
+	auth_obj = webnotes.auth.Authentication(form, {}, [])
 	
-	try:
-		res = server.sql_accounts("select db_name, db_login from tabAccount where ac_name='%s' or db_name='%s'" % (ac,ac))
-		if res:
-			server.db_name = res[0][0]
-			if res[0][1]:
-				server.db_login = res[0][1]
-			else:
-				server.db_login = res[0][0]
-	except:
-		pass			
-	
-	res = server.get_file(n)
+	# get file
+	res = webnotes.utils.get_file(n)
 	
 	fname = res[0][0]
 	if hasattr(res[0][1], 'tostring'):
