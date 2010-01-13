@@ -5,15 +5,17 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 	this.custom_select = 1;
 	this.setup = function() {
 		this.options = options;
-		if(!width) width = '120px';
 		
-		this.wrapper = $a(parent, 'div', '', {width: (cint(width)+2) + 'px', display: 'inline'});
+		this.wrapper = $a(parent, 'div');
 		
-		this.body_tab = make_table(this.wrapper, 1, 2, cint(width) + 'px', [(cint(width)-18) + 'px', '18px'],{border:'1px solid #888'});
+		if(width) 
+			$y(this.wrapper, { width: width } );		
+
+		this.body_tab = make_table(this.wrapper, 1, 2,'100%', ['100%', '18px'],{border:'1px solid #888'});
 	
-		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: (cint(width)-20) + 'px', border:'0px', padding:'2px'});
+		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: '95%', border:'0px', padding:'1px'});
 		
-		this.btn = $a($td(this.body_tab, 0, 1), 'img', '', {cursor:'pointer', margin:'2px'});
+		this.btn = $a($td(this.body_tab, 0, 1), 'img', '', {cursor:'pointer', margin:'1px 2px'});
 		this.btn.src = 'images/ui/down-arrow.gif';
 		this.btn.onclick = function() {
 			if(me.as && me.as.body) {

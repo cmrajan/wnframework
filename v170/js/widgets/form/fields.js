@@ -780,7 +780,8 @@ SelectField.prototype.make_input = function() {
 	} else {
 
 		// Single select
-		this.input = new SelectWidget(this.input_area, []);	
+		this.input = new SelectWidget(this.input_area, [], '80%');	
+		$y(this.input.wrapper, {marginLeft:'1px'});
 		this.txt = this.input.inp;
 		this.btn = this.input.btn;
 		this.txt.onchange = function() {

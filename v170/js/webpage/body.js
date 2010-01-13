@@ -23,7 +23,7 @@ function Body() {
 		return n;
 	}
 	
-	this.setup_sidebars = function() {
+	this.setup_page_areas = function() {
 		var n = this.no_of_columns();
 		if(n==1) 
 			// no sidebar
@@ -82,8 +82,13 @@ function Body() {
 		this.footer = $a(this.wrapper, 'div');
 		
 		// sidebars
-		this.setup_sidebars();
-		
+		if(user_defaults.hide_sidebars) {
+			this.cp.left_sidebar_width = null;
+			this.cp.right_sidebar_width = null;
+		}		
+
+		this.setup_page_areas();
+	
 		// headers & footer
 		this.setup_header_footer();
 		
