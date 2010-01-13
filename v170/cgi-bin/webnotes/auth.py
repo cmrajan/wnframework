@@ -46,6 +46,7 @@ class Authentication:
 		self.session = None
 		self.out_cookies = out_cookies
 		self.out = out
+		self.login_flag = 0
 		
 		self.set_env()
 		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
@@ -55,14 +56,17 @@ class Authentication:
 			if form.getvalue('acx'):
 				self.conn = self.set_db(form.getvalue('acx'))
 			
-			self.login() or self.login(as_guest = True)
+			self.login() or self.login(as_guest = True)			
+			self.login_flag = 1
 		
 		if not self.session: 
 			self.out['message'] = '"Authentication Failed"'
 			raise Exception, "Authentication Failed"
 
-		# set self.cookies
-		self.set_cookies()
+		# if just logged in
+		if self.login_flag:
+			self.set_cookies()
+			self.set_remember_me()
 		
 		webnotes.conn = self.conn
 		webnotes.session = self.session
@@ -142,7 +146,6 @@ class Authentication:
 		if user:
 			self.validate_ip(user)
 			self.start_session(user)
-			self.set_remember_me()
 			self.out['message'] = 'Logged In'
 			return True
 			
@@ -209,8 +212,8 @@ class Authentication:
 			import datetime
 			self.out_cookies['remember_me'] = 1
 			expires = datetime.datetime.now() + datetime.timedelta(days=remember_days)
-			for k in out_cookies.keys():
-				self.cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')	
+			for k in self.out_cookies.keys():
+				self.out_cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')	
 	
 	def set_in_cookies(self):
 		import os

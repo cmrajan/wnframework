@@ -136,7 +136,7 @@ function WNToolbar(parent) {
 	// New
 	// ----------------------------------------------------------------------------------------
 	this.setup_new = function() {	
-		this.new_sel = new SelectWidget($td(this.model_tab, 0, 0), profile.can_create.sort());
+		this.new_sel = new SelectWidget($td(this.model_tab, 0, 0), profile.can_create.sort(), '90%');
 		this.new_sel.inp.value='Create New...';
 		this.new_sel.inp.onchange = function() { new_doc(me.new_sel.inp.value); this.value = 'Create New...'; }
 	}
@@ -144,7 +144,7 @@ function WNToolbar(parent) {
 	// Report Builder
 	// ----------------------------------------------------------------------------------------
 	this.setup_report_builder = function() {
-		this.rb_sel = new SelectWidget($td(this.model_tab, 0, 1), profile.can_get_report.sort());
+		this.rb_sel = new SelectWidget($td(this.model_tab, 0, 1), profile.can_get_report.sort(), '90%');
 		this.rb_sel.inp.value = 'Report Builder...';
 		this.rb_sel.inp.onchange = function() { loadreport(me.rb_sel.inp.value, null, null, 1); this.value = 'Report Builder...'; }
 	}
@@ -154,7 +154,7 @@ function WNToolbar(parent) {
 
 	this.setup_search = function() {
 
-		this.search_sel = new SelectWidget($td(this.model_tab, 0, 2), []);
+		this.search_sel = new SelectWidget($td(this.model_tab, 0, 2), [], '90%');
 		this.search_sel.inp.value = 'Search...';
 		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
 		

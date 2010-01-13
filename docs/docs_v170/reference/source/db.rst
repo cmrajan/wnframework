@@ -77,6 +77,14 @@ database object --- conn
 
       For Single records, let docname be = None
 
+   .. method:: get_description()
+   
+      Get metadata of the last query
+
+   .. method:: exists(dt, dn)
+   
+      Returns true if the record exists
+
    .. method:: close()
    
       Close my connection

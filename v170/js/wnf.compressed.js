@@ -513,7 +513,7 @@ this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=
 if(this.ul)
 delete this.ul;this.iHigh=0;cur_autosug=null;};$ce=function(type,attr,cont,html)
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.bg_color=bg_color?bg_color:'#FFF';this.custom_select=1;this.setup=function(){this.options=options;this.wrapper=$a(parent,'div');if(width)
-$y(this.wrapper,{width:width});this.body_tab=make_table(this.wrapper,1,2,'100%',['100%','18px'],{border:'1px solid #888'});this.inp=$a_input($td(this.body_tab,0,0),'text',{'readonly':(editable?null:'readonly')},{width:'95%',border:'0px',padding:'1px'});this.btn=$a($td(this.body_tab,0,1),'img','',{cursor:'pointer',margin:'1px 2px'});this.btn.src='images/ui/down-arrow.gif';this.btn.onclick=function(){if(me.as&&me.as.body){me.as.clearSuggestions();return;}
+$y(this.wrapper,{width:width});this.body_tab=make_table(this.wrapper,1,2,'100%',['100%','18px'],{border:'1px solid #888'});this.inp=$a_input($td(this.body_tab,0,0),'text',{'readonly':(editable?null:'readonly')},{width:'96%',border:'0px',padding:'1px'});this.btn=$a($td(this.body_tab,0,1),'img','',{cursor:'pointer',margin:'1px 2px'});this.btn.src='images/ui/down-arrow.gif';this.btn.onclick=function(){if(me.as&&me.as.body){me.as.clearSuggestions();return;}
 me.inp.focus();me.as.createList(me.as.aSug);}
 if(!editable){$y(this.inp,{cursor:'pointer'});this.inp.onclick=this.btn.onclick;}
 this.as=new AutoSuggest(this.inp,{fixed_options:true,xdelta:8,ydelta:8});this.as.aSug=me.create_options(me.options);this.set_background();}
@@ -706,9 +706,9 @@ this.rename_notify=function(dt,old,name){me.rdocs.remove(dt,old);me.rdocs.add(dt
 rename_observers.push(this);}
 this.setup_help=function(){me.menu.add_top_menu('Tools',function(){});this.menu.add_item('Tools','Error Console',function(){err_console.show();});this.menu.add_item('Tools','Start / Finish Testing Mode',function(){me.enter_testing();});if(has_common(user_roles,['Administrator','System Manager'])){this.menu.add_item('Tools','Download Backup',function(){me.start_testing();});this.menu.add_item('Tools','Reset Testing',function(){me.download_backup();});}
 this.menu.add_item('Tools','About <b>Web Notes</b>',function(){show_about();});}
-this.setup_new=function(){this.new_sel=new SelectWidget($td(this.model_tab,0,0),profile.can_create.sort());this.new_sel.inp.value='Create New...';this.new_sel.inp.onchange=function(){new_doc(me.new_sel.inp.value);this.value='Create New...';}}
-this.setup_report_builder=function(){this.rb_sel=new SelectWidget($td(this.model_tab,0,1),profile.can_get_report.sort());this.rb_sel.inp.value='Report Builder...';this.rb_sel.inp.onchange=function(){loadreport(me.rb_sel.inp.value,null,null,1);this.value='Report Builder...';}}
-this.setup_search=function(){this.search_sel=new SelectWidget($td(this.model_tab,0,2),[]);this.search_sel.inp.value='Search...';$y($td(this.model_tab,0,3),{paddingTop:'0px'});function open_quick_search(){if(me.search_sel.inp.value)
+this.setup_new=function(){this.new_sel=new SelectWidget($td(this.model_tab,0,0),profile.can_create.sort(),'90%');this.new_sel.inp.value='Create New...';this.new_sel.inp.onchange=function(){new_doc(me.new_sel.inp.value);this.value='Create New...';}}
+this.setup_report_builder=function(){this.rb_sel=new SelectWidget($td(this.model_tab,0,1),profile.can_get_report.sort(),'90%');this.rb_sel.inp.value='Report Builder...';this.rb_sel.inp.onchange=function(){loadreport(me.rb_sel.inp.value,null,null,1);this.value='Report Builder...';}}
+this.setup_search=function(){this.search_sel=new SelectWidget($td(this.model_tab,0,2),[],'90%');this.search_sel.inp.value='Search...';$y($td(this.model_tab,0,3),{paddingTop:'0px'});function open_quick_search(){if(me.search_sel.inp.value)
 selector.set_search(me.search_sel.inp.value);me.search_sel.disabled=1;selector.show();}
 me.search_sel.set_options(profile.can_read.sort());me.search_sel.inp.onchange=function(){open_quick_search();this.value='Search...';}
 makeselector();}

@@ -19,12 +19,13 @@ fw_folder = '/Users/rushabh/workbench/www/'
 # Logs
 
 # refresh / start page
+# ------------------------------------------------------------------------------------
+
 def startup():
 	import webnotes.model.doc
 	import webnotes.model.doctype
 	import webnotes.widgets.page
 	import webnotes.widgets.menus
-	import webnotes.utils
 	import webnotes.profile
 	
 	webnotes.response['profile'] = webnotes.user.load_profile()
@@ -70,7 +71,7 @@ def logout():
 
 
 # DocType Mapper
-# --------------
+# ------------------------------------------------------------------------------------
 
 def dt_map(form, session):
 	import webnotes
@@ -92,7 +93,7 @@ def dt_map(form, session):
 	out['docs'] = doclist
 
 # Load Month Events
-# -----------------
+# ------------------------------------------------------------------------------------
 
 def load_month_events():
 	import webnotes
@@ -105,21 +106,34 @@ def load_month_events():
 
 	import webnotes.widgets.event
 	webnotes.response['docs'] = webnotes.widgets.event.get_cal_events(m_st, m_end)
-	
- # ------------------------------------------------------------------------------------
 
+# Data import
+# ------------------------------------------------------------------------------------
 
-def rename(form, session):
-	if form.getvalue('dt') and form.getvalue('old') and form.getvalue('new'):
-		server.rename(form.getvalue('dt'), form.getvalue('old'), form.getvalue('new'))
+def import_csv():
+	import webnotes.model.import_docs
+	form = webnotes.form
+	from webnotes.utils import cint
+
+	i = webnotes.model.import_docs.CSVImport()
+	r = i.import_csv(form.getvalue('csv_file'), form.getvalue('dateformat'), cint(form.has_key('overwrite')))
 		
-		getdoc(form, session)
+	webnotes.response['type']='iframe'
+	rhead = '''<style>body, html {font-family: Arial; font-size: 12px;}</style>'''
+	webnotes.response['result']= rhead + r
 
+def get_template():
+	import webnotes.model.import_docs
+	webnotes.model.import_docs.get_template()
+	
 
 # File Upload
-# -----------
+# ------------------------------------------------------------------------------------
 
-def uploadfile(form, session):
+def uploadfile():
+	form = webnotes.form
+	from webnotes.model.doc import Document
+
 	dt = form.getvalue('doctype')
 	dn = form.getvalue('docname')
 	at_id = form.getvalue('at_id')
@@ -128,7 +142,7 @@ def uploadfile(form, session):
 		i = form['filedata']
       
 		# create File Data record
-		f = server.Document('File Data')
+		f = Document('File Data')
 		f.blob_content = i.file.read()
 		f.file_name = i.filename
 		if '\\' in f.file_name:
@@ -137,28 +151,34 @@ def uploadfile(form, session):
 			f.file_name = f.file_name.split('/')[-1]
 		f.save(1)
 
-		out['result'] = """
+		webnotes.response['result'] = """
 		<script type='text/javascript'>
 			window.parent.file_upload_done('%s', '%s', '%s', '%s', '%s');
-			window.parent.frms['%s'].show_doc('%s');
+			window.parent._f.frms['%s'].show_doc('%s');
 		</script>""" % (dt, dn, f.name, f.file_name.replace("'", "\\'"), at_id, dt, dn)
 	else:
-		out['result'] = """
-		<script type='text/javascript'>window.parent.webnotes.msgprint("No file")</script>"""
+		webnotes.response['result'] = """
+		<script type='text/javascript'>msgprint("No file")</script>"""
 	
-	out['type'] = 'iframe'
+	webnotes.response['type'] = 'iframe'
 
-# to be called by custom upload scripts
+# File upload (from scripts)
+# ------------------------------------------------------------------------------------
+
 def upload_many(form, session):
-	cp = server.get_obj('Control Panel')
-	cp.upload_many(form)
-	out['result'] = """
+	from webnotes.model.code import get_obj
+
+	# pass it on to upload_many method in Control Panel
+	cp = get_obj('Control Panel')
+	cp.upload_many(webnotes.form)
+	
+	webnotes.response['result'] = """
 <script type='text/javascript'>
 %s
 </script>
 %s
-%s""" % (cp.upload_callback(form), '\n----\n'.join(message_log).replace("'", "\'"), '\n----\n'.join(webnotes.debug_log).replace("'", "\'").replace("\n","<br>"))
-	out['type'] = 'iframe'
+%s""" % (cp.upload_callback(webnotes.form), '\n----\n'.join(webnotes.message_log).replace("'", "\'"), '\n----\n'.join(webnotes.debug_log).replace("'", "\'").replace("\n","<br>"))
+	webnotes.response['type'] = 'iframe'
 
 def remove_attach(form, session):
 	fid = form.getvalue('fid')
@@ -204,68 +224,6 @@ def get_graph(form, session):
 	out['type'] = 'download'
 	out['filename'] = server.random_password() + '.png'
 	out['filecontent'] = f.getvalue()
-
-# Data import
-# -----------
-
-def import_csv(form, session):
-	d = server.Document('Control Panel', 'Control Panel')
-	d.messages = form.getvalue('csv_file')
-	if form.has_key('overwrite'):
-		d.over_write = 1
-	else:
-		d.over_write = 0
-	d.import_date_format = form.getvalue('dateformat')
-
-	cp = server.get_obj(doc=d)
-	cp.import_csv()
-		
-	out['type']='iframe'
-	rhead = '''<style>body, html {font-family: Arial; font-size: 12px;}</style>'''
-	out['result']= rhead + d.response
-
-def get_template(form, session):
-	from webnotes.utils import getCSVelement
-
-	dt = form.getvalue('dt')
-	pt, pf = '', ''
-	
-	# is table?
-	dtd = sql("select istable, autoname from tabDocType where name='%s'" % dt)
-	if dtd and dtd[0][0]:
-		res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % dt)
-		if res1:
-			pt, pf = res1[0][0], res1[0][1]
-
-	# line 1
-	dset = []
-	if pt and pf:
-		fl = ['parent']
-		line1 = '#,%s,%s,%s' % (getCSVelement(dt), getCSVelement(pt), getCSVelement(pf))
-	else:
-		if dtd[0][1]=='Prompt':
-			fl = ['name']
-		else:
-			fl = []
-		line1 = '#,%s' % getCSVelement(dt)
-		
-	# fieldnames
-	res = sql("select fieldname, fieldtype from tabDocField where parent='%s' and docstatus!=2" % dt)
-	for r in res:
-		if not r[1] in server.no_value_fields:
-			fl.append(getCSVelement(r[0]))
-	
-	dset.append(line1)
-	dset.append(','.join(fl))
-	
-	txt = '\n'.join(dset)
-	out['result'] = txt
-	out['type'] = 'csv'
-	out['doctype'] = dt
-	
-
-
-				
 
 
 
@@ -408,7 +366,6 @@ def import_docs(form, session):
 	webnotes.msgprint(server.import_docs(eval(form.getvalue('data'))))
 
 
-
 # -------------
 # Create Backup
 # -------------
@@ -421,50 +378,6 @@ def backupdb(form, session):
 	out['type'] = 'download'
 	out['filename'] = db_name+'.tar.gz'
 	out['filecontent'] = open('../backups/' + db_name+'.tar.gz','rb').read()
-
-# Error log
-# ---------
-
-def client_err_log(form, session):
-	save_log(form.getvalue('error', 'Client'))
-
-def save_log(t, errtype = ''):
-	l = server.Document('Error Log')
-	l.errtype = errtype or 'Server'
-	l.user = session['user']
-	l.time = server.nowdate()
-	l.date = server.now()
-	l.error = t
-	try:
-		l.save(1)
-	except: #bc
-		pass
-
-# ----------------
-# Loading
-# ----------------
-
-# login: app
-def login_app(form,session):
-	app = server.Document('Application',form.getvalue('app_name'))
-	
-	user = session["user"]
-	if form.has_key("sub_id"):
-		sub = server.Document('App Subscription',form.getvalue("sub_id"))
-		# will be blank for global login
-		if sub.remote_login_id and sub.remote_login_id != '__system@webnotestech.com': 
-			user = sub.remote_login_id
-		if sub.membership_type=='Administrator':
-			user = 'Administrator'
-	
-	if app.server and app.pwd:
-		fw = webnotes.utils.webservice.FrameworkServer(app.server, app.path, user, app.pwd, app.account_name)
-		out['url'] = app.server + app.path
-		out['sid'] = fw.sid
-		out['__account'] = fw.account_id
-		if fw.cookies.has_key('dbx'): out['dbx'] = fw.cookies['dbx']
-	else:
-		webnotes.msgprint("Application not defined correctly")
 
 # Execution Starts Here
 # ---------------------------------------------------------------------
@@ -481,13 +394,15 @@ if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# register
 	# ----------------------------------
+	import webnotes.model.code
+	
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql("START TRANSACTION")
 	try:
-		out['message'] = server.get_obj('Profile Control').prelogin(form) or ''
+		out['message'] = webnotes.model.code.get_obj('Profile Control').prelogin(form) or ''
 		sql("COMMIT")
 	except:
-		webnotes.errprint(server.getTraceback())
+		webnotes.errprint(webnotes.utils.getTraceback())
 		sql("ROLLBACK")
 
 else:

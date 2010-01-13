@@ -3,6 +3,9 @@ import webnotes
 
 sql = webnotes.conn.sql
 
+no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image', 'Graph']
+default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
+
 def get_table_fields(doctype):
 	return sql("select options, fieldname from tabDocField where parent='%s' and fieldtype='Table'" % doctype)
 

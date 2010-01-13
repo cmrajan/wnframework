@@ -13,7 +13,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 
 		this.body_tab = make_table(this.wrapper, 1, 2,'100%', ['100%', '18px'],{border:'1px solid #888'});
 	
-		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: '95%', border:'0px', padding:'1px'});
+		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: '96%', border:'0px', padding:'1px'});
 		
 		this.btn = $a($td(this.body_tab, 0, 1), 'img', '', {cursor:'pointer', margin:'1px 2px'});
 		this.btn.src = 'images/ui/down-arrow.gif';
