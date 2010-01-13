@@ -111,9 +111,8 @@ class Authentication:
 
 		# select database from domain mapping table "Account Domain"
 		else:
-			try:
-				res = c.sql("select tabAccount.db_name, tabAccount.db_login, tabAccount.ac_name from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % domain)
-			except: pass
+			if c.sql("select name from tabDocType where name='Account Domain'"):
+				res = c.sql("select tabAccount.db_name, tabAccount.db_login, tabAccount.ac_name from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % self.domain)
 			if res:
 				self.account = res[0][2]
 		
