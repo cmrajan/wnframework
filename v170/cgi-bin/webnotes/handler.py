@@ -225,7 +225,8 @@ def reset_password():
 	if act:
 		webnotes.conn.set_db(act)
 	try:
-		webnotes.user.reset_password(user)
+		p = webnotes.profile.Profile(user)
+		p.reset_password()
 		webnotes.msgprint("Password has been reset and sent to your email id.")
 	except Exception, e:
 		webnotes.msgprint(str(e))
@@ -350,9 +351,15 @@ import webnotes.db
 
 if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 	webnotes.conn = webnotes.db.Database(use_default = 1)
-	sql("start transaction")
-	reset_password(form, session)
-	sql("commit")
+	sql = webnotes.conn.sql
+	sql("START TRANSACTION")
+	try:
+		reset_password()
+		sql("COMMIT")
+	except Exception, e:
+		webnotes.errprint(str(e))
+		sql("ROLLBACK")
+	
 	
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# register
@@ -369,16 +376,17 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 		sql("ROLLBACK")
 
 else:
-	auth_obj = webnotes.auth.Authentication(form, cookies, out)
 
-	if webnotes.conn:
-		sql = webnotes.conn.sql
+	try:
+		auth_obj = webnotes.auth.Authentication(form, cookies, out)
 	
-		# get command cmd
-		cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
-		read_only = form.has_key('_read_only') and form.getvalue('_read_only') or None
+		if webnotes.conn:
+			sql = webnotes.conn.sql
+		
+			# get command cmd
+			cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
+			read_only = form.has_key('_read_only') and form.getvalue('_read_only') or None
 
-		try:
 
 			# load module
 			module = ''
@@ -396,18 +404,21 @@ else:
 				locals()[cmd]()
 						
 				sql("COMMIT")
-		except:
-			webnotes.errprint(webnotes.utils.getTraceback())
-			if (webnotes.conn.in_transaction): 
+	except:
+		webnotes.errprint(webnotes.utils.getTraceback())
+		try:
+			if hasattr(webnotes, 'conn') and webnotes.conn.in_transaction:
 				sql("ROLLBACK")
+			# update session
+			auth_obj.update()
+		except:
+			pass
 
-		# update session
-		auth_obj.update()
 
 #### cleanup
 #-----------
 
-if webnotes.conn.in_transaction:
+if webnotes.conn and webnotes.conn.in_transaction:
 	sql("COMMIT")
 
 if webnotes.conn:

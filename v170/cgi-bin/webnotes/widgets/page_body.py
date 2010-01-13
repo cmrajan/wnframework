@@ -60,6 +60,9 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 import webnotes
 
 def get_page_content(page):
+	if not page:
+		return 'No Title', 'No Content'
+		
 	try:
 		content = webnotes.conn.sql("select content, static_content from tabPage where name=%s", page)
 		if content:

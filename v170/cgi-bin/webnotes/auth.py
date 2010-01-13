@@ -50,14 +50,20 @@ class Authentication:
 		
 		self.set_env()
 		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
-				
-		if (form.getvalue('cmd')=='login') or (not self.load_session(self.cookies.get('sid') or self.form.getvalue('sid'))):
-
+		
+		if form.getvalue('cmd')=='login':
 			if form.getvalue('acx'):
 				self.conn = self.set_db(form.getvalue('acx'))
 			
-			self.login() or self.login(as_guest = True)			
+			self.login()
 			self.login_flag = 1
+		
+		else:
+			# authenticated user
+			if not self.load_session(self.cookies.get('sid') or self.form.getvalue('sid')):
+			
+				# no ? login as guest
+				self.login(as_guest = True)			
 		
 		if not self.session: 
 			self.out['message'] = '"Authentication Failed"'
@@ -153,9 +159,11 @@ class Authentication:
 		if not (user and pwd):
 			return None
 		if user=='Administrator':
-			return self.conn.sql("select name from tabProfile where name=%s and (`password`=%s OR `password`=PASSWORD(%s))", (user, pwd, pwd))[0][0]
+			p = self.conn.sql("select name from tabProfile where name=%s and (`password`=%s OR `password`=PASSWORD(%s))", (user, pwd, pwd))
 		else:
-			return self.conn.sql("select name from tabProfile where name=%s and (password=%s  OR `password`=PASSWORD(%s)) and IFNULL(enabled,0)=1", (user, pwd, pwd))[0][0]
+			p = self.conn.sql("select name from tabProfile where name=%s and (password=%s  OR `password`=PASSWORD(%s)) and IFNULL(enabled,0)=1", (user, pwd, pwd))
+	
+		return p and p[0][0] or ''
 	
 	def validate_ip(self, user):
 		try:
