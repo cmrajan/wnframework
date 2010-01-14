@@ -112,6 +112,10 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 	}
 	this.show = function(my_onload) {
 		$ds(me.wrapper);
+		
+		// reset main title
+		_r.rb_con.main_title.innerHTML = me.doctype;
+		
 		if(my_onload)my_onload(me);
 	}
 	this.make_save_criteria();

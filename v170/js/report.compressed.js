@@ -30,7 +30,7 @@ $dh(this.button_area);this.rb_area=$a(this.wrapper,'div');this.set_dt=function(d
 if(me.cur_rb)
 me.cur_rb.hide();if(me.rb_dict[dt]){me.rb_dict[dt].show(my_onload);}else{me.rb_dict[dt]=new _r.ReportBuilder(me.rb_area,dt,my_onload);}}}
 _r.ReportBuilder=function(parent,doctype,onload){this.menuitems={};this.has_primary_filters=false;this.doctype=doctype;this.forbidden=0;this.filter_fields=[];this.filter_fields_dict={};var me=this;this.fn_list=['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];this.wrapper=$a(parent,'div','finder_wrapper');this.make_tabs();this.current_loaded=null;this.make_filters(onload);this.hide=function(){$dh(me.wrapper);}
-this.show=function(my_onload){$ds(me.wrapper);if(my_onload)my_onload(me);}
+this.show=function(my_onload){$ds(me.wrapper);_r.rb_con.main_title.innerHTML=me.doctype;if(my_onload)my_onload(me);}
 this.make_save_criteria();}
 _r.ReportBuilder.prototype.make_tabs=function(){this.tab_wrapper=$a(this.wrapper,'div','finder_tab_area');this.mytabs=new TabbedPage(this.tab_wrapper);this.mytabs.body_area.className='finder_body_area';this.mytabs.add_tab('Result');this.mytabs.add_tab('More Filters');this.mytabs.add_tab('Select Columns');}
 _r.ReportBuilder.prototype.make_body=function(){_r.rb_con.main_title.innerHTML=this.doctype;this.mytabs.tabs['Result'].show();var me=this;this.make_save_criteria();this.column_picker=new _r.ReportColumnPicker(this);this.report_filters=new _r.ReportFilters(this);}
