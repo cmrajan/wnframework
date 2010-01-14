@@ -17,6 +17,7 @@ Contents:
    client_side_widgets
    javascript_utils
    navigation
+   sitemap
    glossary
 
 Indices and tables

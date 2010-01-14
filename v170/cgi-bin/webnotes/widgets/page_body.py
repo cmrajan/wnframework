@@ -62,20 +62,20 @@ import webnotes
 def get_page_content(page):
 	if not page:
 		return 'No Title', 'No Content'
-		
-	try:
+	
+	if webnotes.conn.sql("select name from tabDocField where fieldname='static_content' and parent='Page'"):
 		content = webnotes.conn.sql("select content, static_content from tabPage where name=%s", page)
 		if content:
 			content = content[0][1] or content[0][0]
-	except:
+	else:
 		content = webnotes.conn.sql("select content from tabPage where name=%s", page)
 		if content:
 			content = content[0][0]
 	
 	# title
-	try:
+	if webnotes.conn.sql("select name from tabDocField where fieldname='page_title' and parent='Page'"):
 		title = webnotes.conn.sql("select page_title from tabPage where name=%s", page)[0][0]
-	except:
+	else:
 		title = page
 	
 	# dynamic (scripted) content
@@ -100,17 +100,17 @@ def get_doc_content(dt, dn):
 
 def get_static_content():
 	import webnotes.widgets.page
+	import urllib
 
 	form = webnotes.form
 	page_url = form.getvalue('page', '')
 	
 	if page_url:
-		page_url = page_url.split('/')
-		
+		page_url = [urllib.unquote(i) for i in page_url.split('/')]		
 	else:
 		page_url = ['Page', webnotes.user.get_home_page()]
 			
-	links_html = content = ''
+	content = ''
 	
 	# generate the page
 	# -----------------	
@@ -122,10 +122,7 @@ def get_static_content():
 		
 	else:
 		title, content = get_page_content(webnotes.user.get_home_page())
-		
-
-	# generate links
-	# --------------
+	
 	content_html = content
 
 	return title, content_html

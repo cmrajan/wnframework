@@ -195,4 +195,3 @@ def create_account(ac_name, ac_type='Framework'):
 	sql("commit")
 
 	return "Created %s (%s)" % (ac_name, newdb)
-

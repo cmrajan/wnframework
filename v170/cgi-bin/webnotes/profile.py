@@ -165,6 +165,7 @@ class Profile:
 		self.can_create = d['can_create']
 		self.can_read = d['can_read']
 		self.can_write = d['can_write']
+		self.can_get_report = d['can_get_report']
 
 		self.roles = d['roles']
 		self.defaults = d['defaults']

@@ -224,6 +224,7 @@ def reset_password():
 	user = form.getvalue('user', '')
 	if act:
 		webnotes.conn.set_db(act)
+
 	try:
 		p = webnotes.profile.Profile(user)
 		p.reset_password()
@@ -403,23 +404,19 @@ else:
 				
 				locals()[cmd]()
 						
+				# update session
+				auth_obj.update()
+
 				sql("COMMIT")
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
-		try:
-			if hasattr(webnotes, 'conn') and webnotes.conn.in_transaction:
-				sql("ROLLBACK")
-			# update session
-			auth_obj.update()
-		except:
-			pass
 
+		if webnotes.conn and webnotes.conn.in_transaction:
+			sql("ROLLBACK")
+			
 
 #### cleanup
 #-----------
-
-if webnotes.conn and webnotes.conn.in_transaction:
-	sql("COMMIT")
 
 if webnotes.conn:
 	webnotes.conn.close()
