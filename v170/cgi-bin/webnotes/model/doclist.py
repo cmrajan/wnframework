@@ -63,6 +63,45 @@ def getlist(doclist, field):
 			l.append(d)
 	return l
 
+# Copy doclist
+# ------------
+
+def copy(doclist, no_copy = []):
+	from webnotes.model.doc import Document
+	
+	cl = []
+	
+	# main doc
+	c = Document(fielddata = doclist[0].fields.copy())
+	
+	# clear no_copy fields
+	for f in no_copy: 
+		if c.fields.has_key(f):
+			c.fields[f] = None
+	
+	c.name = None
+	c.save(1)
+	cl.append(c)
+	
+	# new parent name
+	parent = c.name
+	
+	# children
+	for d in doclist[1:]:
+		c = Document(fielddata = d.fields.copy())
+		c.name = None
+		
+		# clear no_copy fields
+		for f in no_copy: 
+			if c.fields.has_key(f):
+				c.fields[f] = None
+
+		c.parent = parent
+		c.save(1)
+		cl.append(c)
+
+	return cl
+
 # Validate Multiple Links
 # -----------------------
 
