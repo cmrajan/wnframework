@@ -50,10 +50,12 @@ class Authentication:
 		
 		self.set_env()
 		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
+		webnotes.conn = self.conn
 		
 		if form.getvalue('cmd')=='login':
 			if form.getvalue('acx'):
 				self.conn = self.set_db(form.getvalue('acx'))
+				webnotes.conn = self.conn
 			
 			self.login()
 			self.login_flag = 1
@@ -74,7 +76,6 @@ class Authentication:
 			self.set_cookies()
 			self.set_remember_me()
 		
-		webnotes.conn = self.conn
 		webnotes.session = self.session
 		webnotes.user = webnotes.profile.Profile()
 
@@ -152,8 +153,15 @@ class Authentication:
 			self.validate_ip(user)
 			self.start_session(user)
 			self.out['message'] = 'Logged In'
+			self.call_on_login_event()
 			return True
-			
+	
+	def call_on_login_event(self):
+		import webnotes.model.code
+		cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
+		if hasattr(cp, 'on_login'):
+			cp.on_login()
+	
 	def check_password(self, user, pwd):
 		if not (user and pwd):
 			return None
