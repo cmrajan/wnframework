@@ -1,3 +1,4 @@
+import webnotes
 import webnotes.utils
 
 class FrameworkServer:
@@ -30,7 +31,7 @@ class FrameworkServer:
 			try:
 				ret = eval(ret)
 			except Exception, e:
-				msgprint(ret)
+				webnotes.msgprint(ret)
 				raise Exception, e
 				
 			if ret.get('message') and ret.get('message')!='Logged In':
