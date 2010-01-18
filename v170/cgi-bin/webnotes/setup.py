@@ -1,5 +1,7 @@
-# MYSQL ADMIN
-# -----------
+# Setup
+
+import webnotes
+
 
 def backup_all():
 	# backups folder
@@ -49,8 +51,6 @@ def backup_db(db, from_all=0):
 		
 	sql('use %s' % db)
 
-	#sql('FLUSH TABLES WITH READ LOCK')
-
 	try:
 		p = '../backups'
 		if from_all: p = '../backups/dumps'	
@@ -70,7 +70,7 @@ def backup_db(db, from_all=0):
 
 def copy_db(source, target=''):
 	if not server_prefix:
-		msgprint("Server Prefix must be set in defs.py")
+		webnotes.msgprint("Server Prefix must be set in defs.py")
 		raise Exception
 
 	import os
@@ -133,65 +133,93 @@ def import_db(source, target='', is_accounts=0):
  	sql("alter table tabSessions change sessiondata sessiondata longtext") 
 	
 	return target
+
+def create_account_doctype():
 	
+	from webnotes.model.doc import Document
+	import webnotes.model.db_schema
+
+	# create tabAccount
+	ac = Document('DocType')
+	ac.name = 'Account'
+	ac.autoname = 'AC.#####'
+	ac.save(1)
+		
+	f = addchild(ac, 'fields', 'DocField')
+	f.label = 'Account Name'
+	f.fieldname = 'ac_name'
+	f.fieldtype = 'Data'
+	f.save()
+
+	f = addchild(ac, 'fields', 'DocField')
+	f.label = 'Database Name'
+	f.fieldname = 'db_name'
+	f.fieldtype = 'Data'
+	f.save()
+
+	f = addchild(ac, 'fields', 'DocField')
+	f.label = 'Database Login'
+	f.fieldname = 'db_login'
+	f.fieldtype = 'Data'
+	f.save()
+		
+	f = addchild(ac, 'permissions', 'DocPerm')
+	f.role = 'Administrator'
+	f.read = 1
+	f.write = 1
+	f.create = 1
+	f.save()
+	
+	# udpate schema
+	webnotes.model.db_schema.update_db('Account')
+	
+def create_account_record(ac_name):
+	# update accounts
+	from webnotes.model.doc import Document
+	
+	webnotes.conn = webnotes.db.Database(use_default = 1)
+	ac = Document('Account')
+	ac.ac_name = ac_name
+	ac.db_name = newdb
+	ac.name = newdb
+
+	if not webnotes.conn.in_transaction:
+		webnotes.conn.sql("start transaction")
+	ac.save(1)
+	webnotes.conn.sql("commit")
+
+
 def create_account(ac_name, ac_type='Framework'):
 
-	if ac_name=='accounts':
-		# first account
-		newdb = import_db(ac_type, is_accounts = 1)
-	else:
-		newdb = import_db(ac_type)
-		# update accounts
-		use_account(my_db_name = 'accounts')
-		ac = Document('Account')
-		ac.ac_name = ac_name
-		ac.db_name = newdb
-		ac.name = newdb
-		if not in_transaction:
-			sql("start transaction")
-		ac.save(1)
-		sql("commit")
+	newdb = import_db(ac_type)
 
 	# set account id
 	use_account(my_db_name = newdb)
 	if not in_transaction:
 		sql("start transaction")
 	sql("update tabSingles set value=%s where doctype='Control Panel' and field='account_id'", ac_name)
-
-	if ac_name=='accounts':
-		# create tabAccount
-		ac = Document('DocType')
-		ac.name = 'Account'
-		ac.autoname = 'AC.#####'
-		ac.save(1)
-		
-		f = addchild(ac, 'fields', 'DocField')
-		f.label = 'Account Name'
-		f.fieldname = 'ac_name'
-		f.fieldtype = 'Data'
-		f.save()
-
-		f = addchild(ac, 'fields', 'DocField')
-		f.label = 'Database Name'
-		f.fieldname = 'db_name'
-		f.fieldtype = 'Data'
-		f.save()
-
-		f = addchild(ac, 'fields', 'DocField')
-		f.label = 'Database Login'
-		f.fieldname = 'db_login'
-		f.fieldtype = 'Data'
-		f.save()
-		
-		f = addchild(ac, 'permissions', 'DocPerm')
-		f.role = 'Administrator'
-		f.read = 1
-		f.write = 1
-		f.create = 1
-		f.save()
-		
-		get_obj('DocType', 'Account', with_children = 1).on_update()
 		
 	sql("commit")
 
 	return "Created %s (%s)" % (ac_name, newdb)
+
+if __name__=='__main__':
+	import sys, os
+	
+	# set path
+	sys.path.append(os.path.abspath(os.path.dirname(sys.argv[0]) + '/../../'))	
+	
+	if sys.argv[1]=='install':
+		# create the first account
+		
+		import webnotes.db
+		
+		print "Connecting to MySQL..." 
+		webnotes.conn = webnotes.db.Database(use_default = 1)
+		
+		print "Importing Framework.sql..." 
+		import_db("Framework", "accounts")
+		
+		print "Setting up Account..."
+		create_account_doctype()
+		

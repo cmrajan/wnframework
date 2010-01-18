@@ -1,6 +1,32 @@
 Javascript Utilities
 ====================
 
+AJAX - Server Calls
+-------------------
+
+.. function:: $c(command, args, call_back, on_timeout, no_spinner, freeze_msg)
+
+   call a function on the server, where
+   
+   * `cmd` is the command to the handler
+   * `args` dictionary of arguments (form data)
+   * `call_back` - function to be called on complete
+   * `on_timeout` - function to be called on timeout
+   * `no_spinner` - do not show the "Loading..." spinner
+   * `freeze_msg` - freeze the user page while showing with the given message
+
+.. function:: $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg)
+
+   call an object on the server, where:
+   
+   * `doclist` - the doclist of the calling doc or a string with the name of a Control Doctype
+   * `method` - method to be called
+   * `arg` - string argument
+   * `call_back` - function to be called on completion
+   * `no_spinner` - do not show the "Loading..." spinner
+   * `freeze_msg` - freeze the user page while showing with the given message
+
+
 Title
 -----
 

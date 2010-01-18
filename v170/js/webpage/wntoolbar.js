@@ -10,7 +10,7 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC', paddingLeft: '32px', background:'url("images/logos/wnf24.gif") center left no-repeat', backgroundColor:'#EEE'});
+		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC', paddingLeft: '24px', background:'url("images/logos/wnf24.gif") center left no-repeat', backgroundColor:'#EEE'});
 		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['30%','45%','25%'],{padding:'2px'});
 		
 		// model tab

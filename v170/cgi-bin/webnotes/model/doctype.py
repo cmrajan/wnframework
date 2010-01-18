@@ -3,6 +3,8 @@ import webnotes.model
 import webnotes.model.doclist
 import webnotes.model.doc
 
+from webnotes.utils import cstr
+
 sql = webnotes.conn.sql
 
 class _DocType:
@@ -100,6 +102,56 @@ class _DocType:
 		self._clear_code(doclist)
 
 		return doclist
+
+#=================================================================================
+
+def scrub_field_names(doclist):
+	restricted = ('name','parent','idx','owner','creation','modified','modified_by','parentfield','parenttype')
+	for d in doclist:
+		if d.parent and d.fieldtype:
+			if (not d.fieldname) and (d.fieldtype.lower() in ('data', 'select', 'int', 'float', 'currency', 'table', 'text', 'link', 'date', 'code', 'check', 'read only', 'small text', 'time', 'text editor')):
+				d.fieldname = d.label.strip().lower().replace(' ','_')
+				if d.fieldname in restricted:
+					d.fieldname = d.fieldname + '1'
+				webnotes.conn.set(d, 'fieldname', d.fieldname)
+
+def compile_code(doc):
+	if doc.server_code or doc.server_code_core:
+		import marshal
+		try:
+			code = compile(cstr(doc.server_code_core) + '\n' + cstr(doc.server_code), '<string>', 'exec')
+			webnotes.conn.set(doc, 'server_code_compiled', marshal.dumps(code))
+			webnotes.conn.set(doc, 'server_code_error', ' ')
+		except:
+			webnotes.conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
+
+def change_modified_of_parent(doc):
+	parent_list = webnotes.conn.sql('SELECT parent from tabDocField where fieldtype="Table" and options="%s"' % doc.name)
+	for p in parent_list:
+		webnotes.conn.sql('UPDATE tabDocType SET modified="%s" WHERE `name`="%s"' % (webnoes.utils.now(), p[0]))
+
+def update_doctype(doclist):
+	doc = doclist[0]
+	
+	# make field name from label
+	scrub_field_names(doclist)
+	
+	# make schma changes
+	import db_schema
+	db_schema.updatedb(doc)
+	
+	# reload record
+	for d in doclist:
+		d.loadfromdb()
+	
+	# compile server code
+	compile_code(doc)
+		
+	# change modifed of parent doctype (to clear the cache)
+	change_modified_of_parent(doc)
+	
+#=================================================================================
+
 
 def get(dt):
 	doclist = _DocType(dt).make_doclist()

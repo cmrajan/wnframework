@@ -29,4 +29,19 @@ def get_cal_events(m_st, m_end):
 			rl.append(r)
 	
 	return doclist
+
+
+# Load Month Events
+# -----------------
+
+def load_month_events():
+	import webnotes
 	
+	form = webnotes.form
+
+	mm = form.getvalue('month')
+	yy = form.getvalue('year')
+	m_st = str(yy) + '-' + str(mm) + '-01'
+	m_end = str(yy) + '-' + str(mm) + '-31'
+
+	webnotes.response['docs'] = get_cal_events(m_st, m_end)

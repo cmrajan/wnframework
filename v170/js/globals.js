@@ -32,6 +32,8 @@ var top_index=91;
 // Name Spaces
 // ============
 
+var Calendar;
+
 // form
 var _f = {};
 
@@ -49,11 +51,11 @@ var FILTER_SEP = '\1';
 var _c = {};
 
 var widget_files = {
-	'ReportBuilder':'report_builder/report_builder.js'
-	,'_f.FrmContainer':'form.compressed.js'
+	'_f.FrmContainer':'form.compressed.js'
 	,'_c.CalendarPopup':'widgets/form/date_picker.js'
 	,'_r.ReportContainer':'report.compressed.js'
 	,'_p.PrintQuery':'widgets/print_query.js'
+	,'Calendar':'widgets/calendar.js'
 }
 
 // API globals

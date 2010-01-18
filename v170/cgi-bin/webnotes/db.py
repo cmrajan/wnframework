@@ -138,6 +138,9 @@ class Database:
 		self.sql("update `tab"+doc.doctype+"` set `"+field+"`=%s where name=%s", (val, doc.name))
 		doc.fields[field] = val
 
+	def field_exists(self, dt, fn):
+		return self.sql("select name from tabDocField where fieldname=%s and parent=%s", (dt, fn))
+
 	def exists(self, dt, dn):
 		try:
 			return self.sql('select name from `tab%s` where name="%s"' % (dt, dn.replace('"',"'")))

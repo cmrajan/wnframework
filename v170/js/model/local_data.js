@@ -80,8 +80,8 @@ LocalDB.sync = function(list) {
 				fields[d.parent][d.label] = d;
 			}
 		} else if(d.doctype=='Event') {
-			if((!d.localname) && calendar && (!calendar.has_event[d.name]))
-				calendar.set_event(d);
+			if((!d.localname) && _c.calendar && (!_c.calendar.has_event[d.name]))
+				_c.calendar.set_event(d);
 		}
 		if(d.localname)
 			notify_rename_observers(d.doctype, d.localname, d.name);
@@ -200,7 +200,7 @@ function get_perm(doctype, dn, ignore_submit) {
 
 // ======================================================================================
 
-LocalDB.create= function(doctype, n) {
+LocalDB.create = function(doctype, n) {
 	if(!n) n = LocalDB.get_localname(doctype);
 	var doc = LocalDB.add(doctype, n)
 	doc.__islocal=1; doc.owner = user;	
@@ -257,9 +257,6 @@ LocalDB.copy=function(dt, dn, from_amend) {
 		if(key!=='name' && key.substr(0,2)!='__') { // dont copy name and blank fields
 			locals[dt][newdoc][key] = locals[dt][dn][key];
 		}
-		//if(user_defaults[key]) {
-		//	locals[dt][newdoc][key] = user_defaults[key][0];
-		//}
 		var df = get_field(dt, key);
 		if(df && ((!from_amend && cint(df.no_copy)==1) || in_list(LocalDB.no_copy_list, df.fieldname))) { // blank out 'No Copy'
 			locals[dt][newdoc][key]='';

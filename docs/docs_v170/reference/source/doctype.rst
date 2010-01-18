@@ -42,6 +42,15 @@ _DocType object
       * loads all related `Search Criteria`
       * updates the cache
    
-.. method:: getdoctype()
+.. method:: get()
 
    execute `Request` to load a `DocType`
+   
+.. method:: update_doctype(doclist)
+
+   method to be called to update the DocType
+   
+   * creates field names from labels
+   * updates schema
+   * saves compiled code
+   * marks cache for clearing

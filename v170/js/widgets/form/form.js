@@ -199,10 +199,10 @@ _f.Frm.prototype.set_heading = function() {
 	}
 	
 	// tweets
-	_f.frm_con.comments_btn.innerHTML = 'Comments (' + cint(this.n_comments[this.docname]) + ')';
+	//_f.frm_con.comments_btn.innerHTML = 'Comments (' + cint(this.n_comments[this.docname]) + ')';
 	
 	// lst comment
-	this.set_last_comment();
+	//this.set_last_comment();
 	
 	var created_str = repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s", 
 		{c_by:doc.owner
@@ -214,7 +214,7 @@ _f.Frm.prototype.set_heading = function() {
 	set_user_img(_f.frm_con.owner_img, doc.owner);
 	_f.frm_con.owner_img.title = created_str;
 
-	_f.frm_con.last_update_area.innerHTML = '';
+	// _f.frm_con.last_update_area.innerHTML = '';
 	$dh(_f.frm_con.mod_img);
 	if(doc.modified_by) {
 		_f.frm_con.last_update_area.innerHTML = scrub_date(doc.modified ? doc.modified:'') + ' <span class="link_type" style="margin-left: 8px; font-size: 10px;" onclick="msgprint(\''+created_str.replace('/','<br>')+'\')">Details</span>';
@@ -231,7 +231,7 @@ _f.Frm.prototype.set_heading = function() {
 	}
 }
 
-_f.Frm.prototype.set_last_comment = function() {
+/* _f.Frm.prototype.set_last_comment = function() {
 	var lc = this.last_comments[this.docname]
 
 	// last comment
@@ -244,7 +244,7 @@ _f.Frm.prototype.set_last_comment = function() {
 	} else { 
 		$dh(_f.frm_con.last_comment); 
 	}
-}
+} */
 
 
 // PAGING

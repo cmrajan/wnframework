@@ -1,254 +1,3 @@
-// TO DO LIST
-
-function ToDoList(parent) {
-	this.col_widths = ['5%','5%','5%','55%','15%','15%'];
-
-	this.body = $a(parent, 'div', 'todo_page');
-
-	this.min_rows = 40;
-	this.click_string = '<B>[Click to add]</B>';
-	this.docs = {};
-	
-	this.make_head();
-	this.make_body();
-	this.make_inputs();
-}
-
-ToDoList.prototype.make_head = function() {
-	this.head = $a(this.body, 'div', 'todo_head');
-	this.title = $a(this.head, 'div', 'standard_title',{marginTop:'8px'});
-	this.title.innerHTML = 'To Do';
-
-	var link_area = $a(this.head, 'div', 'todo_links');
-
-	var me = this;
-	var c = $a(link_area, 'div', 'link_type');
-	c.style.fontSize = '10px';
-	c.innerHTML = 'Clear checked items'
-	c.onclick = function() { me.clear_checked(); }
-	
-	var c = $a(link_area, 'div', 'link_type');
-	c.style.fontSize = '10px';
-	c.innerHTML = 'Refresh'
-	c.onclick = function() { me.organize_by_priority(); }	
-}
-
-ToDoList.prototype.make_body = function() {
-
-	this.table = $a(this.body, 'table', 'todo_items_table');
-	
-	for(var r=0; r<this.min_rows; r++) {
-		var row = this.table.insertRow(r);
-		for(var c=0; c<this.col_widths.length; c++) {
-			var ce = row.insertCell(row.cells.length);
-			if(c==1)
-				ce.style.borderRight = '1px solid #88F';
-			if(c==3)
-				this.make_item_cell(ce);
-			$w(ce, this.col_widths[c]);
-		}
-	}
-}
-
-ToDoList.prototype.sync = function(row) {
-	var me = this;
-	this.working = true;
-	
-	set_value('ToDo Item',row.docname,'description',row.cells[3].div1.innerHTML);
-	set_value('ToDo Item',row.docname,'priority',row.cells[4].innerHTML);
-	set_value('ToDo Item',row.docname,'date',dateutil.str_to_user(row.cells[5].innerHTML));
-
-	if(row.cells[1].className == 'todo_checked')
-		set_value('ToDo Item',row.docname,'checked',1);
-
-	savedoc('ToDo Item', row.docname, 'Save', function(docname) { me.working = false; });
-}
-
-ToDoList.prototype.make_inputs = function() {
-	var me = this;
-
-	this.input = document.createElement('input');
-	this.input.className = 'todo_input';
-	this.input.onblur = function() {
-		var pn = this.parentNode;
-		if(!this.row.activated) {
-			if(!this.value) {
-				pn.removeChild(this);
-				me.organize_by_priority();
-				return;
-			}
-			me.activate_row(this.row);
-		}
-		if(pn)pn.removeChild(this);
-		pn.innerHTML = this.value;
-		me.sync(this.row);
-		me.organize_by_priority();
-		this.value = '';
-	}
-	
-	this.pselect = document.createElement('select');
-	this.pselect.className = 'todo_input';
-	add_sel_options(this.pselect, ['Normal','Medium','High'], 'Normal');
-	this.pselect.onblur = function() {		
-		var pn = this.parentNode;
-		pn.removeChild(this);
-		pn.innerHTML = sel_val(this);
-		me.sync(this.row);
-		me.organize_by_priority();
-	}
-}
-
-ToDoList.prototype.make_item_cell = function(ce) {
-	var me = this;
-	ce.div1 = $a(ce, 'div');
-	ce.div2 = $a(ce, 'div');
-	$dh(ce.div2);
-	ce.div1.onclick = function() {
-		if(me.input.parentNode==this)return;
-		var v = this.innerHTML;
-		if(!this.parentNode.parentNode.docname)v='';
-		this.innerHTML='';
-		this.appendChild(me.input);
-		me.input.row = this.parentNode.parentNode;
-		me.input.value = v?v:'';
-		me.input.cell = this.parentNode;
-		me.input.focus();
-	}
-}
-
-ToDoList.prototype.activate_row = function(r, docname) {
-	if(r.activated)return;
-	var me = this;
-	r.cells[1].onclick = function() {
-		if(me.working) return;
-		if(this.className=='todo_checked') {
-			this.className = 'todo_unchecked';
-			me.sync(this.parentNode);
-		} else {
-			this.className = 'todo_checked';
-			me.sync(this.parentNode);
-		}
-	}
-	if(!r.cells[1].className)r.cells[1].className = 'todo_unchecked';
-	if(!r.cells[4].innerHTML)r.cells[4].innerHTML = 'Normal';
-	
-	var img = $a(r.cells[2],'img');
-	img.src = 'images/icons/arrow_right.gif';
-	img.setAttribute('title', 'Edit');
-	
-	r.cells[2].style.cursor = 'pointer';
-	r.cells[2].onclick = function() {
-		loaddoc('ToDo Item', this.parentNode.docname);
-	}
-	
-	r.cells[4].onclick = function() {
-		if(me.working) return;	
-		if(me.pselect.parentNode==this)return;
-		var v = this.innerHTML;
-		this.innerHTML = '';
-		this.appendChild(me.pselect);
-		me.pselect.value = v?v:'';
-		me.pselect.row = this.parentNode;
-		me.pselect.focus();
-	}
-	
-	r.cells[5].innerHTML = dateutil.obj_to_user(new Date());
-	
-	if(!docname)
-		docname = LocalDB.create('ToDo Item');
-	else {
-		var doc = locals['ToDo Item'][docname];
-		r.cells[3].div1.innerHTML = doc.description;
-		r.cells[4].innerHTML = doc.priority;
-		r.cells[5].innerHTML = dateutil.str_to_user(doc.date);
-		if(doc.checked)r.cells[1].className = 'todo_checked';
-		if(doc.reference_type && doc.reference_name) {
-			new DocLink(r.cells[3],doc.reference_type,doc.reference_name);
-			$ds(r.cells[3].div2);
-		}
-	}
-
-
-	r.docname = docname;
-	this.docs[docname] = r;
-	r.activated = true;
-}
-
-ToDoList.prototype.clear = function() {
-	for(var r=0; r<this.min_rows; r++) {
-		var row = this.table.rows[r];
-		row.cells[1].className = '';
-		for(var c=0; c<this.col_widths.length; c++) {
-			if(c==3) {
-				row.cells[c].div1.innerHTML = '';
-				row.cells[c].div2.innerHTML = '';
-			} else {
-				row.cells[c].innerHTML = '';
-			}
-			row.docname = null;
-			row.activated = false;
-		}
-	}
-	this.docs = {};
-}
-
-ToDoList.prototype.clear_checked = function() {
-	var cl = [];
-	for(var i=0;i<this.table.rows.length;i++) {
-		if(this.table.rows[i].cells[1].className == 'todo_checked'){
-			cl[cl.length] = this.table.rows[i].docname;
-		};
-	}
-	
-	var me = this;
-	$c('todo_clear_checked', args = { 'cl':cl.join('\1') },
-		function(r, rt) {
-			for(var i=0;i<cl.length;i++) {
-				locals['ToDo Item'][cl[i]] = null;
-				me.docs[cl[i]] = null;
-			}
-			me.organize_by_priority();
-		}
-	);
-
-}
-
-ToDoList.prototype.organize_by_priority = function() {
-	this.clear();
-	
-	var il = [];
-	var values = {'High':1, 'Medium':2, 'Low':3, 'Normal':3}
-	for(var i in locals['ToDo Item']) {
-		var d = locals['ToDo Item'][i];
-		if(d && !d.__deleted)
-			il[il.length] = d;
-	}
-	il = il.sort( function(b,a) { 
-			var pa = values[a.priority];
-			var pb = values[b.priority]
-			if(pb?pb:3 == pa?pa:3) {
-				if(a.date && b.date)
-					return dateutil.str_to_obj(b.date) - dateutil.str_to_obj(a.date);
-				else
-					return 0;
-			} else {
-				return values[b.priority] - values[a.priority];
-			} 
-		} 
-	)
-	var max_il=il.length;
-	if(il.length>=40)max_il=40;
-	for(var i=0;i<max_il;i++) {
-		this.activate_row(this.table.rows[i], il[i].name);
-	}
-	if(this.table.rows[il.length])
-		this.table.rows[il.length].cells[3].div1.innerHTML = this.click_string;
-	
-	if($i('today_todo_td'))
-		$i('today_todo_td').innerHTML = 'To Do Items (' + il.length + ')';
-}
-
-
 ///// CALENDAR
 
 Calendar=function() {
@@ -282,6 +31,12 @@ Calendar.prototype.init=function (parent) {
 	this.views['Day'].show();
 }
 
+Calendar.prototype.rename_notify = function(dt, old_name, new_name) {
+	// calendar
+	if(dt = 'Event' && this.has_event[old_name])
+		this.has_event[old_name] = false;	
+}
+
 Calendar.prototype.make_btn = function(text, w, onclick, left) {
 	var me = this;
 	var b = $a(this.body, 'div', 'cal_button');
@@ -291,7 +46,7 @@ Calendar.prototype.make_btn = function(text, w, onclick, left) {
 	b.innerHTML = text;
 	b.onclick = function(){
 		onclick();
-		if(isIE) { $dh(calendar.wrapper); setTimeout('$ds(calendar.wrapper);',100); } 
+		if(isIE) { $dh(_c.calendar.wrapper); setTimeout('$ds(_c.calendar.wrapper);',100); } 
 	}
 	b.onmouseover = function() { this.className = 'cal_button cal_button_hover'; }
 	b.onmouseout = function() { this.className = 'cal_button'; }
@@ -332,7 +87,7 @@ Calendar.prototype.add_event = function() {
 Calendar.prototype.get_month_events = function(call_back) {
 	// ret fn
 	var me = this;
-	var f = function() {
+	var f = function(r, rt) {
 		var el = me.get_daily_event_list(new Date());
 		if($i('today_events_td'))
 			$i('today_events_td').innerHTML = "Today's Events ("+el.length+")";
@@ -343,11 +98,11 @@ Calendar.prototype.get_month_events = function(call_back) {
 	//load
 	var y=this.selected_date.getFullYear(); var m = this.selected_date.getMonth();
 	if(!this.events[y] || !this.events[y][m]) {
-		$c('load_month_events', args = {
+		$c('webnotes.widgets.event.load_month_events', args = {
 			'month': m + 1, 
 			'year' : y},
 			f);	
-	}r
+	}
 }
 
 Calendar.prototype.get_daily_event_list=function(day) {
@@ -438,9 +193,9 @@ Calendar.CalEvent.prototype.show = function(vu) {
 
 Calendar.CalEvent.prototype.save = function() {
 	var me = this;
-	savedoc('Event', me.docname, 'Save', function(dn) { 
-		me.docname = dn; 
-		calendar.has_event[dn] = true;
+	save_doclist('Event', me.docname, 'Save', function(r) { 
+		me.docname = r.docname; 
+		_c.calendar.has_event[r.docname] = true;
 	} );
 }
 // ----------
@@ -474,8 +229,8 @@ Calendar.View.prototype.prev = function() {
 Calendar.View.prototype.get_events = function() { this.cal.get_month_events(); }
 Calendar.View.prototype.add_unit = function(vu) { this.viewunits[this.viewunits.length] = vu; }
 Calendar.View.prototype.refresh_units = function() { 
-	if(isIE)calendar.cur_view.refresh_units_main();
-	else setTimeout('calendar.cur_view.refresh_units_main()', 2); /* FF BUG */ 
+	if(isIE)_c.calendar.cur_view.refresh_units_main();
+	else setTimeout('_c.calendar.cur_view.refresh_units_main()', 2); /* FF BUG */ 
 }
 Calendar.View.prototype.refresh_units_main = function() {
 	for(var r in this.table.rows)
@@ -497,7 +252,7 @@ Calendar.MonthView.prototype.create_table = function() {
 	var r = this.headtable.insertRow(0);
 	for(var j=0;j<7;j++) {
  		var cell = r.insertCell(j);
-		cell.innerHTML = calendar.weekdays[j]; $w(cell, (100 / 7) + '%');
+		cell.innerHTML = _c.calendar.weekdays[j]; $w(cell, (100 / 7) + '%');
  	}
 
 	var bw = $a(this.body, 'div', 'cal_month_body');
@@ -603,7 +358,7 @@ Calendar.DayView.prototype.refresh = function() {
 	// fill other days
 	var me=this;
 
-	this.month_name.innerHTML = calendar.weekdays[c.getDay()] + ', ' + c.getDate() + ' ' + month_list_full[c.getMonth()] + ' ' + c.getFullYear();
+	this.month_name.innerHTML = _c.calendar.weekdays[c.getDay()] + ', ' + c.getDate() + ' ' + month_list_full[c.getMonth()] + ' ' + c.getFullYear();
 
 	// headers
 	var d = c;
@@ -675,7 +430,7 @@ Calendar.WeekView.prototype.refresh = function() {
 	var d = new Date(c.getFullYear(), c.getMonth(), c.getDate() - c.getDay());
 
 	for (var k=1;k<8;k++) 	{
-		this.headtable.rows[0].cells[k].innerHTML = calendar.weekdays[d.getDay()] + ' ' + d.getDate();
+		this.headtable.rows[0].cells[k].innerHTML = _c.calendar.weekdays[d.getDay()] + ' ' + d.getDate();
 
 		for(var i=0;i<12;i++) {
 			var cell = this.table.rows[i].cells[k];
@@ -702,17 +457,17 @@ Calendar.ViewUnit.prototype.init = function(parent) {
 
 	var me = this;
 	this.body.onclick = function() {
-		calendar.selected_date = me.day;
-		calendar.selected_hour = me.hour;
+		_c.calendar.selected_date = me.day;
+		_c.calendar.selected_hour = me.hour;
 	
-		if(calendar.cur_vu && calendar.cur_vu!=me){
-			calendar.cur_vu.deselect();
+		if(_c.calendar.cur_vu && _c.calendar.cur_vu!=me){
+			_c.calendar.cur_vu.deselect();
 			me.select();
-			calendar.cur_vu = me;
+			_c.calendar.cur_vu = me;
 		}
 	}
 	this.body.ondblclick = function() {
-		calendar.add_event();
+		_c.calendar.add_event();
 	}
 }
 
@@ -765,17 +520,17 @@ Calendar.ViewUnit.prototype.set_display = function() {
 }
 
 Calendar.ViewUnit.prototype.is_selected = function() {
-	return (same_day(this.day, calendar.selected_date)&&this.hour==calendar.selected_hour)
+	return (same_day(this.day, _c.calendar.selected_date)&&this.hour==_c.calendar.selected_hour)
 }
 
 Calendar.ViewUnit.prototype.get_event_list = function() {
 	var y = this.day.getFullYear();
 	var m = this.day.getMonth();
 	var d = this.day.getDate();
-	if(calendar.events[y] && calendar.events[y][m] &&
-		calendar.events[y][m][d] &&
-			calendar.events[y][m][d][this.hour]) {
-		return calendar.events[y][m][d][this.hour];
+	if(_c.calendar.events[y] && _c.calendar.events[y][m] &&
+		_c.calendar.events[y][m][d] &&
+			_c.calendar.events[y][m][d][this.hour]) {
+		return _c.calendar.events[y][m][d][this.hour];
 	} else
 		return [];
 }
@@ -784,9 +539,9 @@ Calendar.ViewUnit.prototype.refresh = function() {
 	this.clear();
 
 	if(this.is_selected()) { 
-		if(calendar.cur_vu)calendar.cur_vu.deselect();
+		if(_c.calendar.cur_vu)_c.calendar.cur_vu.deselect();
 		this.selected = true;
-		calendar.cur_vu = this;	
+		_c.calendar.cur_vu = this;	
 	}
 	
 	this.set_display();
@@ -816,11 +571,11 @@ Calendar.MonthViewUnit=function(parent) {
 }
 Calendar.MonthViewUnit.prototype = new Calendar.ViewUnit();
 Calendar.MonthViewUnit.prototype.is_selected = function() {
-	return same_day(this.day, calendar.selected_date)
+	return same_day(this.day, _c.calendar.selected_date)
 }
 
 Calendar.MonthViewUnit.prototype.get_event_list = function() {
-	return calendar.get_daily_event_list(this.day);
+	return _c.calendar.get_daily_event_list(this.day);
 }
 
 Calendar.DayViewUnit= function(parent) { this.default_class = "cal_day_unit"; this.init(parent); }

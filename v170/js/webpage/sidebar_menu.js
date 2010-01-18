@@ -12,7 +12,7 @@ function SidebarMenu() {
 	this.body = $a(this.wrapper, 'div');
   
 	// make tree
-	this.tree_wrapper = $a(page_body.left_sidebar,'div','',{padding:'4px',paddingBottom:'0px',marginRight:'0px'});
+	this.tree_wrapper = $a(page_body.left_sidebar,'div','',{padding:'0px 4px', marginRight:'0px'});
 	this.menu_tree = new Tree($a(this.tree_wrapper,'div'),'100%',1);
 }
 
@@ -69,20 +69,21 @@ pscript.set_menu_style = function(level) {
 	return opt
 }
 
-SidebarMenu.prototype.make_menu = function(parent_node) {
+SidebarMenu.prototype.make_menu = function(parent) {
   var me = sidebar_menu;
+  this.parent = parent;
   var callback = function(r,rt) {
   	// style
   	// -----
   	var level = 0
-  	if(parent_node) level = parent_node.level;
+  	if(parent) level = parent.level;
   	var opt = pscript.set_menu_style(level);
 
     // add nodes
     // ---------
     for(var i=0;i<r.message.length;i++) {
       var n = me.menu_tree.addNode(
-      	parent_node,
+      	parent,
       	r.message[i].menu_item_label,
       	(r.message[i].icon ? 'images/icons/' + r.message[i].icon : ''),
       	me.menu_click,
@@ -97,14 +98,14 @@ SidebarMenu.prototype.make_menu = function(parent_node) {
         me.menu_items[n.menu_item.name] = n.menu_item;
       // level
       // -----
-      if(parent_node) n.level = parent_node.level + 1;
+      if(parent) n.level = parent.level + 1;
       else n.level = 1;
       
       // callback parent tree
     }
-    if(parent_node) { parent_node.show_expanded(); }
+    if(parent) { parent.show_expanded(); }
   }
-  $c_obj('Menu Control','get_children',parent_node ? parent_node.menu_item.name : '', callback);
+  $c_obj('Menu Control','get_children',parent ? parent.menu_item.name : '', callback);
 }
 
 SidebarMenu.prototype.show_listing = function(mid) {
@@ -132,7 +133,7 @@ SidebarMenu.prototype.show_listing = function(mid) {
     lst.opts = {
 		cell_style : {padding:'3px 2px',borderBottom:'1px dashed #CCC'},
 		alt_cell_style : {backgroundColor:'#FFFFFF'},
-		head_style : {height:'22px',overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},
+		head_style : {overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},
 		head_main_style : {padding:'0px'},
 		hide_export : 1,
 		hide_print : 1,

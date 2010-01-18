@@ -157,7 +157,7 @@ Dialog.prototype.make_row = function(d) {
 
 // Close dialog on Escape
 keypress_observers.push(new function() {
-	this.notify_keypress = function(kc) {
+	this.notify_keypress = function(e, kc) {
 		if(cur_dialog && kc==27 && !cur_dialog.no_cancel_flag) 
 			cur_dialog.hide();
 	}

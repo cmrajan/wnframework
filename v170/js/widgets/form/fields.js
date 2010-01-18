@@ -878,39 +878,34 @@ TimeField.prototype.get_time = function() {
 TimeField.prototype.set_time = function(v) {	
 	//show_alert(ret);
 	ret = time_to_ampm(v);
-	this.input_hr.value = ret[0];
-	this.input_mn.value = ret[1];
-	this.input_am.value = ret[2];
+	this.input_hr.inp.value = ret[0];
+	this.input_mn.inp.value = ret[1];
+	this.input_am.inp.value = ret[2];
 }
 TimeField.prototype.make_input = function() { var me = this;
 	this.input = $a(this.input_area, 'div', 'time_field');
-	this.input_hr = $a(this.input, 'select');
-	this.input_mn = $a(this.input, 'select');
-	this.input_am = $a(this.input, 'select');
-
-	this.input_hr.isactive = 1; this.input_mn.isactive = 1; this.input_am.isactive = 1;
-
-	select_register[select_register.length] = this.input_hr;
-	select_register[select_register.length] = this.input_mn;
-	select_register[select_register.length] = this.input_am;
-
+	
+	var t = make_table(this.input, 1, 3, '200px');
 
 	var opt_hr = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 	var opt_mn = ['00','05','10','15','20','25','30','35','40','45','50','55'];
 	var opt_am = ['AM','PM'];
 
-	add_sel_options(this.input_hr, opt_hr);
-	add_sel_options(this.input_mn, opt_mn);
-	add_sel_options(this.input_am, opt_am);
+	this.input_hr = new SelectWidget($td(t,0,0), opt_hr, '60px');
+	this.input_mn = new SelectWidget($td(t,0,1), opt_mn, '60px');
+	this.input_am = new SelectWidget($td(t,0,2), opt_am, '60px');
+
+	this.input_hr.inp.isactive = 1; this.input_mn.inp.isactive = 1; this.input_am.inp.isactive = 1;
+	this.input_hr.btn.isactive = 1; this.input_mn.btn.isactive = 1; this.input_am.btn.isactive = 1;
 
 	var onchange_fn = function() {
 		me.set(me.get_time()); 
 		me.run_trigger();
 	}
 	
-	this.input_hr.onchange = onchange_fn;
-	this.input_mn.onchange = onchange_fn;
-	this.input_am.onchange = onchange_fn;
+	this.input_hr.inp.onchange = onchange_fn;
+	this.input_mn.inp.onchange = onchange_fn;
+	this.input_am.inp.onchange = onchange_fn;
 	
 	this.onrefresh = function() {
 		var v = _f.get_value ? _f.get_value(me.doctype,me.docname,me.df.fieldname) : null;

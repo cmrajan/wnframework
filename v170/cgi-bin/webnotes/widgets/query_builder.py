@@ -88,9 +88,11 @@ def add_match_conditions(q, tl, ur, ud):
 	# insert the conditions
 	if sl:
 		condition_st  = q.find('WHERE')!=-1 and ' AND ' or ' WHERE '
+
+		condition_end = q.find('GROUP BY')==-1 and 'LIMIT' or 'GROUP BY'
+		condition_end = q.find('ORDER BY')==-1 and condition_end or 'ORDER BY'
 		
-		if q.find('ORDER BY')!=-1 or q.find('LIMIT')!=-1: # if query continues beyond conditions
-			condition_end = q.find('ORDER BY')==-1 and 'LIMIT' or 'ORDER BY'
+		if q.find('ORDER BY')!=-1 or q.find('LIMIT')!=-1 or q.find('GROUP BY')!=-1: # if query continues beyond conditions
 			q = q.split(condition_end)
 			q = q[0] + condition_st + '(' + ' OR '.join(sl) + ') ' + condition_end + q[1]
 		else:

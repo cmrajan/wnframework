@@ -84,6 +84,10 @@ database object --- conn
    .. method:: get_description()
    
       Get metadata of the last query
+      
+   .. method:: field_exists(dt, fn)
+   
+      Returns True if `fn` exists in `DocType` `dt`
 
    .. method:: exists(dt, dn)
    

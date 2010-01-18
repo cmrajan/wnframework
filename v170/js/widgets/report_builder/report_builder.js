@@ -959,9 +959,14 @@ _r.ReportColumnPicker.prototype.make_body = function() {
 	$a($td(t,0,0), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Columns';
 	this.unsel_fields = $a($td(t,0,0), 'select', '', {height:'200px', width:'80%', border:'1px solid #AAA'});
 	this.unsel_fields.multiple = true;
+	this.unsel_fields.onchange = function() { for(var i=0; i<this.options.length; i++) this.options[i].field.is_selected = this.options[i].selected; }
 
 	// buttons
 	var me = this;
+	this.up_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'70px'});
+	this.up_btn.innerHTML = 'Up &uarr;';
+	this.up_btn.onclick = function() { me.move_up(); }
+
 	this.add_all = $a($a($td(t,0,1), 'div'), 'button', '', {width:'40px'});
 	this.add_all.innerHTML = '&gt;&gt;';
 	this.add_all.onclick = function() { me.move(me.unsel_fields, 'add', 1); }
@@ -978,25 +983,56 @@ _r.ReportColumnPicker.prototype.make_body = function() {
 	this.remove_all.innerHTML = '&lt;&lt;';
 	this.remove_all.onclick = function() { me.move(me.sel_fields, 'remove', 1); }
 
+	this.dn_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'70px'});
+	this.dn_btn.innerHTML = 'Down &darr;';
+	this.dn_btn.onclick = function() { me.move_down(); }
+
 	// multiple fields
 	$a($td(t,0,2), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Seleted Columns';
 	this.sel_fields = $a($td(t,0,2), 'select', '', {height:'200px', width:'80%', border:'1px solid #AAA'});
 	this.sel_fields.multiple = true;
+	this.sel_fields.onchange = function() { for(var i=0; i<this.options.length; i++) this.options[i].field.is_selected = this.options[i].selected; }
 
 }
+
+
 
 // -------------------------------------------------------------------------------------
 
-_r.ReportColumnPicker.prototype.set_options = function(s, l) {
-	empty_select(s);
-
-	for(var i=0; i<l.length; i++) {
-		var v = l[i].df.parent + '.' + l[i].df.label;
-		var o = new Option (v, v, false, false);
-		o.field = l[i];
-		s.options[s.options.length] = o;
+_r.ReportColumnPicker.prototype.get_by_sel_idx = function(s, idx) {
+	for(var j=0;j<s.options.length; j++) {
+		if(s.options[j].field.sel_idx == idx)
+			return s.options[j].field;
 	}
+	return {} // nothing
 }
+
+_r.ReportColumnPicker.prototype.move_up = function() {
+	var s = this.sel_fields;
+	for(var i=1;i<s.options.length; i++ ) {
+		if(s.options[i].selected) {
+			s.options[i].field.sel_idx--;
+			this.get_by_sel_idx(s, i-1).sel_idx++;
+		}
+	}
+	this.refresh();
+}
+
+_r.ReportColumnPicker.prototype.move_down = function() {
+	var s = this.sel_fields;
+	
+	if(s.options.length<=1) return;
+	
+	for(var i=s.options.length-2;i>=0; i-- ) {
+		if(s.options[i].selected) {
+			this.get_by_sel_idx(s, i+1).sel_idx--;
+			s.options[i].field.sel_idx++;
+		}
+	}
+	this.refresh();
+}
+
+
 
 // -------------------------------------------------------------------------------------
 
@@ -1044,6 +1080,20 @@ _r.ReportColumnPicker.prototype.refresh = function() {
 	this.set_options(this.unsel_fields, ul);
 	this.set_options(this.sel_fields, sl);
 
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.ReportColumnPicker.prototype.set_options = function(s, l) {
+	empty_select(s);
+
+	for(var i=0; i<l.length; i++) {
+		var v = l[i].df.parent + '.' + l[i].df.label;
+		var o = new Option (v, v, false, false);
+		o.field = l[i];
+		if(o.field.is_selected) o.selected = 1;
+		s.options[s.options.length] = o;
+	}
 }
 
 // -------------------------------------------------------------------------------------

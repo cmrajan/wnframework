@@ -19,6 +19,8 @@ _f.Grid.prototype.init = function(parent, row_height) {
 	this.total_width = 50;
 	
 	if(this.oninit)this.oninit();
+	
+	keypress_observers.push(this)
 }
 
 _f.Grid.prototype.make_ui = function(parent) { 
@@ -384,7 +386,7 @@ _f.Grid.prototype.remove_template = function(cell) {
 
 }
 
-_f.Grid.prototype.cell_keypress = function(e, keycode) {
+_f.Grid.prototype.notify_keypress = function(e, keycode) {
 	if(keycode>=37 && keycode<=40 && e.shiftKey) {
 		if(text_dialog && text_dialog.display) {
 			return;
@@ -393,6 +395,7 @@ _f.Grid.prototype.cell_keypress = function(e, keycode) {
 		return;
 
 	if(!_f.cur_grid_cell) return;
+	if(_f.cur_grid_cell.grid != this) return;
 	var ri = _f.cur_grid_cell.row.rowIndex;
 	var ci = _f.cur_grid_cell.cellIndex;
 	switch(keycode) {

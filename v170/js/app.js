@@ -32,7 +32,7 @@ function startup() {
 		addEvent('keypress', function(ev, target) {
 			for(var i in keypress_observers) {
 				if(keypress_observers[i])
-					keypress_observers[i].notify_keypress((ev.keyCode ? ev.keyCode : ev.charCode));
+					keypress_observers[i].notify_keypress(ev, (ev.keyCode ? ev.keyCode : ev.charCode));
 			}
 		});
 		addEvent('click', function(ev, target) {
@@ -103,5 +103,24 @@ _p.go = function(html) {
 	w.document.write(html);
 	w.document.close();
 }
+
+// setup calendar
+function setup_calendar() {
+
+	var p = new Page('_calendar');
+	p.cont.style.height = '100%'; // IE FIX
+	p.cont.onshow = function() { 
+		if(!_c.calendar) {
+			new_widget('Calendar', function(c) { 
+				_c.calendar = c;
+				_c.calendar.init(p.cont);
+				rename_observers.push(_c.calendar);
+				
+			});
+		}
+	}
+}
+
+startup_list.push(setup_calendar);
 
 window.onload = startup;

@@ -66,7 +66,13 @@ function Body() {
 		if(this.cp.footer_html)this.footer.innerHTML = this.cp.footer_html;
 
 	}
-		
+	
+	this.run_startup_code = function() {
+		// startup
+		if(this.cp.startup_code)
+			eval(this.cp.startup_code);
+	}
+	
 	this.setup = function() {
 		this.cp = locals['Control Panel']['Control Panel'];
 
@@ -93,7 +99,11 @@ function Body() {
 		this.setup_header_footer();
 		
 		// page width
-		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});		
+		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});
+		
+		// startup script
+		this.run_startup_code();
+		
 	}
 	
 	// Standard containers

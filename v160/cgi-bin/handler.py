@@ -658,6 +658,8 @@ def get_graph(form, session):
 def get_sql_tables(q):
 	if q.find('WHERE') != -1:
 		tl = q.split('FROM')[1].split('WHERE')[0].split(',')
+	elif q.find('GROUP BY') != -1:
+		tl = q.split('FROM')[1].split('GROUP BY')[0].split(',')
 	else:
 		tl = q.split('FROM')[1].split('ORDER BY')[0].split(',')
 	return [t.strip().strip('`')[3:] for t in tl]
@@ -710,8 +712,10 @@ def add_match_conditions(q, tl, ur, ud):
 	if sl:
 		condition_st  = q.find('WHERE')!=-1 and ' AND ' or ' WHERE '
 		
-		if q.find('ORDER BY')!=-1 or q.find('LIMIT')!=-1: # if query continues beyond conditions
-			condition_end = q.find('ORDER BY')==-1 and 'LIMIT' or 'ORDER BY'
+		condition_end = q.find('GROUP BY')==-1 and 'LIMIT' or 'GROUP BY'
+		condition_end = q.find('ORDER BY')==-1 and condition_end or 'ORDER BY'
+		
+		if q.find('ORDER BY')!=-1 or q.find('LIMIT')!=-1 or g.find('GROUP BY')!= -1: # if query continues beyond conditions
 			q = q.split(condition_end)
 			q = q[0] + condition_st + '(' + ' OR '.join(sl) + ') ' + condition_end + q[1]
 		else:
@@ -1068,17 +1072,7 @@ def runserverobj(form, session):
 		except Exception, e:
 			errprint(server.getTraceback())
 			raise e
-				
-# Load Month Events
-# -----------------
-
-def load_month_events(form, session):
-	mm = form.getvalue('month')
-	yy = form.getvalue('year')
-	m_st = str(yy) + '-' + str(mm) + '-01'
-	m_end = str(yy) + '-' + str(mm) + '-31'
-
-	out['docs'] = server.compress_doclist(server.get_cal_events(m_st, m_end))
+			
 
 # Send Email
 # ----------

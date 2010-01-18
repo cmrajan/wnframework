@@ -609,7 +609,7 @@ Listing.prototype.make_headings = function(t,nr,nc) {
 		if(this.sort_list[ci])this.set_sort($td(t,0,ci), ci, this.sort_list[ci]);
 					
 		var div = $a($td(t,0,ci), 'div');
-		div.style.borderBottom ='1px solid #CCC';
+		$td(t,0,ci).style.borderBottom ='1px solid #CCC';
 		
 		if(this.coltypes && this.coltypes[ci] && in_list(['Currency','Float','Int'], this.coltypes[ci])) $y($td(t,0,ci).label_cell,{textAlign:'right'})
 	}

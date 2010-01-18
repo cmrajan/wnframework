@@ -4,7 +4,6 @@ from webnotes import *
 from webnotes.utils import *
 from webnotes.model.doc import *
 from webnotes.model.doclist import getlist
-from webnotes.model.db_schema import updatedb
 
 set = webnotes.conn.set
 sql = webnotes.conn.sql
