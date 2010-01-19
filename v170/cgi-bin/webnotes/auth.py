@@ -154,7 +154,7 @@ class Authentication:
 			self.user_id = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
 			self.call_on_login_event()
 		
-		if user:
+		if self.user_id:
 			self.validate_ip(self.user_id)
 			self.start_session(self.user_id)
 			self.out['message'] = 'Logged In'
