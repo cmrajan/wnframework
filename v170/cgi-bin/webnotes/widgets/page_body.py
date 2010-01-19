@@ -57,6 +57,16 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 </html>
 '''
 
+redirect_tempate = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Your Page Title</title>
+<meta http-equiv="REFRESH" content="0;%s"></HEAD>
+<BODY style="padding: 8px; font-size: 14px;">
+Redirecting...
+</BODY>
+</HTML>'''
+
 import webnotes
 
 def get_page_content(page):
@@ -128,13 +138,26 @@ def get_static_content():
 	return title, content_html
 	
 def get():
-	title, content = get_static_content()
-	keywords = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
-	site_description = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+	global index_template
+	import webnotes.model.code
 	
-	return index_template % {
-		'title':title
-		,'content':content
-		,'keywords':keywords
-		,'site_description':site_description
-	}
+	template = index_template
+	cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
+	if hasattr(cp, 'get_index_template'):
+		template = cp.get_index_template()
+		
+
+	if '%(content)s' in template:
+
+		title, content = get_static_content()
+		keywords = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
+		site_description = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+		
+		template = template % {
+			'title':title
+			,'content':content
+			,'keywords':keywords
+			,'site_description':site_description
+		}
+		
+	return template
