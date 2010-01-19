@@ -67,14 +67,14 @@ class Authentication:
 			if not self.load_session(self.form.getvalue('sid') or self.cookies.get('sid')):
 			
 				# no ? login as guest
-				self.login(as_guest = True)			
+				self.login(as_guest = True)
 		
 		if not self.session: 
 			self.out['message'] = '"Authentication Failed"'
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag:
+		if self.login_flag or self.form.getvalue('sid'):
 			self.set_cookies()
 			self.set_remember_me()
 		
