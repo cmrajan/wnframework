@@ -60,9 +60,9 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 redirect_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<title>Your Page Title</title>
+<title>%s</title>
 <meta http-equiv="REFRESH" content="0;%s"></HEAD>
-<BODY style="padding: 8px; font-size: 14px;">
+<BODY style="font-family: Arial; padding: 8px; font-size: 14px;">
 Redirecting...
 </BODY>
 </HTML>'''
