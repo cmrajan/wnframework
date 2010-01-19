@@ -3274,7 +3274,7 @@ function print_query_table(r, start, page_len, has_heading, finder) {
 				$w($td(t,0,i), args.colwidths[i]); // colwidths for all
 			}
 			var c = $td(t,ri+has_heading-start,ci + args.has_index)
-			c.div = $a(c, 'div');
+			c.div = $a(c, 'div', '', {whiteSpace:'normal'});
 			$s(
 				c.div, 
 				r.values[ri][ci],
