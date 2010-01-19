@@ -28,9 +28,13 @@ try:
 		import webnotes.widgets.page_body
 		import webnotes.profile
 
-		auth_obj = webnotes.auth.Authentication(webnotes.form, {}, {})
+		out_cookies = Cookie.SimpleCookie()
+
+		auth_obj = webnotes.auth.Authentication(webnotes.form, out_cookies, {})
 	
 		print "Content-Type: text/html"
+		if out_cookies:
+			print out_cookies
 		print
 		print webnotes.widgets.page_body.get()
 
