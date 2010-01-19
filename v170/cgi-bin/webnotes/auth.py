@@ -53,6 +53,7 @@ class Authentication:
 		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
 		webnotes.conn = self.conn
 		
+		# called from login
 		if form.getvalue('cmd')=='login':
 			if form.getvalue('acx'):
 				self.conn = self.set_db(form.getvalue('acx'))
@@ -63,7 +64,7 @@ class Authentication:
 		
 		else:
 			# authenticated user
-			if not self.load_session(self.cookies.get('sid') or self.form.getvalue('sid')):
+			if not self.load_session(self.form.getvalue('sid') or self.cookies.get('sid')):
 			
 				# no ? login as guest
 				self.login(as_guest = True)			
