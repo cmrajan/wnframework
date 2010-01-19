@@ -252,7 +252,7 @@ class Authentication:
 		import webnotes.model.code
 		cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 		if hasattr(cp, 'on_logout'):
-			cp.on_login(self)
+			cp.on_logout(self)
 
 	def logout(self):
 		self.call_on_logout_event()
