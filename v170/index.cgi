@@ -27,6 +27,7 @@ try:
 		import webnotes.auth
 		import webnotes.widgets.page_body
 		import webnotes.profile
+		import Cookie
 
 		out_cookies = Cookie.SimpleCookie()
 
