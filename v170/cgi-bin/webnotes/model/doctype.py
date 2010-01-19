@@ -125,10 +125,8 @@ def compile_code(doc):
 		except:
 			webnotes.conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
 
-def change_modified_of_parent(doc):
-	parent_list = webnotes.conn.sql('SELECT parent from tabDocField where fieldtype="Table" and options="%s"' % doc.name)
-	for p in parent_list:
-		webnotes.conn.sql('UPDATE tabDocType SET modified="%s" WHERE `name`="%s"' % (webnoes.utils.now(), p[0]))
+def clear_cache(doc):
+	sql("delete from __DocTypeCache")
 
 def update_doctype(doclist):
 	doc = doclist[0]
@@ -148,7 +146,7 @@ def update_doctype(doclist):
 	compile_code(doc)
 		
 	# change modifed of parent doctype (to clear the cache)
-	change_modified_of_parent(doc)
+	clear_cache(doc)
 	
 #=================================================================================
 
