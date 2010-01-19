@@ -177,9 +177,7 @@ class Document:
 			if f in self.name:
 				raise NameError, '%s not allowed in ID (name)' % f
 		
-		sql("""insert into 
-			`tab%s` (name, owner, creation, modified, modified_by) 
-			 values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
+		sql("""insert into `tab%s` (name, owner, creation, modified, modified_by) values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
 
 
 	# Update Values
