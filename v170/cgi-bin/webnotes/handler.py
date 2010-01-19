@@ -67,7 +67,7 @@ def runserverobj():
 	webnotes.widgets.form.runserverobj()
 
 def logout():
-	auth_obj.logout()
+	webnotes.auth_obj.logout()
 
 
 # DocType Mapper
@@ -379,7 +379,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 else:
 
 	try:
-		auth_obj = webnotes.auth.Authentication(form, cookies, out)
+		webnotes.auth_obj = webnotes.auth.Authentication(form, cookies, out)
 	
 		if webnotes.conn:
 			sql = webnotes.conn.sql
@@ -405,7 +405,7 @@ else:
 				locals()[cmd]()
 						
 				# update session
-				auth_obj.update()
+				webnotes.auth_obj.update()
 
 				sql("COMMIT")
 	except:

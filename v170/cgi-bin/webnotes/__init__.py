@@ -2,9 +2,10 @@
 
 version = 'v170'
 
+auth_obj = None
 conn = None
 form = None
-session = None
+session = {}
 user = None
 is_testing = None
 add_cookies = {}
