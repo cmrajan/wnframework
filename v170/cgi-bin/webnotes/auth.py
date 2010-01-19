@@ -47,6 +47,7 @@ class Authentication:
 		self.out_cookies = out_cookies
 		self.out = out
 		self.login_flag = 0
+		self.user_id = None
 		
 		self.set_env()
 		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
@@ -145,22 +146,25 @@ class Authentication:
 	# login
 	def login(self, as_guest = 0):
 		if as_guest:
-			user = self.conn.sql("select name from tabProfile where name='Guest' and ifnull(enabled,0)=1")[0][0]
+			res = self.conn.sql("select name from tabProfile where name='Guest' and ifnull(enabled,0)=1")
+			if not res:
+				raise Exception, "No Guest Access"
+			self.user_id = res[0][0]
 		else:
-			user = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
-				
-		if user:
-			self.validate_ip(user)
-			self.start_session(user)
-			self.out['message'] = 'Logged In'
+			self.user_id = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
 			self.call_on_login_event()
+		
+		if user:
+			self.validate_ip(self.user_id)
+			self.start_session(self.user_id)
+			self.out['message'] = 'Logged In'
 			return True
 	
 	def call_on_login_event(self):
 		import webnotes.model.code
 		cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 		if hasattr(cp, 'on_login'):
-			cp.on_login()
+			cp.on_login(self)
 	
 	def check_password(self, user, pwd):
 		if not (user and pwd):
