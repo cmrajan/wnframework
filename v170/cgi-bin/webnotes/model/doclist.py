@@ -150,16 +150,17 @@ def _make_html(doc, link_list):
 	from webnotes.utils import cstr
 	out = '<table class="simpletable">'
 	for k in doc.fields.keys():
-		v = cstr(doc.fields[k])
-		
-		# link field
-		if v and (k in link_list.keys()):
-			dt = link_list[k]
-			if dt.startswith('link:'):
-				dt = dt[5:]
-			v = '<a href="index.cgi?page=Form/%s/%s">%s</a>' % (dt, v, v) 
+		if k!='server_code_compiled':		
+			v = cstr(doc.fields[k])
 			
-		out += '\t<tr><td>%s</td><td>%s</td></tr>\n' % (cstr(k), v)
+			# link field
+			if v and (k in link_list.keys()):
+				dt = link_list[k]
+				if dt.startswith('link:'):
+					dt = dt[5:]
+				v = '<a href="index.cgi?page=Form/%s/%s">%s</a>' % (dt, v, v) 
+				
+			out += '\t<tr><td>%s</td><td>%s</td></tr>\n' % (cstr(k), v)
 		
 	out += '</table>'
 	return out

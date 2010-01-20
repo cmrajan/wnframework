@@ -286,8 +286,25 @@ function get_screen_dims() {
     d.h = document.body.clientHeight;
   }	
   return d
-
 }
+
+// get full page size
+function get_page_size(){
+	if (window.innerHeight && window.scrollMaxY) {// Firefox
+		yh = window.innerHeight + window.scrollMaxY;
+		xh = window.innerWidth + window.scrollMaxX;
+	} else if (document.body.scrollHeight > document.body.offsetHeight){ // all but Explorer Mac
+		yh = document.body.scrollHeight;
+		xh = document.body.scrollWidth;
+	} else { // works in Explorer 6 Strict, Mozilla (not FF) and Safari
+		yh = document.body.offsetHeight;
+		xh = document.body.offsetWidth;
+  	}
+	r = [xh, yh];
+	//alert( 'The height is ' + yh + ' and the width is ' + xh );
+	return r;
+}
+
 
 // set user image
 var user_img = {};

@@ -16,7 +16,7 @@ function freeze(msg, do_freeze) {
 	
 	// blur
 	$ds($i('dialog_back'));
-	$y($i('dialog_back'), {height: document.body.offsetHeight+'px'});
+	$y($i('dialog_back'), {height: get_page_size()[1] + 'px'});
 	fcount++;
 	frozen = 1;
 }

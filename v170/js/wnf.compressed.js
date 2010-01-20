@@ -145,6 +145,8 @@ obj=obj.offsetParent;}
 co.x=acc_lefts,co.y=acc_tops;return co;}
 function get_screen_dims(){var d={};d.w=0;d.h=0;if(typeof(window.innerWidth)=='number'){d.w=window.innerWidth;d.h=window.innerHeight;}else if(document.documentElement&&(document.documentElement.clientWidth||document.documentElement.clientHeight)){d.w=document.documentElement.clientWidth;d.h=document.documentElement.clientHeight;}else if(document.body&&(document.body.clientWidth||document.body.clientHeight)){d.w=document.body.clientWidth;d.h=document.body.clientHeight;}
 return d}
+function get_page_size(){if(window.innerHeight&&window.scrollMaxY){yh=window.innerHeight+window.scrollMaxY;xh=window.innerWidth+window.scrollMaxX;}else if(document.body.scrollHeight>document.body.offsetHeight){yh=document.body.scrollHeight;xh=document.body.scrollWidth;}else{yh=document.body.offsetHeight;xh=document.body.offsetWidth;}
+r=[xh,yh];return r;}
 var user_img={};function set_user_img(img,username){function set_it(){if(user_img[username]=='no_img')
 img.src='images/ui/no_img/no_img_m.gif';else
 img.src=repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s',{fn:user_img[username],ac:session.account_name});}
@@ -788,7 +790,7 @@ if(!d)return;d.style.top=(get_scroll_top()+10)+'px';$ds(d);pending_req++;}
 function hide_loading(){var d=$i('loading_div')
 if(!d)return;pending_req--;if(!pending_req)$dh(d);}
 var fcount=0;var frozen=0;function freeze(msg,do_freeze){if(msg){var div=$i('dialog_message');var d=get_screen_dims();div.style.left=((d.w-250)/2)+'px';div.style.top=(get_scroll_top()+200)+'px';div.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(div);}
-$ds($i('dialog_back'));$y($i('dialog_back'),{height:document.body.offsetHeight+'px'});fcount++;frozen=1;}
+$ds($i('dialog_back'));$y($i('dialog_back'),{height:get_page_size()[1]+'px'});fcount++;frozen=1;}
 function unfreeze(){$dh($i('dialog_message'));if(!fcount)return;fcount--;if(!fcount){$dh($i('dialog_back'));show_selects();frozen=0;}}
 function hide_selects(){}
 function show_selects(){}
