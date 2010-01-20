@@ -62,6 +62,8 @@ Field.prototype.set_label = function() {
 
 Field.prototype.get_status = function() {
 	// if used in filters
+	if(this.in_filter) this.not_in_form = this.in_filter;
+	
 	if(this.not_in_form) {
 		return 'Write';
 	}
