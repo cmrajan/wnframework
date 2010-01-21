@@ -340,7 +340,7 @@ def remove_attach():
 # Get Fields - Counterpart to $c_get_fields
 #===========================================================================================
 def get_fields():
-	import webotes
+	import webnotes
 	r = {}
 	args = {
 		'select':form.getvalue('select')

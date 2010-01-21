@@ -154,7 +154,7 @@ def uploadfile():
 		webnotes.response['result'] = """
 		<script type='text/javascript'>
 			window.parent._f.file_upload_done('%s', '%s', '%s', '%s', '%s');
-			window.parent._f.frms['%s'].show_doc('%s');
+			window.parent.frms['%s'].show_doc('%s');
 		</script>""" % (dt, dn, f.name, f.file_name.replace("'", "\\'"), at_id, dt, dn)
 	else:
 		webnotes.response['result'] = """
