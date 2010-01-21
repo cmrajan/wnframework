@@ -17,7 +17,7 @@ def validate_email_add(email_str):
 
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
 	import webnotes.utils.email_lib
-	return email_lib.sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[])
+	return email_lib.sendmail(recipients, sender, msg, subject, parts, cc, attach)
 	
 def generate_hash():
 	import sha, time
