@@ -83,7 +83,7 @@ class EMail:
 	
 	def setup(self):
 		import webnotes.model.doc
-
+		from webnotes.utils import cint
 
 		# get defaults from control panel
 		cp = webnotes.model.doc.Document('Control Panel','Control Panel')
@@ -94,13 +94,13 @@ class EMail:
 		self.use_ssl = cint(cp.use_ssl)
 	
 	def send(self):
-		import webnotes.utils
+		from webnotes.utils import cint
 		
 		self.setup()
 		self.validate()
 		
 		import smtplib
-		sess = smtplib.SMTP(self.server, webnotes.utils.cint(self.port))
+		sess = smtplib.SMTP(self.server, cint(self.port))
 		
 		if self.use_ssl: 
 			sess.ehlo()
