@@ -69,6 +69,7 @@ class EMail:
 		self.msg.attach(msg)
 	
 	def validate(self):
+		from webnotes.utils import validate_email_add
 		# validate ids
 		if self.sender and (not validate_email_add(self.sender)):
 			raise Exception, "%s is not a valid email id" % self.sender
@@ -121,11 +122,6 @@ class EMail:
 			sess.quit()
 		except:
 			pass
-
-def validate_email_add(email_str):
-	if email_str: email_str = email_str.strip()
-	import re
-	return re.match("^[a-zA-Z0-9._%-]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email_str)
 	
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
 	import webnotes	

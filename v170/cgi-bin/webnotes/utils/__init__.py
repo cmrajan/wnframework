@@ -9,7 +9,12 @@ def getCSVelement(v):
 		if '"' in v: v = v.replace('"', '""')
 		return '"'+v+'"'
 	else: return v or ''
-	
+
+def validate_email_add(email_str):
+	if email_str: email_str = email_str.strip()
+	import re
+	return re.match("^[a-zA-Z0-9._%-]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email_str)
+		
 def generate_hash():
 	import sha, time
 	return sha.new(str(time.time())).hexdigest()
