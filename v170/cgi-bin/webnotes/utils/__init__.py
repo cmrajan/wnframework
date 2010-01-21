@@ -14,7 +14,11 @@ def validate_email_add(email_str):
 	if email_str: email_str = email_str.strip()
 	import re
 	return re.match("^[a-zA-Z0-9._%-]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email_str)
-		
+
+def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+	import webnotes.utils.email_lib
+	return email_lib.sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[])
+	
 def generate_hash():
 	import sha, time
 	return sha.new(str(time.time())).hexdigest()
