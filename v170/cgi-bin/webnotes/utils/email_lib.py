@@ -5,7 +5,7 @@
 # -------------------
 
 import webnotes.model
-from webnotes.handler import msgprint
+from webnotes import msgprint
 
 class EMail:
 	def __init__(self, sender='', recipients=[], subject=''):
