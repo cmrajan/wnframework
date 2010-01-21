@@ -4,7 +4,6 @@
 # Allows easy adding of Attachments of "File" objects
 # -------------------
 
-import webnotes.model
 from webnotes import msgprint
 
 class EMail:
@@ -29,6 +28,7 @@ class EMail:
 		self.msg.attach(msg)
 		
 	def attach(self, n):
+		import webnotes.model
 		res = webnotes.model.get_file(n)
 
 		if not res:
@@ -82,8 +82,11 @@ class EMail:
 				raise Exception, "%s is not a valid email id" % e	
 	
 	def setup(self):
+		import webnotes.model.doc
+
+
 		# get defaults from control panel
-		cp = webnotes.model.Document('Control Panel','Control Panel')
+		cp = webnotes.model.doc.Document('Control Panel','Control Panel')
 		self.server = cp.outgoing_mail_server and cp.outgoing_mail_server or mail_server
 		self.login = cp.mail_login and cp.mail_login or mail_login
 		self.port = cp.mail_port and cp.mail_port or None
