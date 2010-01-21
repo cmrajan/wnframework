@@ -15,7 +15,8 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   <link rel="Shortcut Icon" href="/favicon.ico">
   
   <script language="JavaScript" src="js/wnf.compressed.js"></script>
-
+  %(add_in_head)s
+  
   <script type="text/javascript">
     window.dhtmlHistory.create({ debugMode: false });
   </script>
@@ -146,7 +147,9 @@ def get():
 	if hasattr(cp, 'get_index_template'):
 		template = cp.get_index_template()
 		
-
+	if hasattr(cp, 'add_in_head'):
+		add_in_head = cp.add_in_head()
+		
 	if '%(content)s' in template:
 
 		title, content = get_static_content()
@@ -158,6 +161,7 @@ def get():
 			,'content':content
 			,'keywords':keywords
 			,'site_description':site_description
+			,'add_in_head':add_in_head
 		}
 		
 	return template
