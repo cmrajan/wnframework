@@ -142,7 +142,7 @@ def get():
 	global index_template
 	import webnotes.model.code
 	
-	template = index_template
+	template, add_in_head = index_template, ''
 	cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 	if hasattr(cp, 'get_index_template'):
 		template = cp.get_index_template()
