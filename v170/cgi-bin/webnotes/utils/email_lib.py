@@ -94,11 +94,13 @@ class EMail:
 		self.use_ssl = cint(cp.use_ssl)
 	
 	def send(self):
+		import webnotes.utils
+		
 		self.setup()
 		self.validate()
 		
 		import smtplib
-		sess = smtplib.SMTP(self.server, cint(self.port))
+		sess = smtplib.SMTP(self.server, webnotes.utils.cint(self.port))
 		
 		if self.use_ssl: 
 			sess.ehlo()
