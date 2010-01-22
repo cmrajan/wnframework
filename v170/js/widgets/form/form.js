@@ -79,7 +79,7 @@ _f.Frm.prototype.rename_notify = function(dt, old, name) {
 	// attach
 	if(this.attachments[old]) {
 		this.attachments[name] = this.attachments[old];
-		this.attachments[name] = null;
+		this.attachments[old] = null;
 		for(var i in this.attachments[name]){ // rename each attachment
 			this.attachments[name][i].docname = name;
 		}

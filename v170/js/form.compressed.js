@@ -30,7 +30,7 @@ var d=_f.frm_dialog;if(!frms[dt]){var f=new _f.Frm(dt,d.body_wrapper);f.parent_d
 if(d.cur_frm){d.cur_frm.hide();}
 var frm=frms[dt];frm.show(dn);d.cur_frm=frm;d.dn=dn;d.set_title("Editing Row #"+(_f.cur_grid_ridx+1));d.show();}
 _f.Frm=function(doctype,parent){this.docname='';this.doctype=doctype;this.display=0;this.in_dialog=false;var me=this;this.is_editable={};this.opendocs={};this.cur_section={};this.sections=[];this.sections_by_label={};this.grids=[];this.cscript={};this.parent=parent;if(!parent)this.parent=_f.frm_con.body;this.attachments={};this.last_comments={};this.n_comments={};frms[doctype]=this;this.setup_meta(doctype);rename_observers.push(this);}
-_f.Frm.prototype.rename_notify=function(dt,old,name){if(this.doctype!=dt)return;this.cur_section[name]=this.cur_section[old];delete this.cur_section[old];this.is_editable[name]=this.is_editable[old];delete this.is_editable[old];if(this.attachments[old]){this.attachments[name]=this.attachments[old];this.attachments[name]=null;for(var i in this.attachments[name]){this.attachments[name][i].docname=name;}}
+_f.Frm.prototype.rename_notify=function(dt,old,name){if(this.doctype!=dt)return;this.cur_section[name]=this.cur_section[old];delete this.cur_section[old];this.is_editable[name]=this.is_editable[old];delete this.is_editable[old];if(this.attachments[old]){this.attachments[name]=this.attachments[old];this.attachments[old]=null;for(var i in this.attachments[name]){this.attachments[name][i].docname=name;}}
 if(this.docname==old)
 this.docname=name;if(this&&this.opendocs[old]){local_dt[dt][name]=local_dt[dt][old];local_dt[dt][old]=null;}
 this.opendocs[old]=false;this.opendocs[name]=true;}
