@@ -10,7 +10,7 @@ def get_table_fields(doctype):
 	return sql("select options, fieldname from tabDocField where parent='%s' and fieldtype='Table'" % doctype)
 
 def delete_doc(doctype, name):
-	tablefields = db_gettablefields(doctype)
+	tablefields = get_table_fields(doctype)
 	sql("delete from `tab%s` where name='%s' limit 1" % (doctype, name))
 	for t in tablefields:
 		sql("delete from `tab%s` where parent = '%s' and parentfield='%s'" % (t[0], name, t[1]))
