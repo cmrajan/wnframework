@@ -94,7 +94,7 @@ var sc=get_local('Search Criteria',me.sc_dict[me.current_loaded]);if(sc)me.dt.se
 var fl=[];var docstatus_cl=[];var cl=[];var table_name=function(t){return'`tab'+t+'`';}
 var dis_filters_list=[];if(sc&&sc.dis_filters)
 var dis_filters_list=sc.dis_filters.split('\n');var t=me.column_picker.get_selected();for(var i=0;i<t.length;i++){fl.push(table_name(t[i].parent)+'.`'+t[i].fieldname+'`');}
-if(sc&&sc.add_col){var adv_fl=sc.add_col.split('\n');for(var i=0;i<adv_fl.length;i++){fl[fl.length]=adv_fl[i];}}
+me.selected_fields=fl;if(sc&&sc.add_col){var adv_fl=sc.add_col.split('\n');for(var i=0;i<adv_fl.length;i++){fl[fl.length]=adv_fl[i];}}
 me.dt.filter_vals={}
 add_to_filter=function(k,v,is_select){if(v==null)v='';if(!in_list(keys(me.dt.filter_vals),k)){me.dt.filter_vals[k]=v;return}else{if(is_select)
 me.dt.filter_vals[k]+='\n'+v;else
@@ -104,8 +104,8 @@ if(!v.length)add_to_filter(t.df.fieldname,"",1);}else add_to_filter(t.df.fieldna
 else if(t.df.label=='Submitted'){if(t.get_value())docstatus_cl[docstatus_cl.length]=table_name(t.df.parent)+'.docstatus=1';else cl[cl.length]=table_name(t.df.parent)+'.docstatus!=1';}
 else if(t.df.label=='Cancelled'){if(t.get_value())docstatus_cl[docstatus_cl.length]=table_name(t.df.parent)+'.docstatus=2';else cl[cl.length]=table_name(t.df.parent)+'.docstatus!=2';}}else{var fn='`'+t.df.fieldname+'`';var v=t.get_value?t.get_value():'';if(v){if(in_list(['Data','Link','Small Text','Text'],t.df.fieldtype)){cl[cl.length]=table_name(t.df.parent)+'.'+fn+' LIKE "'+v+'%"';}else if(t.df.fieldtype=='Select'){var tmp_cl=[];for(var sel_i=0;sel_i<v.length;sel_i++){if(v[sel_i]){tmp_cl[tmp_cl.length]=table_name(t.df.parent)+'.'+fn+' = "'+v[sel_i]+'"';}}
 if(tmp_cl.length)cl[cl.length]='('+tmp_cl.join(' OR ')+')';}else{var condition='=';if(t.sql_condition)condition=t.sql_condition;cl[cl.length]=table_name(t.df.parent)+'.'+fn+condition+'"'+v+'"';}}}}}
-me.dt.filter_vals.user=user;me.dt.filter_vals.user_email=user_email;this.is_simple=0;if(sc&&sc.custom_query){this.query=repl(sc.custom_query,me.dt.filter_vals);this.is_simple=1;return}
-if(docstatus_cl.length)
+me.dt.filter_vals.user=user;me.dt.filter_vals.user_email=user_email;me.filter_vals=me.dt.filter_vals;this.is_simple=0;if(sc&&sc.custom_query){this.query=repl(sc.custom_query,me.dt.filter_vals);this.is_simple=1;return}
+if(me.get_query){this.query=me.get_query();}else{if(docstatus_cl.length)
 cl[cl.length]='('+docstatus_cl.join(' OR ')+')';if(sc&&sc.add_cond){var adv_cl=sc.add_cond.split('\n');for(var i=0;i<adv_cl.length;i++){cl[cl.length]=adv_cl[i];}}
 if(!fl.length){alert('You must select atleast one column to view');this.query='';return;}
 var tn=table_name(me.doctype);if(me.parent_dt){tn=tn+','+table_name(me.parent_dt);cl[cl.length]=table_name(me.doctype)+'.`parent` = '+table_name(me.parent_dt)+'.`name`';}
@@ -114,7 +114,7 @@ if(!cl.length)
 this.query='SELECT '+fl.join(',\n')+' FROM '+tn
 else
 this.query='SELECT '+fl.join(',')+' FROM '+tn+' WHERE '+cl.join('\n AND ');if(sc&&sc.group_by){this.query+=' GROUP BY '+sc.group_by;}
-this.query=repl(this.query,me.dt.filter_vals)
+this.query=repl(this.query,me.dt.filter_vals)}
 if(me.show_query.checked){this.show_query=1;}
 if(me.current_loaded)this.rep_name=me.current_loaded;else this.rep_name=me.doctype;}}
 _r.ReportFilters=function(rb){this.rb=rb;this.first_page_filter=$a(rb.mytabs.tabs['Result'].tab_body,'div','finder_filter_area');this.filter_area=$a(rb.mytabs.tabs['More Filters'].tab_body,'div','finder_filter_area');this.filter_fields_area=$a(this.filter_area,'div');}

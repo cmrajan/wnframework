@@ -629,10 +629,12 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		if(sc && sc.dis_filters)
 			var dis_filters_list = sc.dis_filters.split('\n');
 		
+		// select columns
 		var t = me.column_picker.get_selected();
 		for(var i=0;i<t.length;i++) {
 			fl.push(table_name(t[i].parent) + '.`'+t[i].fieldname+'`');
 		}
+		me.selected_fields = fl;
 				
 		// advanced - additional fields
 		if(sc && sc.add_col) {
@@ -717,6 +719,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		// standard filters
 		me.dt.filter_vals.user = user;
 		me.dt.filter_vals.user_email = user_email;
+		me.filter_vals = me.dt.filter_vals; // in both dt and report
 		
 		// overloaded query - finish it here
 		this.is_simple = 0;
@@ -725,52 +728,59 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			this.is_simple = 1;
 			return
 		}
+		
+		if(me.get_query) {
+			// custom query method
+			this.query = me.get_query();	
 
-		// add docstatus conditions
-		if(docstatus_cl.length)
-			cl[cl.length] = '('+docstatus_cl.join(' OR ')+')';
-
-		// advanced - additional conditions
-		if(sc && sc.add_cond) {
-			var adv_cl = sc.add_cond.split('\n');
-			for(var i=0;i< adv_cl.length;i++) {
-				cl[cl.length] = adv_cl[i];
+		} else {
+			// add docstatus conditions
+			if(docstatus_cl.length)
+				cl[cl.length] = '('+docstatus_cl.join(' OR ')+')';
+	
+			// advanced - additional conditions
+			if(sc && sc.add_cond) {
+				var adv_cl = sc.add_cond.split('\n');
+				for(var i=0;i< adv_cl.length;i++) {
+					cl[cl.length] = adv_cl[i];
+				}
 			}
-		}
-
-		if(!fl.length) {
-			alert('You must select atleast one column to view');
-			this.query = '';
-			return;
-		}
-
-		// join with parent in case of child
-		var tn = table_name(me.doctype);
-		if(me.parent_dt) {
-			tn = tn + ',' + table_name(me.parent_dt);
-			cl[cl.length] = table_name(me.doctype) + '.`parent` = ' + table_name(me.parent_dt) + '.`name`';
+	
+			// atleast one field
+			if(!fl.length) {
+				alert('You must select atleast one column to view');
+				this.query = '';
+				return;
+			}
+	
+			// join with parent in case of child
+			var tn = table_name(me.doctype);
+			if(me.parent_dt) {
+				tn = tn + ',' + table_name(me.parent_dt);
+				cl[cl.length] = table_name(me.doctype) + '.`parent` = ' + table_name(me.parent_dt) + '.`name`';
+			}
+			
+			// advanced - additional tables
+			if(sc && sc.add_tab) {
+				var adv_tl = sc.add_tab.split('\n');
+				tn = tn + ',' + adv_tl.join(',');
+			}
+			
+			// make the query
+			if(!cl.length)
+				this.query = 'SELECT ' + fl.join(',\n') + ' FROM ' + tn
+			else
+				this.query = 'SELECT ' + fl.join(',') + ' FROM ' + tn + ' WHERE ' + cl.join('\n AND ');
+	
+			// advanced - group by
+			if(sc && sc.group_by) {
+				this.query += ' GROUP BY ' + sc.group_by;
+			}
+	
+			// replace
+			this.query = repl(this.query, me.dt.filter_vals)
 		}
 		
-		// advanced - additional tables
-		if(sc && sc.add_tab) {
-			var adv_tl = sc.add_tab.split('\n');
-			tn = tn + ',' + adv_tl.join(',');
-		}
-		
-		// make the query
-		if(!cl.length)
-			this.query = 'SELECT ' + fl.join(',\n') + ' FROM ' + tn
-		else
-			this.query = 'SELECT ' + fl.join(',') + ' FROM ' + tn + ' WHERE ' + cl.join('\n AND ');
-
-		// advanced - group by
-		if(sc && sc.group_by) {
-			this.query += ' GROUP BY ' + sc.group_by;
-		}
-
-		// replace
-		this.query = repl(this.query, me.dt.filter_vals)
-
 		if(me.show_query.checked) {
 			this.show_query = 1;
 		}

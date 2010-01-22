@@ -123,6 +123,23 @@ Example::
      } 
    }
 
+Generating a query by script from client side
+---------------------------------------------
+
+A query can be generated from a script from the client side like in Listing by declaring the `get_query` method.
+Note: Do not put ORDER BY and LIMIT as they would be appended by the Report Builder. There are 2 useful lists
+
+ * report.selected_fields - list of selected fields in `Table_Name`.`field_name` format
+ * report.filter_vals - dictionary of filter keys and values
+
+Example::
+
+   report.get_query = function() {
+   	 var query = 'SELECT ' + report.selected_fields.join(', ') +  'FROM `tab..` WHERE ...';
+   	 return query;
+   }
+
+
 Report Builder API
 ------------------
 
