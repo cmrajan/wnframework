@@ -108,7 +108,7 @@ AutoSuggest.prototype.onKeyUp = function(ev)
 		default:
 			if(key!=13) {
 				if(this.oP.fixed_options)
-					this.find_nearest(key);	
+					this.find_nearest(key);
 				else
 					this.getSuggestions(this.fld.value);
 			}
@@ -471,6 +471,7 @@ AutoSuggest.prototype.setHighlight = function(n, set_value)
 			this.body.scrollTop = cur_y - this.oP.maxheight + h + ff_delta;
 	}
 
+	// set it the field (but do not call onchange as this field still has focus)
 	if(set_value && this.oP.fixed_options) {
 		this.fld.value = this.aSug[this.iHigh-1 ].value;
 	}
@@ -541,6 +542,14 @@ AutoSuggest.prototype.clearSuggestions = function () {
 		delete this.ul;
 	this.iHigh = 0;
 	cur_autosug = null;
+	
+	// refresh field value (in case not seleted and the suggestions timeout)
+	if(this.oP.fixed_options && cur_frm) {
+		var d = locals[cur_frm.doctype][cur_frm.docname];
+		if(this.fld.fieldname) {
+			this.fld.value = d[this.fld.fieldname]; // refresh the value
+		}
+	}	
 };
 
 

@@ -64,6 +64,7 @@ var cur_frm;
 var pscript = {};
 var validated = true;
 var validation_message = '';
+var tinymce_loaded;
 
 var $c_get_values;
 var get_server_fields;

@@ -112,6 +112,17 @@ File (BLOB) Functions
    Returns result set of ((fieldname, blobcontent, lastmodified),) for a file of name or id `fname`
 
 
+Email Functions
+---------------
+
+.. function:: validate_email_add(email_str)
+
+   Validates the email string
+   
+.. function:: sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[])
+
+   Send an email. For more details see :func:`email_lib.sendmail`
+
 Other Functions
 ---------------
 

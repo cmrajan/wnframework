@@ -612,7 +612,7 @@ CheckField.prototype.set_disp = function(val) {
 
 // ======================================================================================
 
-var codeid=0; var code_editors={}; var tinymce_loaded;
+var codeid=0; var code_editors={};
 function CodeField() { } CodeField.prototype = new Field();
 CodeField.prototype.make_input = function() {
 	var me = this; 
@@ -785,6 +785,7 @@ SelectField.prototype.make_input = function() {
 		this.input = new SelectWidget(this.input_area, [], '80%');	
 		$y(this.input.wrapper, {marginLeft:'1px'});
 		this.txt = this.input.inp;
+		this.txt.fieldname = this.df.fieldname; // for reference
 		this.btn = this.input.btn;
 		this.txt.onchange = function() {
 			if(me.validate)

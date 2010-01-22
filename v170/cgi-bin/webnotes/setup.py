@@ -90,6 +90,7 @@ def copy_db(source, target=''):
 def import_db(source, target='', is_accounts=0):
 	# dump source
 	global mysql_path
+	import MySQLdb
 	import os
 
 	if defs.root_login:
@@ -97,21 +98,18 @@ def import_db(source, target='', is_accounts=0):
 		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
 
 	if not target:
-		if is_accounts:
-			target = 'accounts'
-		else:
-			res = sql('SHOW DATABASES')
-			db_list = []
-			for r in res:
-				if r[0] and r[0].startswith(server_prefix):
-					db_list.append(r[0])
-			db_list.sort()
+		res = sql('SHOW DATABASES')
+		db_list = []
+		for r in res:
+			if r[0] and r[0].startswith(server_prefix):
+				db_list.append(r[0])
+		db_list.sort()
 			
-			if db_list:
-				dbn = server_prefix + ('%.3i' % (int(db_list[-1][-3:]) + 1))
-			else:
-				dbn = server_prefix + '001'
-			target = dbn
+		if db_list:
+			dbn = server_prefix + ('%.3i' % (int(db_list[-1][-3:]) + 1))
+		else:
+			dbn = server_prefix + '001'
+		target = dbn
 	
 	os.chdir('../data')
 

@@ -7,7 +7,7 @@ function Page(page_name, content) {
 
 	this.onshow = function() {
 		// default set_title
-		set_title(me.name);
+		set_title(me.doc.page_title ? me.doc.page_title : me.name);
 		
 		// onshow
 		try {
@@ -39,6 +39,8 @@ function render_page(page_name, menuitem) {
 	var p = new Page(page_name, pdoc.__content?pdoc.__content:pdoc.content);
 	// script
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
+	p.doc = pdoc;
+	
 	if(script)
 		try { eval(script); } catch(e) { submit_error(e); }		
 
@@ -49,7 +51,7 @@ function render_page(page_name, menuitem) {
 	try {
 		if(pscript['onload_'+page_name]) pscript['onload_'+page_name](menuitem); // onload
 	} catch(e) { submit_error(e); }
-		
+	
 	return p;
 }
 
