@@ -41,6 +41,8 @@ class FrameworkServer:
 
 			self.account_id = cookies.get('account_id')
 			self.sid = cookies.get('sid')
+			
+			return ret
 	
 	def http_get_response(self, method, args):
 		# get response from remote server
