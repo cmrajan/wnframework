@@ -411,7 +411,7 @@ else:
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
 
-		if webnotes.conn and webnotes.conn.in_transaction:
+		if webnotes.conn and webnotes.conn.in_transaction and sql:
 			sql("ROLLBACK")
 			
 
