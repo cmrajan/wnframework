@@ -12,6 +12,7 @@ convert_to_lists = webnotes.conn.convert_to_lists
 
 version = 'v170'
 NEWLINE = '\n'
+BACKSLASH = '\\'
 	
 def execute(code, doc=None, doclist=[]):
 	# execute it
