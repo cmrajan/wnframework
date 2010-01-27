@@ -203,7 +203,7 @@ def get_file(fname):
 	if webnotes.conn.exists('File',fname):
 		fname = webnotes.conn.sql("select file_list from tabFile where name=%s", fname)
 		fname = fname and fname[0][0]
-		fname = fname.split(NEWLINE)[0].split(',')[1]
+		fname = fname.split('\n')[0].split(',')[1]
 		try:
 			if not in_transaction:
 				webnotes.conn.sql("start transaction")
