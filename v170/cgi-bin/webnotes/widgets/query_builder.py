@@ -155,7 +155,7 @@ def runquery(q='', ret=0, from_export=0):
 				coloptions.append('')
 				colwidths.append('100')
 	
-		q = add_match_conditions(q, tl, webnotes.user.roles, webnotes.user.roles)
+		q = add_match_conditions(q, tl, webnotes.user.roles, webnotes.user.get_defaults())
 	
 		if session['data'].get('__testing'):
 			for dt in tl:
