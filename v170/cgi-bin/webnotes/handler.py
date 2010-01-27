@@ -165,7 +165,7 @@ def uploadfile():
 # File upload (from scripts)
 # ------------------------------------------------------------------------------------
 
-def upload_many(form, session):
+def upload_many():
 	from webnotes.model.code import get_obj
 
 	# pass it on to upload_many method in Control Panel
