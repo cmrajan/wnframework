@@ -54,8 +54,8 @@ try:
 		fcontent = outfile.read()
 
 	import mimetypes
-	print "Content-Type: %s" % (mimetypes.guess_type(n)[0] or 'application/unknown')
-	print "Content-Disposition: filename="+n.replace(' ', '_')
+	print "Content-Type: %s" % (mimetypes.guess_type(fname)[0] or 'application/unknown')
+	print "Content-Disposition: filename="+fname.replace(' ', '_')
 	print "Cache-Control: max-age=3600"
 	print
 	print fcontent
