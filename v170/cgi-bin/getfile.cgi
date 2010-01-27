@@ -17,6 +17,8 @@ try:
 
 	import cgi
 	import webnotes
+	import webnotes.auth
+	import webnotes.utils
 	
 	form = cgi.FieldStorage()
 	n = form.getvalue('name')
@@ -35,7 +37,7 @@ try:
 	fmodified = res[0][2]
 
 	if form.getvalue('thumbnail'):
-		tn = server.cint(form.getvalue('thumbnail'))
+		tn = webnotes.utils.cint(form.getvalue('thumbnail'))
 		from PIL import Image
 		import cStringIO
 		
