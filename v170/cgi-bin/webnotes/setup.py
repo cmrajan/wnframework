@@ -38,7 +38,11 @@ def delete_oldest_file(folder):
 		os.system('rm %s/%s' % (folder, a[0]))
 
 def mysqldump(db, folder=''):
-	global mysql_path
+	import defs
+
+	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
+	db_password = defs.db_password
+	
 	import os
 	os.system('%(path)smysqldump %(db)s > %(folder)s%(db)s.sql -u %(db)s -p%(pwd)s --ignore-table=%(db)s.__DocTypeCache' % {'path':mysql_path, 'db':db, 'pwd':db_password, 'folder':folder})
 
@@ -87,30 +91,43 @@ def copy_db(source, target=''):
 	
 	return target
 
+def get_db_name(conn)
+	res = conn.sql('SHOW DATABASES')
+	db_list = []
+	for r in res:
+		if r[0] and r[0].startswith(server_prefix):
+			db_list.append(r[0])
+	db_list.sort()
+			
+	if db_list:
+		dbn = server_prefix + ('%.3i' % (int(db_list[-1][-3:]) + 1))
+	else:
+		dbn = server_prefix + '001'
+	return dbn
+
 def import_db(source, target='', is_accounts=0):
 	# dump source
-	global mysql_path
+	
+	import webnotes
+	import defs
 	import MySQLdb
 	import os
 
-	if defs.root_login:
-		global conn
-		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
+	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
 
+	# default, use current user id
+	conn = webnotes.conn
+
+	# login as root (if set)
+	if defs.root_login:
+		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
+	sql = conn.sql
+
+	# get database number
 	if not target:
-		res = sql('SHOW DATABASES')
-		db_list = []
-		for r in res:
-			if r[0] and r[0].startswith(server_prefix):
-				db_list.append(r[0])
-		db_list.sort()
-			
-		if db_list:
-			dbn = server_prefix + ('%.3i' % (int(db_list[-1][-3:]) + 1))
-		else:
-			dbn = server_prefix + '001'
-		target = dbn
+		target = get_db_name(conn)
 	
+	# all source database dumps in data
 	os.chdir('../data')
 
 	# create user and db
@@ -199,7 +216,13 @@ def create_account(ac_name, ac_type='Framework'):
 		
 	sql("commit")
 
+	# create entry in Account table in 'accounts' (default) database
+	create_account_record(ac_name)
+	
 	return "Created %s (%s)" % (ac_name, newdb)
+
+# Installation
+# -------------------------------------------------------------
 
 if __name__=='__main__':
 	import sys, os
