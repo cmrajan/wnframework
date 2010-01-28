@@ -327,7 +327,7 @@ _f.Grid.prototype.add_template = function(cell) {
 		hc.template.activate(cell.row.docname);
 		hc.template.activated=1;
 		
-		if(hc.template.input.set_width) {
+		if(hc.template.input && hc.template.input.set_width) {
 			hc.template.input.set_width(isIE ? cell.offsetWidth : cell.clientWidth);
 		}
 	}

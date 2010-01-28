@@ -550,7 +550,7 @@ AutoSuggest.prototype.clearSuggestions = function () {
 	if(this.oP.fixed_options && cur_frm) {
 		if(this.fld.field_object) { // grid
 			var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
-		} else
+		} else {
 			var d = locals[cur_frm.doctype][cur_frm.docname];
 		}
 		if(this.fld.fieldname) {

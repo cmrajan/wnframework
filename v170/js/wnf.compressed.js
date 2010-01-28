@@ -452,8 +452,7 @@ return bubble;}
 AutoSuggest.prototype.clear_user_inp=function(){this.user_inp='';}
 AutoSuggest.prototype.find_nearest=function(key){var list=this.ul;if(!list){if(this.aSug){this.createList(this.aSug);}if(this.aSug[0].value.substr(0,this.user_inp.length).toLowerCase()==String.fromCharCode(key)){this.resetTimeout();return;}}
 if((this.user_inp.length!=1)||(this.user_inp.length==1&&this.user_inp!=String.fromCharCode(key)))
-this.user_inp+=String.fromCharCode(key).toLowerCase();window.clearTimeout(this.clear_timer);this.clear_timer=window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()',500)
-var st=this.iHigh;if(this.user_inp.length>1)st=st-1;for(var i=st;i<this.aSug.length;i++){if(this.aSug[i].value.substr(0,this.user_inp.length).toLowerCase()==this.user_inp){this.setHighlight(i+1,true);this.resetTimeout();return;}}
+this.user_inp+=String.fromCharCode(key).toLowerCase();window.clearTimeout(this.clear_timer);this.clear_timer=window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()',500);var st=this.iHigh;if(this.user_inp.length>1)st=st-1;for(var i=st;i<this.aSug.length;i++){if(this.aSug[i].value.substr(0,this.user_inp.length).toLowerCase()==this.user_inp){this.setHighlight(i+1,true);this.resetTimeout();return;}}
 for(var i=0;i<st;i++){if(this.aSug[i].value.substr(0,this.user_inp.length).toLowerCase()==this.user_inp){this.setHighlight(i+1,true);this.resetTimeout();return;}}}
 AutoSuggest.prototype.getSuggestions=function(val)
 {if(val==this.sInp)return 0;if(this.body&&this.body.parentNode)
@@ -511,9 +510,10 @@ this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selecti
 this.fld.setSelectionRange(this.sInp.length,this.sInp.length);}catch(e){return;}
 this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
 this.oP.callback(this.aSug[this.iHigh-1]);this.fld.value=this.sInp;if(this.fld.onchange)
-this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);var me=this;this.toID=setTimeout(function(){cur_autosug.clearSuggestions();},1000);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();var me=this;if(this.body){$dh(this.body);delete this.body;}
+this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);var me=this;this.toID=setTimeout(function(){cur_autosug.clearSuggestions();},1000);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
 if(this.ul)
-delete this.ul;this.iHigh=0;cur_autosug=null;if(this.oP.fixed_options&&cur_frm){var d=locals[cur_frm.doctype][cur_frm.docname];if(this.fld.fieldname){this.fld.value=d[this.fld.fieldname];}}};$ce=function(type,attr,cont,html)
+delete this.ul;this.iHigh=0;if(this.oP.fixed_options&&cur_frm){if(this.fld.field_object){var d=locals[this.fld.field_object.doctype][this.fld.field_object.docname];}else{var d=locals[cur_frm.doctype][cur_frm.docname];}
+if(this.fld.fieldname){this.fld.value=d[this.fld.fieldname];}}};$ce=function(type,attr,cont,html)
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.bg_color=bg_color?bg_color:'#FFF';this.custom_select=1;this.setup=function(){this.options=options;this.wrapper=$a(parent,'div');if(width)
 $y(this.wrapper,{width:width});this.body_tab=make_table(this.wrapper,1,2,'100%',['100%','18px'],{border:'1px solid #888'});this.inp=$a_input($td(this.body_tab,0,0),'text',{'readonly':(editable?null:'readonly')},{width:'96%',border:'0px',padding:'1px'});this.btn=$a($td(this.body_tab,0,1),'img','',{cursor:'pointer',margin:'1px 2px'});this.btn.src='images/ui/down-arrow.gif';this.btn.onclick=function(){if(me.as&&me.as.body){me.as.clearSuggestions();return;}
 me.inp.focus();me.as.createList(me.as.aSug);}
@@ -550,12 +550,12 @@ if(this.df.description){this.comment_area.innerHTML=replace_newlines(this.df.des
 Field.prototype.get_status=function(){if(this.in_filter)this.not_in_form=this.in_filter;if(this.not_in_form){return'Write';}
 var fn=this.df.fieldname?this.df.fieldname:this.df.label;this.df=get_field(this.doctype,fn,this.docname);if(!this.df.permlevel)this.df.permlevel=0;var p=this.perm[this.df.permlevel];var ret;if(cur_frm.editable&&p&&p[WRITE])ret='Write';else if(p&&p[READ])ret='Read';else ret='None';if(this.df.fieldtype=='Binary')
 ret='None';if(cint(this.df.hidden))
-ret='None';if(ret=='Write'&&cint(cur_frm.doc.docstatus)>0)ret='Read';var a_o_s=this.df.allow_on_submit;if(a_o_s&&(this.in_grid||(this.frm&&this.frm.in_dialog))){a_o_s=null;if(this.in_grid)a_o_s=this.grid.field.df.allow_on_submit;if(this.frm&&this.frm.in_dialog){a_o_s=cur_grid.field.df.allow_on_submit;}}
+ret='None';if(ret=='Write'&&cint(cur_frm.doc.docstatus)>0)ret='Read';var a_o_s=cint(this.df.allow_on_submit);if(a_o_s&&(this.in_grid||(this.frm&&this.frm.in_dialog))){a_o_s=null;if(this.in_grid)a_o_s=this.grid.field.df.allow_on_submit;if(this.frm&&this.frm.in_dialog){a_o_s=cur_grid.field.df.allow_on_submit;}}
 if(cur_frm.editable&&a_o_s&&cint(cur_frm.doc.docstatus)>0&&!this.df.hidden){tmp_perm=get_perm(cur_frm.doctype,cur_frm.docname,1);if(tmp_perm[this.df.permlevel]&&tmp_perm[this.df.permlevel][WRITE])ret='Write';}
 return ret;}
 Field.prototype.refresh_mandatory=function(){if(this.not_in_form)return;if(this.label_cell){if(this.df.reqd){this.label_cell.style.color="#d22";if(this.txt)$bg(this.txt,"#FFFED7");else if(this.input)$bg(this.input,"#FFFED7");}else{this.label_cell.style.color="#222";if(this.txt)$bg(this.txt,"#FFF");else if(this.input)$bg(this.input,"#FFF");}}
 this.set_reqd=this.df.reqd;}
-Field.prototype.refresh_display=function(){if(this.set_status!=this.disp_status){if(this.disp_status=='Write'){if(this.make_input&&(!this.input)){this.make_input();}
+Field.prototype.refresh_display=function(){if(!this.set_status||this.set_status!=this.disp_status){if(this.disp_status=='Write'){if(this.make_input&&(!this.input)){this.make_input();}
 $ds(this.wrapper);if(this.input){$ds(this.input_area);$dh(this.disp_area);if(this.input.refresh)this.input.refresh();}else{$dh(this.input_area);$ds(this.disp_area);}}else if(this.disp_status=='Read'){$ds(this.wrapper);$dh(this.input_area);$ds(this.disp_area);}else{$dh(this.wrapper);}
 this.set_status=this.disp_status;}}
 Field.prototype.refresh=function(){this.disp_status=this.get_status();if(this.in_grid&&this.table_refresh&&this.disp_status=='Write')
@@ -581,9 +581,10 @@ Field.prototype.set_as_error=function(set){if(this.in_grid||this.not_in_form)ret
 Field.prototype.activate=function(docname){this.docname=docname;this.refresh();if(this.input){this.input.isactive=true;var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);this.last_value=v;if(this.input.onchange&&this.input.value!=v){if(this.validate)
 this.input.value=this.validate(v);else
 this.input.value=(v==null)?'':v;if(this.format_input)this.format_input();}
-if(this.input.focus){try{this.input.focus();}catch(e){}}}
+if(this.input.focus){try{this.input.focus();}catch(e){}}
+this.input.field_object=this;}
 if(this.txt){try{this.txt.focus();}catch(e){}
-this.txt.isactive=true;this.btn.isactive=true;}}
+this.txt.isactive=true;this.btn.isactive=true;this.txt.field_object=this;}}
 function DataField(){}DataField.prototype=new Field();DataField.prototype.with_label=1;DataField.prototype.make_input=function(){var me=this;this.input=$a(this.input_area,'input');if(this.df.fieldtype=='Password'){if(isIE){this.input_area.innerHTML='<input type="password">';this.input=this.input_area.childNodes[0];}else{this.input.setAttribute('type','password');}}
 this.get_value=function(){var v=this.input.value;if(this.validate)v=this.validate(v);return v;}
 this.input.name=this.df.fieldname;this.input.onchange=function(){if(!me.last_value)me.last_value='';if(me.validate)
