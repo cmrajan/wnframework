@@ -19,9 +19,6 @@ class Database:
 		self.testing_tables = []
 		
 		self.connect()
-		
-		# for security
-		self.password = ''
 	
 		if use_default:
 			self.use(defs.db_name)
