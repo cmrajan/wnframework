@@ -160,7 +160,8 @@ class Authentication:
 		if self.user_id:
 			self.validate_ip(self.user_id)
 			self.start_session(self.user_id)
-			self.out['message'] = 'Logged In'
+			if not as_guest:
+				self.out['message'] = 'Logged In'
 			return True
 	
 	def call_on_login_event(self):
