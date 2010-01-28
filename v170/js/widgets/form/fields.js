@@ -153,6 +153,7 @@ Field.prototype.refresh_display = function() {
 		}
 		this.set_status = this.disp_status;
 	}
+	if(this.df.fieldname=='area_list') alert(this.set_status);
 }
 
 Field.prototype.refresh = function() { 
