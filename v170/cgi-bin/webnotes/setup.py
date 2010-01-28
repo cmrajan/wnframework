@@ -130,7 +130,7 @@ def import_db(source, target='', is_accounts=0):
 		target = get_db_name(conn, defs.server_prefix)
 	
 	# all source database dumps in data
-	os.chdir('../data')
+	os.chdir('data')
 
 	# create user and db
 	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, db_password))
