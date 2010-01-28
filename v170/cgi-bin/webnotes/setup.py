@@ -109,6 +109,7 @@ def import_db(source, target='', is_accounts=0):
 	# dump source
 	
 	import webnotes
+	import webnotes.db
 	import defs
 	import MySQLdb
 	import os
@@ -120,7 +121,7 @@ def import_db(source, target='', is_accounts=0):
 
 	# login as root (if set)
 	if defs.root_login:
-		conn = MySQLdb.connect(user=defs.root_login, host='localhost', passwd=defs.root_password)
+		conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
 	sql = conn.sql
 
 	# get database number
