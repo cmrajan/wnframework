@@ -133,14 +133,14 @@ def import_db(source, target='', is_accounts=0):
 	os.chdir('data')
 
 	# create user and db
-	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, db_password))
+	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, defs.db_password))
 	sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
 	sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, target))
 	sql("FLUSH PRIVILEGES")
 	sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
 
 	# import in target
-	os.system('%smysql -u %s -p%s %s < %s.sql' % (mysql_path, target, db_password, target, source))
+	os.system('%smysql -u %s -p%s %s < %s.sql' % (mysql_path, target, defs.db_password, target, source))
 
 	sql("use %s;" % target)
 	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT)")
