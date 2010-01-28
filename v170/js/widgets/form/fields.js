@@ -130,7 +130,7 @@ Field.prototype.refresh_mandatory = function() {
 
 Field.prototype.refresh_display = function() {
 	// from permission
-	if(this.set_status!=this.disp_status) { // status changed
+	if(!this.set_status || this.set_status!=this.disp_status) { // status changed
 		if(this.disp_status=='Write') { // write
 			if(this.make_input&&(!this.input)) { // make input if reqd
 				this.make_input();
