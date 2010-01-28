@@ -93,7 +93,7 @@ Field.prototype.get_status = function() {
 	if(ret=='Write' && cint(cur_frm.doc.docstatus) > 0) ret = 'Read';
 
 	// allow on submit
-	var a_o_s = this.df.allow_on_submit;
+	var a_o_s = cint(this.df.allow_on_submit);
 	
 	if(a_o_s && (this.in_grid || (this.frm && this.frm.in_dialog))) {
 		a_o_s = null;
