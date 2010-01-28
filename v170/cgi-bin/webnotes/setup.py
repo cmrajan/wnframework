@@ -51,7 +51,7 @@ def backup_db(db, from_all=0):
 
 	if defs.root_login:
 		global conn
-		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
+		conn = MySQLdb.connect(user=defs.root_login, host='localhost', passwd=defs.root_password)
 		
 	sql('use %s' % db)
 
@@ -120,7 +120,7 @@ def import_db(source, target='', is_accounts=0):
 
 	# login as root (if set)
 	if defs.root_login:
-		conn = MySQLdb.connect(user=defs.root_login, host=db_host, passwd=defs.root_password)
+		conn = MySQLdb.connect(user=defs.root_login, host='localhost', passwd=defs.root_password)
 	sql = conn.sql
 
 	# get database number
