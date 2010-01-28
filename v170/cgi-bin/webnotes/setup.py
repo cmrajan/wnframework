@@ -91,7 +91,7 @@ def copy_db(source, target=''):
 	
 	return target
 
-def get_db_name(conn)
+def get_db_name(conn):
 	res = conn.sql('SHOW DATABASES')
 	db_list = []
 	for r in res:
