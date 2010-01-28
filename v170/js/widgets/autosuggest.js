@@ -138,8 +138,9 @@ AutoSuggest.prototype.find_nearest = function (key) {
 	if((this.user_inp.length!=1) || (this.user_inp.length==1 && this.user_inp != String.fromCharCode(key)))
 		this.user_inp += String.fromCharCode(key).toLowerCase();
 
+	// clear user keys
 	window.clearTimeout(this.clear_timer);
-	this.clear_timer = window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()', 500)
+	this.clear_timer = window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()', 500);
 
 	// loop over the next after the current
 	var st = this.iHigh;
@@ -525,31 +526,37 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 AutoSuggest.prototype.killTimeout = function() {
 	cur_autosug = this;
 	clearTimeout(this.toID);
+	clearTimeout(this.clear_timer);
 };
 
 AutoSuggest.prototype.resetTimeout = function() {
 	cur_autosug = this;
 	clearTimeout(this.toID);
+	clearTimeout(this.clear_timer);
 	var me = this;
 	this.toID = setTimeout(function () { cur_autosug.clearSuggestions(); }, 1000);
 };
 
 AutoSuggest.prototype.clearSuggestions = function () {
 	this.killTimeout();
+	cur_autosug = null;
 	var me = this;
 	if (this.body) { $dh(this.body); delete this.body; }
 	if(this.ul)
 		delete this.ul;
 	this.iHigh = 0;
-	cur_autosug = null;
 	
 	// refresh field value (in case not seleted and the suggestions timeout)
 	if(this.oP.fixed_options && cur_frm) {
-		var d = locals[cur_frm.doctype][cur_frm.docname];
+		if(this.fld.field_object) { // grid
+			var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
+		} else
+			var d = locals[cur_frm.doctype][cur_frm.docname];
+		}
 		if(this.fld.fieldname) {
 			this.fld.value = d[this.fld.fieldname]; // refresh the value
 		}
-	}	
+	}
 };
 
 

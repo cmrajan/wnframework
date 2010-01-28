@@ -289,12 +289,14 @@ Field.prototype.activate = function(docname) {
 		
 		if(this.input.focus){
 			try{this.input.focus();} catch(e){} // IE Fix - Unexpected call???
-		}		
+		}
+		this.input.field_object = this;
 	}
 	if(this.txt) {
 		try{this.txt.focus();} catch(e){} // IE Fix - Unexpected call???
 		this.txt.isactive = true;
 		this.btn.isactive = true;
+		this.txt.field_object = this;
 	}
 }
 // ======================================================================================
