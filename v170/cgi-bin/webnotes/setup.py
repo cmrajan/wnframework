@@ -2,7 +2,6 @@
 
 import webnotes
 
-
 def backup_all():
 	# backups folder
 	import os
@@ -73,7 +72,9 @@ def backup_db(db, from_all=0):
 		raise e
 
 def copy_db(source, target=''):
-	if not server_prefix:
+	import defs
+
+	if not defs.server_prefix:
 		webnotes.msgprint("Server Prefix must be set in defs.py")
 		raise Exception
 
@@ -91,7 +92,7 @@ def copy_db(source, target=''):
 	
 	return target
 
-def get_db_name(conn):
+def get_db_name(conn, server_prefix):
 	res = conn.sql('SHOW DATABASES')
 	db_list = []
 	for r in res:
@@ -126,7 +127,7 @@ def import_db(source, target='', is_accounts=0):
 
 	# get database number
 	if not target:
-		target = get_db_name(conn)
+		target = get_db_name(conn, defs.server_prefix)
 	
 	# all source database dumps in data
 	os.chdir('../data')
