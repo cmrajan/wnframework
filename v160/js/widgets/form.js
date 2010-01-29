@@ -462,6 +462,7 @@ function edit_record(dt, dn) {
 		dialog_record.onhide = function() {
 			if(cur_grid)
 				cur_grid.refresh_row(cur_grid_ridx, dialog_record.dn);
+			dialog_record.cur_frm = null;
 		}
 	}
 	

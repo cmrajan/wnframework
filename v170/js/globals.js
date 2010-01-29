@@ -1,6 +1,7 @@
 // constants
 var NEWLINE = '\n';
 var login_file = 'index.cgi';
+var version = 'v170';
 
 // user
 var profile;
@@ -22,9 +23,6 @@ var keypress_observers = [];
 var click_observers = [];
 
 var editAreaLoader;
-
-// ***** TEMP ********
-var user_fmt = 'dd-MM-yyyy';
 
 // ui
 var top_index=91;

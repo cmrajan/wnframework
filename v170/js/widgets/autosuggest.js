@@ -547,12 +547,9 @@ AutoSuggest.prototype.clearSuggestions = function () {
 	this.iHigh = 0;
 	
 	// refresh field value (in case not seleted and the suggestions timeout)
-	if(this.oP.fixed_options && cur_frm) {
-		if(this.fld.field_object) { // grid
-			var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
-		} else {
-			var d = locals[cur_frm.doctype][cur_frm.docname];
-		}
+	if(this.oP.fixed_options && this.fld.field_object) {
+		var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
+
 		if(this.fld.fieldname) {
 			this.fld.value = d[this.fld.fieldname]; // refresh the value
 		}

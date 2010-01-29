@@ -290,7 +290,6 @@ Field.prototype.activate = function(docname) {
 		if(this.input.focus){
 			try{this.input.focus();} catch(e){} // IE Fix - Unexpected call???
 		}
-		this.input.field_object = this;
 	}
 	if(this.txt) {
 		try{this.txt.focus();} catch(e){} // IE Fix - Unexpected call???
@@ -380,6 +379,7 @@ DateField.prototype.make_input = function() {
 
 		if(cal)_c.cal = cal; // set as global
 		
+		var user_fmt = me.user_fmt.replace('mm', 'MM');
 		_c.cal.select(me.txt, me.txt.getAttribute('id'), user_fmt);
 		if(isIE && window.event) {
     		window.event.cancelBubble = true;
@@ -393,7 +393,6 @@ DateField.prototype.make_input = function() {
 			_c.cal.hidePopup();	
 		} else {
 			hide_selects();
-			var user_fmt = me.user_fmt.replace('mm', 'MM');
 			new_widget('_c.CalendarPopup', me.show_cal, 1);
 		}
 	}
@@ -786,9 +785,14 @@ SelectField.prototype.make_input = function() {
 		// Single select
 		this.input = new SelectWidget(this.input_area, [], '80%');	
 		$y(this.input.wrapper, {marginLeft:'1px'});
-		this.txt = this.input.inp;
-		this.txt.fieldname = this.df.fieldname; // for reference
+
+		this.txt = this.input.inp;		
 		this.btn = this.input.btn;
+
+		// for reference
+		this.txt.field_object = this;
+		this.txt.fieldname = this.df.fieldname;
+
 		this.txt.onchange = function() {
 			if(me.validate)
 				me.validate();
