@@ -84,6 +84,7 @@ function Body() {
 		this.wrapper = $a($i('body_div'),'div');
 		this.header = $a(this.wrapper, 'div');
 		this.topmenu = $a(this.wrapper, 'div');
+		this.breadcrumbs = $a(this.wrapper, 'div');
 		this.body = $a(this.wrapper, 'div');
 		this.footer = $a(this.wrapper, 'div');
 		

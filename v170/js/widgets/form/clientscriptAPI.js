@@ -71,10 +71,10 @@ set_field_tip = function(n,txt) {
 
 refresh_field = function(n, docname, table_field) {
 	if(table_field) { // for table
-		if(dialog_record && dialog_record.display) {
+		if(_f.frm_dialog && _f.frm_dialog.display) {
 			// in dialog
-			if(dialog_record.cur_frm.fields_dict[n] && dialog_record.cur_frm.fields_dict[n].refresh)
-				dialog_record.cur_frm.fields_dict[n].refresh();
+			if(_f.frm_dialog.cur_frm.fields_dict[n] && _f.frm_dialog.cur_frm.fields_dict[n].refresh)
+				_f.frm_dialog.cur_frm.fields_dict[n].refresh();
 		} else {
 			var g = _f.cur_grid_cell;
 			if(g) var hc = g.grid.head_row.cells[g.cellIndex];
