@@ -19,7 +19,6 @@ _f.FrmContainer.prototype.make_head = function() {
 	// ------------------
 
 	var div = $a(this.head, 'div', '', {backgroundColor: this.bg_color});
-	$(div).corner('5px');
 	this.tbartab = make_table(div, 1, 2, '100%', ['50%','50%'],{ paddingTop:'2px'});
 
 	// left side - headers
@@ -105,6 +104,8 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.last_comment.img = $a($td(t,0,0), 'img','',{width:'40px',marginBottom:'8px'});
 	this.last_comment.comment = $a($td(t,0,1),'div','',{backgroundColor:'#FFFAAA', padding:'4px', height:'32px'})
 
+	// add corner
+	$(div).corner('5px');
 
 	// header elements
 	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title, this.last_update_area];
