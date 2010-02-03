@@ -341,7 +341,7 @@ Listing.prototype.hide_paging=function(){for(var i in this.paging_nav)$dh(this.p
 Listing.prototype.add_filter=function(label,ftype,options,tname,fname,cond){if(!this.filter_area){alert('[Listing] make() must be called before add_filter');}
 var me=this;if(!this.filter_set){var h=$a(this.filter_area,'div','',{fontSize:'14px',fontWeight:'bold',marginBottom:'4px'});h.innerHTML='Apply Filters';this.filter_area.div=$a(this.filter_area,'div');this.perm=[[1,1],]
 this.filters={};}
-$ds(this.filter_wrapper);$(this.filter_wrapper).corner();if((!this.inp_tab)||(this.inp_tab.rows[0].cells.length==this.filters_per_line)){this.inp_tab=$a(this.filter_area.div,'table','',{width:'100%'});this.inp_tab.insertRow(0);}
+$ds(this.filter_wrapper);$(this.filter_wrapper).corners();if((!this.inp_tab)||(this.inp_tab.rows[0].cells.length==this.filters_per_line)){this.inp_tab=$a(this.filter_area.div,'table','',{width:'100%'});this.inp_tab.insertRow(0);}
 var c=this.inp_tab.rows[0].insertCell(this.inp_tab.rows[0].cells.length);$y(c,{width:cint(100/this.filters_per_line)+'%',textAlign:'left',verticalAlign:'top'});var d1=$a(c,'div');d1.innerHTML=label;$y(d1,{marginBottom:'2px'});var d2=$a(c,'div');if(in_list(['Text','Small Text','Code','Text Editor'],ftype))
 ftype='Data';var inp=make_field({fieldtype:ftype,'label':label,'options':options},'',d2,this,0,1);inp.not_in_form=1;inp.report=this;inp.df.single_select=1;inp.parent_cell=c;inp.parent_tab=this.input_tab;$y(inp.wrapper,{width:'140px'});inp.refresh();if(!inp.input.custom_select)
 $y(inp.input,{width:'100%'});inp.tn=tname;inp.fn=fname;inp.condition=cond;var me=this;inp.onchange=function(){me.start=0;}

@@ -153,7 +153,7 @@ _f.SectionBreak.prototype.make_simple_section=function(static){var head=$a(this.
 if(static){this.label=$a(head,'div','sectionHeading',{margin:'12px 0px 8px 0px'});this.label.innerHTML=this.df.label?this.df.label:'';return;}
 if(this.df.label){var t=make_table($a(head,'div'),1,2,'100%',['20px',null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,1),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';this.exp_icon=$a($td(t,0,0),'img','',{cursor:'pointer'});this.exp_icon.src=min_icon;this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
 this.exp_icon.expand=function(){$(me.row.body).slideDown();me.exp_icon.src=min_icon;}
-this.exp_icon.collapse=function(){$d(me.row.body).slideUp();me.exp_icon.src=exp_icon;}
+this.exp_icon.collapse=function(){$(me.row.body).slideUp();me.exp_icon.src=exp_icon;}
 $y(head,{padding:'2px',borderBottom:'1px solid #ccc',margin:'8px'});this.collapse=this.exp_icon.collapse;this.expand=this.exp_icon.expand;}else if(!has_col){$y(head,{margin:'8px',borderBottom:'2px solid #445'});}}
 _f.cur_sec_header=null;_f.SectionBreak.prototype.make_body=function(){if((!this.perm[this.df.permlevel])||(!this.perm[this.df.permlevel][READ])||this.df.hidden){return;}
 var me=this;if(this.frm.meta.section_style=='Tabbed'){if(this.df.options!='Simple'){this.sec_id=this.frm.sections.length;this.frm.sections[this.sec_id]=this;this.frm.sections_by_label[me.df.label]=this;this.mytab=this.frm.tabs.add_tab(me.df.label,function(){me.frm.set_section(me.sec_id);});this.hide=function(){this.row.hide();me.mytab.hide();}

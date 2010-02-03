@@ -265,7 +265,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	}
 	
 	$ds(this.filter_wrapper);
-	$(this.filter_wrapper).corner();
+	$(this.filter_wrapper).corners();
 
 	// create new table (or new line)
 	if((!this.inp_tab) || (this.inp_tab.rows[0].cells.length==this.filters_per_line)) {
