@@ -85,8 +85,16 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		// exp / collapse
 		this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
 		this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
-		this.exp_icon.expand = function() { $(me.row.body).slideDown(); me.exp_icon.src = min_icon; }
-		this.exp_icon.collapse = function() { $(me.row.body).slideUp(); me.exp_icon.src = exp_icon; }
+		this.exp_icon.expand = function() { 
+			if(!isIE) $ds(me.row.body) 
+			else $(me.row.body).slideDown(); 
+			me.exp_icon.src = min_icon; 
+		}
+		this.exp_icon.collapse = function() { 
+			if(!isIE) $dh(me.row.body) 
+			else $(me.row.body).slideUp(); 
+			me.exp_icon.src = exp_icon; 
+		}
 		$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
 		
 		// callable functions

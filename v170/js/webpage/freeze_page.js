@@ -7,7 +7,7 @@ function freeze(msg, do_freeze) {
 	if(msg) {
 		if(!dialog_message) {
 			dialog_message = $a('dialogs','div','dialog_message');
-			$(dialog_message).corners();
+			//$(dialog_message).corners();
 		}
 
 		var d = get_screen_dims();
@@ -24,7 +24,7 @@ function freeze(msg, do_freeze) {
 }
 function unfreeze() {
 	if(dialog_message)
-		$(dialog_message).fadeOut();
+		$dh(dialog_message);
 	if(!fcount)return; // anything open?
 	fcount--;
 	if(!fcount) {

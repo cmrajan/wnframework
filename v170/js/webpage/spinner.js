@@ -11,11 +11,11 @@ function set_loading() {
 	var d = $i('loading_div');
 	if(!d)return;
 
-	$(d).corners();
+	if(!isIE)$(d).corners();
 	//d.style.left = (cint(get_screen_dims().w)/2 - 40) + 'px';
 	d.style.top = (get_scroll_top()+10)+'px';
 
-	if($.browser.msie) $ds(d)
+	if(isIE) $ds(d)
 	else $(d).fadeIn();
 	pending_req++;
 }
@@ -24,7 +24,7 @@ function hide_loading() {
 	if(!d)return;
 	pending_req--;
 	if(!pending_req){
-		if($.browser.msie) $dh(d)
+		if(isIE) $dh(d)
 		else $(d).fadeOut();
 	}
 }

@@ -22,9 +22,6 @@ _f.FrmContainer.prototype.make_head = function() {
 	var div = $a(this.head, 'div', '', {backgroundColor: this.bg_color});
 	this.tbartab = make_table(div, 1, 2, '100%', ['50%','50%'],{ paddingTop:'2px'});
 
-	// add corner
-	$(div).corners('5px');
-
 	// left side - headers
 	// -------------------
 	$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 8px'});

@@ -11,9 +11,7 @@ _r.ReportContainer = function() {
 
 	var div = $a(this.wrapper, 'div');
 	var inner = $a(div, 'div', '', {backgroundColor:'#DFD', padding:'6px 8px 4px 8px'});
-	
-	if(!$.browser.msie)$(inner).corners();
-	
+		
 	var htab = make_table(inner, 1,2, '100%', ['80%','20%']);
 	
 	this.main_title = $a($td(htab,0,0),'div','',{fontFamily:'Helvetica', display:'inline', fontSize:'24px'});
