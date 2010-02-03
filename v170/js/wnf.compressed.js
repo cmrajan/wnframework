@@ -412,8 +412,7 @@ this.make_dropdown(tm,this.dropdown_width);return tm.dropdown.add_item(label,onc
 var all_dropdowns=[];var cur_dropdown;function DropdownMenu(parent,width){this.body=$a(parent,'div','menu_toolbar_dropdown',{width:(width?width:'140px'),display:'none'});this.parent=parent;this.items={};this.item_style='dd_item';this.item_mo_style='dd_item_mo';this.list=[];this.max_height=400;this.keypressdelta=500;var me=this;this.body.onmouseout=function(){me.clear();}
 this.body.onmouseover=function(){mcancelclosetime();}
 this.clear_user_inp=function(){me.user_inp='';}
-this.show=function(){mclose();mcancelclosetime();hide_selects();$(me.body).slideDown("fast");if(cint(me.body.clientHeight)>=me.max_height){$y(me.body,{height:me.max_height+'px'});me.scrollbars=1;}else{$y(me.body,{height:null});me.scrollbars=0;}
-me.is_active=1;}
+this.show=function(){mclose();mcancelclosetime();hide_selects();me.is_active=1;$ds(me.body);if(cint(me.body.clientHeight)>=me.max_height){$y(me.body,{height:me.max_height+'px'});me.scrollbars=1;}else{$y(me.body,{height:null});me.scrollbars=0;}}
 this.hide=function(){$dh(me.body);if(!frozen)show_selects();me.is_active=0;if(me.parent.label){me.parent.label.set_unselected();}}
 this.clear=function(){mcancelclosetime();mclosetime();}
 all_dropdowns.push(me);}

@@ -2,6 +2,7 @@ _r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
 	
 	$dh(this.wrapper);
+	$y(this.wrapper, {margin:'4px'});
 	
 	var me = this;
 	this.rb_dict = {};
@@ -9,7 +10,11 @@ _r.ReportContainer = function() {
 	// tool bar
 
 	var div = $a(this.wrapper, 'div');
-	var htab = make_table($a(div,'div','',{padding:'6px 8px 4px 8px', backgroundColor:'#DFD'}), 1,2, '100%', ['80%','20%']);
+	var inner = $a(div, 'div', '', {backgroundColor:'#DFD', padding:'6px 8px 4px 8px'});
+	
+	if(!$.browser.msie)$(inner).corner('5px');
+	
+	var htab = make_table(inner, 1,2, '100%', ['80%','20%']);
 	
 	this.main_title = $a($td(htab,0,0),'div','',{fontFamily:'Helvetica', display:'inline', fontSize:'24px'});
 		

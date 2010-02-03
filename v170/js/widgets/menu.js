@@ -105,9 +105,7 @@ function DropdownMenu(parent, width) {
 
 		me.is_active = 1;
 		
-		$(me.body).slideDown("fast");
-
-		//$ds(me.body); // show
+		$ds(me.body); // show
 
 		if(cint(me.body.clientHeight) >= me.max_height) {
 			$y(me.body, {height:me.max_height + 'px'});

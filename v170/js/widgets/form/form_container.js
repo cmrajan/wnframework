@@ -15,14 +15,15 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.head = $a(this.wrapper, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px'});
 	this.body = $a(this.wrapper,'div');
 
-	// add corner
-	if(!$.browser.msie)$(div).corner('5px');
 	
 	// Row 1
 	// ------------------
 
 	var div = $a(this.head, 'div', '', {backgroundColor: this.bg_color});
 	this.tbartab = make_table(div, 1, 2, '100%', ['50%','50%'],{ paddingTop:'2px'});
+
+	// add corner
+	if(!$.browser.msie)$(div).corner('5px');
 
 	// left side - headers
 	// -------------------
