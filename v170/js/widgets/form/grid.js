@@ -29,7 +29,7 @@ _f.Grid.prototype.make_ui = function(parent) {
 	this.main_title = $td(ht,0,0); this.main_title.className = 'columnHeading';
 	$td(ht,0,1).style.textAlign = 'right';
 	this.tbar_div = $a($td(ht,0,1), 'div', 'grid_tbarlinks');
-	$(this.tbar_div).corner('tr tl 5px');
+	$(this.tbar_div).corners('top-right top-left');
 	this.tbar_tab = make_table(this.tbar_div,1,4,'100%',['25%','25%','25%','25%']);	
 			
 	this.wrapper = $a(parent, 'div', 'grid_wrapper');

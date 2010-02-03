@@ -65,7 +65,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		if(col!='FFF') {
 			
 			$y(this.row.sub_wrapper, { margin:'8px', padding: '0px' ,backgroundColor: ('#' + col)} );
-			$(this.row.sub_wrapper).corner();
+			$(this.row.sub_wrapper).corners();
 		}
 	}
 		
@@ -85,8 +85,8 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		// exp / collapse
 		this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
 		this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
-		this.exp_icon.expand = function() { $ds(me.row.body); me.exp_icon.src = min_icon; }
-		this.exp_icon.collapse = function() { $dh(me.row.body); me.exp_icon.src = exp_icon; }
+		this.exp_icon.expand = function() { $(me.row.body).slideDown(); me.exp_icon.src = min_icon; }
+		this.exp_icon.collapse = function() { $d(me.row.body).slideUp(); me.exp_icon.src = exp_icon; }
 		$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
 		
 		// callable functions
@@ -150,7 +150,7 @@ _f.SectionBreak.prototype.make_body = function() {
 					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
 				}
 			);
-			$(this.header).corner('tl bl 5px');
+			$(this.header).corners('top-left bottom-left');
 			
 			this.hide = function() { 
 				this.row.hide();

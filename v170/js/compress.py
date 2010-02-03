@@ -9,7 +9,7 @@ in_files_main = [
        ,'utils/msgprint.js'
        ,'utils/json.js'
        ,'jquery/jquery-1.4.min.js'
-       ,'jquery/jquery.corner.js'
+       ,'jquery/jquery.corners.js'
        #,'jquery/jquery.shadow.pack.js'
        ,'widgets/dialog.js'
        ,'widgets/listing.js'

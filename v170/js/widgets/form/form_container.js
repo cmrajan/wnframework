@@ -23,7 +23,7 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.tbartab = make_table(div, 1, 2, '100%', ['50%','50%'],{ paddingTop:'2px'});
 
 	// add corner
-	if(!$.browser.msie)$(div).corner('5px');
+	$(div).corners('5px');
 
 	// left side - headers
 	// -------------------

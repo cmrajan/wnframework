@@ -7,7 +7,7 @@ function freeze(msg, do_freeze) {
 	if(msg) {
 		if(!dialog_message) {
 			dialog_message = $a('dialogs','div','dialog_message');
-			$(dialog_message).corner('5px');
+			$(dialog_message).corners();
 		}
 
 		var d = get_screen_dims();

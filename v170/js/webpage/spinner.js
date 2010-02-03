@@ -11,7 +11,7 @@ function set_loading() {
 	var d = $i('loading_div');
 	if(!d)return;
 
-	if(!$.browser.msie)$(d).corner('5px');
+	$(d).corners();
 	//d.style.left = (cint(get_screen_dims().w)/2 - 40) + 'px';
 	d.style.top = (get_scroll_top()+10)+'px';
 

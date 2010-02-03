@@ -275,7 +275,7 @@ _f.Frm.prototype.setup_tabs = function() {
 _f.Frm.prototype.setup_tips = function() {
 	var me = this;
 	this.tip_box = $a(this.tip_wrapper, 'div', 'frm_tip_box');
-	$(this.tip_box).corner('5px');
+	$(this.tip_box).corners();
 
 	var tab = $a(this.tip_box, 'table');
 	var r = tab.insertRow(0);

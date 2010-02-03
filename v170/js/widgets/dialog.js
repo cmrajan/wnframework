@@ -10,13 +10,13 @@ function Dialog(w, h, title, content) {
 	this.w = w;
 	this.h = h;
 
-	if(!$.browser.msie)$(this.wrapper).corner();
+	$(this.wrapper).corners();
 
 	$w(this.wrapper,w + 'px');
 	//$h(this.wrapper,h + 'px');
 	
 	this.head = $a(this.wrapper, 'div', 'dialog_head');
-	$(this.head).corner('tr tl 5px');
+	$(this.head).corners('top-right top-left');
 
 	this.body = $a(this.wrapper, 'div', 'dialog_body');
 	
