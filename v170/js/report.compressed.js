@@ -117,13 +117,13 @@ this.query='SELECT '+fl.join(',')+' FROM '+tn+' WHERE '+cl.join('\n AND ');if(sc
 this.query=repl(this.query,me.dt.filter_vals)}
 if(me.show_query.checked){this.show_query=1;}
 if(me.current_loaded)this.rep_name=me.current_loaded;else this.rep_name=me.doctype;}}
-_r.ReportFilters=function(rb){this.rb=rb;this.first_page_filter=$a(rb.mytabs.tabs['Result'].tab_body,'div','finder_filter_area');this.filter_area=$a(rb.mytabs.tabs['More Filters'].tab_body,'div','finder_filter_area');this.filter_fields_area=$a(this.filter_area,'div');}
+_r.ReportFilters=function(rb){this.rb=rb;this.first_page_filter=$a(rb.mytabs.tabs['Result'].tab_body,'div','finder_filter_area');this.filter_area=$a(rb.mytabs.tabs['More Filters'].tab_body,'div','finder_filter_area');$(this.filter_area).corner();this.filter_fields_area=$a(this.filter_area,'div');}
 _r.ReportFilters.prototype.refresh=function(){var fl=this.rb.filter_fields
 for(var i=0;i<fl.length;i++){var f=fl[i];if(f.df.filter_hide){$dh(f.wrapper);}else{$ds(f.wrapper);}
 if(f.df.bold){if(f.label_cell)
 $y(f.label_cell,{fontWeight:'bold'})}else{if(f.label_cell)$y(f.label_cell,{fontWeight:'normal'})}
 if(f.df['report_default'])
-f.set_input(f.df['report_default']);if(f.df.in_first_page){f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);this.first_page_filter.appendChild(f.df.filter_cell);this.rb.has_primary_filters=1;$ds(this.first_page_filter);}}}
+f.set_input(f.df['report_default']);if(f.df.in_first_page){f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);this.first_page_filter.appendChild(f.df.filter_cell);this.rb.has_primary_filters=1;$ds(this.first_page_filter);$(this.first_page_filter).corner();}}}
 _r.ReportFilters.prototype.add_date_field=function(cell,f,dt){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label='From '+f1.label;var tmp1=this.make_field_obj(f1,dt,my_div);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label='To '+f2.label;var tmp2=this.make_field_obj(f2,dt,my_div);tmp2.sql_condition='<=';tmp2.bound='upper';}
 _r.ReportFilters.prototype.add_numeric_field=function(cell,f,dt){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label=f1.label+' >=';var tmp1=this.make_field_obj(f1,dt,my_div);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label=f2.label+' <=';var tmp2=this.make_field_obj(f2,dt,my_div);tmp2.sql_condition='<=';tmp2.bound='upper';}
 _r.ReportFilters.prototype.make_field_obj=function(f,dt,parent){var tmp=make_field(f,dt,parent,this.rb,false);tmp.not_in_form=true;tmp.refresh();this.rb.filter_fields[this.rb.filter_fields.length]=tmp;this.rb.filter_fields_dict[f.parent+'\1'+f.label]=tmp;return tmp;}
@@ -134,7 +134,7 @@ var cell=$a(fparent,'div','',{width:'70%'});f.filter_cell=cell;if(f.fieldtype=='
 if(f.fieldname!='docstatus')
 me.rb.orig_sort_list.push([f.label,'`tab'+f.parent+'`.`'+f.fieldname+'`']);if(f.def_filter)
 tmp.input.checked=true;}
-_r.ReportColumnPicker=function(rb){this.rb=rb;this.picker_area=$a(this.rb.mytabs.tabs['Select Columns'].tab_body,'div','finder_picker_area');this.all_fields=[];this.sel_idx=0;this.make_body();}
+_r.ReportColumnPicker=function(rb){this.rb=rb;this.picker_area=$a(this.rb.mytabs.tabs['Select Columns'].tab_body,'div','finder_picker_area');$(this.picker_area).corner();this.all_fields=[];this.sel_idx=0;this.make_body();}
 _r.ReportColumnPicker.prototype.make_body=function(){var t=make_table(this.picker_area,1,3,'100%',['33%','34%','33%'],{verticalAlign:'middle',textAlign:'center'});$a($td(t,0,0),'h3','',{marginBottom:'8px'}).innerHTML='Columns';this.unsel_fields=$a($td(t,0,0),'select','',{height:'200px',width:'80%',border:'1px solid #AAA'});this.unsel_fields.multiple=true;this.unsel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}
 var me=this;this.up_btn=$a($a($td(t,0,1),'div'),'button','',{width:'70px'});this.up_btn.innerHTML='Up &uarr;';this.up_btn.onclick=function(){me.move_up();}
 this.add_all=$a($a($td(t,0,1),'div'),'button','',{width:'40px'});this.add_all.innerHTML='&gt;&gt;';this.add_all.onclick=function(){me.move(me.unsel_fields,'add',1);}

@@ -746,8 +746,7 @@ div.finder_filter_area {
 	position: relative;
 	padding: 12px;
 	padding-top: 6px;
-	border:1px solid #CCF;
-	background-color: #F8F8FF;
+	background-color: #DDF;
 	margin-bottom: 8px;
 }
 
@@ -772,8 +771,7 @@ table.filter_tab td {
 div.finder_picker_area {
 	padding: 16px;
 	padding-top: 6px;
-	border:1px solid #AB8;
-	background-color: #FFE;
+	background-color: #FFD;
 	margin-bottom: 16px;
 }
 div.builder_field {

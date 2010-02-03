@@ -102,6 +102,8 @@ function DropdownMenu(parent, width) {
 		mcancelclosetime();
 		
 		hide_selects(); 
+
+		me.is_active = 1;
 		
 		$(me.body).slideDown("fast");
 
@@ -113,9 +115,7 @@ function DropdownMenu(parent, width) {
 		} else {
 			$y(me.body, {height:null});
 			me.scrollbars = 0;
-		}
-		
-		me.is_active = 1;
+		}		
 		
 	}
 
