@@ -19,7 +19,7 @@ function AutoSuggest(id, param) {
 		,delay:1000, offsety:-5, shownoresults: true, noresults: "No results!", maxheight: 250
 		,cache: true, maxentries: 25, fixed_options: false, xdelta: 0, ydelta: 5
 	}
-		
+	
 	for (k in def)
 	{
 		if (typeof(this.oP[k]) != typeof(def[k]))
@@ -547,7 +547,7 @@ AutoSuggest.prototype.clearSuggestions = function () {
 	this.iHigh = 0;
 	
 	// refresh field value (in case not seleted and the suggestions timeout)
-	if(this.oP.fixed_options && this.fld.field_object) {
+	if(this.oP.fixed_options && this.fld.field_object && this.fld.field_object.docname) {
 		var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
 
 		if(this.fld.fieldname) {

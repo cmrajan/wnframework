@@ -123,4 +123,4 @@ function setup_calendar() {
 
 startup_list.push(setup_calendar);
 
-window.onload = startup;
+ $(document).ready(startup);

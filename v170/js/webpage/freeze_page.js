@@ -1,17 +1,19 @@
 var fcount = 0;
 var frozen = 0;
+var dialog_message;
 
 function freeze(msg, do_freeze) {
 	// show message
 	if(msg) {
-		var div = $i('dialog_message');
+		if(!dialog_message) {
+			dialog_message = $a('dialogs','div','dialog_message');
+			$(dialog_message).corner('5px');
+		}
 
 		var d = get_screen_dims();
-		div.style.left = ((d.w - 250)/2) + 'px';
-		div.style.top  = (get_scroll_top() + 200) + 'px';
-		
-		div.innerHTML = '<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';
-		$ds(div);
+		$y(dialog_message, {left : ((d.w - 250)/2) + 'px', top  : (get_scroll_top() + 200) + 'px'});
+		dialog_message.innerHTML = '<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';
+		$ds(dialog_message);
 	} 
 	
 	// blur
@@ -21,7 +23,8 @@ function freeze(msg, do_freeze) {
 	frozen = 1;
 }
 function unfreeze() {
-	$dh($i('dialog_message'));
+	if(dialog_message)
+		$(dialog_message).fadeOut();
 	if(!fcount)return; // anything open?
 	fcount--;
 	if(!fcount) {

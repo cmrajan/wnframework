@@ -77,7 +77,7 @@ MenuToolbar.prototype.add_item = function(top_menu_label, label, onclick, on_top
 
 var all_dropdowns = []; var cur_dropdown;
 function DropdownMenu(parent, width) {
-	this.body = $a(parent, 'div', 'menu_toolbar_dropdown', {width:(width ? width : '140px')});
+	this.body = $a(parent, 'div', 'menu_toolbar_dropdown', {width:(width ? width : '140px'), display:'none'});
 	this.parent = parent;
 	this.items = {};
 	this.item_style = 'dd_item';
@@ -102,7 +102,10 @@ function DropdownMenu(parent, width) {
 		mcancelclosetime();
 		
 		hide_selects(); 
-		$ds(me.body); // show
+		
+		$(me.body).slideDown("fast");
+
+		//$ds(me.body); // show
 
 		if(cint(me.body.clientHeight) >= me.max_height) {
 			$y(me.body, {height:me.max_height + 'px'});
@@ -117,7 +120,9 @@ function DropdownMenu(parent, width) {
 	}
 
 	this.hide = function() {
-		$dh(me.body); // hide
+		$(me.body).slideUp("fast");
+
+		//$dh(me.body); // hide
 		if(!frozen)show_selects();
 		
 		// clear from active list

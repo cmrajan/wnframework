@@ -14,7 +14,8 @@ list_opts = {
 	show_empty_tab : 1,
 	show_bottom_paging: 1,
 	round_corners: 1,
-	no_border: 0
+	no_border: 0,
+	append_records: 0
 };
 function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
@@ -264,6 +265,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	}
 	
 	$ds(this.filter_wrapper);
+	$(this.filter_wrapper).corner();
 
 	// create new table (or new line)
 	if((!this.inp_tab) || (this.inp_tab.rows[0].cells.length==this.filters_per_line)) {
@@ -460,7 +462,9 @@ Listing.prototype.run = function(from_page) {
 			me.n_records = r.values.length;
 			var nc = r.values[0].length;
 			if(me.colwidths) nc = me.colwidths.length-(me.no_index?0:1); // -1 for sr no
-			if(!me.show_empty_tab) {
+
+			// redraw table
+			if(!me.opts.append_records && !me.show_empty_tab) {
 				me.remove_result_tab();
 				me.make_result_tab(r.values.length);
 			}
@@ -468,13 +472,15 @@ Listing.prototype.run = function(from_page) {
 			me.total_records = r.n_values;
 			me.set_rec_label(r.n_values, r.values.length);
 		} else { // no result
-			me.n_records = 0;
-			me.set_rec_label(0);
-			if(!me.show_empty_tab) {
-				me.remove_result_tab();
-				me.make_result_tab(0);
-			} else {
-				me.clear_tab();
+			if(!me.opts.append_records) {
+				me.n_records = 0;
+				me.set_rec_label(0);
+				if(!me.show_empty_tab) {
+					me.remove_result_tab();
+					me.make_result_tab(0);
+				} else {
+					me.clear_tab();
+				}
 			}
 		}
 		$ds(me.results);

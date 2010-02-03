@@ -21,38 +21,6 @@ function set_opacity(ele, ieop) {
 	}
 }
 
-function animate(ele, style_key, from, to, callback) {
-	steps = 10; intervals = 20; powr = 0.5
-    if (ele.animateMemInt) {
-    	window.clearInterval(ele.animateMemInt);
-    }
-    var actStep = 0;
-    ele.animateMemInt = window.setInterval(
-		function() { 
-		  ele.currentAnimateVal = easeInOut(cint(from),cint(to),steps,actStep,powr);
-		  if(in_list(['width','height','top','left'],style_key)) 
-		  	ele.currentAnimateVal = ele.currentAnimateVal + "px";
-		  if(style_key=='opacity')
-		  	set_opacity(ele, ele.currentAnimateVal);
-		  else
-		  	ele.style[style_key] = ele.currentAnimateVal;
-		  	
-		  actStep++;
-		  if (actStep > steps) {
-		  	window.clearInterval(ele.animateMemInt);
-		  	if(callback)callback(ele);
-		  }
-		} 
-		,intervals
-	)
-}
-
-function easeInOut(minValue,maxValue,totalSteps,actualStep,powr) { 
-	var delta = maxValue - minValue; 
-	var stepp = minValue+(Math.pow(((1 / totalSteps) * actualStep), powr) * delta); 
-	return Math.ceil(stepp) 
-}
-
 // Dom
 
 function empty_select(s) {

@@ -10,10 +10,14 @@ function Dialog(w, h, title, content) {
 	this.w = w;
 	this.h = h;
 
+	$(this.wrapper).corner();
+
 	$w(this.wrapper,w + 'px');
 	//$h(this.wrapper,h + 'px');
 	
 	this.head = $a(this.wrapper, 'div', 'dialog_head');
+	$(this.head).corner('tr tl 5px');
+
 	this.body = $a(this.wrapper, 'div', 'dialog_body');
 	
 	this.make_head(title);

@@ -3,6 +3,7 @@ _f.FrmContainer = function() {
 	
 	// create hidden
 	$dh(this.wrapper);
+	$y(this.wrapper,{margin:'4px'});
 	
 	this.make_head();
 	this.make_toolbar();
@@ -16,7 +17,10 @@ _f.FrmContainer.prototype.make_head = function() {
 
 	// Row 1
 	// ------------------
-	this.tbartab = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%'],{backgroundColor: this.bg_color, paddingTop:'2px'});
+
+	var div = $a(this.head, 'div', '', {backgroundColor: this.bg_color});
+	$(div).corner('5px');
+	this.tbartab = make_table(div, 1, 2, '100%', ['50%','50%'],{ paddingTop:'2px'});
 
 	// left side - headers
 	// -------------------
@@ -89,6 +93,7 @@ _f.FrmContainer.prototype.make_head = function() {
 	// created / modified
 	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
 	this.owner_img.is_inline = 1;
+
 	this.mod_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
 	this.mod_img.is_inline = 1;
 

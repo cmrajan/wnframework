@@ -275,6 +275,7 @@ _f.Frm.prototype.setup_tabs = function() {
 _f.Frm.prototype.setup_tips = function() {
 	var me = this;
 	this.tip_box = $a(this.tip_wrapper, 'div', 'frm_tip_box');
+	$(this.tip_box).corner('5px');
 
 	var tab = $a(this.tip_box, 'table');
 	var r = tab.insertRow(0);
@@ -286,7 +287,8 @@ _f.Frm.prototype.setup_tips = function() {
 	c0.style.width = '24px';
 	
 	this.set_tip = function(t, icon) {
-		me.c1.innerHTML = t; $ds(me.tip_box);
+		me.c1.innerHTML = t; 
+		$(me.tip_box).fadeIn();
 		if(icon) this.img.setAttribute('src','images/icons/'+icon);
 	}
 	this.append_tip = function(t) {

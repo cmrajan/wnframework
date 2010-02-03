@@ -142,13 +142,8 @@ function TreeNode(tree, parent, id, imagesrc, onclick, onexpand, opts, label) {
     	me.expand();
   }
   this.collapse = function() {
-  	me.body.orig_height = cint(me.body.clientHeight);
-  	if(me.tree.do_animate)
-	  	animate(me.body, 'height', cint(me.body.clientHeight), 0, function(ele) { $dh(ele); ele.style.height = null;} );
-    else
-	    $dh(me.body);
-    if(me.expimage && me.expimage.src)me.expimage.src = me.exp_img ? me.exp_img : me.tree.exp_img;
     me.expanded = 0;
+    $(me.body).slideUp();
   }
   this.expand = function() {
     if(me.onexpand && !me.expanded_once){
@@ -160,18 +155,9 @@ function TreeNode(tree, parent, id, imagesrc, onclick, onexpand, opts, label) {
     me.expanded = 1;
     me.expanded_once = 1;
   }
-  this.show_expanded = function() {
+  this.show_expanded = function() {  	
   	if(me.tree.do_animate && (!keys(me.nodes).length)) return; // no children
-	$ds(me.body);
-  	if(!me.body.orig_height)
-  		me.body.orig_height = me.body.clientHeight;
-  	if(me.tree.do_animate) {
-  		$y(me.body,{height:'0px'});
-  		animate(me.body, 'height', 0, (me.body.orig_height ? me.body.orig_height : cint(me.body.clientHeight)), function(ele) { ele.style.height = null;} );
-  	}
-    if(me.opts.show_exp_img && me.expimage && me.expimage.src) {
-    	me.expimage.src = me.col_img ? me.col_img : me.tree.col_img;
-    }  	
+  	$(me.body).slideDown();
   }
 
   this.setlabel = function(l) {

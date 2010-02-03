@@ -63,22 +63,14 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		has_col = true;
 		var col = this.df.colour.split(':')[1];
 		if(col!='FFF') {
-			//if(!_f.section_border)
-			//	_f.section_border = RUZEE.ShadedBorder.create({ corner:4, border: 0 });
-
-			//_f.section_border.render(this.row.sub_wrapper);
 			
-			$y(this.row.sub_wrapper, {
-				margin:'8px', padding: '0px'
-				//,border:('1px solid #' + get_darker_shade(col, 0.75))
-				//,borderBottom:('2px solid #' + get_darker_shade(col))
-				,backgroundColor: ('#' + col)}
-			);
+			$y(this.row.sub_wrapper, { margin:'8px', padding: '0px' ,backgroundColor: ('#' + col)} );
+			$(this.row.sub_wrapper).corner();
 		}
 	}
 		
 	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', {margin:'8px 0px'});
+		this.label = $a(head, 'div', 'sectionHeading', {margin:'12px 0px 8px 0px'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
 		return;
 	}
@@ -148,33 +140,26 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.frm.sections_by_label[me.df.label] = this;
 			
 			var w=$a(this.frm.tray_area, 'div');
-			this.header = $a(w, 'div', 'sec_tray_tab');
-			this.header.bottom = $a(w, 'div', 'sec_tray_tab_bottom');
+			this.header = $a(w, 'div', '', {padding: '4px 8px'});
 			this.header.innerHTML = me.df.label;		
 			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
-			this.header.onmouseover = function() { 
-				if(isIE)return; // ie disappearing table error
-				if(_f.cur_sec_header != this) {
-					this.className = 'sec_tray_tab tray_tab_mo'; 
-					this.bottom.className = 'sec_tray_tab_bottom tray_tab_mo_bottom';
+			
+			$(this.header).hover(function() {
+					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
+				}, function() {
+					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
 				}
-			}
-			this.header.onmouseout = function() {
-				if(isIE)return;
-				if(_f.cur_sec_header != this) {
-					this.className = 'sec_tray_tab'; 
-					this.bottom.className = 'sec_tray_tab_bottom'; 
-				}
-			}
+			);
+			$(this.header).corner('tl bl 5px');
+			
 			this.hide = function() { 
 				this.row.hide();
-				this.header.className = 'sec_tray_tab'; 
-				this.header.bottom.className = 'sec_tray_tab_bottom'; 
+				$y(this.header, { backgroundColor:'#FFF', fontWeight:'normal', color:'#000'} );
 			}
 			this.show = function() { 
 				this.row.show(); 
-				this.header.className = 'sec_tray_tab tray_tab_sel';
-				this.header.bottom.className = 'sec_tray_tab_bottom tray_tab_sel_bottom';
+				$y(this.header, { backgroundColor:'#AAA', fontWeight:'bold', color:'#FFF'} );
+
 				_f.cur_sec_header = this.header;
 				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);

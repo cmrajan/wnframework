@@ -55,24 +55,14 @@ div.no_script {
 
 #loading_div {
 	position: absolute;
-	border: 1px solid #F7E522;
-	background-color: #FFFEE2;
+	background-color: #FF8;
 	z-index: 99;
-	right: 10px;
+	right: 5px;
 	display: none;
-}
-#loading_div td {
-	vertical-align: middle;
 	text-align: center;
-	padding: 2px;
-	color: #888;
+	padding: 4px 8px;
+	font-weight: bold;
 }
-#loadingImage {
-	position: absolute;
-	right: 26px;
-	top: 2px;
-}
-
 
 div#head_div { background-color: #FFF; }
 
@@ -243,10 +233,9 @@ div.frm_wrapper {
 }
 
 div.grid_tbarlinks {
-	border: 1px solid #AAB;
 	border-bottom: 0px;
-	background-color: #ECECDB;
-	padding: 2px;
+	background-color: #D6D6C5;
+	padding: 4px 4px 2px 4px;
 	width: 180px;
 	float: right;
 }
@@ -272,8 +261,7 @@ div.frm_body {
 div.frm_tip_box {
 	margin: 8px;
 	padding: 8px;
-	border: 1px solid #FFD;
-	background-color: #FFE;
+	background-color: #FFC;
 	display: none;
 }
 
@@ -355,36 +343,6 @@ div.frm_tray_head {
 	padding: 4px;
 	font-weight: bold;
 }
-
-div.sec_tray_tab {
-	cursor: pointer;
-	padding-top: 5px;
-	padding-left: 5px;
-	margin-left: 4px;
-}
-div.sec_tray_tab_bottom {
-	height: 5px;
-	font-size: 1px;
-	margin-left: 4px;
-}
-
-div.tray_tab_sel {
-	font-weight: bold;
-	color: #FFF;
-	background:url("../images/ui/rc/tray-left-top.gif") no-repeat left top;
-	background-color: #AAAAAA;
-}
-div.tray_tab_sel_bottom {
-	background:url("../images/ui/rc/tray-left-bottom.gif") no-repeat left bottom;
-	background-color: #AAAAAA;
-}
-div.tray_tab_mo {
-	background-color: #EEE;
-}
-div.tray_tab_mo_bottom {
-	background-color: #EEE;
-}
-
 /*------------------*/
 
 .top_cell {
@@ -1049,7 +1007,7 @@ div#dialogs {
 	left: 0px;
 }
 
-div#dialog_message {
+div.dialog_message {
 	display: none;
 	position: absolute;
 	width: 250px;
@@ -1057,7 +1015,7 @@ div#dialog_message {
 	z-index: 91;
 	background-color:#FFF;
 	padding: 12px;
-	border: 2px solid #444;
+	border: 1px solid #444;
 }
 
 div#dialog_message .sb-inner { 
@@ -1126,7 +1084,7 @@ A.cpTodayText { color:black; }
 div.cal_wrapper { margin: 16px; }
 div.cal_body {
 	height: 400px;
-	background-color: #F2F2F2;
+	background-color: #DDD;
 	position: relative;
 }
 
@@ -1462,11 +1420,12 @@ div.autosuggest ul li a
 }
 div.autosuggest ul li a:hover
 {
-	background-color: #FFC;
+
 }
 div.autosuggest ul li.as_highlight a:hover
 {
-	background-color: #FF8;
+	background-color: #22F;
+	color: #FFF;
 }
 
 div.autosuggest ul li a span
@@ -1486,13 +1445,17 @@ div.autosuggest ul li a span small
 
 div.autosuggest ul li.as_highlight a span small
 {
-	color: #444;
+	color: #FFF;
+}
+
+div.autosuggest ul li.as_highlight a span {
+	color: #FFF;	
 }
 
 div.autosuggest ul li.as_highlight a
 {
-	color: #444;
-	background-color: #FF8;
+	color: #FFF;
+	background-color: #22F;
 }
 
 div.autosuggest ul li.as_warning
