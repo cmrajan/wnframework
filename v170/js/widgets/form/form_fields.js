@@ -148,14 +148,14 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.frm.sections_by_label[me.df.label] = this;
 			
 			var w=$a(this.frm.tray_area, 'div');
-			this.header = $a(w, 'div', '', {padding: '4px 8px'});
-			this.header.innerHTML = me.df.label;		
+			this.header = $a(w, 'div', '', {padding: '4px 8px', cursor:'pointer'});
+			this.header.innerHTML = me.df.label;
 			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
-			
+
 			$(this.header).hover(function() {
-					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
+					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); if(isIE) $(this).corner('top-left bottom-left'); }
 				}, function() {
-					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
+					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); if(isIE) $(this).corner('top-left bottom-left'); }
 				}
 			);
 			$(this.header).corners('top-left bottom-left');
@@ -163,11 +163,13 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.hide = function() { 
 				this.row.hide();
 				$y(this.header, { backgroundColor:'#FFF', fontWeight:'normal', color:'#000'} );
+				if(isIE) $(this.header).corner('top-left bottom-left')
 			}
 			this.show = function() { 
 				this.row.show(); 
 				$y(this.header, { backgroundColor:'#AAA', fontWeight:'bold', color:'#FFF'} );
-
+				if(isIE) $(this.header).corner('top-left bottom-left')
+				
 				_f.cur_sec_header = this.header;
 				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);

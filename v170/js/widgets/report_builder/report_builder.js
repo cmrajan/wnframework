@@ -804,7 +804,7 @@ _r.ReportFilters = function(rb) {
 	this.first_page_filter = $a(rb.mytabs.tabs['Result'].tab_body, 'div', 'finder_filter_area');
 	this.filter_area = $a(rb.mytabs.tabs['More Filters'].tab_body, 'div', 'finder_filter_area');
 	
-	$(this.filter_area).corners();
+	if(!isIE)$(this.filter_area).corners();
 
 	// filter fields area
 	this.filter_fields_area = $a(this.filter_area,'div');
@@ -845,7 +845,7 @@ _r.ReportFilters.prototype.refresh = function() {
 			this.first_page_filter.appendChild(f.df.filter_cell);
 			this.rb.has_primary_filters = 1;
 			$ds(this.first_page_filter);
-			$(this.first_page_filter).corners();
+			if(!isIE)$(this.first_page_filter).corners();
 		}
 	}
 }
@@ -959,7 +959,7 @@ _r.ReportColumnPicker = function(rb) {
 	this.rb = rb;
 	this.picker_area = $a(this.rb.mytabs.tabs['Select Columns'].tab_body, 'div', 'finder_picker_area');
 	
-	$(this.picker_area).corners();
+	if(!isIE)$(this.picker_area).corners();
 	
 	this.all_fields = [];
 	this.sel_idx = 0;
