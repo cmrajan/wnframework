@@ -63,7 +63,7 @@ def _validate_type_change(new, old):
 		raise Exception		
 
 def _change_column(f, dt, col_def):
-	if col_def:
+	if col_def and f[0]:
 		sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], _validate_column_name(f[1]), col_def))
 		webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
 			
@@ -102,9 +102,9 @@ def updatecolumns(doctype):
 		# changed
 		if change or (cur_def and col_def.lower() != cur_def.lower()):
 			# validate type change
-			_validate_type_change(f[2], f[4])
-			
-			_change_column(f, doctype, col_def)
+			if f[4]:
+				_validate_type_change(f[2], f[4])				
+				_change_column(f, doctype, col_def)
 	
 	# update the "old" columns
 	sql("start transaction")
