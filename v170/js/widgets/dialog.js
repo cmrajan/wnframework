@@ -6,20 +6,19 @@ var cur_dialog;
 var top_index=91;
 
 function Dialog(w, h, title, content) {
-	this.wrapper = $a('dialogs', 'div', 'dialog_wrapper', {backgroundColor:'#444',padding:'2px'});
+	this.wrapper = $a('dialogs', 'div', 'dialog_wrapper');
 	this.w = w;
 	this.h = h;
 
-	this.inner = $a(this.wrapper, 'div','',{backgroundColor:'#FFF'});
-
-	$(this.inner).corner('4px').parent().corner('8px');
+	if(!$.browser.msie)$(this.wrapper).corner();
 
 	$w(this.wrapper,w + 'px');
+	//$h(this.wrapper,h + 'px');
 	
-	this.head = $a(this.inner, 'div', 'dialog_head');
+	this.head = $a(this.wrapper, 'div', 'dialog_head');
 	$(this.head).corner('tr tl 5px');
 
-	this.body = $a(this.inner, 'div', 'dialog_body');
+	this.body = $a(this.wrapper, 'div', 'dialog_body');
 	
 	this.make_head(title);
 	if(content)this.make_body(content);
@@ -29,9 +28,6 @@ function Dialog(w, h, title, content) {
 	this.no_cancel_flag = 0; // allow to cancel
 	this.display = false;
 	var me = this;
-	
-	// shaded border
-	//this.my_border = RUZEE.ShadedBorder.create({ corner:4, border: 2, shadow:(isIE6 ? 0 : 0) });
 }
 
 Dialog.prototype.make_head = function(title) {

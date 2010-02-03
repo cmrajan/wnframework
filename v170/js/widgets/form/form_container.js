@@ -15,6 +15,9 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.head = $a(this.wrapper, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px'});
 	this.body = $a(this.wrapper,'div');
 
+	// add corner
+	if(!$.browser.msie)$(div).corner('5px');
+	
 	// Row 1
 	// ------------------
 
@@ -103,9 +106,6 @@ _f.FrmContainer.prototype.make_head = function() {
 	var t = make_table(this.last_comment,1,2,'100%',['40px','']);
 	this.last_comment.img = $a($td(t,0,0), 'img','',{width:'40px',marginBottom:'8px'});
 	this.last_comment.comment = $a($td(t,0,1),'div','',{backgroundColor:'#FFFAAA', padding:'4px', height:'32px'})
-
-	// add corner
-	$(div).corner('5px');
 
 	// header elements
 	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title, this.last_update_area];
