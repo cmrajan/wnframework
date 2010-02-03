@@ -8,6 +8,7 @@ from webnotes.model.doclist import getlist
 set = webnotes.conn.set
 sql = webnotes.conn.sql
 get_value = webnotes.conn.get_value
+convert_to_lists = webnotes.conn.convert_to_lists
 
 version = 'v170'
 NEWLINE = '\n'
