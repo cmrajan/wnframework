@@ -210,31 +210,8 @@ function $sum(t, cidx) {
 
 function objpos(obj){
   if(obj.substr)obj = $i(obj);
-  var acc_lefts = 0; var acc_tops = 0;
-  if(!obj)show_alert("No Object Specified");
-  var co={};
-  while (obj){ 
-  	acc_lefts += obj.offsetLeft; 
-  	acc_tops += obj.offsetTop;
-
-	if(isIE) {
-	    if (obj!= window.document.body){
-    		acc_tops -= obj.scrollTop; 
-    		//acc_lefts -= obj.scrollLeft;
-    	}
-    } else { // only for ff
-	    var op = obj.offsetParent
-	    var scr_obj = obj;
-	    
-	    while(scr_obj&&(scr_obj!=op)&&(scr_obj!=window.document.body)) { // scan all elements for scrolls
-		    acc_tops -= scr_obj.scrollTop; 
-		    //acc_lefts -= scr_obj.scrollLeft;
-			scr_obj = scr_obj.parentNode;
-		}
-	}
-	obj = obj.offsetParent;
-  }
-  co.x=acc_lefts, co.y=acc_tops; return co;
+  var p = $(obj).offset();
+  return {x : cint(p.left), y : cint(p.top) }
 }
 
 function get_screen_dims() {

@@ -357,7 +357,7 @@ AutoSuggest.prototype.createList = function(arr) {
 		mywid += 20;
 	}
 	
-	if(cint(mywid) < 70) mywid = 70;
+	if(cint(mywid) < 100) mywid = 100;
 	var left = pos.x - ((mywid - this.fld.offsetWidth)/2);
 	if(left<0) {
 		mywid = mywid + (left/2); left = 0;
