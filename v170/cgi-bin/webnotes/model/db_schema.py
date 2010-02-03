@@ -57,7 +57,7 @@ def _add_column(f, dt):
 
 def _validate_type_change(new, old):
 	if ((old.lower() in ['text','small text','code','text editor']) and (new.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old.lower() in ['data','select','link']) and (new.lower() in ['date','int','currency','float','time','table'])):
-		webnotes.msgprint('%s: Coversion from %s to %s is not allowed' % (new_fn, old_type, new_type_orig))
+		webnotes.msgprint('Coversion from %s to %s is not allowed' % (new, old))
 		raise Exception		
 
 def _change_column(f, dt, col_def):
