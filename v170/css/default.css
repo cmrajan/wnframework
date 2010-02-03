@@ -58,6 +58,7 @@ div.no_script {
 	background-color: #FF8;
 	z-index: 99;
 	right: 5px;
+	width: 70px;
 	display: none;
 	text-align: center;
 	padding: 4px 8px;
