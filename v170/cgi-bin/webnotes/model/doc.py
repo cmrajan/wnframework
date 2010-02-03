@@ -299,7 +299,9 @@ class Document:
 				del self.fields[f]
 
 	def clear_table(self, doclist, tablefield, save=0):
-		for d in getlist(doclist, tablefield):
+		import webnotes.model.doclist
+		
+		for d in webnotes.model.doclist.getlist(doclist, tablefield):
 			d.fields['__oldparent'] = d.parent
 			d.parent = 'old_parent:' + d.parent # for client to send it back while saving
 			d.docstatus = 2
