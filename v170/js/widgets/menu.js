@@ -120,7 +120,7 @@ function DropdownMenu(parent, width) {
 	}
 
 	this.hide = function() {
-		$(me.body).slideUp("fast");
+		$dh(me.body);
 
 		//$dh(me.body); // hide
 		if(!frozen)show_selects();

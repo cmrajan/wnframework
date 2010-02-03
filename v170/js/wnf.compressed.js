@@ -414,7 +414,7 @@ this.body.onmouseover=function(){mcancelclosetime();}
 this.clear_user_inp=function(){me.user_inp='';}
 this.show=function(){mclose();mcancelclosetime();hide_selects();$(me.body).slideDown("fast");if(cint(me.body.clientHeight)>=me.max_height){$y(me.body,{height:me.max_height+'px'});me.scrollbars=1;}else{$y(me.body,{height:null});me.scrollbars=0;}
 me.is_active=1;}
-this.hide=function(){$(me.body).slideUp("fast");if(!frozen)show_selects();me.is_active=0;if(me.parent.label){me.parent.label.set_unselected();}}
+this.hide=function(){$dh(me.body);if(!frozen)show_selects();me.is_active=0;if(me.parent.label){me.parent.label.set_unselected();}}
 this.clear=function(){mcancelclosetime();mclosetime();}
 all_dropdowns.push(me);}
 DropdownMenu.prototype.add_item=function(label,onclick,on_top){var me=this;if(on_top){var mi=document.createElement('div');me.body.insertBefore(mi,me.body.firstChild);mi.className=this.item_style;}else{var mi=$a(this.body,'div',this.item_style);}
@@ -804,9 +804,11 @@ d.wrapper.style.zIndex='95';selector=d;}
 function get_scroll_top(){var st=0;if(document.documentElement&&document.documentElement.scrollTop)
 st=document.documentElement.scrollTop;else if(document.body&&document.body.scrollTop)
 st=document.body.scrollTop;return st;}
-function set_loading(){var d=$i('loading_div');if(!d)return;$(d).corner('5px');d.style.top=(get_scroll_top()+10)+'px';$(d).fadeIn();pending_req++;}
+function set_loading(){var d=$i('loading_div');if(!d)return;$(d).corner('5px');d.style.top=(get_scroll_top()+10)+'px';if($.browser.msie)$ds(d)
+else $(d).fadeIn();pending_req++;}
 function hide_loading(){var d=$i('loading_div')
-if(!d)return;pending_req--;if(!pending_req)$(d).fadeOut();}
+if(!d)return;pending_req--;if(!pending_req){if($.browser.msie)$dh(d)
+else $(d).fadeOut();}}
 var fcount=0;var frozen=0;var dialog_message;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');$(dialog_message).corner('5px');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 $ds($i('dialog_back'));$y($i('dialog_back'),{height:get_page_size()[1]+'px'});fcount++;frozen=1;}
