@@ -14,7 +14,7 @@ Calendar.prototype.init=function (parent) {
 
 	this.wrapper = $a(parent, 'div', 'cal_wrapper');
  	this.body = $a(this.wrapper, 'div', 'cal_body');
- 	$(this.body).corner();
+ 	if(ui_effects)$(this.body).corner();
 
  	this.createheader();
  	

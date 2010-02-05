@@ -86,12 +86,12 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
 		this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
 		this.exp_icon.expand = function() { 
-			if(!isIE) $ds(me.row.body) 
+			if(ui_effects) $ds(me.row.body) 
 			else $(me.row.body).slideDown(); 
 			me.exp_icon.src = min_icon; 
 		}
 		this.exp_icon.collapse = function() { 
-			if(!isIE) $dh(me.row.body) 
+			if(ui_effects) $dh(me.row.body) 
 			else $(me.row.body).slideUp(); 
 			me.exp_icon.src = exp_icon; 
 		}
@@ -158,7 +158,7 @@ _f.SectionBreak.prototype.make_body = function() {
 					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
 				}
 			);
-			if(!isIE)$(this.header).corners('top-left bottom-left');
+			if(ui_effects)$(this.header).corners('top-left bottom-left');
 			
 			this.hide = function() { 
 				this.row.hide();

@@ -11,12 +11,12 @@ function set_loading() {
 	var d = $i('loading_div');
 	if(!d)return;
 
-	if(!isIE)$(d).corners();
+	if(ui_effects)$(d).corners();
 	//d.style.left = (cint(get_screen_dims().w)/2 - 40) + 'px';
 	d.style.top = (get_scroll_top()+10)+'px';
 
-	if(isIE) $ds(d)
-	else $(d).fadeIn();
+	if(ui_effects) $(d).fadeIn();
+	else $ds(d);
 	pending_req++;
 }
 function hide_loading() {
@@ -24,8 +24,8 @@ function hide_loading() {
 	if(!d)return;
 	pending_req--;
 	if(!pending_req){
-		if(isIE) $dh(d)
-		else $(d).fadeOut();
+		if(ui_effects) $(d).fadeOut();
+		else $dh(d);
 	}
 }
 

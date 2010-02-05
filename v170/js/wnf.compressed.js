@@ -841,11 +841,9 @@ d.wrapper.style.zIndex='95';selector=d;}
 function get_scroll_top(){var st=0;if(document.documentElement&&document.documentElement.scrollTop)
 st=document.documentElement.scrollTop;else if(document.body&&document.body.scrollTop)
 st=document.body.scrollTop;return st;}
-function set_loading(){var d=$i('loading_div');if(!d)return;if(!isIE)$(d).corners();d.style.top=(get_scroll_top()+10)+'px';if(isIE)$ds(d)
-else $(d).fadeIn();pending_req++;}
+function set_loading(){var d=$i('loading_div');if(!d)return;if(ui_effects)$(d).corners();d.style.top=(get_scroll_top()+10)+'px';if(ui_effects)$(d).fadeIn();else $ds(d);pending_req++;}
 function hide_loading(){var d=$i('loading_div')
-if(!d)return;pending_req--;if(!pending_req){if(isIE)$dh(d)
-else $(d).fadeOut();}}
+if(!d)return;pending_req--;if(!pending_req){if(ui_effects)$(d).fadeOut();else $dh(d);}}
 var fcount=0;var frozen=0;var dialog_message;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 $ds($i('dialog_back'));$y($i('dialog_back'),{height:get_page_size()[1]+'px'});fcount++;frozen=1;}
@@ -1038,7 +1036,7 @@ me.cur_page.onhide();$dh(me.cur_page);}
 me.cur_page=me.pages[label];$ds(me.cur_page);if(me.cur_page.onshow)
 me.cur_page.onshow(me.cur_page);}
 this.setup();}
-function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;}
+var ui_effects=1;function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);if($.browser.msie&&flt($.browser.version)<8)ui_effects=0;if($.browser.mozilla&&flt($.browser.version)<1.5)ui_effects=0;var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;}
 var setup_history=function(r){rename_observers.push(nav_obj);}
 var setup_events=function(){addEvent('keypress',function(ev,target){for(var i in keypress_observers){if(keypress_observers[i])
 keypress_observers[i].notify_keypress(ev,(ev.keyCode?ev.keyCode:ev.charCode));}});addEvent('click',function(ev,target){for(var i=0;i<click_observers.length;i++){if(click_observers[i])
