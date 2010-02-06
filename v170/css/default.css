@@ -1424,7 +1424,7 @@ div.autosuggest ul li a:hover
 }
 div.autosuggest ul li.as_highlight a:hover
 {
-	background-color: #22F;
+	background-color: #45A;
 	color: #FFF;
 }
 
@@ -1455,7 +1455,7 @@ div.autosuggest ul li.as_highlight a span {
 div.autosuggest ul li.as_highlight a
 {
 	color: #FFF;
-	background-color: #22F;
+	background-color: #45A;
 }
 
 div.autosuggest ul li.as_warning

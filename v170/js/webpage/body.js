@@ -77,7 +77,7 @@ function Body() {
 		this.cp = locals['Control Panel']['Control Panel'];
 
 		// core areas;
-		if(!user_defaults.hide_webnotes_toolbar) {
+		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
 			this.wntoolbar = new WNToolbar($i('body_div'));
 		}
 		
