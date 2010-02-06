@@ -127,7 +127,8 @@ class Profile:
 	
 	# update recent documents
 	def update_recent(self, dt, dn):
-		if not (dt in ['Print Format', 'Start Page', 'Event', 'ToDo Item', 'Search Criteria']) and not webnotes.is_testing:
+		child_tables = [t[0] for t in webnotes.conn.sql('select name from tabDocType where istable = 1')]
+		if not (dt in ['Print Format', 'Start Page', 'Event', 'ToDo Item', 'Search Criteria']) and not webnotes.is_testing and not (dt in child_tables):
 			r = webnotes.conn.sql("select recent_documents from tabProfile where name=%s", self.name)[0][0] or ''
 			new_str = dt+'~~~'+dn + '\n'
 			if new_str in r:
@@ -136,7 +137,7 @@ class Profile:
 			self.recent = new_str + r
 			
 			if len(self.recent.split('\n')) > 50:
-				self.recent[:49]
+				self.recent = '\n'.join(self.recent.split('\n')[:50])
 			
 			webnotes.conn.sql("update tabProfile set recent_documents=%s where name=%s", (self.recent, self.name))
 			
