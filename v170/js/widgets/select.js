@@ -11,7 +11,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 		if(width) 
 			$y(this.wrapper, { width: width } );		
 
-		this.body_tab = make_table(this.wrapper, 1, 2,'100%', ['100%', '18px'],{border:'1px solid #888'});
+		this.body_tab = make_table(this.wrapper, 1, 2,'100%', ['100%', '18px'],{border:'1px solid #AAA'});
 	
 		this.inp = $a_input($td(this.body_tab, 0, 0), 'text', {'readonly':(editable ? null : 'readonly')}, {width: '96%', border:'0px', padding:'1px'});
 		

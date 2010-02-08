@@ -63,6 +63,7 @@ var pscript = {};
 var validated = true;
 var validation_message = '';
 var tinymce_loaded;
+var tinyMCE;
 
 var $c_get_values;
 var get_server_fields;
