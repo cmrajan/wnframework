@@ -489,7 +489,7 @@ else:
 		
 	str_out = json.dumps(out)
 	
-	if 0 and acceptsGzip and len(str_out)>512:
+	if acceptsGzip and len(str_out)>512:
 		out_buf = compressBuf(str_out)
 		print "Content-Encoding: gzip"
 		print "Content-Length: %d" % (len(out_buf))
