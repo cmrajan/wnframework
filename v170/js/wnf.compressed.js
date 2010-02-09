@@ -841,9 +841,10 @@ d.wrapper.style.zIndex='95';selector=d;}
 function get_scroll_top(){var st=0;if(document.documentElement&&document.documentElement.scrollTop)
 st=document.documentElement.scrollTop;else if(document.body&&document.body.scrollTop)
 st=document.body.scrollTop;return st;}
-function set_loading(){var d=$i('loading_div');if(!d)return;d.style.top=(get_scroll_top()+10)+'px';$ds(d);pending_req++;}
+function set_loading(){var d=$i('loading_div');if(!d)return;if($.browser.msie&&flt($.browser.version)<7){d.style.top=(get_scroll_top()+10)+'px';document.body.onscroll=function(){$i('loading_div').style.top=(get_scroll_top()+10)+'px';}}else{$y($i('loading_div'),{position:'fixed',top:'10px'});}
+$ds(d);pending_req++;}
 function hide_loading(){var d=$i('loading_div')
-if(!d)return;pending_req--;if(!pending_req){$dh(d);}}
+if(!d)return;pending_req--;if(!pending_req){$dh(d);if($.browser.msie&&flt($.browser.version)<7){document.body.onscroll=null;}}}
 var fcount=0;var frozen=0;var dialog_message;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 $ds($i('dialog_back'));$y($i('dialog_back'),{height:get_page_size()[1]+'px'});fcount++;frozen=1;}

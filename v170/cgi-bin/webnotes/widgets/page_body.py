@@ -26,8 +26,6 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 
 <!-- Main Starts -->
 
-<div id="loading_div">Loading...</div>
-
 <div id="body_div"> 
 
 	<!--static (no script) content-->
@@ -37,7 +35,9 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 
 </div>
 	
-<div id="dialogs"></div>
+<div id="dialogs">
+	<div id="loading_div">Loading...</div>
+</div>
 <div id="dialog_back"></div>
 
 <div id="floating_message">
