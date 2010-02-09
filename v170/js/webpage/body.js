@@ -37,7 +37,7 @@ function Body() {
 				$y(this.left_sidebar, {width:cint(this.cp.left_sidebar_width) + 'px'});
 				c++;
 			}
-			this.center = $td(this.body_table, 0, c);
+			this.center = $a($td(this.body_table, 0, c), 'div');
 			c++;
 			if(cint(this.cp.right_sidebar_width)) {
 				this.right_sidebar = $td(this.body_table, 0, c);
