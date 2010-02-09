@@ -33,15 +33,15 @@ function Body() {
 			this.body_table = make_table(this.body, 1, n, '100%');
 			var c = 0;
 			if(cint(this.cp.left_sidebar_width)) {
-				this.left_sidebar = $td(this.body_table, 0, c);
+				this.left_sidebar = $a($td(this.body_table, 0, c), 'div');
 				$y(this.left_sidebar, {width:cint(this.cp.left_sidebar_width) + 'px'});
 				c++;
 			}
 			this.center = $a($td(this.body_table, 0, c), 'div');
 			c++;
 			if(cint(this.cp.right_sidebar_width)) {
-				this.right_sidebar = $td(this.body_table, 0, c);
-				$y(this.left_sidebar, {width:cint(this.cp.right_sidebar_width) + 'px'})
+				this.right_sidebar = $a($td(this.body_table, 0, c), 'div');
+				$y(this.right_sidebar, {width:cint(this.cp.right_sidebar_width) + 'px'})
 				c++;
 			}			
 		}
