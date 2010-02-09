@@ -44,14 +44,14 @@ function render_page(page_name, menuitem) {
 	if(script)
 		try { eval(script); } catch(e) { submit_error(e); }		
 
-	// change
-	page_body.change_to(page_name);	
-
 	// run onload
 	try {
 		if(pscript['onload_'+page_name]) pscript['onload_'+page_name](menuitem); // onload
 	} catch(e) { submit_error(e); }
-	
+
+	// change
+	page_body.change_to(page_name);	
+		
 	return p;
 }
 

@@ -33,14 +33,14 @@ function Body() {
 			this.body_table = make_table(this.body, 1, n, '100%');
 			var c = 0;
 			if(cint(this.cp.left_sidebar_width)) {
-				this.left_sidebar = $a($td(this.body_table, 0, c), 'div');
+				this.left_sidebar = $td(this.body_table, 0, c);
 				$y(this.left_sidebar, {width:cint(this.cp.left_sidebar_width) + 'px'});
 				c++;
 			}
 			this.center = $a($td(this.body_table, 0, c), 'div');
 			c++;
 			if(cint(this.cp.right_sidebar_width)) {
-				this.right_sidebar = $a($td(this.body_table, 0, c), 'div');
+				this.right_sidebar = $td(this.body_table, 0, c);
 				$y(this.right_sidebar, {width:cint(this.cp.right_sidebar_width) + 'px'})
 				c++;
 			}			
@@ -130,7 +130,6 @@ function Body() {
 				me.cur_page.onhide();
 			$dh(me.cur_page);
 		}
-					
 		// show
 		me.cur_page = me.pages[label];
 		$ds(me.cur_page);
