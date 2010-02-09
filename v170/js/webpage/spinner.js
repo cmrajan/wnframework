@@ -13,7 +13,7 @@ function set_loading() {
 
 	if($.browser.msie && flt($.browser.version)<7) {
 		d.style.top = (get_scroll_top()+10)+'px';
-		document.body.onscroll = function() {
+		window.onscroll = function() {
 			$i('loading_div').style.top = (get_scroll_top()+10)+'px';
 		}
 	} else {
@@ -24,7 +24,7 @@ function set_loading() {
 	pending_req++;
 }
 function hide_loading() {
-	var d = $i('loading_div')
+	var d = $i('loading_div');
 	if(!d)return;
 	pending_req--;
 	if(!pending_req){
