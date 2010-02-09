@@ -31,6 +31,7 @@ function Body() {
 		else {
 			// has sidebars, make a table
 			this.body_table = make_table(this.body, 1, n, '100%');
+			$y(this.body_table, {tableLayout:'fixed'});
 			var c = 0;
 			if(cint(this.cp.left_sidebar_width)) {
 				this.left_sidebar = $td(this.body_table, 0, c);
