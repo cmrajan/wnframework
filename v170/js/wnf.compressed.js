@@ -841,9 +841,9 @@ d.wrapper.style.zIndex='95';selector=d;}
 function get_scroll_top(){var st=0;if(document.documentElement&&document.documentElement.scrollTop)
 st=document.documentElement.scrollTop;else if(document.body&&document.body.scrollTop)
 st=document.body.scrollTop;return st;}
-function set_loading(){var d=$i('loading_div');if(!d)return;if(ui_effects)$(d).corners();d.style.top=(get_scroll_top()+10)+'px';if(ui_effects)$(d).fadeIn();else $ds(d);pending_req++;}
+function set_loading(){var d=$i('loading_div');if(!d)return;d.style.top=(get_scroll_top()+10)+'px';$ds(d);pending_req++;}
 function hide_loading(){var d=$i('loading_div')
-if(!d)return;pending_req--;if(!pending_req){if(ui_effects)$(d).fadeOut();else $dh(d);}}
+if(!d)return;pending_req--;if(!pending_req){$dh(d);}}
 var fcount=0;var frozen=0;var dialog_message;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 $ds($i('dialog_back'));$y($i('dialog_back'),{height:get_page_size()[1]+'px'});fcount++;frozen=1;}
@@ -915,7 +915,7 @@ function refresh_page(page_name){var fn=function(r,rt){render_page(page_name)}
 $c('webnotes.widgets.page.getpage',{'name':page_name},fn);}
 function SidebarMenu(){this.menu_items={};this.menu_lists={};this.menu_dt_details={};this.menu_page=page_body.add_page('Document Browser',function(){if(sidebar_menu.cur_node)sidebar_menu.cur_node.show_selected();})
 this.wrapper=$a(this.menu_page,'div','',{margin:'8px'});this.head=$a(this.wrapper,'div','standard_title');this.body=$a(this.wrapper,'div');this.tree_wrapper=$a(page_body.left_sidebar,'div','',{padding:'0px 4px',marginRight:'0px'});this.menu_tree=new Tree($a(this.tree_wrapper,'div'),'100%',1);}
-SidebarMenu.prototype.menu_click=function(n){if(n.menu_item.menu_item_type=='DocType'){sidebar_menu.cur_node=n;sidebar_menu.show_listing(n.menu_item.name);}else if(n.menu_item.menu_item_type=='New'){newdoc(n.menu_item.link_id);}else if(n.menu_item.menu_item_type=='Single'){loaddoc(n.menu_item.link_id,n.menu_item.link_id,null,n);n.toggle();}else if(n.menu_item.menu_item_type=='Page'){loadpage(n.menu_item.link_id,n.onload,n);n.toggle();}else if(n.menu_item.menu_item_type=='Report'){loadreport(n.menu_item.link_id,n.menu_item.criteria_name,n.onload,n);}else{if(n.onload)n.onload();n.toggle();}}
+SidebarMenu.prototype.menu_click=function(n){if(n.menu_item.menu_item_type=='DocType'){sidebar_menu.cur_node=n;sidebar_menu.show_listing(n.menu_item.name);}else if(n.menu_item.menu_item_type=='New'){newdoc(n.menu_item.link_id);}else if(n.menu_item.menu_item_type=='Single'){loaddoc(n.menu_item.link_id,n.menu_item.link_id,null,n);n.toggle();}else if(n.menu_item.menu_item_type=='Page'){loadpage(n.menu_item.link_id,n.onload,n);n.toggle();}else if(n.menu_item.menu_item_type=='Report'){loadreport(n.menu_item.link_id,n.menu_item.link_content,n.onload,n);}else{if(n.onload)n.onload();n.toggle();}}
 pscript.set_menu_style=function(level){var opt={}
 if(level==0){opt={show_exp_img:0,show_icon:0,label_style:{padding:'4px',cursor:'pointer',color:'#222',marginBottom:'4px',fontSize:'14px',borderBottom:'1px solid #CCC',fontWeight:'bold',backgroundColor:'#EEE'}}}else if(level==1){opt={show_exp_img:0,show_icon:0,label_style:{padding:'4px',paddingTop:'0px',marginBottom:'4px',cursor:'pointer',borderBottom:'1px solid #CCC',fontSize:'12px',marginLeft:'8px'},onselect_style:{fontWeight:'bold'},ondeselect_style:{fontWeight:'normal'}}}if(level>=2){opt={show_exp_img:0,show_icon:0,label_style:{padding:'4px',paddingTop:'0px',marginBottom:'4px',cursor:'pointer',borderBottom:'1px dashed #EEE',fontSize:'11px',marginLeft:'12px'},onselect_style:{fontWeight:'bold'},ondeselect_style:{fontWeight:'normal'}}}
 return opt}

@@ -32,7 +32,7 @@ SidebarMenu.prototype.menu_click = function(n) {
     loadpage(n.menu_item.link_id, n.onload, n); 
     n.toggle();
   } else if(n.menu_item.menu_item_type == 'Report') {
-    loadreport(n.menu_item.link_id, n.menu_item.criteria_name, n.onload, n);
+    loadreport(n.menu_item.link_id, n.menu_item.link_content, n.onload, n);
   } else {
   	if(n.onload) n.onload();
     n.toggle();

@@ -310,8 +310,8 @@ _r.ReportBuilder.prototype.set_filter = function(dt, label, value) {
 // -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
-	this.clear_criteria();	
-	
+	this.clear_criteria();
+		
 	if(!this.sc_dict[criteria_name]) {
 		alert(criteria_name + ' could not be loaded. Please Refresh and try again');
 	}
@@ -989,11 +989,11 @@ _r.ReportColumnPicker.prototype.make_body = function() {
 	this.add_all.innerHTML = '&gt;&gt;';
 	this.add_all.onclick = function() { me.move(me.unsel_fields, 'add', 1); }
 
-	this.add_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'90px'});
+	this.add_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'110px'});
 	this.add_btn.innerHTML = '<b>Add &gt;</b>';
 	this.add_btn.onclick = function() { me.move(me.unsel_fields, 'add'); }
 		
-	this.remove_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'90px'});
+	this.remove_btn = $a($a($td(t,0,1), 'div'), 'button', '', {width:'110px'});
 	this.remove_btn.innerHTML = '<b>&lt; Remove</b>';
 	this.remove_btn.onclick = function() { me.move(me.sel_fields, 'remove'); }
 

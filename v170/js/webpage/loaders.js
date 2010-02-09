@@ -7,7 +7,7 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 			// first load
 			_r.rb_con = rb_con;
 		}
-		
+				
 		_r.rb_con.set_dt(dt, function(rb) { 
 			if(rep_name) {
 				var t = rb.current_loaded;
