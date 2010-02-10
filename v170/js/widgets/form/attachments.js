@@ -5,7 +5,7 @@
 _f.Frm.prototype.setup_attach = function() {
 	var me = this;
 	
-	this.attach_area = $a(this.layout.cur_row.wrapper, 'div', 'attach_area');
+	this.attach_area = $a(this.layout ? this.layout.cur_row.wrapper : this.body, 'div', 'attach_area');
 	if(!this.meta.max_attachments)
 		this.meta.max_attachments = 10;
 	

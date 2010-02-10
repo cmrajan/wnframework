@@ -408,6 +408,8 @@ else:
 				webnotes.auth_obj.update()
 
 				sql("COMMIT")
+			else:
+				webnotes.msgprint('No Method: %s' % cmd)
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
 

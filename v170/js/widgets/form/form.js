@@ -388,6 +388,7 @@ _f.Frm.prototype.setup_fields_std = function() {
 
 _f.Frm.prototype.setup_template_layout = function() {
 	this.body = $a(this.wrapper, 'div');
+	this.layout = null;
 	this.body.innerHTML = this.meta.dt_template;
 	var dt = this.doctype.replace(/ /g, '');
 

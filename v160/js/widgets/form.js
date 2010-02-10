@@ -625,7 +625,7 @@ Frm.prototype.setup_meta = function() {
 Frm.prototype.setup_attach = function() {
 	var me = this;
 	
-	this.attach_area = $a(this.layout.cur_row.wrapper, 'div', 'attach_area');
+	this.attach_area = $a(this.layout ? this.layout.cur_row.wrapper : this.body, 'div', 'attach_area');
 	if(!this.meta.max_attachments)
 		this.meta.max_attachments = 10;
 	
@@ -966,6 +966,7 @@ Frm.prototype.setup_fields_std = function() {
 
 Frm.prototype.setup_template_layout = function() {
 	this.body = $a(this.wrapper, 'div');
+	this.layout = null;
 	this.body.innerHTML = this.meta.dt_template;
 	var dt = this.doctype.replace(/ /g, '');
 

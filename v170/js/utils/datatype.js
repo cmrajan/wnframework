@@ -33,6 +33,18 @@ function fmt_money(v){
 	}
 }
 
+// to title case
+function toTitle(str){
+	var word_in = str.split(" ");
+	var word_out = [];
+	
+	for(w in word_in){
+		word_out[w] = word_in[w].charAt(0).toUpperCase() + word_in[w].slice(1);
+	}
+	
+	return word_out.join(" ");
+}
+
 function is_null(v) {
 	if(v==null) {
 		return 1
