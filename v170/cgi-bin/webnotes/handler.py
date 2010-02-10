@@ -409,7 +409,8 @@ else:
 
 				sql("COMMIT")
 			else:
-				webnotes.msgprint('No Method: %s' % cmd)
+				if cmd!='login':
+					webnotes.msgprint('No Method: %s' % cmd)
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
 
