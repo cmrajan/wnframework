@@ -60,6 +60,7 @@ def log(event, details):
 # Date and Time
 # -------------
 
+
 def getdate(string_date):
 	import datetime
 	t = string_date.split('-')
@@ -72,6 +73,18 @@ def add_days(string_date, days):
 	import datetime
 	d = getdate(string_date)
 	return (d + datetime.timedelta(days)).strftime('%Y-%m-%d')
+
+def add_months(string_date, months):
+	import datetime
+	return webnotes.conn.sql("select DATE_ADD('%s',INTERVAL '%s' MONTH)" % (getdate(string_date),months))[0][0]
+
+def add_years(string_date, years):
+	import datetime
+	return webnotes.conn.sql("select DATE_ADD('%s',INTERVAL '%s' YEAR)" % (getdate(string_date),years))[0][0]
+
+def date_diff(string_ed_date, string_st_date):
+	import datetime
+	return webnotes.conn.sql("SELECT DATEDIFF('%s','%s')" %(getdate(string_ed_date), getdate(string_st_date)))[0][0]
 
 def now():
 	import time
