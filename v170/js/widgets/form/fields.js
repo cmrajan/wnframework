@@ -653,7 +653,7 @@ CodeField.prototype.make_input = function() {
 			tinymce_loaded = 1;
 			tinyMCE_GZ.init({
 				themes : "advanced",
-				plugins : "style,table,inlinepopups,indicime",
+				plugins : "style,table,indicime",
 				languages : "en",
 				disk_cache : true
 			}, function() { me.setup_editor() });
@@ -674,7 +674,7 @@ CodeField.prototype.setup_editor = function() {
 		theme : "advanced",
 		mode : "exact",
 		elements: this.myid,
-		plugins:"table,style,inlinepopups,indicime",
+		plugins:"table,style,indicime",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
