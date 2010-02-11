@@ -13,7 +13,6 @@ function submit_error(e) {
 	} else {
 		var t = 'Mozilla: ' + e.toString() + '\n' + e.message + '\nLine Number:' + e.lineNumber;// + '\nStack:' + e.stack;
 	}
-	$c('client_err_log', args ={'error':t});
 	errprint(e + '\nLine Number:' + e.lineNumber + '\nStack:' + e.stack);
 }
 

@@ -843,9 +843,10 @@ d.wrapper.style.zIndex='95';selector=d;}
 function get_scroll_top(){var st=0;if(document.documentElement&&document.documentElement.scrollTop)
 st=document.documentElement.scrollTop;else if(document.body&&document.body.scrollTop)
 st=document.body.scrollTop;return st;}
-function set_loading(){var d=$i('loading_div');if(!d)return;if($.browser.msie&&flt($.browser.version)<7){d.style.top=(get_scroll_top()+10)+'px';window.onscroll=function(){$i('loading_div').style.top=(get_scroll_top()+10)+'px';}}else{$y($i('loading_div'),{position:'fixed',top:'10px'});}
+var _loading_div;function set_loading(){if(!_loading_div){_loading_div=$a('dialogs','div','loading_div');_loading_div.innerHTML='Loading';}
+var d=_loading_div;if(!d)return;if($.browser.msie&&flt($.browser.version)<7){d.style.top=(get_scroll_top()+10)+'px';window.onscroll=function(){d.style.top=(get_scroll_top()+10)+'px';}}else{$y(d,{position:'fixed',top:'10px'});}
 $ds(d);pending_req++;}
-function hide_loading(){var d=$i('loading_div');if(!d)return;pending_req--;if(!pending_req){$dh(d);if($.browser.msie&&flt($.browser.version)<7){document.body.onscroll=null;}}}
+function hide_loading(){var d=_loading_div;if(!d)return;pending_req--;if(!pending_req){$dh(d);if($.browser.msie&&flt($.browser.version)<7){document.body.onscroll=null;}}}
 var fcount=0;var frozen=0;var dialog_message;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 $ds($i('dialog_back'));$y($i('dialog_back'),{height:get_page_size()[1]+'px'});fcount++;frozen=1;}
@@ -855,7 +856,7 @@ function hide_selects(){}
 function show_selects(){}
 var err_console;var err_list=[];function errprint(t){err_list[err_list.length]=('<pre style="font-family: Courier, Fixed; font-size: 11px; border-bottom: 1px solid #AAA; overflow: auto; width: 90%;">'+t+'</pre>');}
 function submit_error(e){if(isIE){var t='Explorer: '+e+'\n'+e.description;}else{var t='Mozilla: '+e.toString()+'\n'+e.message+'\nLine Number:'+e.lineNumber;}
-$c('client_err_log',args={'error':t});errprint(e+'\nLine Number:'+e.lineNumber+'\nStack:'+e.stack);}
+errprint(e+'\nLine Number:'+e.lineNumber+'\nStack:'+e.stack);}
 function setup_err_console(){err_console=new Dialog(640,480,'Error Console')
 err_console.make_body([['HTML','Error List'],['Button','Ok'],['Button','Clear']]);err_console.widgets['Ok'].onclick=function(){err_console.hide();}
 err_console.widgets['Clear'].onclick=function(){err_list=[];err_console.rows['Error List'].innerHTML='';}

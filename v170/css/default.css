@@ -53,13 +53,13 @@ div.no_script {
 	display: none;
 }
 
-#loading_div {
+div.loading_div {
 	position: absolute;
 	background-color: #FF8;
 	z-index: 99;
 	right: 5px;
 	width: 70px;
-	height: 14px;
+	height: 16px;
 	display: none;
 	text-align: center;
 	padding: 4px 8px;
