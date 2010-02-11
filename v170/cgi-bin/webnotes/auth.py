@@ -92,6 +92,9 @@ class Authentication:
 	def set_env(self):
 		import os
 		self.domain = os.environ.get('HTTP_HOST')
+		if self.domain.startswith('www.'):
+			self.domain = self.domain[4:]
+			
 		self.remote_ip = os.environ.get('REMOTE_ADDR')
 	
 	def set_db(self, acc_id = None):
