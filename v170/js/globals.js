@@ -1,6 +1,6 @@
 // constants
 var NEWLINE = '\n';
-var login_file = 'index.cgi';
+var login_file = '';
 var version = 'v170';
 
 // user

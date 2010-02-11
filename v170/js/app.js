@@ -90,7 +90,8 @@ function to_open() {
 
 function logout() {
 	$c('logout', args = {}, function() { 
-		window.location.reload();
+		if(login_file) window.location.href = login_file;
+		else window.location.reload();
 	});
 }
 
