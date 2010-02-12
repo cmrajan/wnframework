@@ -160,6 +160,10 @@ if(freeze_msg)unfreeze();if(r.exc){errprint(r.exc);};if(r.server_messages){msgpr
 saveAllowed=true;if(fn)fn(r,rtxt);}}
 req.onreadystatechange=ret_fn;req.open("POST",outUrl,true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");args['cmd']=command;req.send(makeArgString(args));if(!no_spinner)set_loading();if(freeze_msg)freeze(freeze_msg,1);}
 function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){if(doclist.substr){$c('runserverobj',{'doctype':doclist,'method':method,'arg':arg},call_back);}else{$c('runserverobj',{'docs':compress_doclist(doclist),'method':method,'arg':arg},call_back,no_spinner,freeze_msg);}}
+function $c_obj_csv(doclist,method,arg){var args={}
+args.cmd='runserverobj';args.as_csv=1;args.method=method;args.arg=arg;if(doclist.substr)
+args.doctype=doclist;else
+args.docs=compress_doclist(doclist);open_url_post(outUrl,args);}
 function $c_graph(img,control_dt,method,arg){img.src=outUrl+'?'+makeArgString({cmd:'get_graph',dt:control_dt,method:method,arg:arg});}
 function my_eval(co){var w=window;if(!w.execScript){if(/Gecko/.test(navigator.userAgent)){eval(co,w);}else{eval.call(w,co);}}else{w.execScript(co);}}
 function $c_js(fn,callback){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,function(){},1,null)){if(req.responseText.substr(0,9)=='Not Found'){alert(req.responseText);return;}
@@ -177,6 +181,8 @@ if(namespace?window[namespace][widget_name]:window[widget_name]){callback(create
 currently_loading[widget]=1;}}
 function makeArgString(dict){var varList=[];for(key in dict){varList[varList.length]=key+'='+encodeURIComponent(dict[key]);}
 return varList.join('&');}
+function open_url_post(URL,PARAMS){var temp=document.createElement("form");temp.action=URL;temp.method="POST";temp.style.display="none";for(var x in PARAMS){var opt=document.createElement("textarea");opt.name=x;opt.value=PARAMS[x];temp.appendChild(opt);}
+document.body.appendChild(temp);temp.submit();return temp;}
 var msg_dialog;function msgprint(msg,static,callback){if(!msg_dialog){msg_dialog=new Dialog(300,200,"Message");msg_dialog.make_body([['HTML','Msg'],])
 msg_dialog.onhide=function(){msg_dialog.msg_area.innerHTML='';$dh(msg_dialog.msg_icon);if(msg_dialog.custom_onhide)msg_dialog.custom_onhide();}
 var t=make_table(msg_dialog.rows['Msg'],1,2,'100%',['20px','250px'],{padding:'2px',verticalAlign:'Top'});msg_dialog.msg_area=$td(t,0,1);msg_dialog.msg_icon=$a($td(t,0,0),'img');}
@@ -593,8 +599,6 @@ export_dialog.query+=' LIMIT 0,'+cint(n);callback(export_dialog.query);}
 d.onshow=function(){this.widgets['Max rows'].value='500';}
 export_dialog=d;}
 export_dialog.query=query;export_dialog.show();}
-function open_url_post(URL,PARAMS){var temp=document.createElement("form");temp.action=URL;temp.method="POST";temp.style.display="none";for(var x in PARAMS){var opt=document.createElement("textarea");opt.name=x;opt.value=PARAMS[x];temp.appendChild(opt);}
-document.body.appendChild(temp);temp.submit();return temp;}
 function export_csv(q,report_name,sc_id,is_simple,filter_values,colnames){var args={}
 args.cmd='webnotes.widgets.query_builder.runquery_csv';if(is_simple)args.simple_query=q;else args.query=q;args.sc_id=sc_id?sc_id:'';args.filter_values=filter_values?filter_values:'';if(colnames)args.colnames=colnames.join(',');args.report_name=report_name?report_name:'';open_url_post(outUrl,args);}
 var no_value_fields=['Section Break','Column Break','HTML','Table','FlexTable','Button','Image'];function Field(){}

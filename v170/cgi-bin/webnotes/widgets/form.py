@@ -138,14 +138,39 @@ def runserverobj():
 						clientlist += r['doclist']
 				except:
 					pass
-				webnotes.response['message'] = r
+				
+				#build output as csv
+				if cint(webnotes.form.getvalue('as_csv')):
+					make_csv_output(r, so.doc.doctype)
+				else:
+					webnotes.response['message'] = r
+					
 			if clientlist:
 				doclist.append(main_doc)
 				webnotes.response['docs'] = doclist
 		except Exception, e:
 			webnotes.errprint(webnotes.utils.getTraceback())
 			raise e
+
+def make_csv_output(res, dt):
+	import webnotes
+	from webnotes.utils import getCSVelement
+
+	txt = []
+	if type(res)==list:
+		for r in res:
+			txt.append(','.join([getCSVelement(i) for i in r]))
+		
+		txt = '\n'.join(txt)
 	
+	else:
+		txt = 'Output was not in list format\n' + r
+					
+	webnotes.response['result'] = txt
+	webnotes.response['type'] = 'csv'
+	webnotes.response['doctype'] = dt.replace(' ','')						
+
+
 # Document Save
 #===========================================================================================
 

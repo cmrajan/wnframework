@@ -83,6 +83,26 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 	}
 }
 
+// For calling an for output as csv
+function $c_obj_csv(doclist, method, arg) {
+	// single
+	
+	var args = {}
+	args.cmd = 'runserverobj';
+	args.as_csv = 1;
+	args.method = method;
+	args.arg = arg;
+	
+	if(doclist.substr)
+		args.doctype = doclist;		
+	else
+		args.docs = compress_doclist(doclist);
+
+	// open
+	open_url_post(outUrl, args);
+}
+
+
 // For loading a matplotlib Plot
 function $c_graph(img, control_dt, method, arg) {
 	img.src = outUrl + '?' + makeArgString({cmd:'get_graph', dt:control_dt, method:method, arg:arg});
@@ -196,4 +216,21 @@ function makeArgString(dict) {
 		varList[varList.length] = key + '=' + encodeURIComponent(dict[key]);
 	}
 	return varList.join('&');
+}
+
+// call a url as POST
+function open_url_post(URL, PARAMS) {
+	var temp=document.createElement("form");
+	temp.action=URL;
+	temp.method="POST";
+	temp.style.display="none";
+	for(var x in PARAMS) {
+		var opt=document.createElement("textarea");
+		opt.name=x;
+		opt.value=PARAMS[x];
+		temp.appendChild(opt);
+	}
+	document.body.appendChild(temp);
+	temp.submit();
+	return temp;
 }

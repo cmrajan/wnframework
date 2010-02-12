@@ -26,6 +26,11 @@ AJAX - Server Calls
    * `no_spinner` - do not show the "Loading..." spinner
    * `freeze_msg` - freeze the user page while showing with the given message
 
+.. function:: $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg)
+
+   call an object on the server and return the output as CSV.
+   
+   *Note:* There will be no callback. The output must be a list-in-a-list
 
 Title
 -----
@@ -329,7 +334,7 @@ URL
 User Image
 ----------
 
-.. function:: set_user_img(img, username) 
+.. function:: set_user_img(username, img)
 
    Sets the user image or No Image tag to the given `img`
 
