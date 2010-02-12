@@ -44,7 +44,7 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 	<td id="fm_cancel" class="link_type">Cancel</td>
 	</tr></table>
 </div>
-
+%(add_in_body)s
 </body>
 </html>
 '''
@@ -133,14 +133,17 @@ def get():
 	global index_template
 	import webnotes.model.code
 	
-	template, add_in_head = index_template, ''
+	template, add_in_head, add_in_body = index_template, '', ''
 	cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 	if hasattr(cp, 'get_index_template'):
 		template = cp.get_index_template()
 		
 	if hasattr(cp, 'add_in_head'):
 		add_in_head = cp.add_in_head()
-		
+
+	if hasattr(cp, 'add_in_body'):
+		add_in_body = cp.add_in_body()
+	
 	if '%(content)s' in template:
 
 		title, content = get_static_content()
@@ -153,6 +156,7 @@ def get():
 			,'keywords':keywords
 			,'site_description':site_description
 			,'add_in_head':add_in_head
+			,'add_in_body':add_in_body
 		}
 		
 	return template
