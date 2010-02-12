@@ -103,9 +103,6 @@ function Body() {
 		// page width
 		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});
 		
-		// startup script
-		this.run_startup_code();
-		
 	}
 	
 	// Standard containers
