@@ -289,6 +289,8 @@ function $c_obj_csv(doclist, method, arg) {
 	args.as_csv = 1;
 	args.method = method;
 	args.arg = arg;
+	args.__account = account_id; // for multiple logins on same domain
+	args.__sid150 = __sid150; // for cross domain login
 	
 	if(doclist.substr)
 		args.doctype = doclist;		
