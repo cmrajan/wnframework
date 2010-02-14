@@ -1066,7 +1066,7 @@ def runserverobj(form, session):
 				except:
 					pass
 				#build output as csv
-				if cint(form.getvalue('as_csv')):
+				if server.cint(form.getvalue('as_csv')):
 					make_csv_output(r, so.doc.doctype)
 				else:
 					out['message'] = r
