@@ -280,6 +280,25 @@ function $c_obj(doclist, method, arg, call_back, no_loading, freeze_msg) {
 	}
 }
 
+// For calling an for output as csv
+function $c_obj_csv(doclist, method, arg) {
+	// single
+	
+	var args = {}
+	args.cmd = 'runserverobj';
+	args.as_csv = 1;
+	args.method = method;
+	args.arg = arg;
+	
+	if(doclist.substr)
+		args.doctype = doclist;		
+	else
+		args.docs = compress_doclist(doclist);
+
+	// open
+	open_url_post(outUrl, args);
+}
+
 function $c_graph(img, control_dt, method, arg) {
 	img.src = outUrl + '?' + makeArgString({cmd:'get_graph', dt:control_dt, method:method, arg:arg});
 }

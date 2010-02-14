@@ -1065,7 +1065,12 @@ def runserverobj(form, session):
 						clientlist += r['doclist']
 				except:
 					pass
-				out['message'] = r
+				#build output as csv
+				if cint(form.getvalue('as_csv')):
+					make_csv_output(r, so.doc.doctype)
+				else:
+					out['message'] = r
+					
 			if clientlist:
 				doclist.append(main_doc)
 				out['docs'] = server.compress_doclist(doclist)
@@ -1073,6 +1078,22 @@ def runserverobj(form, session):
 			errprint(server.getTraceback())
 			raise e
 			
+def make_csv_output(res, dt):
+	txt = []
+	if type(res)==list:
+		for r in res:
+			txt.append(','.join([getCSVelement(i) for i in r]))
+		
+		txt = '\n'.join(txt)
+	
+	else:
+		txt = 'Output was not in list format\n' + r
+					
+	out['result'] = txt
+	out['type'] = 'csv'
+	out['doctype'] = dt.replace(' ','')						
+
+
 
 # Send Email
 # ----------
