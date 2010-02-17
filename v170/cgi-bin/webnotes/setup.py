@@ -209,6 +209,7 @@ def create_account_doctype():
 	
 def create_account_record(ac_name, newdb):
 	# update accounts
+	import webnotes.db
 
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	
