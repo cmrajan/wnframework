@@ -209,7 +209,14 @@ def create_account_doctype():
 	
 def create_account_record(ac_name, newdb):
 	# update accounts
+
 	webnotes.conn = webnotes.db.Database(use_default = 1)
+	
+	if not webnotes.conn.in_transaction:
+		webnotes.conn.sql("start transaction")
+
+	if not webnotes.session:
+		webnotes.session = {'user':'shell'}
 
 	from webnotes.model.doc import Document
 	
@@ -217,10 +224,8 @@ def create_account_record(ac_name, newdb):
 	ac.ac_name = ac_name
 	ac.db_name = newdb
 	ac.name = newdb
-
-	if not webnotes.conn.in_transaction:
-		webnotes.conn.sql("start transaction")
 	ac.save(1)
+
 	webnotes.conn.sql("commit")
 
 
