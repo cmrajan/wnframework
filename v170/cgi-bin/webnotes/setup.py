@@ -228,7 +228,6 @@ def create_account_record(ac_name, newdb):
 
 	webnotes.conn.sql("commit")
 
-
 def create_account(ac_name, ac_type='Framework'):
 	import webnotes.db
 
