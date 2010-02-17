@@ -207,7 +207,7 @@ def create_account_doctype():
 	# udpate schema
 	webnotes.model.db_schema.update_db('Account')
 	
-def create_account_record(ac_name):
+def create_account_record(ac_name, newdb):
 	# update accounts
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 
@@ -241,7 +241,7 @@ def create_account(ac_name, ac_type='Framework'):
 	sql("commit")
 
 	# create entry in Account table in 'accounts' (default) database
-	create_account_record(ac_name)
+	create_account_record(ac_name, newdb)
 	
 	return "Created %s (%s)" % (ac_name, newdb)
 
