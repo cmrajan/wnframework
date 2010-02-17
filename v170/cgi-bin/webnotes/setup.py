@@ -129,9 +129,6 @@ def import_db(source, target='', is_accounts=0):
 	if not target:
 		target = get_db_name(conn, defs.server_prefix)
 	
-	# all source database dumps in data
-	os.chdir('data')
-
 	# create user and db
 	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, defs.db_password))
 	sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
@@ -139,8 +136,10 @@ def import_db(source, target='', is_accounts=0):
 	sql("FLUSH PRIVILEGES")
 	sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
 
+	target_path = get_target_path(target)		
+
 	# import in target
-	os.system('%smysql -u %s -p%s %s < %s.sql' % (mysql_path, target, defs.db_password, target, source))
+	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target_path, source))
 
 	sql("use %s;" % target)
 	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT)")
@@ -150,6 +149,22 @@ def import_db(source, target='', is_accounts=0):
  	sql("alter table tabSessions change sessiondata sessiondata longtext") 
 	
 	return target
+
+def get_target_path(target):
+	cwd = os.path.split(os.getcwd())
+	if cwd == 'cgi-bin':
+		f = '../data/' + target + '.sql'
+	if cwd == 'data'
+		f = target + '.sql'
+	else:
+		f = 'data/' + target + '.sql'
+		
+	# check if exists
+	if os.path.exists(f):
+		return f
+	else:
+		raise Exception, "Target file does not exist"
+
 
 def create_account_doctype():
 	
