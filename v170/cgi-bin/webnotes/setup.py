@@ -207,7 +207,7 @@ def create_account_doctype():
 	# udpate schema
 	webnotes.model.db_schema.update_db('Account')
 	
-def create_account_record(ac_name, newdb):
+def create_account_record(ac_name, newdb, domain=''):
 	# update accounts
 	import webnotes.db
 
@@ -226,6 +226,12 @@ def create_account_record(ac_name, newdb):
 	ac.db_name = newdb
 	ac.name = newdb
 	ac.save(1)
+	
+	# add domain
+	if domain:
+		acd = ac.addchild('account_domains','Account Domain',1)
+		acd.domain = ac_name + '.' + domain
+		acd.save(1)
 
 	webnotes.conn.sql("commit")
 
