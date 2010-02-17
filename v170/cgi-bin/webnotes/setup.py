@@ -136,10 +136,10 @@ def import_db(source, target='', is_accounts=0):
 	sql("FLUSH PRIVILEGES")
 	sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
 
-	target_path = get_target_path(target)		
+	source_path = get_source_path(source)		
 
 	# import in target
-	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target_path, source))
+	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target, source_path))
 
 	sql("use %s;" % target)
 	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT)")
@@ -150,20 +150,22 @@ def import_db(source, target='', is_accounts=0):
 	
 	return target
 
-def get_target_path(target):
-	cwd = os.path.split(os.getcwd())
+def get_source_path(s):
+	import os
+	
+	cwd = os.path.split(os.getcwd())[-1]
 	if cwd == 'cgi-bin':
-		f = '../data/' + target + '.sql'
-	if cwd == 'data'
+		f = '../data/' + s + '.sql'
+	elif cwd == 'data':
 		f = target + '.sql'
 	else:
-		f = 'data/' + target + '.sql'
+		f = 'data/' + s + '.sql'
 		
 	# check if exists
 	if os.path.exists(f):
 		return f
 	else:
-		raise Exception, "Target file does not exist"
+		raise Exception, "Target file '%s' does not exist" % f
 
 
 def create_account_doctype():
