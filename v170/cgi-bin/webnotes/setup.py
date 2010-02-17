@@ -209,9 +209,10 @@ def create_account_doctype():
 	
 def create_account_record(ac_name):
 	# update accounts
+	webnotes.conn = webnotes.db.Database(use_default = 1)
+
 	from webnotes.model.doc import Document
 	
-	webnotes.conn = webnotes.db.Database(use_default = 1)
 	ac = Document('Account')
 	ac.ac_name = ac_name
 	ac.db_name = newdb
@@ -236,7 +237,7 @@ def create_account(ac_name, ac_type='Framework'):
 	if not conn.in_transaction:
 		sql("start transaction")
 	sql("update tabSingles set value=%s where doctype='Control Panel' and field='account_id'", ac_name)
-		
+
 	sql("commit")
 
 	# create entry in Account table in 'accounts' (default) database
