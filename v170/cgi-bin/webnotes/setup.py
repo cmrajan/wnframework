@@ -224,11 +224,15 @@ def create_account_record(ac_name):
 
 
 def create_account(ac_name, ac_type='Framework'):
+	import webnotes.db
 
 	newdb = import_db(ac_type)
 
 	# set account id
-	webnotes.conn.use(newdb)
+	conn = webnotes.db.Database()
+	conn.use(newdb)
+	sql = conn.sql
+	
 	if not webnotes.conn.in_transaction:
 		sql("start transaction")
 	sql("update tabSingles set value=%s where doctype='Control Panel' and field='account_id'", ac_name)
