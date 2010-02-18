@@ -230,7 +230,7 @@ _f.ImageField.prototype.get_image_src = function(doc) {
 		var img_extn_list = ['gif', 'jpg', 'bmp', 'jpeg', 'jp2', 'cgm',  'ief', 'jpm', 'jpx', 'png', 'tiff', 'jpe', 'tif'];
 
 		if(in_list(img_extn_list, extn)) {
-			var src = outUrl + "?cmd=downloadfile&file_id="+file[1]+"&__account="+account_id + (__sid150 ? ("&sid150="+__sid150) : '');
+			var src = outUrl + "?cmd=downloadfile&file_id="+file[1];
 		}
 	} else {
 		var src = "";

@@ -67,7 +67,7 @@ class Database:
 		self.check_transaction_status(query)
 		
 		# execute
-		if values:
+		if values!=():
 			self._cursor.execute(query, values)
 		else:
 			self._cursor.execute(query)	

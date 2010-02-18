@@ -28,14 +28,17 @@ def generate_xml(conn, site_prefix):
 	return frame_xml % site_map
 
 # to be called by cron
-def create(site_prefix, fname = None):
-	if not fname:
-		import os
-		fname = os.path.dirname(__file__) + '/../../../sitemap.xml'
+def create(site_prefix, ac_name = None):
+	fname = os.path.dirname(__file__) + '/../../../sitemap.xml'
 
 	import webnotes.db
 	conn = webnotes.db.Database(use_default=1)
 	
+	
+	if ac_name:
+		db_name = conn.sql('select db_name from tabAccount where ac_name=%s', ac_name)[0][0]
+		conn.use(db_name)
+		
 	xml = generate_xml(conn, site_prefix)
 	
 	f = open(fname, 'w')
@@ -52,5 +55,5 @@ if __name__ == '__main__':
 	import sys, os
 	
 	sys.path.append(os.path.abspath(os.path.dirname(sys.argv[0]) + '/../../'))
-		
-	create(sys.argv[1])
+
+	create(sys.argv[1], sys.argv[2])
