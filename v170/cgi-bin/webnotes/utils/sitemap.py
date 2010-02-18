@@ -33,11 +33,11 @@ def create(site_prefix, ac_name = None):
 
 	import webnotes.db
 	conn = webnotes.db.Database(use_default=1)
-	
-	
+		
 	if ac_name:
 		db_name = conn.sql('select db_name from tabAccount where ac_name=%s', ac_name)[0][0]
-		conn = conn = webnotes.db.Database(user = db_name)
+		conn = webnotes.db.Database(user = db_name)
+		conn.use(db_name)
 		
 	xml = generate_xml(conn, site_prefix)
 	
