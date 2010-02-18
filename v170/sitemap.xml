@@ -5,6 +5,10 @@ import webnotes.auth
 import webnotes.utils.sitemap
 import Cookie
 
+import sys, os
+	
+sys.path.append(os.getcwd()+'/cgi-bin')
+
 out_cookies = Cookie.SimpleCookie()
 
 # login
