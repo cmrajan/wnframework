@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os
+import sys, os, cgi
 	
 sys.path.append(os.getcwd()+'/cgi-bin')
 
@@ -12,7 +12,7 @@ import Cookie
 out_cookies = Cookie.SimpleCookie()
 
 # login
-auth_obj = webnotes.auth.Authentication({}, out_cookies, {})
+auth_obj = webnotes.auth.Authentication(cgi.FieldStorage(), out_cookies, {})
 
 # get the server prefix
 prefix = webnotes.conn.sql('select defvalue from `tabDefaultValue` where parent = "Control Panel" and defkey="sitemap_url"')
