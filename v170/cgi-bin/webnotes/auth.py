@@ -80,6 +80,7 @@ class Authentication:
 		
 		webnotes.session = self.session
 		webnotes.user = webnotes.profile.Profile()
+		webnotes.incoming_cookies = self.cookies
 
 		if webnotes.session['data'].get('profile'):
 			webnotes.user.load_from_session(webnotes.session['data']['profile'])

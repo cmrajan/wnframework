@@ -8,6 +8,7 @@ form = None
 session = None
 user = None
 is_testing = None
+incoming_cookies = {}
 add_cookies = {}
 
 # json response object
