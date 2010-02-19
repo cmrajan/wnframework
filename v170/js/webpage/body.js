@@ -12,9 +12,9 @@
 
 **/
 function Body() { 
-	var me = this;
 	this.left_sidebar = null;
 	this.right_sidebar = null;
+	var me = this;
 
 	this.no_of_columns = function() {
 		var n = 1;
@@ -69,9 +69,11 @@ function Body() {
 	}
 	
 	this.run_startup_code = function() {
-		// startup
+		// startup style
 		if(this.cp.startup_css)
 			set_style(this.cp.startup_css);
+		
+		// startup code
 		if(this.cp.startup_code)
 			eval(this.cp.startup_code);
 	}

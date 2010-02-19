@@ -1025,7 +1025,7 @@ load('themes/'+n+'/langs/'+c+'.js');});}});each(s.plugins.split(','),function(n)
 load('plugins/'+n+'/langs/'+c+'.js');});}});},end:function(){},eval:function(co){var w=window;if(!w.execScript){if(/Gecko/.test(navigator.userAgent))
 eval(co,w);else
 eval.call(w,co);}else
-w.execScript(co);}};function Body(){var me=this;this.left_sidebar=null;this.right_sidebar=null;this.no_of_columns=function(){var n=1;if(cint(this.cp.left_sidebar_width))n++;if(cint(this.cp.right_sidebar_width))n++;return n;}
+w.execScript(co);}};function Body(){this.left_sidebar=null;this.right_sidebar=null;var me=this;this.no_of_columns=function(){var n=1;if(cint(this.cp.left_sidebar_width))n++;if(cint(this.cp.right_sidebar_width))n++;return n;}
 this.setup_page_areas=function(){var n=this.no_of_columns();if(n==1)
 this.center=this.body;else{this.body_table=make_table(this.body,1,n,'100%');$y(this.body_table,{tableLayout:'fixed'});var c=0;if(cint(this.cp.left_sidebar_width)){this.left_sidebar=$td(this.body_table,0,c);$y(this.left_sidebar,{width:cint(this.cp.left_sidebar_width)+'px'});c++;}
 this.center=$a($td(this.body_table,0,c),'div');c++;if(cint(this.cp.right_sidebar_width)){this.right_sidebar=$td(this.body_table,0,c);$y(this.right_sidebar,{width:cint(this.cp.right_sidebar_width)+'px'})
