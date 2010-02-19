@@ -1032,7 +1032,8 @@ this.center=$a($td(this.body_table,0,c),'div');c++;if(cint(this.cp.right_sidebar
 c++;}}}
 this.setup_sidebar_menu=function(){if(this.left_sidebar){sidebar_menu=new SidebarMenu();sidebar_menu.make_menu('');}}
 this.setup_header_footer=function(){var hh=this.cp.header_height?(cint(this.cp.header_height)+'px'):'40px';$y(this.header,{height:hh});if(this.cp.client_name)this.header.innerHTML=this.cp.client_name;var fh=this.cp.footer_height?(cint(this.cp.footer_height)+'px'):'0px';$y(this.footer,{height:fh});if(this.cp.footer_html)this.footer.innerHTML=this.cp.footer_html;}
-this.run_startup_code=function(){if(this.cp.startup_code)
+this.run_startup_code=function(){if(this.cp.startup_css)
+set_style(this.cp.startup_css);if(this.cp.startup_code)
 eval(this.cp.startup_code);}
 this.setup=function(){this.cp=locals['Control Panel']['Control Panel'];if(!user_defaults.hide_webnotes_toolbar||user=='Administrator'){this.wntoolbar=new WNToolbar($i('body_div'));}
 this.wrapper=$a($i('body_div'),'div');this.header=$a(this.wrapper,'div');this.topmenu=$a(this.wrapper,'div');this.breadcrumbs=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div');this.footer=$a(this.wrapper,'div');if(user_defaults.hide_sidebars){this.cp.left_sidebar_width=null;this.cp.right_sidebar_width=null;}

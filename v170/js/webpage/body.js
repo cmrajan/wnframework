@@ -70,6 +70,8 @@ function Body() {
 	
 	this.run_startup_code = function() {
 		// startup
+		if(this.cp.startup_css)
+			set_style(this.cp.startup_css);
 		if(this.cp.startup_code)
 			eval(this.cp.startup_code);
 	}
