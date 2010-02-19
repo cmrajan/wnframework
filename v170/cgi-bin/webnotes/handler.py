@@ -365,9 +365,9 @@ if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# register
 	# ----------------------------------
+	webnotes.conn = webnotes.db.Database(use_default = 1)
 	import webnotes.model.code
 	
-	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql("START TRANSACTION")
 	try:
 		out['message'] = webnotes.model.code.get_obj('Profile Control').prelogin(form) or ''
