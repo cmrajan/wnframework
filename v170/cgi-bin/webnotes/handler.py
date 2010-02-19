@@ -366,6 +366,8 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# register
 	# ----------------------------------
 	webnotes.conn = webnotes.db.Database(use_default = 1)
+	sql = webnotes.conn.sql
+
 	import webnotes.model.code
 	
 	sql("START TRANSACTION")
