@@ -54,7 +54,10 @@ var widget_files = {
 	,'_r.ReportContainer':'report.compressed.js'
 	,'_p.PrintQuery':'widgets/print_query.js'
 	,'Calendar':'widgets/calendar.js'
+	,'Recommendation':'widgets/recommend.js'
 }
+
+var Recommendation;
 
 // API globals
 var frms={};

@@ -112,13 +112,15 @@ def import_db(source, target='', is_accounts=0):
 	import webnotes
 	import webnotes.db
 	import defs
-	import MySQLdb
 	import os
 
 	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
 
 	# default, use current user id
 	conn = webnotes.conn
+	
+	if conn.in_transaction:
+		conn.sql('COMMIT')
 
 	# login as root (if set)
 	if defs.root_login:
@@ -154,6 +156,7 @@ def get_source_path(s):
 	import os
 	
 	cwd = os.path.split(os.getcwd())[-1]
+	
 	if cwd == 'cgi-bin':
 		f = '../data/' + s + '.sql'
 	elif cwd == 'data':

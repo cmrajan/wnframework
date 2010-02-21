@@ -88,7 +88,7 @@ class Authentication:
 			webnotes.user.load_profile()
 		
 		# clear defs password - for security
-		defs.db_password = ''
+		#defs.db_password = ''
 		
 	def set_env(self):
 		import os
@@ -159,7 +159,7 @@ class Authentication:
 			self.user_id = res[0][0]
 		else:
 			self.user_id = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
-			self.call_on_login_event()
+			if self.user_id: self.call_on_login_event()
 		
 		if self.user_id:
 			self.validate_ip(self.user_id)

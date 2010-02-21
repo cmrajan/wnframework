@@ -11,11 +11,10 @@ _f.FrmContainer = function() {
 
 _f.FrmContainer.prototype.make_head = function() {
 	var me = this;
-	this.bg_color = '#DDF';
-	this.head = $a(this.wrapper, 'div', '', {borderBottom:'1px solid #AAA', margin:'0px'});
+	this.bg_color = '#FFF';
+	this.head = $a(this.wrapper, 'div', '', {margin:'0px 0px 4px 0px'});
 	this.body = $a(this.wrapper,'div');
 
-	
 	// Row 1
 	// ------------------
 
@@ -24,8 +23,8 @@ _f.FrmContainer.prototype.make_head = function() {
 
 	// left side - headers
 	// -------------------
-	$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 8px'});
-	this.main_title = $a($td(this.tbartab,0,0), 'div', '',{fontFamily:'Helvetica', margin: '0px 8px 0px 0px', display:'inline', fontSize:'24px'});
+	$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 4px'});
+	this.main_title = $a($td(this.tbartab,0,0), 'h1', '',{margin:'0px'});
 	this.sub_title = $a($td(this.tbartab,0,0), 'div','',{display:'inline'});
 	this.sub_title.is_inline = 1;
 	this.status_title = $a($td(this.tbartab,0,0), 'span','',{marginLeft:'8px'});
