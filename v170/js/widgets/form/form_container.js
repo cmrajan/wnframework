@@ -33,8 +33,8 @@ _f.FrmContainer.prototype.make_head = function() {
 	// right side - actions, comments & close btn
 	// ------------------------------------------
 	this.tbar_div = $a($td(this.tbartab,0,1),'div','',{marginRight:'8px', textAlign:'right'})
-	var tab2 = make_table(this.tbar_div, 1, 4, '220px', ['160px','60px'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
-	$y(tab2,{cssFloat:'right'});
+	var tab2 = make_table(this.tbar_div, 1, 2, '220px', ['160px','60px'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
+	$y(tab2,{cssFloat:'right', backgroundColor:'#DDD'});
 
 
 	// (Tweets) Comments
@@ -71,11 +71,12 @@ _f.FrmContainer.prototype.make_head = function() {
 
 	// Actions...
 	// -------------
+	$y($td(tab2,0,0),{paddingLeft:'6px'});
 	this.tbarlinks = new SelectWidget($td(tab2,0,0),[]);
 
 	// close button
 	// ---------------
-	$y($td(tab2,0,1),{padding:'6px 0px 2px 0px', textAlign:'right'});
+	$y($td(tab2,0,1),{padding:'6px 6px 2px 0px', textAlign:'right'});
 	this.close_btn = $a($td(tab2,0,1), 'img','',{cursor:'pointer'}); this.close_btn.src="images/icons/close.gif";
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
