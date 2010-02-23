@@ -234,3 +234,29 @@ def get_file(fname):
 	else: 
 		return webnotes.conn.sql("select file_name, `blob_content`, modified from `tabFile Data` where file_name=%s limit 1", fname)
 
+# Clear recycle bin
+# -----------------
+
+def clear_recycle_bin():
+	sql = webnotes.conn.sql
+	
+	tl = sql('show tables')
+	total_deleted = 0
+	for t in tl:
+		fl = [i[0] for i in sql('desc `%s`' % t[0])]
+		
+		if 'name' in fl:
+			total_deleted += sql("select count(*) from `%s` where name like '__overwritten:%%'" % t[0])[0][0]
+			sql("delete from `%s` where name like '__overwritten:%%'" % t[0])
+
+		if 'parent' in fl:	
+			total_deleted += sql("select count(*) from `%s` where parent like '__oldparent:%%'" % t[0])[0][0]
+			sql("delete from `%s` where parent like '__oldparent:%%'" % t[0])
+	
+			total_deleted += sql("select count(*) from `%s` where parent like 'oldparent:%%'" % t[0])[0][0]
+			sql("delete from `%s` where parent like 'oldparent:%%'" % t[0])
+
+			total_deleted += sql("select count(*) from `%s` where parent like 'old_parent:%%'" % t[0])[0][0]
+			sql("delete from `%s` where parent like 'old_parent:%%'" % t[0])
+
+	return "%s records deleted" % str(int(total_deleted))

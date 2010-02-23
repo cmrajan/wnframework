@@ -472,28 +472,6 @@ def delete_doc(doctype, name):
 	for t in tablefields:
 		sql("delete from `tab%s` where parent = '%s' and parentfield='%s'" % (t[0], name, t[1]))
 
-def clear_recycle_bin():
-	tl = sql('show tables')
-	total_deleted = 0
-	for t in tl:
-		fl = [i[0] for i in sql('desc `%s`' % t[0])]
-		
-		if 'name' in fl:
-			total_deleted += sql("select count(*) from `%s` where name like '__overwritten:%%'" % t[0])[0][0]
-			sql("delete from `%s` where name like '__overwritten:%%'" % t[0])
-
-		if 'parent' in fl:	
-			total_deleted += sql("select count(*) from `%s` where parent like '__oldparent:%%'" % t[0])[0][0]
-			sql("delete from `%s` where parent like '__oldparent:%%'" % t[0])
-	
-			total_deleted += sql("select count(*) from `%s` where parent like 'oldparent:%%'" % t[0])[0][0]
-			sql("delete from `%s` where parent like 'oldparent:%%'" % t[0])
-
-			total_deleted += sql("select count(*) from `%s` where parent like 'old_parent:%%'" % t[0])[0][0]
-			sql("delete from `%s` where parent like 'old_parent:%%'" % t[0])
-
-	msgprint("%s records deleted" % str(int(total_deleted)))
-
 def _get_print_format(match):
 	name = match.group('name')
 	content = sql('select html from `tabPrint Format` where name="%s"' % name)

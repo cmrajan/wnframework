@@ -124,3 +124,7 @@ unhide_field = function(n) {
 		else { for(var i in n)_hide_field(n[i],0) }
 	}
 }
+
+get_field_obj = function(fn) {
+	return cur_frm.fields_dict[fn];
+}

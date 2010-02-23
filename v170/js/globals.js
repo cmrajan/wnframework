@@ -55,9 +55,11 @@ var widget_files = {
 	,'_p.PrintQuery':'widgets/print_query.js'
 	,'Calendar':'widgets/calendar.js'
 	,'Recommendation':'widgets/recommend.js'
+	,'RatingWidget':'widgets/rating.js'
 }
 
 var Recommendation;
+var RatingWidget;
 
 // API globals
 var frms={};
