@@ -1,6 +1,9 @@
 // App.js
 var ui_effects = 1;
 
+// dialog container
+var popup_cont;
+
 function startup() {
 
 	//initialize our DHTML history
@@ -11,7 +14,9 @@ function startup() {
 	
 	if($.browser.msie && flt($.browser.version) < 8) ui_effects = 0;
 	if($.browser.mozilla && flt($.browser.version) < 1.9) ui_effects = 0;
-		
+
+	popup_cont = $a(document.getElementsByTagName('body')[0], 'div');
+
 	// Globals
 	// ---------------------------------
 	var setup_globals = function(r) {
@@ -77,8 +82,8 @@ function startup() {
 			loadpage(home_page);
 		}
 	}
-	$c('startup',{},callback,null,1);
-	
+	if($i('startup_div'))
+		$c('startup',{},callback,null,1);
 }
 
 function to_open() {

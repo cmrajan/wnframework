@@ -1005,7 +1005,7 @@ load('themes/'+n+'/langs/'+c+'.js');});}});each(s.plugins.split(','),function(n)
 load('plugins/'+n+'/langs/'+c+'.js');});}});},end:function(){},eval:function(co){var w=window;if(!w.execScript){if(/Gecko/.test(navigator.userAgent))
 eval(co,w);else
 eval.call(w,co);}else
-w.execScript(co);}};var popup_cont;function Body(){this.left_sidebar=null;this.right_sidebar=null;var me=this;this.no_of_columns=function(){var n=1;if(cint(this.cp.left_sidebar_width))n++;if(cint(this.cp.right_sidebar_width))n++;return n;}
+w.execScript(co);}};function Body(){this.left_sidebar=null;this.right_sidebar=null;var me=this;this.no_of_columns=function(){var n=1;if(cint(this.cp.left_sidebar_width))n++;if(cint(this.cp.right_sidebar_width))n++;return n;}
 this.setup_page_areas=function(){var n=this.no_of_columns();if(n==1)
 this.center=this.body;else{this.body_table=make_table(this.body,1,n,'100%');$y(this.body_table,{tableLayout:'fixed'});var c=0;if(cint(this.cp.left_sidebar_width)){this.left_sidebar=$td(this.body_table,0,c);$y(this.left_sidebar,{width:cint(this.cp.left_sidebar_width)+'px'});c++;}
 this.center=$a($td(this.body_table,0,c),'div');c++;if(cint(this.cp.right_sidebar_width)){this.right_sidebar=$td(this.body_table,0,c);$y(this.right_sidebar,{width:cint(this.cp.right_sidebar_width)+'px'})
@@ -1015,23 +1015,23 @@ this.setup_header_footer=function(){var hh=this.cp.header_height?(cint(this.cp.h
 this.run_startup_code=function(){if(this.cp.startup_css)
 set_style(this.cp.startup_css);if(this.cp.startup_code)
 eval(this.cp.startup_code);}
-this.setup_popup_container=function(){popup_cont=$a(document.getElementsByTagName('body')[0],'div');}
 this.setup=function(){this.cp=locals['Control Panel']['Control Panel'];if(!user_defaults.hide_webnotes_toolbar||user=='Administrator'){this.wntoolbar=new WNToolbar($i('body_div'));}
 this.wrapper=$a($i('body_div'),'div');this.header=$a(this.wrapper,'div');this.topmenu=$a(this.wrapper,'div');this.breadcrumbs=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div');this.footer=$a(this.wrapper,'div');if(user_defaults.hide_sidebars){this.cp.left_sidebar_width=null;this.cp.right_sidebar_width=null;}
-this.setup_page_areas();this.setup_header_footer();this.setup_popup_container();if(this.cp.page_width)$y(this.wrapper,{width:cint(this.cp.page_width)+'px'});}
+this.setup_page_areas();this.setup_header_footer();if(this.cp.page_width)$y(this.wrapper,{width:cint(this.cp.page_width)+'px'});}
 this.pages={};this.cur_page=null;this.add_page=function(label,onshow){var c=$a(this.center,'div');if(onshow)c.onshow=onshow;this.pages[label]=c;$dh(c);return c}
 this.change_to=function(label){if(me.cur_page&&me.pages[label]!=me.cur_page){if(me.cur_page.onhide)
 me.cur_page.onhide();$dh(me.cur_page);}
 me.cur_page=me.pages[label];$ds(me.cur_page);if(me.cur_page.onshow)
 me.cur_page.onshow(me.cur_page);}
 this.setup();}
-var ui_effects=1;function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);if($.browser.msie&&flt($.browser.version)<8)ui_effects=0;if($.browser.mozilla&&flt($.browser.version)<1.9)ui_effects=0;var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;}
+var ui_effects=1;var popup_cont;function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);if($.browser.msie&&flt($.browser.version)<8)ui_effects=0;if($.browser.mozilla&&flt($.browser.version)<1.9)ui_effects=0;popup_cont=$a(document.getElementsByTagName('body')[0],'div');var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;}
 var setup_history=function(r){rename_observers.push(nav_obj);}
 var setup_events=function(){addEvent('keypress',function(ev,target){for(var i in keypress_observers){if(keypress_observers[i])
 keypress_observers[i].notify_keypress(ev,(ev.keyCode?ev.keyCode:ev.charCode));}});addEvent('click',function(ev,target){for(var i=0;i<click_observers.length;i++){if(click_observers[i])
 click_observers[i].notify_click(ev,target);}});if(isIE){$op($i('dialog_back'),60);}}
 var callback=function(r,rt){if(r.exc)msgprint(r.ext);setup_globals(r);setup_history(r);setup_events();page_body=new Body();page_body.run_startup_code();page_body.setup_sidebar_menu();for(var i=0;i<startup_list.length;i++){startup_list[i]();}
 $dh('startup_div');$ds('body_div');var t=to_open();if(t){historyChange(t);}else if(home_page){loadpage(home_page);}}
+if($i('startup_div'))
 $c('startup',{},callback,null,1);}
 function to_open(){if(get_url_arg('page'))
 return get_url_arg('page');}
