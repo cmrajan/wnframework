@@ -23,12 +23,9 @@ def accept_module():
 # prepare a list of items in a module
 def get_module_items(mod):
 	import webnotes
-	dl = []
-	if only_dt:
-		transfer_types = ['DocType']
-	else:
-		transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','Search Criteria','Menu Item','TDS Category','TDS Rate Chart']
-		dl = ['Module Def,'+mod]
+
+	transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','Search Criteria','Menu Item','TDS Category','TDS Rate Chart']
+	dl = ['Module Def,'+mod]
 	  
 	for dt in transfer_types:
 		try:
@@ -37,11 +34,10 @@ def get_module_items(mod):
 		except:
 			pass
 	
-	if not only_dt:
-		dl1 = webnotes.conn.sql('select doctype_list from `tabModule Def` where name=%s', mod)
-		dl1 = dl1 and dl1[0][0] or ''
-		if dl1:
-			dl += dl1.split('\n')
+	dl1 = webnotes.conn.sql('select doctype_list from `tabModule Def` where name=%s', mod)
+	dl1 = dl1 and dl1[0][0] or ''
+	if dl1:
+		dl += dl1.split('\n')
 
 	# build finally
 	dl = [e.split(',') for e in dl]
