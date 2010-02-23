@@ -73,7 +73,10 @@ function WNToolbar(parent) {
 		
 		// add to recent
 		this.rdocs.add = function(dt, dn, on_top) {
-			if(!in_list(['Start Page','ToDo Item','Event','Search Criteria'], dt)) {
+			var has_parent = false;
+			if(locals[dt] && locals[dt][dn] && locals[dt][dn].parent) has_parent = true;
+			
+			if(!in_list(['Start Page','ToDo Item','Event','Search Criteria'], dt) && !has_parent) {
 	
 				// if there in list, only bring it to top
 				if(this.items[dt+'-'+dn]) {

@@ -759,7 +759,7 @@ loaddoc(this.dt,this.dn);mclose();}
 profile.start_items.sort(function(a,b){return(a[4]-b[4])});for(var i=0;i<profile.start_items.length;i++){var d=profile.start_items[i];var mi=this.menu.add_item('Options',d[1],fn);mi.dt=d[0];mi.dn=d[5]?d[5]:d[1];}}
 this.setup_home=function(){this.menu.add_top_menu('Home',function(){loadpage(home_page);});}
 this.setup_recent=function(){this.rdocs=me.menu.add_top_menu('Recent',function(){});this.rdocs.items={};var fn=function(){loaddoc(this.dt,this.dn);mclose();}
-this.rdocs.add=function(dt,dn,on_top){if(!in_list(['Start Page','ToDo Item','Event','Search Criteria'],dt)){if(this.items[dt+'-'+dn]){var mi=this.items[dt+'-'+dn];mi.bring_to_top();return;}
+this.rdocs.add=function(dt,dn,on_top){var has_parent=false;if(locals[dt]&&locals[dt][dn]&&locals[dt][dn].parent)has_parent=true;if(!in_list(['Start Page','ToDo Item','Event','Search Criteria'],dt)&&!has_parent){if(this.items[dt+'-'+dn]){var mi=this.items[dt+'-'+dn];mi.bring_to_top();return;}
 var tdn=dn;var rec_label='<table style="width: 100%" cellspacing=0><tr>'
 +'<td style="width: 10%; vertical-align: middle;"><div class="status_flag" id="rec_'+dt+'-'+dn+'"></div></td>'
 +'<td style="width: 50%; text-decoration: underline; color: #22B; padding: 2px;">'+tdn+'</td>'
