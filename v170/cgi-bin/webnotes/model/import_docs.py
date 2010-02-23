@@ -32,6 +32,13 @@ def import_docs(docs = []):
 	for m in created_docs:
 		if doc_list.has_key(m.name):
 			tmp = webnotes.model.code.run_server_obj(webnotes.model.code.get_server_obj(m, doc_list.get(m.name, [])),'on_update')
+
+			# update database (in case of DocType)
+			if m.doctype=='DocType':
+				import webnotes.model.doctype
+				try: webnotes.model.doctype.update_doctype(doc_list.get(m.name, []))
+				except: pass
+			
 			out += 'Executed: '+ str(m.name) + ', Err:' + str(tmp) + "\n"
 
 	return out
@@ -46,6 +53,7 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 	from webnotes.model.doc import Document
 	from webnotes.model.doclist import getlist
 	import webnotes.model.code
+	from webnotes.utils import cstr
 	
 	sql = webnotes.conn.sql
 	
@@ -84,10 +92,17 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 	
 	if onupdate:
 		so = webnotes.model.code.get_obj('DocType', doc.name, with_children = 1)
+
+		# update database (in case of DocType)
+		if so.doc.doctype=='DocType':
+			import webnotes.model.doctype
+			try: webnotes.model.doctype.update_doctype(so.doclist)
+			except: pass
+
 		if hasattr(so, 'on_update'):
 			so.on_update()
 
-	if in_transaction: sql("COMMIT")
+	if webnotes.conn.in_transaction: sql("COMMIT")
 
 	return doc.name + (' Upgraded: %s fields added' % added)
 
@@ -168,7 +183,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 			so.on_update()
 
 	# reset modified
-	webnote.conn.set(doc, 'modified', orig_modified)
+	webnotes.conn.set(doc, 'modified', orig_modified)
 
 	if webnotes.conn.in_transaction: 
 		sql("COMMIT")

@@ -10,11 +10,11 @@ _r.ReportContainer = function() {
 	// tool bar
 
 	var div = $a(this.wrapper, 'div');
-	var inner = $a(div, 'div', '', {backgroundColor:'#DFD', padding:'6px 8px 4px 8px'});
+	var inner = $a(div, 'div', '', {padding:'6px 8px 4px 8px'});
 		
 	var htab = make_table(inner, 1,2, '100%', ['80%','20%']);
 	
-	this.main_title = $a($td(htab,0,0),'div','',{fontFamily:'Helvetica', display:'inline', fontSize:'24px'});
+	this.main_title = $a($td(htab,0,0),'h1');
 		
 	// close button
 	$y($td(htab,0,1),{textAlign:'right'});
@@ -354,8 +354,7 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 // -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
-	// load additional fields sort option
-	_r.rb_con.main_title.innerHTML = criteria_name;
+
 	
 	var sc = locals['Search Criteria'][this.sc_dict[criteria_name]];
 	if(sc && sc.add_col)
@@ -381,6 +380,8 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 		this.dt.page_len_sel.inp.value = sc.page_len;
 	}
 	this.current_loaded = criteria_name;
+	// load additional fields sort option
+	_r.rb_con.main_title.innerHTML = criteria_name;	
 }
 
 //

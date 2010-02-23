@@ -4,11 +4,12 @@ def accept_module(super_doclist):
 	import webnotes.utils
 	from webnotes.model.import_docs import set_doc
 	
+	form = webnotes.form
 	cint = webnotes.utils.cint
 	msg, i = [], 0
 
 	for dl in super_doclist:
-		msg.append(set_doc(dl, cint(form.getvalue('ovr')), cint(form.getvalue('ignore')), cint(form.getvalue('onupdate'))))
+		msg.append(set_doc(dl, 1, 1, 1))
 	msg = '<br>'.join(msg)
 
 	if not webnotes.conn.in_transaction:
@@ -16,7 +17,7 @@ def accept_module(super_doclist):
 	webnotes.utils.clear_recycle_bin()
 	webnotes.conn.sql("COMMIT")
 
-	out['message'] = msg
+	return msg
 
 # prepare a list of items in a module
 def get_module_items(mod):
