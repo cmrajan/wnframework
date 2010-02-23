@@ -1,13 +1,11 @@
 # accept a module coming from a remote server
-def accept_module():
+def accept_module(super_doclist):
 	import webnotes
 	import webnotes.utils
 	from webnotes.model.import_docs import set_doc
 	
 	cint = webnotes.utils.cint
-		
 	msg, i = [], 0
-	super_doclist = eval(webnotes.form.getvalue('super_doclist'))
 
 	for dl in super_doclist:
 		msg.append(set_doc(dl, cint(form.getvalue('ovr')), cint(form.getvalue('ignore')), cint(form.getvalue('onupdate'))))
