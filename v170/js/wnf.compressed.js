@@ -504,7 +504,7 @@ this.init();this.oP=param?param:{};var k,def={minchars:1,meth:"get",varname:"inp
 for(k in def)
 {if(typeof(this.oP[k])!=typeof(def[k]))
 this.oP[k]=def[k];}
-var p=this;this.fld.onkeypress=function(ev){if(!selector.display)return p.onKeyPress(ev);};this.fld.onkeyup=function(ev){if(!selector.display)return p.onKeyUp(ev);};this.fld.setAttribute("autocomplete","off");};AutoSuggest.prototype.init=function(){this.sInp="";this.nInpC=0;this.aSug=[];this.iHigh=0;}
+var p=this;this.fld.onkeypress=function(ev){if(!(selector&&selector.display))return p.onKeyPress(ev);};this.fld.onkeyup=function(ev){if(!(selector&&selector.display))return p.onKeyUp(ev);};this.fld.setAttribute("autocomplete","off");};AutoSuggest.prototype.init=function(){this.sInp="";this.nInpC=0;this.aSug=[];this.iHigh=0;}
 AutoSuggest.prototype.onKeyPress=function(ev)
 {var key=(window.event)?window.event.keyCode:ev.keyCode;var RETURN=13;var TAB=9;var ESC=27;var bubble=1;switch(key)
 {case TAB:this.setHighlightedValue();bubble=0;break;case RETURN:this.setHighlightedValue();bubble=0;break;case ESC:this.clearSuggestions();break;}
