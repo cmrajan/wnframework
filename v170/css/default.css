@@ -1005,7 +1005,6 @@ div#dialogs {
 	z-index: 90;
 	position: absolute;
 	top: 0px;
-	left: 0px;
 }
 
 div.dialog_message {
