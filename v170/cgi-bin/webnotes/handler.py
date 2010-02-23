@@ -81,7 +81,7 @@ def dt_map():
 	
 	form = webnotes.form
 	
-	dt_list = webnotes.model.doclist.expand_doclist(form.getvalue('docs'))
+	dt_list = webnotes.model.doclist.expand(form.getvalue('docs'))
 	from_doctype = form.getvalue('from_doctype')
 	to_doctype = form.getvalue('to_doctype')
 	from_docname = form.getvalue('from_docname')
