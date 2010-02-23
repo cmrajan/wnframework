@@ -1,6 +1,7 @@
 var fcount = 0;
 var frozen = 0;
 var dialog_message;
+var dialog_back;
 
 function freeze(msg, do_freeze) {
 	// show message
@@ -17,8 +18,11 @@ function freeze(msg, do_freeze) {
 	} 
 	
 	// blur
-	$ds($i('dialog_back'));
-	$y($i('dialog_back'), {height: get_page_size()[1] + 'px'});
+	if(!dialog_back)
+		dialog_back = $a(document.getElementsByTagName('body')[0], 'div', 'dialog_back');
+
+	$ds(dialog_back);
+	$y(dialog_back, {height: get_page_size()[1] + 'px'});
 	fcount++;
 	frozen = 1;
 }
@@ -28,7 +32,7 @@ function unfreeze() {
 	if(!fcount)return; // anything open?
 	fcount--;
 	if(!fcount) {
-		$dh($i('dialog_back'));
+		$dh(dialog_back);
 		show_selects();
 		frozen = 0;
 	}

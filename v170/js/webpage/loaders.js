@@ -75,7 +75,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 		
 		// case C - only frm loaded
 		} else {
-			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user}, show_doc, null, null, 'Loading ' + name);	// onload
+			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user}, show_doc, null, null);	// onload
 		}
 	}
 	

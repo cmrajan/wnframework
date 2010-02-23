@@ -377,7 +377,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	// add DIV to document
 	//
 	//document.getElementsByTagName("body")[0].appendChild(div);	
-	$i('dialogs').appendChild(div);
+	popup_cont.appendChild(div);
 	
 	//height
 	if(cint(div.clientHeight) >= this.oP.maxheight) {

@@ -10,137 +10,6 @@ function setlinkvalue(name) {
 	if(selector.input.txt)selector.input.txt.onchange();
 }
 
-function makeselector2() {
-	var d = new Dialog(640,440, 'Search');
-
-	d.make_body([
-		['HTML', 'List']
-	]);
-
-	d.loading_div = $a(d.widgets.List,'div','comment',{margin:'8px 0px', display:'none'}); d.loading_div.innerHTML = 'Setting up...';
-	d.ls = new Listing("Search", 1);
-	d.ls.opts = {
-		cell_style : {padding:'3px 2px',border:'0px'},
-		alt_cell_style : {backgroundColor:'#FFFFFF'},
-		hide_export : 1,
-		hide_print : 1,
-		hide_refresh : 0,
-		hide_rec_label: 0,
-		show_calc: 0,
-		show_empty_tab : 0,
-		show_bottom_paging: 0,
-		round_corners: 0,
-		no_border: 1
-	}
-	d.ls.is_std_query = 1;
-
-	// make
-	d.ls.colwidths=[''];
-	d.ls.make(d.widgets.List);
-	$y(d.ls.results, {height:'200px',overflowY:'auto'});
-	
-	d.ls.get_query = function() {
-
-					
-		if(d.input && d.input.get_query) {
-			var doc = {};
-			if(cur_frm) doc = locals[cur_frm.doctype][cur_frm.docname];
-			this.query = d.input.get_query(doc);
-			this.query_max = 'SELECT COUNT(*) FROM ' + this.query.split(' FROM ')[1]; // custom query -- NO QUERY MAX
-
-		} else {
-
-			var q = {};
-			var fl = []
-			q.table = repl('`tab%(dt)s`', {dt:d.sel_type});
-			for(var i in d.fields) 
-				fl.push(q.table+'.`'+d.fields[i][0]+'`')
-	
-			q.fields = fl.join(', ');
-			q.conds = q.table + '.docstatus < 2 ';
-			this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
-			this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
-		}
-
-	}
-
-	d.ls.show_cell = function(cell,ri,ci,dat) {
-		var l = $a($a(cell,'div','',{borderBottom:'1px dashed #CCC',paddingBottom:'4px'}), 'span','link_type'); l.innerHTML = dat[ri][0];
-		l.d = d;
-		l.onclick = function() {
-			if(this.d.style=='Search')
-				loaddoc(this.d.sel_type, this.innerHTML);
-			else
-				setlinkvalue(this.innerHTML);
-		}
-		var l = $a(cell, 'div','comment'); var tmp = [];
-		for(var i=1;i<dat[ri].length;i++) tmp.push(dat[ri][i]);
-		l.innerHTML = tmp.join(', ');
-	}
-
-	// called from search
-	d.set_search = function(dt) {
-		if(d.style!='Search') {
-			d.ls.clear();
-		}
-		d.style = 'Search';
-		if(d.input) { d.input = null; sel_type = null; } // clear out the linkfield refrences
-		d.sel_type = dt;
-		d.title_text.innerHTML = 'Search for ' + dt;
-	}
-	
-	// called from link
-	d.set = function(input, type, label) {
-		d.sel_type = type; d.input = input;
-		if(d.style!='Link') {
-			d.ls.clear();
-		}
-		d.style = 'Link';
-		if(!d.sel_type)d.sel_type = 'Value';
-		d.title_text.innerHTML = 'Select a "'+ d.sel_type +'" for field "'+label+'"';
-	}
-	
-	// on show
-	d.onshow = function() {
-		if(d.sel_type!='Value' && !search_fields[d.sel_type]) {
-			$dh(d.ls.wrapper);
-			$ds(d.loading_div);
-			 // de focus selector
-			// get search fields
-			$c('getsearchfields', {doctype:d.sel_type}, function(r,rt) { search_fields[d.sel_type] = r.searchfields; d.show_lst(); })
-		} else {
-			d.show_lst();
-		}
-	}
-	d.onhide = function() {
-		if(page_body.wntoolbar)
-			page_body.wntoolbar.search_sel.disabled = 0;
-	}
-	d.show_lst = function() {
-		$ds(d.ls.wrapper);
-		$dh(d.loading_div);
-		d.fields = search_fields[d.sel_type];
-		if(d.sel_type=='Value') {
-			d.fields = []; // for customized query with no table - NO FILTERS
-		}
-
-		if(d.sel_type!=d.set_doctype) {
-			// clear filters
-			d.ls.clear();
-			d.ls.remove_all_filters();
-			for(var i=0;i< (d.fields.length>4 ? 4 : d.fields.length);i++) {
-				if(d.fields[i][2]=='Link')d.fields[i][2]='Data';  // no link-in-link
-				d.ls.add_filter(d.fields[i][1], d.fields[i][2], d.fields[i][3], d.sel_type, d.fields[i][0], (in_list(['Data','Text','Link'], d.fields[i][2]) ? 'LIKE' : ''));
-			}
-		}
-		d.set_doctype = d.sel_type;
-		if(d.ls.filters['ID'].input)d.ls.filters['ID'].input.focus();
-		
-		//d.ls.show_query = 1;
-	}	
-	selector = d;
-}
-
 // Link Selector
 // -------------
 
@@ -153,7 +22,6 @@ function makeselector() {
 		['Button', 'Search'],
 		['HTML', 'Result']
 	]);	
-	d.wrapper.style.zIndex = 93;
 	
 	// search with
 	var inp = d.widgets['Beginning With'];
@@ -299,8 +167,6 @@ function makeselector() {
 		}
 		
 	}
-	
-	d.wrapper.style.zIndex = '95';
 	
 	selector = d;	
 }

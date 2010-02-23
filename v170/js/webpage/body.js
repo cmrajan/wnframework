@@ -11,6 +11,10 @@
 
 
 **/
+
+// dialog container
+var popup_cont;
+
 function Body() { 
 	this.left_sidebar = null;
 	this.right_sidebar = null;
@@ -78,6 +82,10 @@ function Body() {
 			eval(this.cp.startup_code);
 	}
 	
+	this.setup_popup_container = function() {
+		popup_cont = $a(document.getElementsByTagName('body')[0], 'div');
+	}
+	
 	this.setup = function() {
 		this.cp = locals['Control Panel']['Control Panel'];
 
@@ -92,6 +100,7 @@ function Body() {
 		this.breadcrumbs = $a(this.wrapper, 'div');
 		this.body = $a(this.wrapper, 'div');
 		this.footer = $a(this.wrapper, 'div');
+	
 		
 		// sidebars
 		if(user_defaults.hide_sidebars) {
@@ -103,6 +112,9 @@ function Body() {
 	
 		// headers & footer
 		this.setup_header_footer();
+		
+		// popup container
+		this.setup_popup_container();
 		
 		// page width
 		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});

@@ -6,7 +6,8 @@ var cur_dialog;
 var top_index=91;
 
 function Dialog(w, h, title, content) {
-	this.wrapper = $a('dialogs', 'div', 'dialog_wrapper');
+
+	this.wrapper = $a(popup_cont, 'div', 'dialog_wrapper');
 	this.w = w;
 	this.h = h;
 
@@ -67,12 +68,11 @@ Dialog.prototype.show = function() {
 	$y(this.wrapper,{zIndex:top_index});
 
 	$ds(this.wrapper);
-	//this.my_border.render(this.wrapper);
 
 	this.display = true;
 	cur_dialog = this;
 
-	if(this.onshow)this.onshow();	
+	if(this.onshow)this.onshow();
 }
 
 Dialog.prototype.hide = function() {

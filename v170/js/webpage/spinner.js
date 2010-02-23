@@ -10,7 +10,7 @@ function get_scroll_top() {
 var _loading_div;
 function set_loading() {
 	if(!_loading_div) {
-		_loading_div = $a('dialogs', 'div', 'loading_div');
+		_loading_div = $a(popup_cont, 'div', 'loading_div');
 		_loading_div.innerHTML = 'Loading';
 	}
 	var d = _loading_div;

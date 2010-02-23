@@ -988,7 +988,7 @@ div.dialog_body {
 	padding-bottom: 16px;
 }
 
-div#dialog_back {
+div.dialog_back {
 	position: absolute;
 	display: none;
 	top: 0px;
@@ -1001,12 +1001,6 @@ div#dialog_back {
 	height: 100%;
 }
 
-div#dialogs {
-	z-index: 90;
-	position: absolute;
-	top: 0px;
-}
-
 div.dialog_message {
 	display: none;
 	position: absolute;
@@ -1016,14 +1010,6 @@ div.dialog_message {
 	background-color:#FFF;
 	padding: 12px;
 	border: 1px solid #444;
-}
-
-div#dialog_message .sb-inner { 
-	background-color:#FFF; 
-}
-
-div#dialog_message .sb-border { 
-	background-color:#444; 
 }
 
 div.dialog_row {

@@ -171,7 +171,7 @@ function WNToolbar(parent) {
 		me.search_sel.set_options(profile.can_read.sort());
 		me.search_sel.inp.onchange = function() { open_quick_search(); this.value = 'Search...'; }
 		
-		makeselector();
+		startup_list.push(makeselector);
 	}
 	
 	// Setup User / Logout area
