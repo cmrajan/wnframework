@@ -73,7 +73,7 @@ def logout():
 # DocType Mapper
 # ------------------------------------------------------------------------------------
 
-def dt_map(form, session):
+def dt_map():
 	import webnotes
 	import webnotes.model.doclist
 	from webnotes.model.code import get_obj
