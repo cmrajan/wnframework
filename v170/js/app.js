@@ -15,7 +15,7 @@ function startup() {
 	if($.browser.msie && flt($.browser.version) < 8) ui_effects = 0;
 	if($.browser.mozilla && flt($.browser.version) < 1.9) ui_effects = 0;
 
-	popup_cont = $a($i('body_div'), 'div');
+	popup_cont = $a(document.getElementsByTagName('body')[0], 'div');
 
 	// Globals
 	// ---------------------------------
