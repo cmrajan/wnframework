@@ -19,7 +19,7 @@ function freeze(msg, do_freeze) {
 	
 	// blur
 	if(!dialog_back) {
-		dialog_back = $a(document.getElementsByTagName('body')[0], 'div', 'dialog_back');
+		dialog_back = $a($i('body_div'), 'div', 'dialog_back');
 		if(isIE) dialog_back.style['filter'] = 'alpha(opacity=60)';
 	}
 
