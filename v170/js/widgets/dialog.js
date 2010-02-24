@@ -66,6 +66,8 @@ Dialog.prototype.show = function() {
 
 	top_index++;
 	$y(this.wrapper,{zIndex:top_index});
+	$y(this.head,{zIndex:top_index});
+	$y(this.body,{zIndex:top_index});
 
 	$ds(this.wrapper);
 
