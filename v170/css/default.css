@@ -998,7 +998,6 @@ div.dialog_back {
 	opacity: 0.6;
 	z-index: 50;
 	text-align: center;
-	height: 100%;
 }
 
 div.dialog_message {

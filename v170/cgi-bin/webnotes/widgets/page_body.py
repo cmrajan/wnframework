@@ -37,7 +37,6 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 
 </div>
 
-
 %(add_in_body)s
 </body>
 </html>
