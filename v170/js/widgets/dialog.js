@@ -58,7 +58,6 @@ Dialog.prototype.no_cancel = function() {
 }
 
 Dialog.prototype.show = function() {
-	freeze();
 	var d = get_screen_dims();
 	
 	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
@@ -66,10 +65,10 @@ Dialog.prototype.show = function() {
 
 	top_index++;
 	$y(this.wrapper,{zIndex:top_index});
-	$y(this.head,{zIndex:top_index});
-	$y(this.body,{zIndex:top_index});
 
 	$ds(this.wrapper);
+
+	freeze();
 
 	this.display = true;
 	cur_dialog = this;
