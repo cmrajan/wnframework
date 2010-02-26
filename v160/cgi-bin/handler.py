@@ -715,7 +715,7 @@ def add_match_conditions(q, tl, ur, ud):
 		condition_end = q.find('ORDER BY')!=-1 and 'ORDER BY' or 'LIMIT'
 		condition_end = q.find('GROUP BY')!=-1 and 'GROUP BY' or condition_end
 				
-		if q.find('ORDER BY')!=-1 or q.find('LIMIT')!=-1 or g.find('GROUP BY')!= -1: # if query continues beyond conditions
+		if q.find('ORDER BY')!=-1 or q.find('LIMIT')!=-1 or q.find('GROUP BY')!= -1: # if query continues beyond conditions
 			q = q.split(condition_end)
 			q = q[0] + condition_st + '(' + ' OR '.join(sl) + ') ' + condition_end + q[1]
 		else:
