@@ -11,7 +11,11 @@ var _loading_div;
 function set_loading() {
 	if(!_loading_div) {
 		_loading_div = $a(popup_cont, 'div', 'loading_div');
-		_loading_div.innerHTML = 'Loading';
+		var t = make_table(_loading_div, 1, 2, '90px', [null, null], {verticalAlign:'middle'});
+		$y(t,{borderCollapse: 'collapse'});
+		$a($td(t,0,1), 'img').src="images/ui/loading.gif";
+		$td(t,0,0).innerHTML = 'Loading...'
+		if(!isIE)$y($td(t,0,1),{paddingTop:'2px'});
 	}
 	var d = _loading_div;
 	if(!d)return;
