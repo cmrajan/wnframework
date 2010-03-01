@@ -292,8 +292,7 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	$y(this.input_area,{height:'30px', marginTop:'4px', marginBottom: '4px'});
 
 	this.input = $a(this.input_area, 'button');
-	this.input.label = $a(this.input,'span');
-	this.input.label.innerHTML = me.df.label;
+	this.input.innerHTML = me.df.label;
 	this.input.onclick = function() {
 		this.disabled = true;
 		if(me.df.trigger=='Client' && (!me.in_filter)) {
@@ -302,6 +301,7 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 		} else
 			cur_frm.runscript(me.df.options, me);
 	}
+	$(this.input).button({icons:{ primary: 'ui-icons-play' }});
 }
 _f.ButtonField.prototype.set = function(v) { }; // No Setter
 _f.ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly
