@@ -6,14 +6,14 @@ function msgprint(msg, static, callback) {
 		$(msg_dialog).dialog({
 			modal: true,
 			autoOpen: false,
-			hide: function(event, ui) {
-				$(msg_dialog).innerHTML = '';
+			close: function(event, ui) {
+				msg_dialog.innerHTML = '';
 			}
 		});
 	} 
 
 	// add table
-	var t = make_table(msg_dialog.rows['Msg'], 1, 2, '100%',['20px',null],{padding:'2px',verticalAlign: 'Top'});
+	var t = make_table(msg_dialog, 1, 2, '100%',['20px',null],{padding:'2px',verticalAlign: 'Top'});
 	msg_dialog.msg_area = $td(t,0,1);
 	msg_dialog.msg_icon = $a($td(t,0,0),'img');
 
