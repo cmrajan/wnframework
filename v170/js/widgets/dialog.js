@@ -103,7 +103,7 @@ Dialog.prototype.make_row = function(d) {
 	else if(d[0]=='Button') {
 		c2.style.height = '32px';
 		c2.style.textAlign = 'right';
-		var b = $a(c2, 'button');
+		var b = $a(c2, 'button','',{padding:'6px'});
 		$(b).button();
 		b.innerHTML = d[1];
 		b.dialog = me;
