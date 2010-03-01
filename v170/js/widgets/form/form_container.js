@@ -36,19 +36,19 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.tbartab2 = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%']);
 
 	// created / modified
-	this.owner_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
+	this.owner_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px',width:'40px',display:'inline'});
 	this.owner_img.is_inline = 1;
 
-	this.mod_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
+	this.mod_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px',width:'40px',display:'inline'});
 	this.mod_img.is_inline = 1;
 		
 	// details
 	$y($td(this.tbartab2,0,1),{textAlign:'right', paddingRight:'12px'});
-	this.sub_title = $a($td(this.tbartab2, 0, 1), 'div','',{display:'inline'});
+	this.sub_title = $a($td(this.tbartab2, 0, 1), 'div','',{display:'inline', color:'#888'});
 	this.sub_title.is_inline = 1;
 	this.status_title = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px'});
 	this.status_title.is_inline = 1;
-	this.last_update_area = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px'});
+	this.last_update_area = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px', color:'#888'});
 	this.last_update_area.is_inline = 1;
 
 
