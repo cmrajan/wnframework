@@ -301,7 +301,7 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 		} else
 			cur_frm.runscript(me.df.options, me);
 	}
-	$(this.input).button({icons:{ primary: 'ui-icons-play' }});
+	$(this.input).button({icons:{ primary: 'ui-icon-play' }});
 }
 _f.ButtonField.prototype.set = function(v) { }; // No Setter
 _f.ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly

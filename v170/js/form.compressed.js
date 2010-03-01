@@ -184,7 +184,7 @@ _f.ImageField.prototype.set_disp=function(val){}
 _f.ImageField.prototype.set=function(val){}
 _f.ButtonField=function(){};_f.ButtonField.prototype=new Field();_f.ButtonField.prototype.make_input=function(){var me=this;$y(this.input_area,{height:'30px',marginTop:'4px',marginBottom:'4px'});this.input=$a(this.input_area,'button');this.input.innerHTML=me.df.label;this.input.onclick=function(){this.disabled=true;if(me.df.trigger=='Client'&&(!me.in_filter)){cur_frm.runclientscript(me.df.label,me.doctype,me.docname);this.disabled=false;}else
 cur_frm.runscript(me.df.options,me);}
-$(this.input).button({icons:{primary:'ui-icons-play'}});}
+$(this.input).button({icons:{primary:'ui-icon-play'}});}
 _f.ButtonField.prototype.set=function(v){};_f.ButtonField.prototype.set_disp=function(val){}
 _f.TableField=function(){};_f.TableField.prototype=new Field();_f.TableField.prototype.make_body=function(){if(this.perm[this.df.permlevel]&&this.perm[this.df.permlevel][READ]){this.grid=new _f.FormGrid(this);if(this.frm)this.frm.grids[this.frm.grids.length]=this;this.grid.make_buttons();}}
 _f.TableField.prototype.refresh=function(){if(!this.grid)return;var st=this.get_status();if(!this.df['default'])
