@@ -284,56 +284,6 @@ div.dialog_frm {
 	margin: 10px;
 }
 
-/* TABS */
-
-div.box_label_wrapper {
-	border-bottom: 4px solid #ABABAB;
-}
-
-div.box_label_body {
-	height: 28px;
-}
-
-ul.box_tabs {
-	margin: 0px;
-	padding: 0px;
-	list-style: none;
-}
-
-ul.box_tabs li {
-	height: 28px;
-	float:left;
-	background:url("../images/ui/rc/tab-left-EEE.gif") no-repeat left top;
-	/*background:url("left.gif") no-repeat left top;*/
-	margin:0;
-	margin-left: 4px;
-	padding:0 0 0 9px;
-	background-color: #E0E0E0;
-	cursor: pointer;
-}
-
-ul.box_tabs a {
-	display:block;
-	background:url("../images/ui/rc/tab-right-EEE.gif") no-repeat right top;
-	padding:6px 15px 6px 6px;
-	text-decoration:none;
-	font-weight:bold;
-}
-
-ul.box_tabs li.box_tab_mouseover {
-
-}
-
-
-ul.box_tabs li.box_tab_selected {
-	background:url("../images/ui/rc/tab-left-CCC.gif") no-repeat left top;
-	background-color: #ABABAB;
-	color: #FFF;
-}
-ul.box_tabs li.box_tab_selected a {
-	background:url("../images/ui/rc/tab-right-CCC.gif") no-repeat right top;
-}
-
 td.frm_tray_area {
 	padding-bottom: 200px;
 	width: 128px;
@@ -960,56 +910,6 @@ div.todo_links div {
 
 /* Drop Shadow */
 
-div.dialog_wrapper {
-	position: absolute;
-	display: none;
-	z-index: 90;
-	padding: 4px;
-	background-color: #FFF;
-	border: 2px solid #444;
-}
-
-div.dialog_wrapper .sb-inner {
-	background-color: #FFF;
-}
-div.dialog_wrapper .sb-border {
-	background-color: #444;
-}
-
-div.dialog_head {
-	height: 22px;
-	padding: 4px;
-	margin-bottom: 4px;
-	background-color: #DDD;
-}
-
-div.dialog_body {
-	padding-bottom: 16px;
-}
-
-div.dialog_back {
-	position: absolute;
-	display: none;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	background-color: #EEE;
-	opacity: 0.6;
-	z-index: 50;
-	text-align: center;
-}
-
-div.dialog_message {
-	display: none;
-	position: absolute;
-	width: 250px;
-	font-size: 12px;
-	z-index: 91;
-	background-color:#FFF;
-	padding: 12px;
-	border: 1px solid #444;
-}
-
 div.dialog_row {
 	padding: 8px 8px 0px 8px;
 }
@@ -1036,23 +936,6 @@ div.dialog_row table td textarea {
 .search_table td {
 	padding: 2px;
 }
-
-
-/* Calendar */
-
-.cpYearNavigation,.cpMonthNavigation { background-color:#C0C0C0; text-align:center; vertical-align: middle; text-decoration:none; color:#000000; font-weight:bold; }
-.cpDayColumnHeader, .cpYearNavigation,.cpMonthNavigation,.cpCurrentMonthDate,.cpCurrentMonthDateDisabled,.cpOtherMonthDate,.cpOtherMonthDateDisabled,.cpCurrentDate,.cpCurrentDateDisabled,.cpTodayText,.cpTodayTextDisabled,.cpText { font-family:Verdana, Arial; font-size:8pt; }
-TD.cpDayColumnHeader { text-align:right; border:solid thin #C0C0C0;border-width:0px 0px 1px 0px; }
-.cpCurrentMonthDate, .cpOtherMonthDate, .cpCurrentDate  { text-align:right; text-decoration:none; }
-.cpCurrentMonthDateDisabled, .cpOtherMonthDateDisabled, .cpCurrentDateDisabled { color:#D0D0D0; text-align:right; text-decoration:line-through; }
-.cpCurrentMonthDate, .cpCurrentDate { color:#000000; }
-.cpOtherMonthDate { color:#808080; }
-TD.cpCurrentDate { color:white; background-color: #C0C0C0; border-width:1px; border:solid thin #800000; }
-TD.cpTodayText, TD.cpTodayTextDisabled { border:solid thin #C0C0C0; border-width:1px 0px 0px 0px;}
-A.cpTodayText, SPAN.cpTodayTextDisabled { height:20px; }
-A.cpTodayText { color:black; }
-.cpTodayTextDisabled { color:#D0D0D0; }
-.cpBorder { border:solid thin #808080; width: 144px; }
 
 .caldiv {
 	position:absolute;
@@ -1249,118 +1132,6 @@ div.cal_event_Private {
 
 div.cal_event_hover {
 	text-decoration: underline;
-}
-
-/***** GRAPH ******/
-
-div.gr_body {
-	position: absolute;
-	height: 100%;
-	width: 100%;
-}
-
-div.gr_title_area { 
-	position: absolute;
-	left: 16px;
-	width: 70%;
-	top: 16px;
-	height: 30px;
-	text-align: left;
-	font-size: 14px;
-	font-weight: bold;
-}
-
-div.gr_main_area {
-	position: absolute;
-	left: 20%;
-	width: 70%;
-	top: 10%;
-	background-color: #fff;
-	border-left: 1px solid #888;
-	border-bottom: 1px solid #888;
-}
-
-div.gr_legend_area {
-	position: absolute;
-	left: 70%;
-	width: 30%;
-	top: 16px;
-	height: 50px;
-}
-
-div.gr_y_name {
-	position: absolute;
-	left: 16px;
-	width: 74px;
-	top: 20%;
-	height: 65%;
-	font-size: 11px;
-}
-
-div.gr_x_name {
-	position: absolute;
-	left: 25%;
-	width: 70%;
-	/*top: 90%;*/
-	height: 30px;
-	text-align: center;
-	font-size: 11px;
-}
-	
-div.gr_y_labels {
-	position: absolute;
-	left: 10%;
-	width: 90px;
-	top: 10%;
-	/*height: 65%;*/
-	font-size: 11px;
-}
-
-div.gr_y_labels div {
-	text-align: left;
-	font-size: 11px;
-	width: 100%;
-}
-
-div.gr_x_labels {
-	position: absolute;
-	left: 20%;
-	width: 70%;
-	/*top: 85%;*/
-	height: 30px;
-}
-
-div.gr_x_labels div {
-	font-size: 11px;
-}
-
-div.gr_xunit {
-	position: absolute;
-}
-
-div.gr_grid {
-	position: absolute;
-}
-
-div.absdiv {
-	position: absolute;
-}
-
-div.gr_label {
-	position: absolute;
-	text-align:center;
-}
-
-div.gr_bar {
-	position:absolute;
-	background-color: #BBB;
-	font-size: 0px;
-}
-
-div.gr_legend {
-	position:absolute;
-	width: 20px;
-	font-size: 11px;
 }
 
 /* 

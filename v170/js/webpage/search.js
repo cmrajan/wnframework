@@ -39,7 +39,7 @@ function makeselector() {
 		}
 		d.style = 'Link';
 		if(!d.sel_type)d.sel_type = 'Value';
-		d.title_text.innerHTML = 'Select a "'+ d.sel_type +'" for field "'+label+'"';
+		d.set_title('Select a "'+ d.sel_type +'" for field "'+label+'"');
 	}
 	d.set_search = function(dt) {
 		if(d.style!='Search') {
@@ -49,7 +49,7 @@ function makeselector() {
 		d.style = 'Search';
 		if(d.input) { d.input = null; sel_type = null; }
 		d.sel_type = dt;
-		d.title_text.innerHTML = 'Quick Search for ' + dt;
+		d.set_title('Quick Search for ' + dt);
 	}
 	
 	inp.onkeydown = function(e) { 

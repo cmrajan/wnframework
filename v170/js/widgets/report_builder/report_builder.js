@@ -129,7 +129,6 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
 	this.mytabs = new TabbedPage(this.tab_wrapper);
-	this.mytabs.body_area.className = 'finder_body_area';
 	
 	this.mytabs.add_tab('Result');
 	this.mytabs.add_tab('More Filters');
@@ -142,7 +141,6 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 _r.ReportBuilder.prototype.make_body = function() {
 
 	_r.rb_con.main_title.innerHTML = this.doctype;
-	this.mytabs.tabs['Result'].show();
 
 	var me = this;
 	

@@ -10,8 +10,9 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   <meta name="generator" content="Web Notes Framework Version v170 - Open Source Web Application Framework" />  
   
   <title>%(title)s</title>
-  <link type="text/css" rel="stylesheet" href="css/default.css?v=1.6.0">
-  <link type="text/css" rel="stylesheet" href="css/user.css?v=1.6.0">
+  <link type="text/css" rel="stylesheet" href="css/default.css?">
+  <link type="text/css" rel="stylesheet" href="css/jquery-ui.css?">
+  <link type="text/css" rel="stylesheet" href="css/user.css?">
   <link rel="Shortcut Icon" href="/favicon.ico">
   
   <script language="JavaScript" src="js/wnf.compressed.js"></script>

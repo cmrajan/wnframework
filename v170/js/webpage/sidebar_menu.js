@@ -1,5 +1,5 @@
 // Sidebar Menu
-function SidebarMenu() {
+SidebarMenu = function() {
 	this.menu_items = {};	
 	this.menu_lists = {};
 	this.menu_dt_details = {};
@@ -201,5 +201,4 @@ SidebarMenu.prototype.show_listing = function(mid) {
   me.cur_menu_lst = me.menu_lists[mi.name];
   
 }
-var sidebar_menu;
 

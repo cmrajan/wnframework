@@ -53,6 +53,37 @@ _f.SectionBreak.prototype.make_row = function() {
 	this.row = this.frm.layout.addrow();
 }
 
+_f.SectionBreak.prototype.make_collapsible = function(head) {
+	var me = this;
+
+	var t = make_table($a(head,'div'), 1,2, '100%', ['20px',null], {verticalAlign:'middle'});
+	$y(t,{borderCollapse:'collapse'});
+		
+	this.label = $a($td(t,0,1), 'div', 'sectionHeading');
+	this.label.innerHTML = this.df.label?this.df.label:'';
+		
+	// exp / collapse
+	this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
+	this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
+	this.exp_icon.expand = function() { 
+		if(ui_effects) $ds(me.row.body) 
+		else $(me.row.body).slideDown(); 
+		me.exp_icon.src = min_icon; 
+	}
+	this.exp_icon.collapse = function() { 
+		if(ui_effects) $dh(me.row.body) 
+		else $(me.row.body).slideUp(); 
+		me.exp_icon.src = exp_icon; 
+	}
+	$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
+		
+	// callable functions
+	this.collapse = this.exp_icon.collapse;
+	this.expand = this.exp_icon.expand;
+
+}
+
+
 _f.SectionBreak.prototype.make_simple_section = function(static) {
 	var head = $a(this.row.header, 'div', '', {margin:'4px 8px 0px 8px'});
 	var me = this;
@@ -76,30 +107,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	}
 	
 	if(this.df.label) {
-		var t = make_table($a(head,'div'), 1,2, '100%', ['20px',null], {verticalAlign:'middle'});
-		$y(t,{borderCollapse:'collapse'});
-		
-		this.label = $a($td(t,0,1), 'div', 'sectionHeading');
-		this.label.innerHTML = this.df.label?this.df.label:'';
-		
-		// exp / collapse
-		this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
-		this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
-		this.exp_icon.expand = function() { 
-			if(ui_effects) $ds(me.row.body) 
-			else $(me.row.body).slideDown(); 
-			me.exp_icon.src = min_icon; 
-		}
-		this.exp_icon.collapse = function() { 
-			if(ui_effects) $dh(me.row.body) 
-			else $(me.row.body).slideUp(); 
-			me.exp_icon.src = exp_icon; 
-		}
-		$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
-		
-		// callable functions
-		this.collapse = this.exp_icon.collapse;
-		this.expand = this.exp_icon.expand;
+		this.make_collapsible(head);
 		
 	} else if(!has_col) {
 		// divider
@@ -120,23 +128,21 @@ _f.SectionBreak.prototype.make_body = function() {
 	if(this.frm.meta.section_style=='Tabbed') {
 		if(this.df.options!='Simple') {
 			// IE full page ??
+			
+			this.make_row();
+			
 			this.sec_id = this.frm.sections.length;
 			this.frm.sections[this.sec_id] = this;
 			this.frm.sections_by_label[me.df.label] = this;
 			
-			this.mytab = this.frm.tabs.add_tab(me.df.label, 
-				function() { me.frm.set_section(me.sec_id);});
-						
-			this.hide = function() { this.row.hide(); me.mytab.hide(); }
 			this.show = function() { 
-				this.row.show(); me.mytab.set_selected();
 				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
-	
-			this.make_row();
+
+			this.mytab = this.frm.tabs.add_tab(me.df.label, this.show, this.row.wrapper);			
+			
 			this.make_simple_section(1);
-			if(!isIE) this.hide();
 		} else {
 			this.row = this.frm.layout.addsubrow();
 			this.make_simple_section();
@@ -262,7 +268,7 @@ _f.ImageField.prototype.onrefresh = function() {
 		$w(canvas, "100%");
 	
 		if(!this.col_break_width)this.col_break_width = '100%';
-		var allow_width = cint(pagewidth * (cint(this.col_break_width)-10) / 100);
+		var allow_width = cint(1000 * (cint(this.col_break_width)-10) / 100);
 
 		if((!img.naturalWidth) || cint(img.naturalWidth)>allow_width)
 			$w(img, allow_width + 'px');

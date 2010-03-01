@@ -7,49 +7,18 @@ var top_index=91;
 
 function Dialog(w, h, title, content) {
 
-	this.wrapper = $a(popup_cont, 'div', 'dialog_wrapper');
-	this.w = w;
-	this.h = h;
+	this.wrapper = $a(popup_cont, 'div');
+	this.wrapper.title = title;	
 
-	//$(this.wrapper).corners();
+	this.body = $a(this.wrapper, 'div')//, 'dialog_body');
 
-	$w(this.wrapper,w + 'px');
-	//$h(this.wrapper,h + 'px');
-	
-	this.head = $a(this.wrapper, 'div', 'dialog_head');
-	//$(this.head).corners('top-right top-left');
-
-	this.body = $a(this.wrapper, 'div', 'dialog_body');
-	
-	this.make_head(title);
 	if(content)this.make_body(content);
-
 	this.onshow = '';
 	this.oncancel = '';
 	this.no_cancel_flag = 0; // allow to cancel
 	this.display = false;
 	var me = this;
-}
-
-Dialog.prototype.make_head = function(title) {
-	var t = make_table(this.head,1,2,'100%',['100%','16px'],{padding:'2px'});
-	
-	//$y(t,{borderBottom:'1px solid #DDD'});
-	$y($td(t,0,0),{paddingLeft:'16px',fontWeight:'bold',fontSize:'14px',textAlign:'center'});
-	$y($td(t,0,1),{textAlign:'right'});	
-
-	var img = $a($td(t,0,01),'img','',{cursor:'pointer'});
-	img.src='images/icons/close.gif';
-	this.title_text = $td(t,0,0);
-	if(!title)title='';
-	this.title_text.innerHTML = title;
-
-	var me = this;
-	img.onclick = function() {
-		if(me.oncancel)me.oncancel();
-		me.hide();
-	}
-	this.cancel_img = img;
+	$(this.wrapper).dialog({autoOpen:false, width:w, height:h, modal: true});
 }
 
 Dialog.prototype.no_cancel = function() {
@@ -58,37 +27,25 @@ Dialog.prototype.no_cancel = function() {
 }
 
 Dialog.prototype.show = function() {
-	var d = get_screen_dims();
-	
-	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
-	this.wrapper.style.top = (get_scroll_top() + ((d.h - this.h)/2)) + 'px';
-
-	top_index++;
-	$y(this.wrapper,{zIndex:top_index});
-
-	$ds(this.wrapper);
-
-	freeze();
-
+	$(this.wrapper).dialog('open');
+	if(this.onshow)this.onshow();
 	this.display = true;
 	cur_dialog = this;
-
-	if(this.onshow)this.onshow();
 }
 
 Dialog.prototype.hide = function() {
-	var me = this;
-	unfreeze();
+
+	$(this.wrapper).dialog('close');
 	if(this.onhide)this.onhide();
-	$dh(this.wrapper);
 	
 	if(cur_autosug) cur_autosug.clearSuggestions();
-	
 	this.display = false;
 	cur_dialog = null;
 }
 
-Dialog.prototype.set_title = function(title) { if(!title)title=''; this.title_text.innerHTML = title.bold(); }
+Dialog.prototype.set_title = function(title) { 
+	this.wrapper.title = title;
+}
 
 Dialog.prototype.make_body = function(content) {
 	this.rows = {}; this.widgets = {};
@@ -156,11 +113,3 @@ Dialog.prototype.make_row = function(d) {
 		this.widgets[d[1]] = b;
 	}
 }
-
-// Close dialog on Escape
-keypress_observers.push(new function() {
-	this.notify_keypress = function(e, kc) {
-		if(cur_dialog && kc==27 && !cur_dialog.no_cancel_flag) 
-			cur_dialog.hide();
-	}
-});

@@ -340,9 +340,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// setup tabbed sections
 	if(this.meta.section_style=='Tabbed') 
 		this.setup_tabs();
-	//else 
-		//this.wrapper.style.borderTop = '3px solid #CCC';
-	
+
 	// bg colour
 	if(this.meta.colour) 
 		this.layout.wrapper.style.backgroundColor = '#'+this.meta.colour.split(':')[1];
@@ -562,7 +560,7 @@ _f.Frm.prototype.refresh = function(no_script) {
 
 _f.Frm.prototype.refresh_tabs = function() {
 	var me = this;
-	if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed') {
+	if(me.meta.section_style=='Tray') {
 		for(var i in me.sections) {
 			me.sections[i].hide();
 		}

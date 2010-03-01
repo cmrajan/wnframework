@@ -30,8 +30,6 @@ var top_index=91;
 // Name Spaces
 // ============
 
-var Calendar;
-
 // form
 var _f = {};
 
@@ -50,16 +48,18 @@ var _c = {};
 
 var widget_files = {
 	'_f.FrmContainer':'form.compressed.js'
-	,'_c.CalendarPopup':'widgets/form/date_picker.js'
 	,'_r.ReportContainer':'report.compressed.js'
 	,'_p.PrintQuery':'widgets/print_query.js'
 	,'Calendar':'widgets/calendar.js'
 	,'Recommendation':'widgets/recommend.js'
 	,'RatingWidget':'widgets/rating.js'
+	,'SidebarMenu':'webpage/sidebar_menu.js'
 }
 
 var Recommendation;
 var RatingWidget;
+var SidebarMenu;
+var sidebar_menu;
 
 // API globals
 var frms={};

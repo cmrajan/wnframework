@@ -30,7 +30,6 @@ sendmail = function(emailto, emailfrom, cc, subject, message, fmt, with_attachme
 
 _e.make = function() {
 	var d = new Dialog(440, 440, "Send Email");
-	$dh(d.wrapper);
 
 	var email_go = function() {
 		var emailfrom = d.widgets['From'].value;
