@@ -33,9 +33,6 @@ _f.FrmContainer.prototype.make_head = function() {
 	// right side - actions, comments & close btn
 	// ------------------------------------------
 	this.tbar_div = $a($td(this.tbartab,0,1),'div','',{marginRight:'8px', textAlign:'right'})
-	var tab2 = make_table(this.tbar_div, 1, 2, '220px', ['160px','60px'], {textAlign: 'center', padding:'3px', verticalAlign:'middle'}); 
-	$y(tab2,{cssFloat:'right', backgroundColor:'#DDD'});
-
 
 	// (Tweets) Comments
 	// -----------------
@@ -71,14 +68,6 @@ _f.FrmContainer.prototype.make_head = function() {
 
 	// Actions...
 	// -------------
-	$y($td(tab2,0,0),{paddingLeft:'6px'});
-	this.tbarlinks = new SelectWidget($td(tab2,0,0),[]);
-
-	// close button
-	// ---------------
-	$y($td(tab2,0,1),{padding:'6px 6px 2px 0px', textAlign:'right'});
-	this.close_btn = $a($td(tab2,0,1), 'img','',{cursor:'pointer'}); this.close_btn.src="images/icons/close.gif";
-	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	// Row 2
 	// ------------------
@@ -121,34 +110,27 @@ _f.FrmContainer.prototype.hide_head = function() {
 _f.FrmContainer.prototype.make_toolbar = function() {
 	this.btns = {};
 	var me = this;
-	var makebtn = function(label, fn, bold) {
+	var makebtn = function(label, fn, bold, icon) {
 		var btn = $a(me.button_area,'button');
-		btn.l_area = $a(btn,'span');
-		btn.l_area.innerHTML = label; btn.onclick = fn;
-		if(bold)$y(btn.l_area, {fontWeight: 'bold'});
+		btn.innerHTML = label; 
+		btn.onclick = fn;
+		if(bold)$y(btn, {fontWeight: 'bold'});
 		btn.show = function() { 
 			if(isFF)$y(this,{display:'-moz-inline-box'});
 			else $y(this,{display:'inline-block'});
 		}
 		btn.hide = function() { $dh(this); }
 		me.btns[label] = btn;
+		$(btn).button({icons:{ primary: icon }});
 	}
 
-	makebtn('Edit', function() { cur_frm.edit_doc() });
-	makebtn('Save', function() { cur_frm.save('Save');}, 1);
-	makebtn('Submit', function() { cur_frm.savesubmit(); });
-	makebtn('Cancel', function() { cur_frm.savecancel() });
-	makebtn('Amend', function() { cur_frm.amend_doc() });
+	makebtn('Edit', function() { cur_frm.edit_doc(), 0, 'ui-icon-document' });
+	makebtn('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk');
+	makebtn('Submit', function() { cur_frm.savesubmit(); }, 0, 'ui-icon-locked');
+	makebtn('Cancel', function() { cur_frm.savecancel() }, 0, 'ui-icon-closethick');
+	makebtn('Amend', function() { cur_frm.amend_doc(), 0, 'ui-icon-scissors' });
 	
-	me.tbarlinks.inp.onchange= function() {
-		var v = this.value;
-		if(v=='New') new_doc();
-		else if(v=='Refresh') cur_frm.reload_doc();
-		else if(v=='Print') cur_frm.print_doc();
-		else if(v=='Email') cur_frm.email_doc();
-		else if(v=='Copy') cur_frm.copy_doc();
-		this.value = 'Actions...';
-	}
+	$(this.button_area).buttonset();
 }
 
 _f.FrmContainer.prototype.refresh_save_btns= function() {
@@ -173,15 +155,27 @@ _f.FrmContainer.prototype.refresh_save_btns= function() {
 
 _f.FrmContainer.prototype.refresh_opt_btns = function() {
 	var frm = cur_frm;
+	
+	// clear
+	this.tbar_div.innerHTML = '';
+	var div = $a(this.tbar_div,'div');
 
-	var ol = ['Actions...','New','Refresh'];
+	var makebtn = function(label, fn, icon) {
+		var btn = $($a(div,'button')).html(label).click(fn);
+		$(btn).button({icons:{ primary: icon }});
+	}
 
-	if(!frm.meta.allow_print) ol.push('Print');
-	if(!frm.meta.allow_email) ol.push('Email');
-	if(!frm.meta.allow_copy) ol.push('Copy');
+	makebtn('New', function() { new_doc() }, 'ui-icon-document');
+	makebtn('Refresh', function() { cur_frm.reload_doc(); }, 'ui-icon-refresh');
+	if(!frm.meta.allow_print)makebtn('Print', function() { cur_frm.print_doc(); }, 'ui-icon-print');
+	if(!frm.meta.allow_email)makebtn('Email', function() { cur_frm.email_doc(); }, 'ui-icon-mail-closed');
+	if(!frm.meta.allow_copy)makebtn('Copy', function() { cur_frm.copy_doc(); }, 'ui-icon-copy');
+	
+	// close
+	makebtn('Close', function() { nav_obj.show_last_open(); }, 'ui-icon-close');
 
-	empty_select(this.tbarlinks);
-	add_sel_options(this.tbarlinks, ol, 'Actions...');
+	$(div).buttonset();
+
 }
 
 _f.FrmContainer.prototype.show_toolbar = function() {

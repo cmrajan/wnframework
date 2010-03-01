@@ -91,7 +91,7 @@ Dialog.prototype.make_row = function(d) {
 	} 
 	else if(d[0]=='Select') {
 		c1.innerHTML = d[1];
-		this.widgets[d[1]] = new SelectWidget(c2, [], '200px');
+		this.widgets[d[1]] = new SelectWidget(c2, [], '120px');
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
 	} 
 	else if(d[0]=='Text') {

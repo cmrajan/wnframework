@@ -316,6 +316,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// headings
 	this.header = $a(this.wrapper, 'div', 'frm_header');
 	this.heading = $a(this.header, 'div', 'frm_heading');
+	this.tip_wrapper = $a(this.header, 'div');
 	this.tab_wrapper = $a(this.header, 'div'); $dh(this.tab_wrapper);
 
 	if(this.meta.section_style=='Tray') {
@@ -328,7 +329,6 @@ _f.Frm.prototype.setup_std_layout = function() {
 		this.body = $a(this.wrapper, 'div', 'frm_body');
 	}
 	
-	this.tip_wrapper = $a(this.body, 'div');
 
 	// layout
 	if(this.in_dialog) 	this.meta.hide_heading = 1;
