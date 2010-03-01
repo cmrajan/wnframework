@@ -7,7 +7,6 @@ _p.show_dialog = function() {
 
 _p.make_dialog = function() {
 	var d = new Dialog(360, 140, "Print Formats");
-	$dh(d.wrapper);
 	d.make_body(
 		[['HTML','Select']
 		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), _p.go); }]]);

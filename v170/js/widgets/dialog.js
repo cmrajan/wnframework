@@ -104,6 +104,7 @@ Dialog.prototype.make_row = function(d) {
 		c2.style.height = '32px';
 		c2.style.textAlign = 'right';
 		var b = $a(c2, 'button');
+		$(b).button();
 		b.innerHTML = d[1];
 		b.dialog = me;
 		if(d[2]){
