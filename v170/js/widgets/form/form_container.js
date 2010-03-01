@@ -15,84 +15,42 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.head = $a(this.wrapper, 'div', '', {margin:'0px 0px 4px 0px'});
 	this.body = $a(this.wrapper,'div');
 
-	// Row 1
-	// ------------------
+	// Row 1 - title / btns / toolbar
+	// -----------------------
 
-	var div = $a(this.head, 'div', '', {backgroundColor: this.bg_color});
-	this.tbartab = make_table(div, 1, 2, '100%', ['50%','50%'],{ paddingTop:'2px'});
-
-	// left side - headers
-	// -------------------
-	$y($td(this.tbartab,0,0),{padding:'6px 4px 2px 4px'});
+	var div = $a(this.head, 'div', '');
+	this.tbartab = make_table(div, 1, 3, '100%', ['30%','20%','50%'],{ paddingTop:'2px'});
+	
+	$y($td(this.tbartab,0,0),{padding:'4px'});
 	this.main_title = $a($td(this.tbartab,0,0), 'h1', '',{margin:'0px'});
-	this.sub_title = $a($td(this.tbartab,0,0), 'div','',{display:'inline'});
-	this.sub_title.is_inline = 1;
-	this.status_title = $a($td(this.tbartab,0,0), 'span','',{marginLeft:'8px'});
-	this.status_title.is_inline = 1;
-	
-	// right side - actions, comments & close btn
-	// ------------------------------------------
-	this.tbar_div = $a($td(this.tbartab,0,1),'div','',{marginRight:'8px', textAlign:'right'})
 
-	// (Tweets) Comments
-	// -----------------
-	/*$y($td(tab2,0,0),{textAlign:'right'});
-	var comm_img = $a($td(tab2,0,0),'img','',{marginRight:'4px', paddingTop:'2px'});
-	comm_img.src = 'images/icons/comments.gif';
+	// buttons
+	this.button_area = $a($td(this.tbartab,0,1), 'div', '');
 
-	var c = $td(tab2,0,1); 
-	this.comments_btn = $a(c,'div','link_type',{padding:'0px 2px',position:'relative',display:'inline'});
-	
-	$y(c,{textAlign:'left'});
-	this.comments_btn.dropdown = new DropdownMenu(c, '240px'); // Tweets Dropdown
-	$y(this.comments_btn.dropdown.body, {height:'400px'});
+	// buttons 2
+	this.tbar_div = $a($td(this.tbartab,0,2),'div','',{marginRight:'8px', textAlign:'right'})
 
-	c.set_unselected = function() { // called by dropdown on hide
-		tweet_dialog.hide();
-	}
-	this.comments_btn.onmouseover = function() { // custom mouseover
-		$y(c,{backgroundColor:'#F8F8FF'});
-		if(me.doc.__islocal) {
-			return;
-		}
-		this.dropdown.body.appendChild(tweet_dialog);
-		this.dropdown.show();
-		tweet_dialog.show(); 
-	}
-	this.comments_btn.onmouseout = function() {
-		$y(c,{backgroundColor:me.bg_color});
-		this.dropdown.clear();
-	}
-		
-	this.comments_btn.innerHTML = 'Comments';*/
-
-	// Actions...
-	// -------------
-
-	// Row 2
-	// ------------------
+	// Row 2 - images  / details
+	// -------------------------
 
 	this.tbartab2 = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%']);
-	var t = make_table($a($td(this.tbartab2,0,0),'div'),1,2,'100%',['38%','62%'])
-	
-	// buttons
-	this.button_area = $a($td(t,0,1), 'div', '', {margin:'4px'});
-	this.last_update_area = $a($td(t,0,1), 'div', '', {margin:'0px 4px 4px 4px',color:"#888"});
-	
+
 	// created / modified
-	this.owner_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
+	this.owner_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
 	this.owner_img.is_inline = 1;
 
-	this.mod_img = $a($td(t,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
+	this.mod_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px 8px 4px 0px',width:'40px',display:'inline'});
 	this.mod_img.is_inline = 1;
+		
+	// details
+	$y($td(this.tbartab2,0,1),{textAlign:'right', paddingRight:'12px'});
+	this.sub_title = $a($td(this.tbartab2, 0, 1), 'div','',{display:'inline'});
+	this.sub_title.is_inline = 1;
+	this.status_title = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px'});
+	this.status_title.is_inline = 1;
+	this.last_update_area = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px'});
+	this.last_update_area.is_inline = 1;
 
-	// last comment area
-	// -----------------
-	this.last_comment = $a($td(this.tbartab2,0,1),'div','',{display:'none', paddingTop:'4px'});
-	
-	var t = make_table(this.last_comment,1,2,'100%',['40px','']);
-	this.last_comment.img = $a($td(t,0,0), 'img','',{width:'40px',marginBottom:'8px'});
-	this.last_comment.comment = $a($td(t,0,1),'div','',{backgroundColor:'#FFFAAA', padding:'4px', height:'32px'})
 
 	// header elements
 	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title, this.last_update_area];
@@ -108,49 +66,40 @@ _f.FrmContainer.prototype.hide_head = function() {
 }
 
 _f.FrmContainer.prototype.make_toolbar = function() {
-	this.btns = {};
+}
+
+_f.FrmContainer.prototype.refresh_save_btns= function() {
+
 	var me = this;
+	var frm = cur_frm;
+	var p = frm.get_doc_perms();
+	
+	me.button_area.innerHTML = '';
+
 	var makebtn = function(label, fn, bold, icon) {
 		var btn = $a(me.button_area,'button');
 		btn.innerHTML = label; 
 		btn.onclick = fn;
 		if(bold)$y(btn, {fontWeight: 'bold'});
-		btn.show = function() { 
-			if(isFF)$y(this,{display:'-moz-inline-box'});
-			else $y(this,{display:'inline-block'});
-		}
-		btn.hide = function() { $dh(this); }
-		me.btns[label] = btn;
 		$(btn).button({icons:{ primary: icon }});
 	}
 
-	makebtn('Edit', function() { cur_frm.edit_doc(), 0, 'ui-icon-document' });
-	makebtn('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk');
-	makebtn('Submit', function() { cur_frm.savesubmit(); }, 0, 'ui-icon-locked');
-	makebtn('Cancel', function() { cur_frm.savecancel() }, 0, 'ui-icon-closethick');
-	makebtn('Amend', function() { cur_frm.amend_doc(), 0, 'ui-icon-scissors' });
+	if(!cur_frm.editable)
+		makebtn('Edit', function() { cur_frm.edit_doc(), 0, 'ui-icon-document' });
+	
+	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[WRITE])
+		makebtn('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk');
+	
+	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[SUBMIT] && (!frm.doc.__islocal))
+		makebtn('Submit', function() { cur_frm.savesubmit(); }, 0, 'ui-icon-locked');
+	
+	if(cur_frm.editable && cint(frm.doc.docstatus)==1  && p[CANCEL])
+		makebtn('Cancel', function() { cur_frm.savecancel() }, 0, 'ui-icon-closethick');
+
+	if(cint(frm.doc.docstatus)==2  && p[AMEND])
+		makebtn('Amend', function() { cur_frm.amend_doc(), 0, 'ui-icon-scissors' });
 	
 	$(this.button_area).buttonset();
-}
-
-_f.FrmContainer.prototype.refresh_save_btns= function() {
-	var frm = cur_frm;
-	var p = frm.get_doc_perms();
-
-	if(cur_frm.editable) this.btns['Edit'].hide();
-	else this.btns['Edit'].show();
-	
-	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[WRITE]) this.btns['Save'].show();
-	else this.btns['Save'].hide();
-
-	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[SUBMIT] && (!frm.doc.__islocal)) this.btns['Submit'].show();
-	else this.btns['Submit'].hide();
-
-	if(cur_frm.editable && cint(frm.doc.docstatus)==1  && p[CANCEL]) this.btns['Cancel'].show();
-	else this.btns['Cancel'].hide();
-
-	if(cint(frm.doc.docstatus)==2  && p[AMEND]) this.btns['Amend'].show();
-	else this.btns['Amend'].hide();
 }
 
 _f.FrmContainer.prototype.refresh_opt_btns = function() {

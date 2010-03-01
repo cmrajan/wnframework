@@ -135,12 +135,14 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.frm.sections[this.sec_id] = this;
 			this.frm.sections_by_label[me.df.label] = this;
 			
-			this.show = function() { 
+			this.onshow = function() { 
 				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
+			this.show = function() { me.frm.tabs.tabs[me.df.label].show(); }
+			this.hide = function() {  }
 
-			this.mytab = this.frm.tabs.add_tab(me.df.label, this.show, this.row.wrapper);			
+			this.mytab = this.frm.tabs.add_tab(me.df.label, this.onshow, this.row.wrapper);			
 			
 			this.make_simple_section(1);
 		} else {

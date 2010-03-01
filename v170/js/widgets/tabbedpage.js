@@ -48,6 +48,9 @@ TabbedPage.prototype.add_tab = function(n, onshow, body) {
 	tab.show = function() {
 		$(me.wrapper).tabs('option', 'selected', this.idx);
 	}
+	tab.hide = function() {
+		// nothing	
+	}
 
 	tab.onshow = onshow;
 
