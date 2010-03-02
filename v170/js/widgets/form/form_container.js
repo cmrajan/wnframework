@@ -98,7 +98,7 @@ _f.FrmContainer.prototype.refresh_save_btns= function() {
 		makebtn('Cancel', function() { cur_frm.savecancel() }, 0, 'ui-icon-closethick');
 
 	if(cint(frm.doc.docstatus)==2  && p[AMEND])
-		makebtn('Amend', function() { cur_frm.amend_doc(), 0, 'ui-icon-scissors' });
+		makebtn('Amend', function() { cur_frm.amend_doc() }, 0, 'ui-icon-scissors');
 	
 	$(this.button_area).buttonset();
 }
