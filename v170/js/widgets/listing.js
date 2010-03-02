@@ -85,12 +85,12 @@ Listing.prototype.make = function(parent) {
 	this.bottom_div = $a(this.body_area,'div','',{paddingTop:'8px',height:'22px'});
 	
 	// buttons
-	var make_btn = function(label, icon, onclick, bold) {
-		var b = $a(this.btn_area,'button');
-		if(bold)$y(b,{fontWeight: 'bold'});
-		b.innerHTML = label;
-		b.onclick = onclick;
-		$(b).button({icons:{ primary: icon }});
+	var make_btn = function(label,icon,onclick,bold) {
+		var btn = $a(me.btn_area,'button');
+		if(bold)$y(btn,{fontWeight: 'bold'});
+		btn.innerHTML = label;
+		btn.onclick = onclick;
+		$(btn).button({icons:{ primary: icon }});
 	}
 	
 	
@@ -124,9 +124,8 @@ Listing.prototype.make = function(parent) {
 	if(this.opts.show_calc) {
 		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
 	}
-	
 	if(!cnt)$dh(this.btn_area);
-	else $(this.btn_area).buttonset();
+	else { $(this.btn_area).buttonset(); }
 	
 	this.paging_nav = {};
 	this.make_paging_area('top',$td(this.body_head,0,1));
