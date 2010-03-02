@@ -966,9 +966,10 @@ _f.Frm.prototype.amend_doc = function() {
 		alert('"amended_from" field must be present to do an amendment.');
 		return;
 	}
+	var me = this;
     var fn = function(newdoc) {
-      newdoc.amended_from = this.docname;
-      if(this.fields_dict['amendment_date'])
+      newdoc.amended_from = me.docname;
+      if(me.fields_dict && me.fields_dict['amendment_date'])
 	      newdoc.amendment_date = dateutil.obj_to_str(new Date());
     }
     this.copy_doc(fn, 1);

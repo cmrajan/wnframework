@@ -133,7 +133,7 @@ _f.Frm.prototype.savedoc=function(save_action,onsave,onerr){this.error_in_sectio
 _f.Frm.prototype.savesubmit=function(){var answer=confirm("Permanently Submit "+cur_frm.docname+"?");if(answer)this.save('Submit');}
 _f.Frm.prototype.savecancel=function(){var answer=confirm("Permanently Cancel "+cur_frm.docname+"?");if(answer)this.save('Cancel');}
 _f.Frm.prototype.amend_doc=function(){if(!this.fields_dict['amended_from']){alert('"amended_from" field must be present to do an amendment.');return;}
-var fn=function(newdoc){newdoc.amended_from=this.docname;if(this.fields_dict['amendment_date'])
+var me=this;var fn=function(newdoc){newdoc.amended_from=me.docname;if(me.fields_dict&&me.fields_dict['amendment_date'])
 newdoc.amendment_date=dateutil.obj_to_str(new Date());}
 this.copy_doc(fn,1);}
 _f.get_value=function(dt,dn,fn){if(locals[dt]&&locals[dt][dn])
