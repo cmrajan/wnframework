@@ -87,7 +87,7 @@ Listing.prototype.make = function(parent) {
 	// buttons
 	var make_btn = function(label, icon, onclick, bold) {
 		var b = $a(this.btn_area,'button');
-		if(bold)$y(span,{fontWeight: 'bold'});
+		if(bold)$y(b,{fontWeight: 'bold'});
 		b.innerHTML = label;
 		b.onclick = onclick;
 		$(b).button({icons:{ primary: icon }});
