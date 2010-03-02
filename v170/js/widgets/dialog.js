@@ -31,12 +31,15 @@ Dialog.prototype.show = function() {
 	if(this.onshow)this.onshow();
 	this.display = true;
 	cur_dialog = this;
+	
+	// bind hide event
+	if(this.onhide)
+		$(this.wrapper).bind('dialogclose', function(event, ui) { cur_dialog.onhide(); });	
 }
 
 Dialog.prototype.hide = function() {
 
 	$(this.wrapper).dialog('close');
-	if(this.onhide)this.onhide();
 	
 	if(cur_autosug) cur_autosug.clearSuggestions();
 	this.display = false;
@@ -44,7 +47,7 @@ Dialog.prototype.hide = function() {
 }
 
 Dialog.prototype.set_title = function(title) { 
-	this.wrapper.title = title;
+	$(this.wrapper).dialog('option', 'title', title );
 }
 
 Dialog.prototype.make_body = function(content) {

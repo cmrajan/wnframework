@@ -85,53 +85,48 @@ Listing.prototype.make = function(parent) {
 	this.bottom_div = $a(this.body_area,'div','',{paddingTop:'8px',height:'22px'});
 	
 	// buttons
-	var t = make_table(me.btn_area, 1,12, '',['20px','','20px','','20px','','20px','','20px','','20px',''],{height: '36px', verticalAlign:'middle'});
-	var cnt = 0;
-	this.btns = {};
-	var make_btn = function(label,src,onclick,bold) {
-		$w($td(t,0,cnt+1), (20 + 6*label.length) + 'px');
-		var img = $a($td(t,0,cnt+0), 'img', ''); img.src = "images/icons/"+src+".gif";
-		var span = $a($td(t,0,cnt+1),'span','link_type',{margin:'0px 8px 0px 4px'});
-		if(bold)$y(span,{fontSize: '14px', fontWeight: 'bold'});
-		span.innerHTML = label;
-		span.onclick = onclick;
-		me.btns[label] = [img,span]; // link
+	var make_btn = function(label, icon, onclick, bold) {
+		var b = $a(this.btn_area,'button');
+		if(bold)$y(span,{fontWeight: 'bold'});
+		b.innerHTML = label;
+		b.onclick = onclick;
+		$(b).button({icons:{ primary: icon }});
 	}
 	
 	
 	// refresh btn
-	var tmp = 0;
+	var cnt = 0;
 	if(!this.opts.hide_refresh) {
-		make_btn('Refresh','page_refresh',function() {me.run();},1); cnt+=2;
+		make_btn('Refresh','ui-icon-refresh',function() {me.run();},1); cnt+=2;
 	}
 
 	// new
 	if(this.opts.show_new) {
-		make_btn('New ','page_add',function() { new_doc(me.dt); },1); cnt+=2;
+		make_btn('New ','ui-icon-document',function() { new_doc(me.dt); },1); cnt+=2;
 	}
 
 	// report
 	if(this.opts.show_report) {
-		make_btn('Report Builder','table',function() { loadreport(me.dt); },0); cnt+=2;
+		make_btn('Report Builder','ui-icon-clipboard',function() { loadreport(me.dt); },0); cnt+=2;
 	}
 	
 	// export
 	if(!this.opts.hide_export) {
-		make_btn('Export','page_excel',function() {me.do_export();}); cnt +=2;
+		make_btn('Export','ui-icon-circle-arrow-e',function() {me.do_export();}); cnt +=2;
 	}
 
 	// print
 	if(!this.opts.hide_print) {
-		make_btn('Print','printer',function() {me.do_print();}); cnt+=2;
+		make_btn('Print','ui-icon-print',function() {me.do_print();}); cnt+=2;
 	}
 	
 	// calc
 	if(this.opts.show_calc) {
-		make_btn('Calc','calculator',function() {me.do_calc();}); cnt+=2;
-		$dh(this.btns['Calc'][0]); $dh(this.btns['Calc'][1]);
+		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
 	}
 	
 	if(!cnt)$dh(this.btn_area);
+	else $(this.btn_area).buttonset();
 	
 	this.paging_nav = {};
 	this.make_paging_area('top',$td(this.body_head,0,1));
@@ -563,7 +558,6 @@ Listing.prototype.clear = function() {
 Listing.prototype.refresh_calc = function() {
 	if(!this.opts.show_calc) return;
 	if(has_common(this.coltypes, ['Currency','Int','Float'])) {
-		$di(this.btns['Calc'][0]); $di(this.btns['Calc'][1]);
 	}
 }
 

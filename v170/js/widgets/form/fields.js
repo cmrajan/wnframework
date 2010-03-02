@@ -711,7 +711,7 @@ TextField.prototype.make_input = function() {
 // text dialog
 var text_dialog;
 function make_text_dialog() {
-	var d = new Dialog(520,410);
+	var d = new Dialog(520,410,'Edit Text');
 	d.make_body([
 		['Text', 'Enter Text'],
 		['Button', 'Update']
@@ -737,7 +737,7 @@ function make_text_dialog() {
 TextField.prototype.table_refresh = function() {
 	if(!this.text_dialog)
 		make_text_dialog();
-	text_dialog.title_text.data = 'Enter text for "'+ this.df.label +'"';
+	text_dialog.set_title('Enter text for "'+ this.df.label +'"'); 
 	text_dialog.field = this;
 	text_dialog.show();
 }

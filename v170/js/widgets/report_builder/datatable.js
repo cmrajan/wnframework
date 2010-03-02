@@ -92,38 +92,40 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
   var me = this;
   
   // headbar
-  this.hbar = $a(parent, 'div', 'report_hbar');
+  this.hbar = $a(parent, 'div', '', {margin:'8px 0px 16px 0px'});
 
-  var ht = make_table(this.hbar,1,2,'100%',['80%','20%'],{verticalAlign:'middle'});
+  var ht = make_table(this.hbar,1,3,'100%',['40%','40%','20%'],{verticalAlign:'middle'});
+  var div = $a($td(ht,0,0), 'div');
   
-	var t = make_table($td(ht,0,0), 1,13, '',['20px','','20px','','20px','','20px','','80px','100px','20px','80px','50px'],{height: '54px', verticalAlign:'middle'});
-	var cnt = 0;
-	var make_btn = function(label,src,onclick,bold) {
-		$w($td(t,0,cnt+1), (20 + ((bold?7:6)*label.length)) + 'px');
-		var img = $a($td(t,0,cnt+0), 'img', ''); img.src = "images/icons/"+src+".gif";
-		var span = $a($td(t,0,cnt+1),'span','link_type',{margin:'0px 8px 0px 4px'});
-		if(bold)$y(span,{fontSize: '14px', fontWeight: 'bold'});
-		span.innerHTML = label;
-		span.onclick = onclick;
+	var make_btn = function(label,icon,onclick,bold) {
+		var btn = $a(div,'button');
+		if(bold)$y(btn,{fontWeight: 'bold'});
+		btn.innerHTML = label;
+		btn.onclick = onclick;
+		$(btn).button({icons:{ primary: icon }});
 	}
 	
 	
 	// refresh btn
-	make_btn('Refresh','page_refresh',function() { me.start_rec = 1; me.run();},1); cnt+=2;
+	make_btn('Refresh','ui-icon-refresh',function() { me.start_rec = 1; me.run();},1); 
 	
 	// export
-	make_btn('Export','page_excel',function() {me.do_export();}); cnt +=2;
+	make_btn('Export','ui-icon-circle-arrow-e',function() {me.do_export();}); 
 
 	// print
-	make_btn('Print','printer',function() {me.do_print();}); cnt+=2;
+	make_btn('Print','ui-icon-print',function() {me.do_print();}); 
 
 	// print
-	make_btn('Calc','calculator',function() {me.do_calc();}); cnt+=2;
+	make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); 
+
+	$(div).buttonset();
 
   // sort select
-  $td(t,0,cnt).innerHTML = 'Sort By:'; $y($td(t,0,cnt),{textAlign:'right',paddingRight:'4px'});
+  var t = make_table($td(ht,0,1),1,6,null,[null,null,null,'20px',null,null],{verticalAlign:'middle'});
+
+  $td(t,0,0).innerHTML = 'Sort By:'; $y($td(t,0,1),{textAlign:'right',paddingRight:'4px'});
   
-  this.sort_sel = new SelectWidget($td(t,0,cnt+1), [], 100);
+  this.sort_sel = new SelectWidget($td(t,0,2), [], '100px');
 
   this.sort_sel.inp.onchange = function() {
     me.start_rec = 1;
@@ -131,7 +133,7 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
   }
 
   // sort order
-  this.sort_icon = this.add_icon($td(t,0,cnt+2), 'arrow_down');
+  this.sort_icon = this.add_icon($td(t,0,3), 'arrow_down');
   this.sort_order = 'DESC';
   
   this.sort_icon.onclick = function() {
@@ -144,8 +146,8 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
 
   // page len
 
-  $td(t,0,cnt+3).innerHTML = 'Per Page:'; $y($td(t,0,cnt+3),{textAlign:'right',paddingRight:'4px'});  
-  var s = new SelectWidget($td(t,0,cnt+4), ['50','100','500','1000'], 70);
+  $td(t,0,4).innerHTML = 'Per Page:'; $y($td(t,0,4),{textAlign:'right',paddingRight:'4px'});  
+  var s = new SelectWidget($td(t,0,5), ['50','100','500','1000'], '70px');
   s.inp.value = '50';
 
   s.inp.onchange = function() { 
@@ -153,7 +155,7 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
   }
   this.page_len_sel = s;
 
-  var c1 = $td(ht,0,1);
+  var c1 = $td(ht,0,2);
   c1.style.textAlign = 'right';
 
   // first page

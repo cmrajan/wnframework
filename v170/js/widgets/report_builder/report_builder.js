@@ -53,12 +53,13 @@ _r.ReportContainer = function() {
 	}
 	
 	// buttons
-	var runbtn = $a(this.button_area, 'button');
+	var runbtn = $a(this.button_area, 'button', '', {fontSize:'14px'});
 	runbtn.innerHTML = 'Run'.bold();
 	runbtn.onclick = function() { if(me.cur_rb){
 		me.cur_rb.dt.start_rec = 1;
 		me.cur_rb.dt.run();} 
 	}
+	$(runbtn).button({icons:{primary:'ui-icon-circle-triangle-e'}});
 	$dh(this.button_area);
 	
 	this.rb_area = $a(this.wrapper, 'div');
@@ -280,13 +281,7 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 	this.has_index = 1; this.has_headings = 1;
 
 	for(var i in this.fn_list) this[this.fn_list[i]] = null; // clear custom functions
-	
-	// show all tabs
-	// -------------
-	
-	$ds(this.mytabs.tabs['Select Columns']);
-	$ds(this.mytabs.tabs['More Filters']);
-	
+			
 	this.report_filters.refresh();	
 	this.column_picker.refresh();
 }

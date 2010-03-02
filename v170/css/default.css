@@ -587,10 +587,6 @@ div.report_no_data {
 	display: none;	
 }
 
-div.report_hbar {
-	/*display: none;*/
-}
-
 div.report_htitle {
 	float: left;
 	padding: 2px;
