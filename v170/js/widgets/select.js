@@ -31,7 +31,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 			this.inp.onclick = this.btn.onclick;
 		}
 
-		this.btn.onclick = function() {
+		this.body_tab.onclick = function() {
 			if(me.as && me.as.body) {
 				me.as.clearSuggestions();
 				return;
