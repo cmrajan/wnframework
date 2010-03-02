@@ -123,6 +123,7 @@ AutoSuggest.prototype.clear_user_inp = function() {
 
 AutoSuggest.prototype.find_nearest = function (key) {
 	var list = this.ul;
+	var same_key = 0;
 
 	// make the list
 	if (!list) {
@@ -135,18 +136,20 @@ AutoSuggest.prototype.find_nearest = function (key) {
 	}
 
 	// values for multiple keystrokes
-	if((this.user_inp.length!=1) || (this.user_inp.length==1 && this.user_inp != String.fromCharCode(key)))
+	if((this.user_inp.length==1) && this.user_inp == String.fromCharCode(key).toLowerCase()) {
+		same_key = 1;
+	} else {
 		this.user_inp += String.fromCharCode(key).toLowerCase();
+	}
 
 	// clear user keys
 	window.clearTimeout(this.clear_timer);
-	this.clear_timer = window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()', 500);
 
 	// loop over the next after the current
 	var st = this.iHigh;
 	
 	// continuation of typing, also check the current value
-	if(this.user_inp.length > 1) st=st-1;
+	if(!same_key) st--;
 	
 	for(var i = st; i<this.aSug.length; i++) {
 		if(this.aSug[i].value.substr(0,this.user_inp.length).toLowerCase()==this.user_inp) {
@@ -155,6 +158,8 @@ AutoSuggest.prototype.find_nearest = function (key) {
 			return;
 		}
 	}
+
+	this.clear_timer = window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()', 500);
 	
 	// begin at the top
 	for(var i = 0; i<st; i++) {
@@ -291,7 +296,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	// create holding div
 	var div = $ce("div", {className:this.oP.className});
 	top_index++;
-	div.style.zIndex = top_index;
+	div.style.zIndex = 1100;
 	div.isactive = 1;
 
 	// create and populate ul

@@ -31,6 +31,7 @@ Dialog.prototype.show = function() {
 	if(this.onshow)this.onshow();
 	this.display = true;
 	cur_dialog = this;
+	if(cur_autosug) cur_autosug.clearSuggestions();
 	
 	// bind hide event
 	if(this.onhide)

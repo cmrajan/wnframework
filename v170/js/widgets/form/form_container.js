@@ -19,7 +19,7 @@ _f.FrmContainer.prototype.make_head = function() {
 	// -----------------------
 
 	var div = $a(this.head, 'div', '');
-	this.tbartab = make_table(div, 1, 3, '100%', ['30%','20%','50%'],{ paddingTop:'2px'});
+	this.tbartab = make_table(div, 1, 3, '100%', ['35%','20%','45%'],{ paddingTop:'2px'});
 	
 	$y($td(this.tbartab,0,0),{padding:'4px'});
 	this.main_title = $a($td(this.tbartab,0,0), 'h1', '',{margin:'0px'});
