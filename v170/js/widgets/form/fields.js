@@ -95,10 +95,10 @@ Field.prototype.get_status = function() {
 	// allow on submit
 	var a_o_s = cint(this.df.allow_on_submit);
 	
-	if(a_o_s && (this.in_grid || (this.frm && this.frm.in_dialog))) {
+	if(a_o_s && (this.in_grid || (this.frm && this.frm.not_in_container))) {
 		a_o_s = null;
 		if(this.in_grid) a_o_s = this.grid.field.df.allow_on_submit; // take from grid
-		if(this.frm && this.frm.in_dialog) { a_o_s = cur_grid.field.df.allow_on_submit;} // take from grid
+		if(this.frm && this.frm.not_in_container) { a_o_s = cur_grid.field.df.allow_on_submit;} // take from grid
 	}
 	
 	if(cur_frm.editable && a_o_s && cint(cur_frm.doc.docstatus)>0 && !this.df.hidden) {
@@ -417,8 +417,6 @@ DateField.prototype.validate = function(v) {
 var _last_link_value = null;
 
 // reference when a new record is created via link
-var calling_link_field = null;
-
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
@@ -461,8 +459,13 @@ LinkField.prototype.make_input = function() {
 		var sp = $a(me.new_link_area, 'span', 'link_type',{fontSize:'11px'});
 		sp.innerHTML = 'New ' + me.df.options;
 		sp.onclick = function() { 
-			calling_link_field = me.df.fieldname;
-			new_doc(me.df.options, null, 1); 
+			var on_save_callback = function(new_rec) {
+				if(new_rec) {
+					locals[me.frm.doctype][me.frm.docname][me.df.fieldname] = new_rec;
+					me.refresh();
+				}
+			}
+			new_doc(me.df.options, null, 1, on_save_callback); 
 		}
 	}
 
@@ -486,9 +489,9 @@ LinkField.prototype.make_input = function() {
 LinkField.prototype.set_get_query = function() { 
 	if(this.get_query)return;
 
-	// if from dialog
-	if(_f.frm_dialog && _f.frm_dialog.display) {
-		// find if there is a twin as template?
+	// if from grid
+	if(this.frm.not_in_container && this.frm.parent_doctype) {
+		// find the corresponding get_query method from the grid?
 		var gl = cur_frm.grids;
 		for(var i = 0; i < gl.length; i++) {
 			if(gl[i].grid.doctype = this.df.parent) {
