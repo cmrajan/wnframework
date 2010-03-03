@@ -140,12 +140,14 @@ _f.FrmContainer.prototype.hide_toolbar = function() {
 }
 
 _f.FrmContainer.prototype.refresh_toolbar = function() {
-	var frm = cur_frm;
-	if(frm.meta.hide_heading) { this.hide_head(); }
-	else {
+	var m = cur_frm.meta;
+	
+	if(m.hide_heading) { 
+		this.hide_head(); 
+	} else {
 		this.show_head();
 		
-		if(frm.meta.hide_toolbar) { 
+		if(m.hide_toolbar) { 
 			this.hide_toolbar();
 		} else {
 			this.show_toolbar();

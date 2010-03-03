@@ -42,8 +42,9 @@ _f.edit_record = function(dt, dn, from_grid, on_save_callback) {
 		}
 		f.meta.section_style='Simple';
 
-		if(d.cur_frm) 
-			{ d.cur_frm.hide(); }
+		if(d.cur_frm) { 
+			d.cur_frm.hide(); 
+		}
 			
 		f.show(dn, null, d.dialog.body_wrapper, 1);
 	
@@ -260,8 +261,10 @@ _f.Frm.prototype.set_heading = function() {
 	} 
 	
 	if(this.heading){
-		if(this.meta.hide_heading) $dh(_f.frm_con.head_div);
-		else $ds(_f.frm_con.head_div);
+		if(this.meta.hide_heading || this.not_in_container) 
+			$dh(_f.frm_con.head_div);
+		else 
+			$ds(_f.frm_con.head_div);
 	}
 }
 
@@ -365,7 +368,6 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 
 	// layout
-	if(this.not_in_container) 	this.meta.hide_heading = 1;
 	this.layout = new Layout(this.body, '100%');
 	
 	// setup tips area

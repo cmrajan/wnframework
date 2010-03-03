@@ -16,8 +16,7 @@ _f.FrmContainer.prototype.refresh_opt_btns=function(){var frm=cur_frm;this.tbar_
 makebtn('New',function(){new_doc()},'ui-icon-document');makebtn('Refresh',function(){cur_frm.reload_doc();},'ui-icon-refresh');if(!frm.meta.allow_print)makebtn('Print',function(){cur_frm.print_doc();},'ui-icon-print');if(!frm.meta.allow_email)makebtn('Email',function(){cur_frm.email_doc();},'ui-icon-mail-closed');if(!frm.meta.allow_copy)makebtn('Copy',function(){cur_frm.copy_doc();},'ui-icon-copy');makebtn('Close',function(){nav_obj.show_last_open();},'ui-icon-close');$(div).buttonset();}
 _f.FrmContainer.prototype.show_toolbar=function(){for(var i=0;i<this.head_elements.length;i++)this.head_elements[i].is_inline?$di(this.head_elements[i]):$ds(this.head_elements[i]);this.refresh_save_btns();this.refresh_opt_btns();}
 _f.FrmContainer.prototype.hide_toolbar=function(){for(var i=0;i<this.head_elements.length;i++)$dh(this.head_elements[i]);}
-_f.FrmContainer.prototype.refresh_toolbar=function(){var frm=cur_frm;if(frm.meta.hide_heading){this.hide_head();}
-else{this.show_head();if(frm.meta.hide_toolbar){this.hide_toolbar();}else{this.show_toolbar();}}}
+_f.FrmContainer.prototype.refresh_toolbar=function(){var m=cur_frm.meta;if(m.hide_heading){this.hide_head();}else{this.show_head();if(m.hide_toolbar){this.hide_toolbar();}else{this.show_toolbar();}}}
 _f.add_frm=function(doctype,onload,opt_name,parent){if(parent)parent=_f.frm_con.body;if(frms['DocType']&&frms['DocType'].opendocs[doctype]){msgprint("error:Cannot create an instance of \""+doctype+"\" when the DocType is open.");return;}
 if(frms[doctype]){return frms[doctype];}
 var callback=function(r,rt){if(!locals['DocType'][doctype]){return;}
@@ -30,8 +29,7 @@ $(d.done_btn).button({icons:{primary:'ui-icon-disk'}});d.onhide=function(){if(_f
 _f.cur_grid.refresh_row(_f.cur_grid_ridx,me.dialog.dn);}
 this.dialog=d;}
 _f.edit_record=function(dt,dn,from_grid,on_save_callback){var d=new _f.FrmDialog();var show_dialog=function(){var f=frms[dt];if(from_grid){f.parent_doctype=cur_frm.doctype;f.parent_docname=cur_frm.docname;}
-f.meta.section_style='Simple';if(d.cur_frm)
-{d.cur_frm.hide();}
+f.meta.section_style='Simple';if(d.cur_frm){d.cur_frm.hide();}
 f.show(dn,null,d.dialog.body_wrapper,1);d.cur_frm=frm;d.dn=dn;d.from_grid=from_grid;d.on_save_callback=on_save_callback;if(from_grid)
 d.dialog.set_title("Editing Row #"+(_f.cur_grid_ridx+1));else
 d.dialog.set_title(dt+': '+dn);d.dialog.show();_f.frm_dialog=d;}
