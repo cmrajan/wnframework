@@ -8,7 +8,7 @@ _f.FrmDialog = function() {
 	d.body_wrapper = $a(d.body, 'div', 'dialog_frm');
 	d.done_btn = $a($a(d.body, 'div', '', {margin:'8px'}),'button');
 	d.done_btn.innerHTML = 'Done'; 
-		
+
 	// done button
 	d.done_btn.onclick = function() { 
 		if(!me.dialog.from_grid) {
@@ -27,7 +27,7 @@ _f.FrmDialog = function() {
 		
 	d.onhide = function() {
 		if(_f.cur_grid)
-			_f.cur_grid.refresh_row(_f.cur_grid_ridx, me.dialog.dn);
+			_f.cur_grid.refresh_row(_f.cur_grid_ridx, me.dn);
 	}
 	this.dialog = d;
 }
@@ -48,7 +48,7 @@ _f.edit_record = function(dt, dn, from_grid, on_save_callback) {
 			
 		f.show(dn, null, d.dialog.body_wrapper, 1);
 	
-		d.cur_frm = frm;
+		d.cur_frm = f;
 		d.dn = dn;
 		d.from_grid = from_grid;
 		d.on_save_callback = on_save_callback;
