@@ -62,7 +62,7 @@ _f.FormGrid.prototype.make_buttons = function() {
 			// edit record
 			cur_grid = me;
 			cur_grid_ridx = me.tab.rows.length - 1; // the last row is the fresh one
-			edit_record(me.doctype, dn);
+			edit_record(me.doctype, dn, 1);
 		}
 	}
 }

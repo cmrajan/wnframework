@@ -67,7 +67,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 		
 		// case A - frm not loaded
 		if(!frms[doctype]) {
-			_f.frm_con.add_frm(doctype, show_doc, name);
+			_f.add_frm(doctype, show_doc, name);
 
 		// case B - both loaded
 		} else if(LocalDB.is_doc_loaded(doctype, name)) {
@@ -96,7 +96,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 
 			
 			// show
-			frm.show(name);
+			frm.show(name, null, _f.frm_con.body, 0);
 
 			// show menuitem selected
 			if(frm.menuitem) frm.menuitem.show_selected();
@@ -115,7 +115,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 // -------------------------------------------------------------------------------
 
 
-function new_doc(doctype, onload) {	
+function new_doc(doctype, onload, in_dialog) {	
 	if(!doctype) {
 		if(cur_frm)doctype = cur_frm.doctype; else return;
 	}
@@ -132,9 +132,13 @@ function new_doc(doctype, onload) {
 				
 			if(onload)onload(d);
 			
-			nav_obj.open_notify('Form',doctype,d);
 			
-			frm.show(d);
+			if(in_dialog) {
+				_f.edit_record(doctype, d);		
+			} else {
+				nav_obj.open_notify('Form',doctype,d);
+				frm.show(d, null, _f.frm_con.body, 0);
+			}
 		} else {
 			msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');
 		}
@@ -147,7 +151,7 @@ function new_doc(doctype, onload) {
 		}
 
 		if(!frms[doctype]) 
-			_f.frm_con.add_frm(doctype, show_doc); // load
+			_f.add_frm(doctype, show_doc); // load
 		else 
 			show_doc(frms[doctype]); // directly
 		

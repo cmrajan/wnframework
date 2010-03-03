@@ -416,6 +416,9 @@ DateField.prototype.validate = function(v) {
 // for ensuring in AutoSuggest that 2 values are not set in quick succession due to un intentional event call
 var _last_link_value = null;
 
+// reference when a new record is created via link
+var calling_link_field = null;
+
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
@@ -457,7 +460,10 @@ LinkField.prototype.make_input = function() {
 		me.new_link_area = $a(me.input_area,'div','',{display:'none',textAlign:'right',width:'81%'});
 		var sp = $a(me.new_link_area, 'span', 'link_type',{fontSize:'11px'});
 		sp.innerHTML = 'New ' + me.df.options;
-		sp.onclick = function() { new_doc(me.df.options); }
+		sp.onclick = function() { 
+			calling_link_field = me.df.fieldname;
+			new_doc(me.df.options, null, 1); 
+		}
 	}
 
 	me.onrefresh = function() {

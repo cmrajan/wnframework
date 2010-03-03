@@ -1,12 +1,31 @@
 
 // Open the Form in a Dialog
 _f.frm_dialog = null;
-_f.edit_record = function(dt, dn) {
+_f.edit_record = function(dt, dn, from_grid) {
 	if(!_f.frm_dialog) {
 		var d = new Dialog(640, 400, 'Edit Row');
 		d.body_wrapper = $a(d.body, 'div', 'dialog_frm');
 		d.done_btn = $a($a(d.body, 'div', '', {margin:'8px'}),'button');
-		d.done_btn.innerHTML = 'Done'; d.done_btn.onclick = function() { _f.frm_dialog.hide() }
+		d.done_btn.innerHTML = 'Done'; 
+		
+		// done button
+		d.done_btn.onclick = function() { 
+			if(!_f.frm_dialog.from_grid) {
+				var callback = function(r,rt) {
+					// set field value and refresh
+					if(cur_frm && calling_link_field) {
+						locals[cur_frm.doctype][cur_frm.docname][calling_link_field] = _f.frm_dialog.cur_frm.docname;
+						refresh_field(calling_link_field);
+					}
+					_f.frm_dialog.hide();
+				}
+				_f.frm_dialog.cur_frm.save('Save', callback);
+			} else {
+				_f.frm_dialog.hide();
+			}
+		}
+		$(d.done_btn).button({icons:{primary:'ui-icon-disk'}});
+		
 		d.onhide = function() {
 			if(_f.cur_grid)
 				_f.cur_grid.refresh_row(_f.cur_grid_ridx, _f.frm_dialog.dn);
@@ -14,24 +33,38 @@ _f.edit_record = function(dt, dn) {
 		_f.frm_dialog = d;
 	}
 	var d = _f.frm_dialog;
-		
-	if(!frms[dt]) {
-		var f = new _f.Frm(dt, d.body_wrapper);
-		f.parent_doctype = cur_frm.doctype;
-		f.parent_docname = cur_frm.docname;
-		f.in_dialog = true;
+
+	var show_dialog = function() {
+		var f = frms[dt];
+		if(from_grid) {
+			f.parent_doctype = cur_frm.doctype;
+			f.parent_docname = cur_frm.docname;
+		}
 		f.meta.section_style='Simple';
+
+		if(d.cur_frm) 
+			{ d.cur_frm.hide(); }
+			
+		f.show(dn, null, d.body_wrapper, 1);
+	
+		d.cur_frm = frm;
+		d.dn = dn;
+		d.from_grid = from_grid;
+		
+		if(from_grid)
+			d.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
+		else
+			d.set_title(dt + ': ' + dn);
+		d.show();		
+	}
+
+	// load
+	if(!frms[dt]) {
+		_f.add_frm(dt, show_dialog, null, d.body_wrapper);
+	} else {
+		show_dialog();
 	}
 	
-	if(d.cur_frm) { d.cur_frm.hide(); }
-		
-	var frm = frms[dt];
-	frm.show(dn);
-
-	d.cur_frm = frm;
-	d.dn = dn;
-	d.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
-	d.show();
 }
 
 _f.Frm = function(doctype, parent) {
@@ -48,7 +81,6 @@ _f.Frm = function(doctype, parent) {
 	this.grids = [];
 	this.cscript = {};
 	this.parent = parent;
-	if(!parent)this.parent = _f.frm_con.body; // temp
 	this.attachments = {};
 	
 	// comments
@@ -418,14 +450,22 @@ _f.Frm.prototype.setup_client_script = function() {
 	this.script_setup = 1;
 }
 
+_f.Frm.prototype.set_parent = function(parent) {
+	if(parent) {
+		if(this.wrapper)
+			parent.appendChild(this.wrapper);
+		else
+			this.parent = parent;
+	}
+}
+
 _f.Frm.prototype.setup = function() {
 
 	var me = this;
 	this.fields = [];
 	this.fields_dict = {};
 
-	if(this.in_dialog) this.wrapper = $a(this.parent, 'div');
-	else this.wrapper = $a(this.parent, 'div', 'frm_wrapper');
+	this.wrapper = $a(this.parent, 'div', 'frm_wrapper');
 	
 	if(this.meta.use_template) {
 		// template layout
@@ -450,16 +490,23 @@ _f.Frm.prototype.hide = function() {
 	hide_autosuggest();
 }
 
-_f.Frm.prototype.show = function(docname, from_refresh) {
+_f.Frm.prototype.show = function(docname, from_refresh, parent, in_dialog) {
+	this.in_dialog = in_dialog;
+	
 	if(!this.in_dialog && cur_frm && cur_frm != this) {
 		this.defocus_rest();
 		cur_frm.hide();
 	}
-	if(docname)this.docname = docname;
+	if(docname)
+		this.docname = docname;
+	if(parent)
+		this.set_parent(parent);
 	$ds(this.wrapper);
 	this.display = 1;
-	if(!this.in_dialog) cur_frm = this;
-	if(!from_refresh) this.refresh();
+	if(!this.in_dialog) 
+		cur_frm = this;
+	if(!from_refresh) 
+		this.refresh();
 }
 
 _f.Frm.prototype.defocus_rest = function() {
@@ -764,7 +811,9 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 	}
 	
 	var ret_fn = function(r) {
-		cur_frm.refresh();
+		if(!cur_frm.in_dialog)
+			cur_frm.refresh();
+
 		if(call_back){
 			if(call_back == 'home'){ loadpage('_home'); return; }
 			call_back();

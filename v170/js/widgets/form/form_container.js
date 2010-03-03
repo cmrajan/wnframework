@@ -153,7 +153,9 @@ _f.FrmContainer.prototype.refresh_toolbar = function() {
 	}
 }
 
-_f.FrmContainer.prototype.add_frm = function(doctype, onload, opt_name) {
+_f.add_frm = function(doctype, onload, opt_name, parent) {
+	if(parent) parent = _f.frm_con.body;
+	
 	// dont open doctype and docname from the same session
 	if(frms['DocType'] && frms['DocType'].opendocs[doctype]) {
 		msgprint("error:Cannot create an instance of \"" + doctype+ "\" when the DocType is open.");
@@ -163,20 +165,21 @@ _f.FrmContainer.prototype.add_frm = function(doctype, onload, opt_name) {
 	if(frms[doctype]) { return frms[doctype]; }
 
 	// Load Doctype from server
-	var me = this;
-	var fn = function(r,rt) {
+	var callback = function(r,rt) {
 		if(!locals['DocType'][doctype]) {
 			return;
 		}
-		new _f.Frm(doctype, me.body);
+		new _f.Frm(doctype, parent);
 
 		if(onload)onload(r,rt);
 	}
-	if(opt_name && (!LocalDB.is_doc_loaded(doctype, opt_name))) {
+	if(locals['DocType'] && locals['DocType'][doctype]) {
+		callback();
+	} else if(opt_name && (!LocalDB.is_doc_loaded(doctype, opt_name))) {
 		// get both
-		$c('webnotes.widgets.form.getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, fn);
+		$c('webnotes.widgets.form.getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, callback);
 	} else {
 		// get doctype only
-		$c('webnotes.widgets.form.getdoctype', args={'doctype':doctype}, fn);
+		$c('webnotes.widgets.form.getdoctype', args={'doctype':doctype}, callback);
 	}
 }
