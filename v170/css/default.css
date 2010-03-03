@@ -55,7 +55,7 @@ div.no_script {
 div.loading_div {
 	position: absolute;
 	background-color: #FFFFCC;
-	z-index: 99;
+	z-index: 1999;
 	right: 5px;
 	width: 90px;
 	display: none;
