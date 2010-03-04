@@ -244,7 +244,7 @@ def create_account(ac_name, ac_type='Framework'):
 	newdb = import_db(ac_type)
 
 	# set account id
-	conn = webnotes.db.Database()
+	conn = webnotes.db.Database(user=newdb)
 	conn.use(newdb)
 	sql = conn.sql
 	

@@ -365,26 +365,43 @@ HTMLField.prototype.onrefresh = function() { this.set_disp(this.df.options?this.
 
 // ======================================================================================
 
+var datepicker_active = 0;
+
 function DateField() { } DateField.prototype = new Field();
 DateField.prototype.with_label = 1;
 DateField.prototype.make_input = function() {
 
+	var me = this;
 	this.user_fmt = locals['Control Panel']['Control Panel'].date_format;
 	if(!this.user_fmt)this.user_fmt = 'dd-mm-yy';
-	
+
 	this.input = $a(this.input_area, 'input');
-	$(this.input).datepicker({dateFormat: this.user_fmt.replace('yyyy','yy'), altFormat:'yy-mm-dd', changeYear: true});
+	$(this.input).datepicker({
+		dateFormat: me.user_fmt.replace('yyyy','yy'), 
+		altFormat:'yy-mm-dd', 
+		changeYear: true,
+		beforeShow: function(input, inst) { 
+			datepicker_active = 1 
+		},
+		onClose: function(dateText, inst) { 
+			datepicker_active = 0 
+			if(_f.cur_grid_cell)
+				_f.cur_grid_cell.grid.cell_deselect();	
+		}
+	});
 	
 	var me = this;
 
 	me.input.onchange = function() {
 		// input as dd-mm-yyyy
+		if(this.value==null)this.value='';
+
 		me.set(dateutil.str_to_user(me.input.value));
 		me.run_trigger();
 	}
 	me.input.set_input = function(val) {
-		val=dateutil.str_to_user(val);
 		if(val==null)val='';
+		else val=dateutil.str_to_user(val);
 		me.input.value = val;
 	}
 	me.get_value = function() {

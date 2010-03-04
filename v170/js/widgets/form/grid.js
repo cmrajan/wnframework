@@ -271,7 +271,7 @@ _f.Grid.prototype.cell_click = function(cell, e) {
 
 _f.Grid.prototype.notify_click = function(e, target) {
 	if(_f.cur_grid_cell && !target.isactive) {
-		if(!(text_dialog && text_dialog.display) && !selector.display) {
+		if(!(text_dialog && text_dialog.display) && !selector.display && !datepicker_active) {
 			_f.cur_grid_cell.grid.cell_deselect();
 		}
 	}
