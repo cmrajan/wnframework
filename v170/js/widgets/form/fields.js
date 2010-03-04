@@ -666,6 +666,8 @@ CodeField.prototype.make_input = function() {
 		} else {
 			this.setup_editor();
 		}
+	} else {
+		$y(me.input, {fontFamily:'Courier, Fixed'});
 	}
 }
 CodeField.prototype.set_disp = function(val) { 
