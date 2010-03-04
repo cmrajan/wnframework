@@ -507,7 +507,7 @@ LinkField.prototype.set_get_query = function() {
 	if(this.get_query)return;
 
 	// if from grid
-	if(this.frm.not_in_container && this.frm.parent_doctype) {
+	if(cur_frm.not_in_container && cur_frm.parent_doctype) {
 		// find the corresponding get_query method from the grid?
 		var gl = cur_frm.grids;
 		for(var i = 0; i < gl.length; i++) {
