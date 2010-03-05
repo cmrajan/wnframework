@@ -89,9 +89,6 @@ function startup() {
 function to_open() {
 	if(get_url_arg('page'))
 		return get_url_arg('page');
-	//if(document.location.href.search('#')!=-1) {
-	//	return document.location.href.split('#')[1];
-	//}
 }
 
 function logout() {

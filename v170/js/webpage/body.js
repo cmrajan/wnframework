@@ -3,6 +3,7 @@
 	+ body
 		+ wntoolbar
 		+ header
+		+ body_spinner
 		+ body
 			+ left_sidebar
 			+ center
@@ -91,6 +92,7 @@ function Body() {
 		this.topmenu = $a(this.wrapper, 'div');
 		this.breadcrumbs = $a(this.wrapper, 'div');
 		this.body = $a(this.wrapper, 'div');
+		this.body_spinner = $a(this.wrapper, 'div', '', {height:'400px', background:'url("images/ui/loading-old.gif") center no-repeat'});
 		this.footer = $a(this.wrapper, 'div');
 	
 		
@@ -128,6 +130,7 @@ function Body() {
 	
 	this.change_to = function(label) {
 		// hide existing
+		$dh(this.body_spinner);
 		if(me.cur_page &&  me.pages[label]!=me.cur_page) {
 			if(me.cur_page.onhide)
 				me.cur_page.onhide();

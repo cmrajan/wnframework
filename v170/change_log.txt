@@ -134,3 +134,10 @@ create_account('xx','s2u019.sql')
 18-Sep-09
 
 matplotlib - numpy, 
+
+
+------- Updates in httpd.conf
+
+RewriteEngine On
+RewriteRule ^/uploads/(.*)$ /cgi-bin/getfile.cgi?name=$1
+RewriteRule \.py - [F]
