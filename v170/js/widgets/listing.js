@@ -90,7 +90,6 @@ Listing.prototype.make = function(parent) {
 		if(bold)$y(btn,{fontWeight: 'bold'});
 		btn.innerHTML = label;
 		btn.onclick = onclick;
-		$(btn).button({icons:{ primary: icon }});
 	}
 	
 	
@@ -125,7 +124,7 @@ Listing.prototype.make = function(parent) {
 		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
 	}
 	if(!cnt)$dh(this.btn_area);
-	else { $(this.btn_area).buttonset(); }
+	else {  }
 	
 	this.paging_nav = {};
 	this.make_paging_area('top',$td(this.body_head,0,1));
@@ -259,7 +258,6 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	}
 	
 	$ds(this.filter_wrapper);
-	$(this.filter_wrapper).corners();
 
 	// create new table (or new line)
 	if((!this.inp_tab) || (this.inp_tab.rows[0].cells.length==this.filters_per_line)) {

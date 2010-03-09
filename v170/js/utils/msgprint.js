@@ -2,23 +2,21 @@ var msg_dialog;
 function msgprint(msg, static, callback) {
 
 	if(!msg_dialog) {
-		msg_dialog = $a(popup_cont, 'div');
-		$(msg_dialog).dialog({
-			modal: true,
-			autoOpen: false,
-			close: function(event, ui) {
-				msg_dialog.innerHTML = '';
-			}
-		});
-	} 
+		msg_dialog = new Dialog(300, 200, "Message");
+		msg_dialog.make_body([['HTML','Msg'],])
+		msg_dialog.onhide = function() {
+			msg_dialog.msg_area.innerHTML = '';
+			$dh(msg_dialog.msg_icon);
+			if(msg_dialog.custom_onhide) msg_dialog.custom_onhide();
+		}
+		var t = make_table(msg_dialog.rows['Msg'], 1, 2, '100%',['20px','250px'],{padding:'2px',verticalAlign: 'Top'});
+		msg_dialog.msg_area = $td(t,0,1);
+		msg_dialog.msg_icon = $a($td(t,0,0),'img');
+	}
 
-	// add table
-	var t = make_table(msg_dialog, 1, 2, '100%',['20px',null],{padding:'2px',verticalAlign: 'Top'});
-	msg_dialog.msg_area = $td(t,0,1);
-	msg_dialog.msg_icon = $a($td(t,0,0),'img');
+	// blur bg
+	if(!msg_dialog.display) msg_dialog.show();
 
-	$(msg_dialog).dialog('open');	
-	
 	// set message content
 	var has_msg = msg_dialog.msg_area.innerHTML ? 1 : 0;
 
@@ -34,5 +32,23 @@ function msgprint(msg, static, callback) {
 		msg_dialog.msg_icon.src = 'images/icons/accept.gif'; $di(msg_dialog.msg_icon); msg = msg.substr(3);
 	}
 
-	m.innerHTML = replace_newlines(msg);	
+	m.innerHTML = replace_newlines(msg);
+	
+	msg_dialog.custom_onhide = callback;
+	
+}
+
+
+// Floating Message
+
+function FloatingMessage() {
+	if($i('fm_cancel')) {
+		$i('fm_cancel').onclick = function() {
+			$dh($i('floating_message'));	
+		}
+		this.show = function(content) {
+			$i('fm_content').innerHTML = content;
+			$ds($i('floating_message'));
+		}
+	}
 }
