@@ -15,6 +15,8 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   <link type="text/css" rel="stylesheet" href="css/user.css?">
   <link rel="Shortcut Icon" href="/favicon.ico">
   
+  <script language="JavaScript" src="js/jquery/jquery-1.4.2.min.js"></script>
+  <script language="JavaScript" src="js/jquery/jquery-ui.min.js"></script>
   <script language="JavaScript" src="js/wnf.compressed.js"></script>
   %(add_in_head)s
   

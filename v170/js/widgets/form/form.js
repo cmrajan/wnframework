@@ -23,7 +23,6 @@ _f.FrmDialog = function() {
 			me.dialog.hide();
 		}
 	}
-	$(d.done_btn).button({icons:{primary:'ui-icon-disk'}});
 		
 	d.onhide = function() {
 		if(_f.cur_grid)
@@ -312,7 +311,6 @@ _f.Frm.prototype.setup_tabs = function() {
 _f.Frm.prototype.setup_tips = function() {
 	var me = this;
 	this.tip_box = $a(this.tip_wrapper, 'div', 'frm_tip_box');
-	if(ui_effects)$(this.tip_box).corners();
 
 	var tab = $a(this.tip_box, 'table');
 	var r = tab.insertRow(0);
@@ -325,7 +323,7 @@ _f.Frm.prototype.setup_tips = function() {
 	
 	this.set_tip = function(t, icon) {
 		me.c1.innerHTML = t; 
-		$(me.tip_box).fadeIn();
+		$ds(me.tip_box);
 		if(icon) this.img.setAttribute('src','images/icons/'+icon);
 	}
 	this.append_tip = function(t) {
@@ -611,7 +609,7 @@ _f.Frm.prototype.refresh = function(no_script) {
 
 _f.Frm.prototype.refresh_tabs = function() {
 	var me = this;
-	if(me.meta.section_style=='Tray') {
+	if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed') {
 		for(var i in me.sections) {
 			me.sections[i].hide();
 		}

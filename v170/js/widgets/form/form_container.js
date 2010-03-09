@@ -82,7 +82,6 @@ _f.FrmContainer.prototype.refresh_save_btns= function() {
 		btn.innerHTML = label; 
 		btn.onclick = fn;
 		if(bold)$y(btn, {fontWeight: 'bold'});
-		$(btn).button({icons:{ primary: icon }});
 	}
 
 	if(!cur_frm.editable)
@@ -99,8 +98,6 @@ _f.FrmContainer.prototype.refresh_save_btns= function() {
 
 	if(cint(frm.doc.docstatus)==2  && p[AMEND])
 		makebtn('Amend', function() { cur_frm.amend_doc() }, 0, 'ui-icon-scissors');
-	
-	$(this.button_area).buttonset();
 }
 
 _f.FrmContainer.prototype.refresh_opt_btns = function() {
@@ -111,8 +108,9 @@ _f.FrmContainer.prototype.refresh_opt_btns = function() {
 	var div = $a(this.tbar_div,'div');
 
 	var makebtn = function(label, fn, icon) {
-		var btn = $($a(div,'button')).html(label).click(fn);
-		$(btn).button({icons:{ primary: icon }});
+		var btn = $a(div,'button')
+		btn.innerHTML = label
+		btn.onclick = fn;
 	}
 
 	makebtn('New', function() { new_doc() }, 'ui-icon-document');
@@ -123,8 +121,6 @@ _f.FrmContainer.prototype.refresh_opt_btns = function() {
 	
 	// close
 	makebtn('Close', function() { nav_obj.show_last_open(); }, 'ui-icon-close');
-
-	$(div).buttonset();
 
 }
 

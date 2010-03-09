@@ -76,7 +76,7 @@ var tinyMCE_GZ = {
 
 					ti = x = null;
 				}
-			}, 10);
+			}, 100);
 		} else
 			t.eval(x.responseText);
 	},

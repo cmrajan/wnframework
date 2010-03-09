@@ -48,18 +48,22 @@ var _c = {};
 
 var widget_files = {
 	'_f.FrmContainer':'form.compressed.js'
+	,'_c.CalendarPopup':'widgets/form/date_picker.js'
 	,'_r.ReportContainer':'report.compressed.js'
 	,'_p.PrintQuery':'widgets/print_query.js'
 	,'Calendar':'widgets/calendar.js'
 	,'Recommendation':'widgets/recommend.js'
 	,'RatingWidget':'widgets/rating.js'
 	,'SidebarMenu':'webpage/sidebar_menu.js'
+	,'DocBrowser':'webpage/docbrowser.js'
 }
 
 var Recommendation;
 var RatingWidget;
 var SidebarMenu;
 var sidebar_menu;
+var DocBrowser;
+var doc_browser;
 
 // API globals
 var frms={};
@@ -68,7 +72,6 @@ var pscript = {};
 var validated = true;
 var validation_message = '';
 var tinymce_loaded;
-var tinyMCE;
 
 var $c_get_values;
 var get_server_fields;

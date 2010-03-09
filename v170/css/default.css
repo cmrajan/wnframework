@@ -1219,3 +1219,143 @@ div.autosuggest ul em
 	font-style: normal;
 	font-weight: bold;
 }
+
+/******* TABS ********/
+
+div.box_label_wrapper {
+	border-bottom: 4px solid #ABABAB;
+}
+
+div.box_label_body {
+	height: 28px;
+}
+
+ul.box_tabs {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+}
+
+ul.box_tabs li {
+	height: 28px;
+	float:left;
+	background:url("../images/ui/rc/tab-left-EEE.gif") no-repeat left top;
+	/*background:url("left.gif") no-repeat left top;*/
+	margin:0;
+	margin-left: 4px;
+	padding:0 0 0 9px;
+	background-color: #E0E0E0;
+	cursor: pointer;
+}
+
+ul.box_tabs a {
+	display:block;
+	background:url("../images/ui/rc/tab-right-EEE.gif") no-repeat right top;
+	padding:6px 15px 6px 6px;
+	text-decoration:none;
+	font-weight:bold;
+}
+
+ul.box_tabs li.box_tab_mouseover {
+
+}
+
+
+ul.box_tabs li.box_tab_selected {
+	background:url("../images/ui/rc/tab-left-CCC.gif") no-repeat left top;
+	background-color: #ABABAB;
+	color: #FFF;
+}
+ul.box_tabs li.box_tab_selected a {
+	background:url("../images/ui/rc/tab-right-CCC.gif") no-repeat right top;
+}
+
+/***** Dialogs *******/
+
+div.dialog_wrapper {
+	position: absolute;
+	display: none;
+	z-index: 90;
+	padding: 4px;
+	background-color: #FFF;
+	border: 2px solid #444;
+}
+
+div.dialog_wrapper .sb-inner {
+	background-color: #FFF;
+}
+div.dialog_wrapper .sb-border {
+	background-color: #444;
+}
+
+div.dialog_head {
+	height: 22px;
+	padding: 4px;
+	margin-bottom: 4px;
+	background-color: #DDD;
+}
+
+div.dialog_body {
+	padding-bottom: 16px;
+}
+
+div.dialog_back {
+	position: absolute;
+	display: none;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	background-color: #EEE;
+	opacity: 0.6;
+	z-index: 50;
+	text-align: center;
+}
+
+div.dialog_message {
+	display: none;
+	position: absolute;
+	width: 250px;
+	font-size: 12px;
+	z-index: 91;
+	background-color:#FFF;
+	padding: 12px;
+	border: 1px solid #444;
+}
+
+div.dialog_row {
+	padding: 8px 8px 0px 8px;
+}
+
+div.dialog_row table {
+	width: 100%;
+}
+
+div.dialog_row table td {
+}
+
+div.dialog_row input, div.dialog_row textarea, div.dialog_row select {
+	width: 80%;
+}
+
+div.dialog_row table td textarea {
+	width: 80%;
+	height: 200px;
+	font-size: 12px;
+}
+
+/******* Calendar *********/
+
+.cpYearNavigation,.cpMonthNavigation { background-color:#C0C0C0; text-align:center; vertical-align: middle; text-decoration:none; color:#000000; font-weight:bold; }
+.cpDayColumnHeader, .cpYearNavigation,.cpMonthNavigation,.cpCurrentMonthDate,.cpCurrentMonthDateDisabled,.cpOtherMonthDate,.cpOtherMonthDateDisabled,.cpCurrentDate,.cpCurrentDateDisabled,.cpTodayText,.cpTodayTextDisabled,.cpText { font-family:Verdana, Arial; font-size:8pt; }
+TD.cpDayColumnHeader { text-align:right; border:solid thin #C0C0C0;border-width:0px 0px 1px 0px; }
+.cpCurrentMonthDate, .cpOtherMonthDate, .cpCurrentDate  { text-align:right; text-decoration:none; }
+.cpCurrentMonthDateDisabled, .cpOtherMonthDateDisabled, .cpCurrentDateDisabled { color:#D0D0D0; text-align:right; text-decoration:line-through; }
+.cpCurrentMonthDate, .cpCurrentDate { color:#000000; }
+.cpOtherMonthDate { color:#808080; }
+TD.cpCurrentDate { color:white; background-color: #C0C0C0; border-width:1px; border:solid thin #800000; }
+TD.cpTodayText, TD.cpTodayTextDisabled { border:solid thin #C0C0C0; border-width:1px 0px 0px 0px;}
+A.cpTodayText, SPAN.cpTodayTextDisabled { height:20px; }
+A.cpTodayText { color:black; }
+.cpTodayTextDisabled { color:#D0D0D0; }
+.cpBorder { border:solid thin #808080; width: 144px; }
+

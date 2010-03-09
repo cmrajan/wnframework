@@ -66,13 +66,11 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
 	this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
 	this.exp_icon.expand = function() { 
-		if(ui_effects) $ds(me.row.body) 
-		else $(me.row.body).slideDown(); 
+		$ds(me.row.body) 
 		me.exp_icon.src = min_icon; 
 	}
 	this.exp_icon.collapse = function() { 
-		if(ui_effects) $dh(me.row.body) 
-		else $(me.row.body).slideUp(); 
+		$dh(me.row.body) 
 		me.exp_icon.src = exp_icon; 
 	}
 	$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
@@ -93,10 +91,8 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	if(this.df.colour) {
 		has_col = true;
 		var col = this.df.colour.split(':')[1];
-		if(col!='FFF') {
-			
+		if(col!='FFF') {			
 			$y(this.row.sub_wrapper, { margin:'8px', padding: '0px' ,backgroundColor: ('#' + col)} );
-			$(this.row.sub_wrapper).corners();
 		}
 	}
 		
@@ -135,16 +131,20 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.frm.sections[this.sec_id] = this;
 			this.frm.sections_by_label[me.df.label] = this;
 			
-			this.onshow = function() { 
+			this.mytab = this.frm.tabs.add_tab(me.df.label, function() { me.frm.set_section(me.sec_id);});
+			
+			this.show = function() { 
+				this.row.show(); me.mytab.set_selected();
+				
 				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
-			this.show = function() { me.frm.tabs.tabs[me.df.label].show(); }
-			this.hide = function() {  }
+			this.hide = function() { this.row.hide(); me.mytab.hide(); }
 
-			this.mytab = this.frm.tabs.add_tab(me.df.label, this.onshow, this.row.wrapper);			
+			this.make_row();		
 			
 			this.make_simple_section(1);
+			if(!isIE) this.hide();
 		} else {
 			this.row = this.frm.layout.addsubrow();
 			this.make_simple_section();
@@ -160,13 +160,12 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.header.innerHTML = me.df.label;
 			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
 
-			$(this.header).hover(function() {
-					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
-				}, function() {
-					if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
-				}
-			);
-			if(ui_effects)$(this.header).corners('top-left bottom-left');
+			this.header.onmouseover = function() {
+				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
+			}
+			this.header.onmouseout = function() {
+				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
+			}
 			
 			this.hide = function() { 
 				this.row.hide();
@@ -301,7 +300,6 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 		} else
 			cur_frm.runscript(me.df.options, me);
 	}
-	$(this.input).button({icons:{ primary: 'ui-icon-circle-triangle-e' }});
 }
 _f.ButtonField.prototype.set = function(v) { }; // No Setter
 _f.ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly

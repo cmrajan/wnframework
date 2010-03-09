@@ -30,7 +30,6 @@ _f.Grid.prototype.make_ui = function(parent) {
 	$td(ht,0,1).style.textAlign = 'right';
 	this.tbar_div = $a($td(ht,0,1), 'div', 'grid_tbarlinks');
 	if(isIE) $y(this.tbar_div, {width:'200px'});
-	if(!isIE) $(this.tbar_div).corners('top-right top-left');
 	this.tbar_tab = make_table(this.tbar_div,1,4,'100%',['25%','25%','25%','25%']);	
 			
 	this.wrapper = $a(parent, 'div', 'grid_wrapper');
@@ -271,7 +270,7 @@ _f.Grid.prototype.cell_click = function(cell, e) {
 
 _f.Grid.prototype.notify_click = function(e, target) {
 	if(_f.cur_grid_cell && !target.isactive) {
-		if(!(text_dialog && text_dialog.display) && !selector.display && !datepicker_active) {
+		if(!(text_dialog && text_dialog.display) && !selector.display) {
 			_f.cur_grid_cell.grid.cell_deselect();
 		}
 	}

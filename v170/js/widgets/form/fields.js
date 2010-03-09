@@ -375,24 +375,31 @@ DateField.prototype.make_input = function() {
 	this.user_fmt = locals['Control Panel']['Control Panel'].date_format;
 	if(!this.user_fmt)this.user_fmt = 'dd-mm-yy';
 
-	this.input = $a(this.input_area, 'input');
-	$(this.input).datepicker({
-		dateFormat: me.user_fmt.replace('yyyy','yy'), 
-		altFormat:'yy-mm-dd', 
-		changeYear: true,
-		beforeShow: function(input, inst) { 
-			datepicker_active = 1 
-		},
-		onClose: function(dateText, inst) { 
-			datepicker_active = 0 
-			if(_f.cur_grid_cell)
-				_f.cur_grid_cell.grid.cell_deselect();	
-		}
-	});
-	
-	var me = this;
+	makeinput_popup(this, 'images/icons/calendar.gif');
 
-	me.input.onchange = function() {
+	me.show_cal = function(cal) {
+
+		if(cal)_c.cal = cal; // set as global
+		
+		var user_fmt = me.user_fmt.replace('mm', 'MM');
+		_c.cal.select(me.txt, me.txt.getAttribute('id'), user_fmt);
+		if(isIE && window.event) {
+    		window.event.cancelBubble = true;
+	 	   	window.event.returnValue = false;
+		}
+	}
+
+	me.btn.onclick = function() {
+		if(_c.cal_displayed) {
+			// hide if shown
+			_c.cal.hidePopup();	
+		} else {
+			hide_selects();
+			new_widget('_c.CalendarPopup', me.show_cal, 1);
+		}
+	}
+
+	me.txt.onchange = function() {
 		// input as dd-mm-yyyy
 		if(this.value==null)this.value='';
 
@@ -405,7 +412,7 @@ DateField.prototype.make_input = function() {
 		me.input.value = val;
 	}
 	me.get_value = function() {
-		return dateutil.str_to_user(me.input.value);
+		return dateutil.str_to_user(me.txt.value);
 	}
 }
 DateField.prototype.set_disp = function(val) {
@@ -622,13 +629,14 @@ CheckField.prototype.set_disp = function(val) {
 var codeid=0; var code_editors={};
 function CodeField() { } CodeField.prototype = new Field();
 CodeField.prototype.make_input = function() {
-	var me = this; 
+	var me = this;
 	$ds(this.label_area);
 	this.label_area.innerHTML = this.df.label;
 	this.input = $a(this.input_area, 'textarea','code_text');
 	this.myid = 'code-'+codeid;
 	this.input.setAttribute('id',this.myid);
 	codeid++;
+
 
 	this.input.setAttribute('wrap', 'off');
 	this.input.set_input = function(v) {
@@ -644,7 +652,7 @@ CodeField.prototype.make_input = function() {
 			me.set(me.editor.getContent()); // tinyMCE
 		} else {
 			me.set(me.input.value);
-		} 
+		}
 		me.run_trigger();
 	}
 	this.get_value= function() {
@@ -655,6 +663,7 @@ CodeField.prototype.make_input = function() {
 		}
 	}
 	if(this.df.fieldtype=='Text Editor') {
+		code_editors[me.df.fieldname] = me;
 		if(!tinymce_loaded) {
 			tinymce_loaded = 1;
 			tinyMCE_GZ.init({
@@ -670,18 +679,18 @@ CodeField.prototype.make_input = function() {
 		$y(me.input, {fontFamily:'Courier, Fixed'});
 	}
 }
-CodeField.prototype.set_disp = function(val) { 
+CodeField.prototype.set_disp = function(val) {
 	$y(this.disp_area, {width:'90%'})
-	this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>'; 
+	this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>';
 }
-CodeField.prototype.setup_editor = function() { 
+CodeField.prototype.setup_editor = function() {
 	var me = this;
-	code_editors[me.df.fieldname] = me.input;
 	// make the editor
 	tinyMCE.init({
 		theme : "advanced",
-		mode : "exact",
-		elements: this.myid,
+		mode : "none",
+		//elements: me.myid,
+
 		plugins:"table,style,indicime",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
@@ -695,16 +704,18 @@ CodeField.prototype.setup_editor = function() {
 		// buttons
 		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
 		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,cleanup,help,code,|,forecolor,backcolor,|,indicime,indicimehelp",
-		theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,ltr,rtl",
+		theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup",
 
 		// framework integation
 		init_instance_callback : "code_editors."+ this.df.fieldname+".editor_init_callback",
-		onchange_callback : "code_editors."+ this.df.fieldname+".onchange"
+		onchange_callback : "code_editors."+ this.df.fieldname+".input.onchange"
 	});
-	this.input.editor_init_callback = function() {
+
+	this.editor_init_callback = function() {
 		if(cur_frm)
 			cur_frm.fields_dict[me.df.fieldname].editor = tinyMCE.get(me.myid);
 	}
+	tinyMCE.execCommand("mceAddControl",false,me.myid);
 }
 
 // ======================================================================================

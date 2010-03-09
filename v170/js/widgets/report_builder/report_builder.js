@@ -59,7 +59,6 @@ _r.ReportContainer = function() {
 		me.cur_rb.dt.start_rec = 1;
 		me.cur_rb.dt.run();} 
 	}
-	$(runbtn).button({icons:{primary:'ui-icon-circle-triangle-e'}});
 	$dh(this.button_area);
 	
 	this.rb_area = $a(this.wrapper, 'div');
@@ -798,8 +797,6 @@ _r.ReportFilters = function(rb) {
 	this.first_page_filter = $a(rb.mytabs.tabs['Result'].tab_body, 'div', 'finder_filter_area');
 	this.filter_area = $a(rb.mytabs.tabs['More Filters'].tab_body, 'div', 'finder_filter_area');
 	
-	if(!isIE)$(this.filter_area).corners();
-
 	// filter fields area
 	this.filter_fields_area = $a(this.filter_area,'div');
 
@@ -839,7 +836,6 @@ _r.ReportFilters.prototype.refresh = function() {
 			this.first_page_filter.appendChild(f.df.filter_cell);
 			this.rb.has_primary_filters = 1;
 			$ds(this.first_page_filter);
-			if(!isIE)$(this.first_page_filter).corners();
 		}
 	}
 }
@@ -952,8 +948,6 @@ _r.ReportFilters.prototype.add_field = function(f, dt, in_primary) {
 _r.ReportColumnPicker = function(rb) {
 	this.rb = rb;
 	this.picker_area = $a(this.rb.mytabs.tabs['Select Columns'].tab_body, 'div', 'finder_picker_area');
-	
-	if(!isIE)$(this.picker_area).corners();
 	
 	this.all_fields = [];
 	this.sel_idx = 0;

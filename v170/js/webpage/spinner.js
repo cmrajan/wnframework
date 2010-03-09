@@ -20,7 +20,7 @@ function set_loading() {
 	var d = _loading_div;
 	if(!d)return;
 
-	if($.browser.msie && flt($.browser.version)<7) {
+	if(isIE6) {
 		d.style.top = (get_scroll_top()+10)+'px';
 		window.onscroll = function() { 
 			d.style.top = (get_scroll_top()+10)+'px'; 
@@ -39,7 +39,7 @@ function hide_loading() {
 	pending_req--;
 	if(!pending_req){
 		$dh(d);
-		if($.browser.msie && flt($.browser.version)<7) {
+		if(isIE6) {
 			document.body.onscroll = null;
 		}
 	}

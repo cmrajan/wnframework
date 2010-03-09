@@ -1,5 +1,4 @@
 // App.js
-var ui_effects = 1;
 
 // dialog container
 var popup_cont;
@@ -11,9 +10,6 @@ function startup() {
 
 	//subscribe to DHTML history change events
 	dhtmlHistory.addListener(historyChange);
-	
-	if($.browser.msie && flt($.browser.version) < 8) ui_effects = 0;
-	if($.browser.mozilla && flt($.browser.version) < 1.9) ui_effects = 0;
 
 	popup_cont = $a(document.getElementsByTagName('body')[0], 'div');
 
@@ -74,7 +70,7 @@ function startup() {
 		
 		$dh('startup_div');
 		$ds('body_div');
-				
+
 		var t = to_open();
 		if(t) {
 			historyChange(t);
@@ -131,4 +127,4 @@ function setup_calendar() {
 
 startup_list.push(setup_calendar);
 
- $(document).ready(startup);
+window.onload = function() { startup() }
