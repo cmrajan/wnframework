@@ -90,6 +90,7 @@ Listing.prototype.make = function(parent) {
 		if(bold)$y(btn,{fontWeight: 'bold'});
 		btn.innerHTML = label;
 		btn.onclick = onclick;
+		$(btn).button({icons:{ primary: icon }});
 	}
 	
 	
@@ -124,7 +125,7 @@ Listing.prototype.make = function(parent) {
 		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
 	}
 	if(!cnt)$dh(this.btn_area);
-	else {  }
+	else {  $(this.btn_area).buttonset();  }
 	
 	this.paging_nav = {};
 	this.make_paging_area('top',$td(this.body_head,0,1));
