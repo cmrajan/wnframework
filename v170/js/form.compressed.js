@@ -164,11 +164,11 @@ this.cell.hide();else
 this.cell.show();this.set_hidden=this.df.hidden;}}}
 _f.SectionBreak=function(){this.set_input=function(){};}
 _f.SectionBreak.prototype.make_row=function(){this.row=this.frm.layout.addrow();}
-_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div'),1,2,'100%',['20px',null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,1),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.body,{margin:'32px'});this.exp_icon=$a($td(t,0,0),'img','',{cursor:'pointer'});this.exp_icon.src=min_icon;this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
+_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div'),1,2,'100%',[null,'60px'],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,0),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.body,{margin:'32px'});$y($td(t,0,1),{textAlign:'right'});this.exp_icon=$a($td(t,0,1),'span','link_type',{fontSize:'11px'});this.exp_icon.innerHTML='hide';this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
 this.exp_icon.expand=function(){$ds(me.row.body)
-me.exp_icon.src=min_icon;}
+me.exp_icon.innerHTML='hide';}
 this.exp_icon.collapse=function(){$dh(me.row.body)
-me.exp_icon.src=exp_icon;}
+me.exp_icon.innerHTML='show';}
 $y(head,{padding:'2px',borderBottom:'1px solid #ccc',margin:'8px'});this.collapse=this.exp_icon.collapse;this.expand=this.exp_icon.expand;}
 _f.SectionBreak.prototype.make_simple_section=function(static){var head=$a(this.row.header,'div','',{margin:'4px 8px 0px 8px'});var me=this;if(this.df.description){var d=$a(this.row.header,'div','',{margin:'0px 8px',padding:'8px 8px',backgroundColor:'#EEE'});if(this.df.description.length>240){$($a(d,'div','comment')).html(replace_newlines(this.df.description.substr(0,240))+'...');$($a(d,'div','link_type',{fontSize:'11px'})).html('more').click(function(){msgprint(me.df.description)});}else{$($a(d,'div')).html(replace_newlines(this.df.description));}}
 var has_col=false;if(this.df.colour){has_col=true;var col=this.df.colour.split(':')[1];if(col!='FFF'){$y(this.row.sub_wrapper,{margin:'8px',padding:'0px',backgroundColor:('#'+col)});}}
