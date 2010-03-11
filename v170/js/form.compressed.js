@@ -22,7 +22,7 @@ if(frms[doctype]){return frms[doctype];}
 var callback=function(r,rt){if(!locals['DocType'][doctype]){return;}
 new _f.Frm(doctype,parent);if(onload)onload(r,rt);}
 if(locals['DocType']&&locals['DocType'][doctype]){callback();}else if(opt_name&&(!LocalDB.is_doc_loaded(doctype,opt_name))){$c('webnotes.widgets.form.getdoc',{'name':opt_name,'doctype':doctype,'getdoctype':1,'user':user},callback);}else{$c('webnotes.widgets.form.getdoctype',args={'doctype':doctype},callback);}}
-_f.frm_dialog=null;_f.FrmDialog=function(){var me=this;var d=new Dialog(640,400,'Edit Row');d.body_wrapper=$a(d.body,'div','dialog_frm');d.done_btn=$a($a(d.body,'div','',{margin:'8px'}),'button');d.done_btn.innerHTML='Done';d.done_btn.onclick=function(){if(!me.dialog.from_grid){var callback=function(r,rt){if(me.on_save_callback)
+_f.frm_dialog=null;_f.FrmDialog=function(){var me=this;var d=new Dialog(640,400,'Edit Row');d.body_wrapper=$a(d.body,'div','dialog_frm');d.done_btn=$a($a(d.body,'div','',{margin:'8px'}),'button');d.done_btn.innerHTML='Done';d.done_btn.onclick=function(){if(!me.from_grid){var callback=function(r,rt){if(me.on_save_callback)
 me.on_save_callback(me.cur_frm.docname);me.dialog.hide();}
 me.cur_frm.save('Save',callback);}else{me.dialog.hide();}}
 d.onhide=function(){if(_f.cur_grid)
@@ -170,7 +170,8 @@ me.exp_icon.src=min_icon;}
 this.exp_icon.collapse=function(){$dh(me.row.body)
 me.exp_icon.src=exp_icon;}
 $y(head,{padding:'2px',borderBottom:'1px solid #ccc',margin:'8px'});this.collapse=this.exp_icon.collapse;this.expand=this.exp_icon.expand;}
-_f.SectionBreak.prototype.make_simple_section=function(static){var head=$a(this.row.header,'div','',{margin:'4px 8px 0px 8px'});var me=this;var has_col=false;if(this.df.colour){has_col=true;var col=this.df.colour.split(':')[1];if(col!='FFF'){$y(this.row.sub_wrapper,{margin:'8px',padding:'0px',backgroundColor:('#'+col)});}}
+_f.SectionBreak.prototype.make_simple_section=function(static){var head=$a(this.row.header,'div','',{margin:'4px 8px 0px 8px'});var me=this;if(this.df.description){var d=$a(this.row.header,'div','',{margin:'0px 8px',padding:'8px 8px',backgroundColor:'#EEE'});if(this.df.description.length>240){$($a(d,'div','comment')).html(replace_newlines(this.df.description.substr(0,240))+'...');$($a(d,'div','link_type',{fontSize:'11px'})).html('more').click(function(){msgprint(me.df.description)});}else{$($a(d,'div')).html(replace_newlines(this.df.description));}}
+var has_col=false;if(this.df.colour){has_col=true;var col=this.df.colour.split(':')[1];if(col!='FFF'){$y(this.row.sub_wrapper,{margin:'8px',padding:'0px',backgroundColor:('#'+col)});}}
 if(static){this.label=$a(head,'div','sectionHeading',{margin:'12px 0px 8px 0px'});this.label.innerHTML=this.df.label?this.df.label:'';return;}
 if(this.df.label){this.make_collapsible(head);}else if(!has_col){$y(head,{margin:'8px',borderBottom:'2px solid #445'});}}
 _f.cur_sec_header=null;_f.SectionBreak.prototype.make_body=function(){if((!this.perm[this.df.permlevel])||(!this.perm[this.df.permlevel][READ])||this.df.hidden){return;}
@@ -210,7 +211,17 @@ if(cur_frm.editable&&this.df.allow_on_submit&&cur_frm.doc.docstatus==1&&this.df[
 if(this.old_status!=st){if(st=='Write'){this.grid.show();}else if(st=='Read'){this.grid.show();}else{this.grid.hide();}
 this.old_status=st;}
 this.grid.refresh();}
-_f.TableField.prototype.set=function(v){};_f.TableField.prototype.set_input=function(v){};_f.cur_grid_cell=null;_f.Grid=function(parent){}
+_f.TableField.prototype.set=function(v){};_f.TableField.prototype.set_input=function(v){};_f.CodeField=function(){};_f.CodeField.prototype=new Field();_f.CodeField.prototype.make_input=function(){var me=this;$ds(this.label_area);this.label_area.innerHTML=this.df.label;this.input=$a(this.input_area,'textarea','code_text');this.myid='code-'+codeid;this.input.setAttribute('id',this.myid);codeid++;this.input.setAttribute('wrap','off');this.input.set_input=function(v){if(me.editor){me.editor.setContent(v);}else{me.input.value=v;me.input.innerHTML=v;}}
+this.input.onchange=function(){if(me.editor){me.set(me.editor.getContent());}else{me.set(me.input.value);}
+me.run_trigger();}
+this.get_value=function(){if(me.editor){return me.editor.getContent();}else{return this.input.value;}}
+if(this.df.fieldtype=='Text Editor'){code_editors[me.df.fieldname]=me;if(!tinymce_loaded){tinymce_loaded=1;tinyMCE_GZ.init({strict_loading_mode:true,themes:"advanced",plugins:"style,table,indicime",languages:"en",disk_cache:true},function(){me.setup_editor()});}else{this.setup_editor();}}else{$y(me.input,{fontFamily:'Courier, Fixed'});}}
+_f.CodeField.prototype.set_disp=function(val){$y(this.disp_area,{width:'90%'})
+this.disp_area.innerHTML='<textarea class="code_text" readonly=1>'+val+'</textarea>';}
+_f.CodeField.prototype.setup_editor=function(){var me=this;tinyMCE.init({theme:"advanced",mode:"none",strict_loading_mode:true,plugins:"table,style,indicime",theme_advanced_toolbar_location:"top",theme_advanced_toolbar_align:"left",theme_advanced_statusbar_location:"bottom",extended_valid_elements:"div[id|dir|class|align|style]",width:'100%',height:'360px',theme_advanced_buttons1:"save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",theme_advanced_buttons2:"cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,cleanup,help,code,|,forecolor,backcolor,|,indicime,indicimehelp",theme_advanced_buttons3:"tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup",init_instance_callback:"code_editors."+this.df.fieldname+".editor_init_callback",onchange_callback:"code_editors."+this.df.fieldname+".input.onchange"});this.editor_init_callback=function(){if(cur_frm)
+cur_frm.fields_dict[me.df.fieldname].editor=tinyMCE.get(me.myid);}
+tinyMCE.execCommand("mceAddControl",false,me.myid);}
+_f.cur_grid_cell=null;_f.Grid=function(parent){}
 _f.Grid.prototype.init=function(parent,row_height){this.alt_row_bg='#F2F2FF';this.row_height=row_height;if(this.is_scrolltype){if(!row_height)this.row_height='26px';this.make_ui(parent);}else{this.make_ui_simple(parent);}
 this.insert_column('','','Int','Sr','50px','',[1,0,0]);this.total_width=50;if(this.oninit)this.oninit();keypress_observers.push(this)}
 _f.Grid.prototype.make_ui=function(parent){var ht=make_table($a(parent,'div'),1,2,'100%',['60%','40%']);this.main_title=$td(ht,0,0);this.main_title.className='columnHeading';$td(ht,0,1).style.textAlign='right';this.tbar_div=$a($td(ht,0,1),'div','grid_tbarlinks');if(isIE)$y(this.tbar_div,{width:'200px'});this.tbar_tab=make_table(this.tbar_div,1,4,'100%',['25%','25%','25%','25%']);this.wrapper=$a(parent,'div','grid_wrapper');$h(this.wrapper,cint(screen.width*0.5)+'px');this.head_wrapper=$a(this.wrapper,'div','grid_head_wrapper');this.head_tab=$a(this.head_wrapper,'table','grid_head_table');this.head_row=this.head_tab.insertRow(0);this.tab_wrapper=$a(this.wrapper,'div','grid_tab_wrapper');this.tab=$a(this.tab_wrapper,'table','grid_table');var me=this;this.wrapper.onscroll=function(){me.head_wrapper.style.top=me.wrapper.scrollTop+'px';}}

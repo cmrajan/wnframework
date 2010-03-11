@@ -7,6 +7,7 @@
 // ======================================================================================
 
 var no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image'];
+var codeid=0; var code_editors={};
 
 function Field() {	}
 
@@ -36,10 +37,10 @@ Field.prototype.make_body = function() {
 		var lt = make_table($a(lc,'div'),1,2,'100%',[null,'20px']);
 		this.label_icon = $a($td(lt,0,1),'img'); $dh(this.label_icon);
 		this.label_icon.src = 'images/icons/error.gif';
-		this.label_cell= $td(lt,0,0)
+		this.label_cell= $td(lt,0,0);
 		this.input_area = $a(this.input_cell, 'div', 'input_area');
 		this.disp_area = $a(this.input_cell, 'div');
-		this.comment_area = $a(this.input_cell, 'div', 'comment');
+		this.comment_area = $a(this.input_cell, 'div', 'comment', {width:'80%', fontSize:'11px'});
 	}
 	if(this.onmake)this.onmake();
 }
@@ -48,11 +49,21 @@ Field.prototype.set_label = function() {
 	if(this.label_cell&&this.label!=this.df.label) { 
 		this.label_cell.innerHTML = this.df.label;this.label = this.df.label; 
 	}
+
+}
+
+Field.prototype.set_comment = function() {
+	var me = this;
+	this.comment_area.innerHTML = '';
 	if(this.df.description) {
-		this.comment_area.innerHTML = replace_newlines(this.df.description);
+		if(this.df.description.length > 120) {
+			$($a(this.comment_area, 'div')).html(this.df.description.substr(0,120) + '...');
+			$($a(this.comment_area, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
+		} else {
+			this.comment_area.innerHTML = replace_newlines(this.df.description);
+		}
 		$ds(this.comment_area);
 	} else {
-		this.comment_area.innerHTML = '';
 		$dh(this.comment_area);
 	}
 }
@@ -134,6 +145,7 @@ Field.prototype.refresh_display = function() {
 		if(this.disp_status=='Write') { // write
 			if(this.make_input&&(!this.input)) { // make input if reqd
 				this.make_input();
+				this.set_comment();
 			}
 			$ds(this.wrapper);
 			if(this.input) { // if there, show it!
@@ -626,99 +638,6 @@ CheckField.prototype.set_disp = function(val) {
 
 // ======================================================================================
 
-var codeid=0; var code_editors={};
-function CodeField() { } CodeField.prototype = new Field();
-CodeField.prototype.make_input = function() {
-	var me = this;
-	$ds(this.label_area);
-	this.label_area.innerHTML = this.df.label;
-	this.input = $a(this.input_area, 'textarea','code_text');
-	this.myid = 'code-'+codeid;
-	this.input.setAttribute('id',this.myid);
-	codeid++;
-
-
-	this.input.setAttribute('wrap', 'off');
-	this.input.set_input = function(v) {
-		if(me.editor) {
-			me.editor.setContent(v); // tinyMCE
-		} else {
-			me.input.value = v;
-			me.input.innerHTML = v;
-		}
-	}
-	this.input.onchange = function() {
-		if(me.editor) {
-			me.set(me.editor.getContent()); // tinyMCE
-		} else {
-			me.set(me.input.value);
-		}
-		me.run_trigger();
-	}
-	this.get_value= function() {
-		if(me.editor) {
-			return me.editor.getContent(); // tinyMCE
-		} else {
-			return this.input.value;
-		}
-	}
-	if(this.df.fieldtype=='Text Editor') {
-		code_editors[me.df.fieldname] = me;
-		if(!tinymce_loaded) {
-			tinymce_loaded = 1;
-			tinyMCE_GZ.init({
-				themes : "advanced",
-				plugins : "style,table,indicime",
-				languages : "en",
-				disk_cache : true
-			}, function() { me.setup_editor() });
-		} else {
-			this.setup_editor();
-		}
-	} else {
-		$y(me.input, {fontFamily:'Courier, Fixed'});
-	}
-}
-CodeField.prototype.set_disp = function(val) {
-	$y(this.disp_area, {width:'90%'})
-	this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>';
-}
-CodeField.prototype.setup_editor = function() {
-	var me = this;
-	// make the editor
-	tinyMCE.init({
-		theme : "advanced",
-		mode : "none",
-		//elements: me.myid,
-
-		plugins:"table,style,indicime",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		extended_valid_elements: "div[id|dir|class|align|style]",
-
-		// w/h
-		width: '100%',
-		height: '360px',
-
-		// buttons
-		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,cleanup,help,code,|,forecolor,backcolor,|,indicime,indicimehelp",
-		theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup",
-
-		// framework integation
-		init_instance_callback : "code_editors."+ this.df.fieldname+".editor_init_callback",
-		onchange_callback : "code_editors."+ this.df.fieldname+".input.onchange"
-	});
-
-	this.editor_init_callback = function() {
-		if(cur_frm)
-			cur_frm.fields_dict[me.df.fieldname].editor = tinyMCE.get(me.myid);
-	}
-	tinyMCE.execCommand("mceAddControl",false,me.myid);
-}
-
-// ======================================================================================
 
 function TextField() { } TextField.prototype = new Field();
 TextField.prototype.with_label = 1;
@@ -1026,11 +945,11 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 		case 'check':var f = new CheckField(); break;
 		case 'text':var f = new TextField(); break;
 		case 'small text':var f = new TextField(); break;
-		case 'code':var f = new CodeField(); break;
-		case 'text editor':var f = new CodeField(); break;
 		case 'select':var f = new SelectField(); break;
 		
 		// form fields
+		case 'code':var f = new _f.CodeField(); break;
+		case 'text editor':var f = new _f.CodeField(); break;
 		case 'button':var f = new _f.ButtonField(); break;
 		case 'table':var f = new _f.TableField(); break;
 		case 'section break':var f= new _f.SectionBreak(); break;

@@ -61,7 +61,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 		
 	this.label = $a($td(t,0,1), 'div', 'sectionHeading');
 	this.label.innerHTML = this.df.label?this.df.label:'';
-		
+	
 	// exp / collapse
 	this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
 	this.exp_icon.onclick = function() { if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); else me.exp_icon.collapse(); }
@@ -86,6 +86,17 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	var head = $a(this.row.header, 'div', '', {margin:'4px 8px 0px 8px'});
 	var me = this;
 
+	// description
+	if(this.df.description) {
+		var d = $a(this.row.header, 'div', '', {margin:'0px 8px', padding:'8px 8px', backgroundColor:'#EEE'});
+		if(this.df.description.length > 240) {
+			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
+			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
+		} else {
+			$($a(d, 'div')).html(replace_newlines(this.df.description));
+		}
+	}
+
 	// colour
 	var has_col = false;
 	if(this.df.colour) {
@@ -95,7 +106,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 			$y(this.row.sub_wrapper, { margin:'8px', padding: '0px' ,backgroundColor: ('#' + col)} );
 		}
 	}
-		
+	
 	if(static) {
 		this.label = $a(head, 'div', 'sectionHeading', {margin:'12px 0px 8px 0px'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
@@ -362,3 +373,101 @@ _f.TableField.prototype.refresh = function() {
 
 _f.TableField.prototype.set = function(v) { }; // nothing
 _f.TableField.prototype.set_input = function(v) { }; // nothing
+
+// ==============================================================
+
+_f.CodeField = function() { };
+_f.CodeField.prototype = new Field();
+_f.CodeField.prototype.make_input = function() {
+	var me = this;
+	$ds(this.label_area);
+	this.label_area.innerHTML = this.df.label;
+	this.input = $a(this.input_area, 'textarea','code_text');
+	this.myid = 'code-'+codeid;
+	this.input.setAttribute('id',this.myid);
+	codeid++;
+
+
+	this.input.setAttribute('wrap', 'off');
+	this.input.set_input = function(v) {
+		if(me.editor) {
+			me.editor.setContent(v); // tinyMCE
+		} else {
+			me.input.value = v;
+			me.input.innerHTML = v;
+		}
+	}
+	this.input.onchange = function() {
+		if(me.editor) {
+			me.set(me.editor.getContent()); // tinyMCE
+		} else {
+			me.set(me.input.value);
+		}
+		me.run_trigger();
+	}
+	this.get_value= function() {
+		if(me.editor) {
+			return me.editor.getContent(); // tinyMCE
+		} else {
+			return this.input.value;
+		}
+	}
+	if(this.df.fieldtype=='Text Editor') {
+		code_editors[me.df.fieldname] = me;
+		if(!tinymce_loaded) {
+			tinymce_loaded = 1;
+			tinyMCE_GZ.init({
+				strict_loading_mode: true,
+				themes : "advanced",
+				plugins : "style,table,indicime",
+				languages : "en",
+				disk_cache : true
+			}, function() { me.setup_editor() });
+		} else {
+			this.setup_editor();
+		}
+	} else {
+		$y(me.input, {fontFamily:'Courier, Fixed'});
+	}
+}
+_f.CodeField.prototype.set_disp = function(val) {
+	$y(this.disp_area, {width:'90%'})
+	this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>';
+}
+_f.CodeField.prototype.setup_editor = function() {
+	var me = this;
+	// make the editor
+	tinyMCE.init({
+		theme : "advanced",
+		mode : "none",
+		//elements: me.myid,
+		strict_loading_mode: true,
+		plugins:"table,style,indicime",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		extended_valid_elements: "div[id|dir|class|align|style]",
+
+		// w/h
+		width: '100%',
+		height: '360px',
+
+		// buttons
+		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,cleanup,help,code,|,forecolor,backcolor,|,indicime,indicimehelp",
+		theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup",
+
+		// framework integation
+		init_instance_callback : "code_editors."+ this.df.fieldname+".editor_init_callback",
+		onchange_callback : "code_editors."+ this.df.fieldname+".input.onchange"
+	});
+
+	this.editor_init_callback = function() {
+		if(cur_frm)
+			cur_frm.fields_dict[me.df.fieldname].editor = tinyMCE.get(me.myid);
+	}
+	tinyMCE.execCommand("mceAddControl",false,me.myid);
+}
+
+// ======================================================================================
+

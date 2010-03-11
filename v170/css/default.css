@@ -6,7 +6,7 @@ body {
 	margin: 0px;
 	font-family: Arial, Helvetica, Sans;
 	font-size: 12px;
-	color: #222;
+	color: #000;
 	background: url(foo) fixed;
 }
 
@@ -41,7 +41,7 @@ div.fix_ff_cursor { overflow: auto; }
 
 /* --- Layout --- */
 
-div.comment { color: #777; }
+div.comment { color: #444; }
 
 div#body_div {
 	position: relative;

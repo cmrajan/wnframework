@@ -11,7 +11,7 @@ _f.FrmDialog = function() {
 
 	// done button
 	d.done_btn.onclick = function() { 
-		if(!me.dialog.from_grid) {
+		if(!me.from_grid) {
 			var callback = function(r,rt) {
 				// set field value and refresh
 				if(me.on_save_callback)
