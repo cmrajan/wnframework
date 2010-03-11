@@ -13,7 +13,7 @@ in_files_main = [
        ,'widgets/tree.js'
        ,'widgets/menu.js'
        ,'widgets/layout.js'
-       ,'widgets/datepicker.js'
+       #,'widgets/datepicker.js'
        ,'widgets/tabbedpage.js'
        ,'widgets/autosuggest.js'
        ,'widgets/select.js'
