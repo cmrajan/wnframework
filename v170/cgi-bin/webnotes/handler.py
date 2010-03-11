@@ -35,6 +35,7 @@ def startup():
 	cp = doclist[0]
 	
 	doclist += webnotes.model.doctype.get('Event')
+	doclist += webnotes.model.doctype.get('Search Criteria')
 	home_page = webnotes.user.get_home_page()
 
 	if home_page:

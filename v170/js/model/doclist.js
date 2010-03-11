@@ -63,16 +63,15 @@ function save_doclist(dt, dn, save_action, onsave, onerr) {
 	}
 		
 	var f = frms[dt];
-	if(!all_clear) { // has errors
+	if(f && !all_clear) { // has errors
 		if(f)f.savingflag = false;
 		return 'Error';
 	}
-	
+		
 	var _save = function() {
-		var out = compress_doclist(doclist);
 		//if(user=='Administrator')errprint(out);
 		
-		$c('webnotes.widgets.form.savedocs', {'docs':out, 'docname':dn, 'action': save_action, 'user':user }, 
+		$c('webnotes.widgets.form.savedocs', {'docs':compress_doclist(doclist), 'docname':dn, 'action': save_action, 'user':user }, 
 			function(r, rtxt) {
 				if(f){ f.savingflag = false;}
 				if(r.saved) {

@@ -692,7 +692,7 @@ div.finder_filter_area {
 	padding: 12px;
 	padding-top: 6px;
 	background-color: #DDF;
-	margin-bottom: 8px;
+	margin:16px;
 }
 
 div.filter_head {
@@ -714,10 +714,10 @@ table.filter_tab td {
 }
 
 div.finder_picker_area {
+	margin: 16px;
 	padding: 16px;
 	padding-top: 6px;
 	background-color: #FFD;
-	margin-bottom: 16px;
 }
 div.builder_field {
 	margin: 0px;
@@ -755,7 +755,7 @@ table.builder_tab td {
 
 
 div.finder_dt_area {
-
+	padding: 16px;
 }
 
 
