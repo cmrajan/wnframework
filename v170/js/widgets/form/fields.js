@@ -60,7 +60,7 @@ Field.prototype.set_comment = function() {
 	if(this.df.description) {
 		if(this.df.description.length > 100) {
 			$($a(this.comment_area, 'div')).html(this.df.description.substr(0,100) + '...');
-			$($a($a(this.comment_area, 'div'),'span'), 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
+			$($a($a(this.comment_area, 'div'),'span', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
 		} else {
 			this.comment_area.innerHTML = replace_newlines(this.df.description);
 		}
