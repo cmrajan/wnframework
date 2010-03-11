@@ -164,7 +164,7 @@ this.cell.hide();else
 this.cell.show();this.set_hidden=this.df.hidden;}}}
 _f.SectionBreak=function(){this.set_input=function(){};}
 _f.SectionBreak.prototype.make_row=function(){this.row=this.frm.layout.addrow();}
-_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div'),1,2,'100%',['20px',null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,1),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.sub_wrapper,{margin:'0px 16px'});this.exp_icon=$a($td(t,0,0),'img','',{cursor:'pointer'});this.exp_icon.src=min_icon;this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
+_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div'),1,2,'100%',['20px',null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,1),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.body,{margin:'0px 16px'});this.exp_icon=$a($td(t,0,0),'img','',{cursor:'pointer'});this.exp_icon.src=min_icon;this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
 this.exp_icon.expand=function(){$ds(me.row.body)
 me.exp_icon.src=min_icon;}
 this.exp_icon.collapse=function(){$dh(me.row.body)

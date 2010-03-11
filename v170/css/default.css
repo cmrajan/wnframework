@@ -235,7 +235,7 @@ div.frm_wrapper {
 
 div.grid_tbarlinks {
 	border-bottom: 0px;
-	background-color: #D6D6C5;
+	background-color: #EEE;
 	padding: 4px 4px 2px 4px;
 	width: 180px;
 	float: right;
@@ -462,7 +462,7 @@ div.time_field select{
 }
 
 .grid_head_table td {
-	background-color: #D6D6C5;
+	background-color: #EEE;
 	border-right: 1px solid #AAA;
 	border-bottom: 1px solid #AAA;
 	height: 30px;
@@ -651,7 +651,7 @@ div.report_tab_wrapper table td div, div.report_head_wrapper table td div {
 }
 
 .report_head_cell {
-	background-color: #D6D6C5;
+	background-color: #EEE;
 	border-bottom: 1px solid #AA9;
 	text-align: center;
 	font-weight: bold;
