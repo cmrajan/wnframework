@@ -247,7 +247,7 @@ var me=this;if(cell.cellIndex){var ft=hc.fieldtype;if(ft=='Link'&&cur_frm.doc.do
 if(!me.is_scrolltype){var ca=$a($td(t,0,2),'img','',{cursor:'pointer'});ca.cell=cell;ca.title='Delete Row';ca.src='images/icons/cancel.gif';ca.onclick=function(){me.delete_row(me.doctype,this.cell.row.docname);}}}else{cell.div.innerHTML=(cell.row.rowIndex+1);cell.div.style.cursor='default';cell.div.onclick=function(){}}}}
 _f.Grid.prototype.cell_click=function(cell,e){if(_f.cur_grid_cell==cell)
 return;this.cell_select(cell);if(cur_frm.editable){if(isIE){window.event.cancelBubble=true;window.event.returnValue=false;}else{e.preventDefault();}}}
-_f.Grid.prototype.notify_click=function(e,target){if(_f.cur_grid_cell&&!target.isactive){if(!(text_dialog&&text_dialog.display)&&!selector.display){_f.cur_grid_cell.grid.cell_deselect();}}}
+_f.Grid.prototype.notify_click=function(e,target){if(_f.cur_grid_cell&&!target.isactive){if(!(text_dialog&&text_dialog.display)&&!datepicker_active){_f.cur_grid_cell.grid.cell_deselect();}}}
 _f.Grid.prototype.cell_deselect=function(){if(_f.cur_grid_cell){var c=_f.cur_grid_cell;c.grid.remove_template(c);c.div.className='grid_cell_div';if(c.is_odd)c.div.style.border='2px solid '+c.grid.alt_row_bg;else c.div.style.border='2px solid #FFF';_f.cur_grid_cell=null;_f.cur_grid=null;this.isactive=false;delete click_observers[this.observer_id];}}
 _f.Grid.prototype.cell_select=function(cell,ri,ci){if(ri!=null&&ci!=null)
 cell=this.tab.rows[ri].cells[ci];var hc=this.head_row.cells[cell.cellIndex];if(!hc.template){this.make_template(hc);}

@@ -688,11 +688,11 @@ DataField.prototype.onrefresh=function(){if(this.input&&this.df.colour){var col=
 function ReadOnlyField(){}ReadOnlyField.prototype=new Field();ReadOnlyField.prototype.with_label=1;function HTMLField(){}HTMLField.prototype=new Field();HTMLField.prototype.set_disp=function(val){this.disp_area.innerHTML=val;}
 HTMLField.prototype.set_input=function(val){if(val)this.set_disp(val);}
 HTMLField.prototype.onrefresh=function(){this.set_disp(this.df.options?this.df.options:'');}
-var datepicker_active=0;function DateField(){}DateField.prototype=new Field();DateField.prototype.with_label=1;DateField.prototype.make_input=function(){var me=this;this.user_fmt=locals['Control Panel']['Control Panel'].date_format;if(!this.user_fmt)this.user_fmt='dd-mm-yy';makeinput_popup(this,'images/icons/calendar.gif');me.show_cal=function(cal){if(cal)_c.cal=cal;var user_fmt=me.user_fmt.replace('mm','MM');_c.cal.select(me.txt,me.txt.getAttribute('id'),user_fmt);if(isIE&&window.event){window.event.cancelBubble=true;window.event.returnValue=false;}}
-me.btn.onclick=function(){if(_c.cal_displayed){_c.cal.hidePopup();}else{hide_selects();new_widget('_c.CalendarPopup',me.show_cal,1);}}
-me.txt.onchange=function(){if(this.value==null)this.value='';me.set(dateutil.str_to_user(me.input.value));me.run_trigger();}
+var datepicker_active=0;function DateField(){}DateField.prototype=new Field();DateField.prototype.with_label=1;DateField.prototype.make_input=function(){var me=this;this.user_fmt=locals['Control Panel']['Control Panel'].date_format;if(!this.user_fmt)this.user_fmt='dd-mm-yy';this.input=$a(this.input_area,'input');$(this.input).datepicker({dateFormat:me.user_fmt.replace('yyyy','yy'),altFormat:'yy-mm-dd',changeYear:true,beforeShow:function(input,inst){datepicker_active=1},onClose:function(dateText,inst){datepicker_active=0
+if(_f.cur_grid_cell)
+_f.cur_grid_cell.grid.cell_deselect();}});var me=this;me.input.onchange=function(){if(this.value==null)this.value='';me.set(dateutil.str_to_user(me.input.value));me.run_trigger();}
 me.input.set_input=function(val){if(val==null)val='';else val=dateutil.str_to_user(val);me.input.value=val;}
-me.get_value=function(){return dateutil.str_to_user(me.txt.value);}}
+me.get_value=function(){return dateutil.str_to_user(me.input.value);}}
 DateField.prototype.set_disp=function(val){var v=dateutil.str_to_user(val);if(v==null)v='';this.set_disp_html(v);}
 DateField.prototype.validate=function(v){if(!v)return;var me=this;this.clear=function(){msgprint("Date must be in format "+this.user_fmt);me.input.set_input('');return'';}
 var t=v.split('-');if(t.length!=3){return this.clear();}
