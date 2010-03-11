@@ -118,7 +118,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	}
 	
 	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', {margin-top:'12px', padding: '4px', backgroundColor:'#EEE'});
+		this.label = $a(head, 'div', 'sectionHeading', {marginTop:'12px', padding: '4px', backgroundColor:'#EEE'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
 		return;
 	}
