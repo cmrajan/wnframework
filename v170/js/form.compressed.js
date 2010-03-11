@@ -202,7 +202,8 @@ _f.ButtonField=function(){};_f.ButtonField.prototype=new Field();_f.ButtonField.
 cur_frm.runscript(me.df.options,me);}
 $(this.input).button({icons:{primary:'ui-icon-circle-triangle-e'}});}
 _f.ButtonField.prototype.set=function(v){};_f.ButtonField.prototype.set_disp=function(val){}
-_f.TableField=function(){};_f.TableField.prototype=new Field();_f.TableField.prototype.make_body=function(){if(this.perm[this.df.permlevel]&&this.perm[this.df.permlevel][READ]){this.grid=new _f.FormGrid(this);if(this.frm)this.frm.grids[this.frm.grids.length]=this;this.grid.make_buttons();}}
+_f.TableField=function(){};_f.TableField.prototype=new Field();_f.TableField.prototype.make_body=function(){if(this.perm[this.df.permlevel]&&this.perm[this.df.permlevel][READ]){if(this.df.description){this.comment_area=$a(this.parent,'div','comment',{padding:'8px'});this.set_comment();}
+this.grid=new _f.FormGrid(this);if(this.frm)this.frm.grids[this.frm.grids.length]=this;this.grid.make_buttons();}}
 _f.TableField.prototype.refresh=function(){if(!this.grid)return;var st=this.get_status();if(!this.df['default'])
 this.df['default']='';this.grid.can_add_rows=false;this.grid.can_edit=false
 if(st=='Write'){if(cur_frm.editable&&this.perm[this.df.permlevel]&&this.perm[this.df.permlevel][WRITE]){this.grid.can_edit=true;if(this.df['default'].toLowerCase()!='no toolbar')

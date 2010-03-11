@@ -21,9 +21,11 @@ Field.prototype.make_body = function() {
 
 		// simple field with label on top
 		this.label_area = $a(this.wrapper, 'div');
-		$dh(this.label_area);
 		this.comment_area = $a(this.wrapper, 'div', 'comment');
-		$dh(this.comment_area);
+		if(this.in_grid) {
+			$dh(this.label_area);
+			$dh(this.comment_area);
+		}
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
 	} else {
@@ -56,7 +58,7 @@ Field.prototype.set_comment = function() {
 	var me = this;
 	this.comment_area.innerHTML = '';
 	if(this.df.description) {
-		if(this.df.description.length > 120) {
+		if(this.df.description.length > 100) {
 			$($a(this.comment_area, 'div')).html(this.df.description.substr(0,120) + '...');
 			$($a(this.comment_area, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
 		} else {
