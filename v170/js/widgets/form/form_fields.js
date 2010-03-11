@@ -93,19 +93,8 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 
 
 _f.SectionBreak.prototype.make_simple_section = function(static) {
-	var head = $a(this.row.header, 'div', '', {margin:'4px 16px 0px 8px'});
+	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '16px'});
 	var me = this;
-
-	// description
-	if(this.df.description) {
-		var d = $a(this.row.header, 'div', '', {margin:'0px 8px', padding:'8px 8px', backgroundColor:'#EEE'});
-		if(this.df.description.length > 240) {
-			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
-			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
-		} else {
-			$($a(d, 'div')).html(replace_newlines(this.df.description));
-		}
-	}
 
 	// colour
 	var has_col = false;
@@ -118,17 +107,29 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	}
 	
 	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', {marginTop:'12px', padding: '4px', backgroundColor:'#EEE'});
+		this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor:'#EEE'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
-		return;
+	}
+
+	// description
+	if(this.df.description) {
+		var d = $a(head, 'div', '', {margin:'0px', padding:'0px 8px 8px 8px', backgroundColor:'#EEE'});
+		if(this.df.description.length > 240) {
+			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
+			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
+		} else {
+			$($a(d, 'div')).html(replace_newlines(this.df.description));
+		}
 	}
 	
-	if(this.df.label) {
-		this.make_collapsible(head);
-		
-	} else if(!has_col) {
-		// divider
-		$y(head,{margin:'8px', borderBottom:'2px solid #445'});
+	if(!static) {	
+		if(this.df.label) {
+			this.make_collapsible(head);
+			
+		} else if(!has_col) {
+			// divider
+			$y(head,{margin:'8px', borderBottom:'2px solid #445'});
+		}
 	}
 
 }
