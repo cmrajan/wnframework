@@ -93,7 +93,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 
 
 _f.SectionBreak.prototype.make_simple_section = function(static) {
-	var head = $a(this.row.header, 'div', '', {margin:'4px 8px 0px 8px'});
+	var head = $a(this.row.header, 'div', '', {margin:'4px 16px 0px 8px'});
 	var me = this;
 
 	// description
@@ -118,7 +118,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	}
 	
 	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', {margin:'12px 0px 8px 0px', padding: '4px', backgroundColor:'#EEE'});
+		this.label = $a(head, 'div', 'sectionHeading', {margin-top:'12px', padding: '4px', backgroundColor:'#EEE'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
 		return;
 	}
