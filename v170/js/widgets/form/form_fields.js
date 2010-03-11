@@ -63,7 +63,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	this.label.innerHTML = this.df.label?this.df.label:'';
 	
 	// indent
-	$y(this.row.body, { margin:'0px 16px' });
+	$y(this.row.body, { margin:'32px' });
 
 	// exp / collapse
 	this.exp_icon = $a($td(t,0,0),'img','',{cursor:'pointer'}); this.exp_icon.src = min_icon;
