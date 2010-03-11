@@ -149,6 +149,7 @@ Dialog.prototype.make_row = function(d) {
 			b._onclick = d[2];
 			b.onclick = function() { this._onclick(me); }
 		}
+		$(b).button({icons:{ primary: 'ui-icon-circle-triangle-e' }});
 		this.widgets[d[1]] = b;
 	}
 }
