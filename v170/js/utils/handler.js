@@ -41,7 +41,12 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 
 			var rtxt = req.responseText;
 						
-			var r = eval("var a="+rtxt+";a")
+			try { 
+				var r = eval("var a="+rtxt+";a"); 
+			} catch(e) { 
+				msgprint('Handler Exception:' + rtxt);
+				return; 
+			}
 			if(r.exc && r.__redirect_login) {
 				msgprint(r.exc, 0, function() { document.location = login_file });
 				// logout

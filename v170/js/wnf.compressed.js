@@ -157,7 +157,7 @@ unfreeze();return false;}}
 var pending_req=0;function newHttpReq(){if(!isIE)
 var r=new XMLHttpRequest();else if(window.ActiveXObject)
 var r=new ActiveXObject("Microsoft.XMLHTTP");return r;}
-function $c(command,args,fn,on_timeout,no_spinner,freeze_msg){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,on_timeout,no_spinner,freeze_msg)){if(!no_spinner)hide_loading();var rtxt=req.responseText;var r=eval("var a="+rtxt+";a")
+function $c(command,args,fn,on_timeout,no_spinner,freeze_msg){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,on_timeout,no_spinner,freeze_msg)){if(!no_spinner)hide_loading();var rtxt=req.responseText;try{var r=eval("var a="+rtxt+";a");}catch(e){msgprint('Handler Exception:'+rtxt);return;}
 if(r.exc&&r.__redirect_login){msgprint(r.exc,0,function(){document.location=login_file});return;}
 if(freeze_msg)unfreeze();if(r.exc){errprint(r.exc);};if(r.server_messages){msgprint(r.server_messages);};if(r.docs){LocalDB.sync(r.docs);}
 saveAllowed=true;if(fn)fn(r,rtxt);}}
@@ -498,7 +498,7 @@ cur_y+=(isIE?list.childNodes[i].offsetHeight:list.childNodes[i].clientHeight);if
 this.body.scrollTop=cur_y;ff_delta=(isFF?cint(this.iHigh/2):0);var h=(isIE?ele.offsetHeight:ele.clientHeight);if(cur_y>=(this.body.scrollTop+this.oP.maxheight-h))
 this.body.scrollTop=cur_y-this.oP.maxheight+h+ff_delta;}
 if(set_value&&this.oP.fixed_options){this.fld.value=this.aSug[this.iHigh-1].value;}
-this.killTimeout();};AutoSuggest.prototype.clearHighlight=function()
+this.resetTimeout();};AutoSuggest.prototype.clearHighlight=function()
 {var list=this.ul;if(!list)
 return false;if(this.iHigh>0){list.childNodes[this.iHigh-1].className="";this.iHigh=0;}};AutoSuggest.prototype.setHighlightedValue=function()
 {if(this.iHigh){if(this.custom_select)
@@ -507,14 +507,14 @@ this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selecti
 this.fld.setSelectionRange(this.sInp.length,this.sInp.length);}catch(e){return;}
 this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
 this.oP.callback(this.aSug[this.iHigh-1]);this.fld.value=this.sInp;if(this.fld.onchange)
-this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);var me=this;this.toID=setTimeout(function(){cur_autosug.clearSuggestions();},1000);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
+this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);var me=this;this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions();},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
 if(this.ul)
-delete this.ul;this.iHigh=0;if(this.oP.fixed_options&&this.fld.field_object&&this.fld.field_object.docname){var d=locals[this.fld.field_object.doctype][this.fld.field_object.docname];if(this.fld.fieldname){this.fld.value=d[this.fld.fieldname];}}};$ce=function(type,attr,cont,html)
+delete this.ul;this.iHigh=0;if(this.oP.fixed_options){if(this.fld.field_object&&this.fld.field_object.docname){var d=locals[this.fld.field_object.doctype][this.fld.field_object.docname];if(this.fld.fieldname){this.fld.value=d[this.fld.fieldname];}}else{}}};$ce=function(type,attr,cont,html)
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.bg_color=bg_color?bg_color:'#FFF';this.custom_select=1;this.setup=function(){this.options=options;this.wrapper=$a(parent,'div');if(width)
 $y(this.wrapper,{width:width});this.body_tab=make_table(this.wrapper,1,2,'100%',['100%','18px'],{border:'1px solid #AAA'});this.inp=$a_input($td(this.body_tab,0,0),'text',{'readonly':(editable?null:'readonly')},{width:'96%',border:'0px',padding:'1px'});this.btn=$a($td(this.body_tab,0,1),'img','',{cursor:'pointer',margin:'1px 2px'});this.btn.src='images/ui/down-arrow1.gif';if(!editable){$y(this.inp,{cursor:'pointer'});this.inp.onclick=this.btn.onclick;}
 this.body_tab.onclick=function(){if(me.as&&me.as.body){me.as.clearSuggestions();return;}
 me.inp.focus();me.as.createList(me.as.aSug);}
-this.as=new AutoSuggest(this.inp,{fixed_options:true,xdelta:8,ydelta:8});this.as.aSug=me.create_options(me.options);this.set_background();}
+this.as=new AutoSuggest(this.inp,{fixed_options:true,xdelta:8,ydelta:8,timeout:3000});this.as.aSug=me.create_options(me.options);this.set_background();}
 this.set_width=function(w){w=cint(w);$y(this.inp,{width:(w-20)+'px'});$y(this.body_tab,{width:w+'px'});$y($td(this.body_tab,0,0),{width:(w-18)+'px'})
 $y($td(this.body_tab,0,1),{width:'18px'});}
 this.set_background=function(color){if(color)this.bg_color=color;$y(this.inp,{backgroundColor:this.bg_color});$y($td(this.body_tab,0,0),{backgroundColor:this.bg_color});$y($td(this.body_tab,0,1),{backgroundColor:'#DDD'});}

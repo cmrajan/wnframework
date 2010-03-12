@@ -29,7 +29,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 			me.inp.focus();
 			me.as.createList(me.as.aSug);
 		}
-		this.as = new AutoSuggest(this.inp, {fixed_options: true, xdelta: 8, ydelta: 8});
+		this.as = new AutoSuggest(this.inp, {fixed_options: true, xdelta: 8, ydelta: 8, timeout:3000});
 		this.as.aSug = me.create_options(me.options);
 		this.set_background();
 	}

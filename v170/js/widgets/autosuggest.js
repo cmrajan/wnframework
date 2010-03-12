@@ -482,7 +482,7 @@ AutoSuggest.prototype.setHighlight = function(n, set_value)
 		this.fld.value = this.aSug[this.iHigh-1 ].value;
 	}
 	
-	this.killTimeout();
+	this.resetTimeout();
 };
 
 
@@ -539,7 +539,7 @@ AutoSuggest.prototype.resetTimeout = function() {
 	clearTimeout(this.toID);
 	clearTimeout(this.clear_timer);
 	var me = this;
-	this.toID = setTimeout(function () { cur_autosug.clearSuggestions(); }, 1000);
+	this.toID = setTimeout(function () { if(cur_autosug)cur_autosug.clearSuggestions(); }, this.oP.timeout);
 };
 
 AutoSuggest.prototype.clearSuggestions = function () {
@@ -552,11 +552,15 @@ AutoSuggest.prototype.clearSuggestions = function () {
 	this.iHigh = 0;
 	
 	// refresh field value (in case not seleted and the suggestions timeout)
-	if(this.oP.fixed_options && this.fld.field_object && this.fld.field_object.docname) {
-		var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
+	if(this.oP.fixed_options) {
+		if(this.fld.field_object && this.fld.field_object.docname) {
+			var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
 
-		if(this.fld.fieldname) {
-			this.fld.value = d[this.fld.fieldname]; // refresh the value
+			if(this.fld.fieldname) {
+				this.fld.value = d[this.fld.fieldname]; // refresh the value
+			}
+		} else {
+			// accept the value
 		}
 	}
 };
