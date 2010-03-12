@@ -27,7 +27,7 @@ DocBrowser.prototype.make = function(dt, img, label, field_list) {
 		// header
 		$td(me.head_tab,0,1).innerHTML = '<h1>' + label + '</h1>';
 		if(img) 
-			$a($td(me.head_tab,0,0), img);
+			$td(me.head_tab,0,0).appendChild(img);
 		$y($td(me.head_tab,0,0), {'textAlign':'right'});
 	
 		// make the list
