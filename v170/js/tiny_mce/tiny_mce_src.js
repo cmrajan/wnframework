@@ -5311,8 +5311,9 @@ window.tinymce.dom.Sizzle = Sizzle;
 			// No range found then create an empty one
 			// This can occur when the editor is placed in a hidden container element on Gecko
 			// Or on IE when there was an exception
-			if (!r)
+			if (!r) {
 				r = isIE ? t.win.document.body.createTextRange() : t.win.document.createRange();
+			}
 
 			return r;
 		},

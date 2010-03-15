@@ -120,12 +120,15 @@ function Body() {
 
 	this.pages = {};
 	this.cur_page = null;
-	this.add_page = function(label, onshow) {
+	this.add_page = function(label, onshow, onhide) {
 		var c = $a(this.center, 'div');
-		if(onshow) c.onshow = onshow;
+		if(onshow) 
+			c.onshow = onshow;
+		if(onhide)
+			c.onhide = onhide;
 		this.pages[label] = c;
 		$dh(c);
-		return c
+		return c;
 	}
 	
 	this.change_to = function(label) {

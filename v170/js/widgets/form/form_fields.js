@@ -483,6 +483,7 @@ _f.CodeField.prototype.setup_editor = function() {
 			cur_frm.fields_dict[me.df.fieldname].editor = tinyMCE.get(me.myid);
 	}
 	tinyMCE.execCommand("mceAddControl",false,me.myid);
+	cur_frm.tinymce_id_list.push(me.myid);
 }
 
 // ======================================================================================

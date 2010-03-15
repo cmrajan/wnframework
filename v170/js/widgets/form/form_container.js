@@ -1,5 +1,5 @@
 _f.FrmContainer = function() {  
-	this.wrapper = page_body.add_page("Forms", function() {});
+	this.wrapper = page_body.add_page("Forms", function() {}, function() { });
 	
 	// create hidden
 	$dh(this.wrapper);

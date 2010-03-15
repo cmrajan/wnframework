@@ -99,6 +99,7 @@ _f.Frm = function(doctype, parent) {
 	this.cscript = {};
 	this.parent = parent;
 	this.attachments = {};
+	this.tinymce_id_list = [];
 	
 	// comments
 	this.last_comments = {};
@@ -470,7 +471,7 @@ _f.Frm.prototype.setup_client_script = function() {
 _f.Frm.prototype.set_parent = function(parent) {
 	if(parent) {
 		this.parent = parent;
-		if(this.wrapper)
+		if(this.wrapper && this.wrapper.parentNode != parent)
 			parent.appendChild(this.wrapper);
 	}
 }
@@ -517,11 +518,17 @@ _f.Frm.prototype.show = function(docname, from_refresh, parent, not_in_container
 		this.docname = docname;
 	if(parent)
 		this.set_parent(parent);
-	$ds(this.wrapper);
-	this.display = 1;
+
+	if(this.wrapper && this.wrapper.style.display.toLowerCase()=='none') {
+		$ds(this.wrapper);
+		this.display = 1;
+		this.showtinymce();
+	}
+
 	if(!this.not_in_container) 
 		cur_frm = this;
-	if(!from_refresh) 
+
+	if(!from_refresh)
 		this.refresh();
 }
 
