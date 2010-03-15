@@ -293,12 +293,13 @@ Field.prototype.activate = function(docname) {
 		this.last_value=v;
 		// set input value
 
-		if(this.input.onchange && this.input.value!=v) {
+		if(this.input.onchange && this.input.get_value && this.input.get_value() !=v) {
 			if(this.validate)
-				this.input.value = this.validate(v);
+				this.input.set_value(this.validate(v));
 			else 
-				this.input.value = (v==null)?'':v;
-			if(this.format_input)this.format_input();
+				this.input.set_value((v==null)?'':v);
+			if(this.format_input)
+				this.format_input();
 		}
 		
 		if(this.input.focus){
