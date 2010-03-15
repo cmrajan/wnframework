@@ -16,6 +16,9 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 		this.btn = $a($td(this.body_tab, 0, 1), 'img', '', {cursor:'pointer', margin:'1px 2px'});
 		this.btn.src = 'images/ui/down-arrow1.gif';
 
+		this.txt = this.inp;
+		this.onchange = this.inp.onchange;
+
 		if(!editable) {
 			$y(this.inp, {cursor:'pointer'});
 			this.inp.onclick = this.btn.onclick;

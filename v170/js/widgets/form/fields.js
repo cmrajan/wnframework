@@ -148,6 +148,7 @@ Field.prototype.refresh_display = function() {
 			if(this.make_input&&(!this.input)) { // make input if reqd
 				this.make_input();
 				this.set_comment();
+				if(this.onmake_input) this.onmake_input();
 			}
 			$ds(this.wrapper);
 			if(this.input) { // if there, show it!
@@ -588,9 +589,10 @@ CurrencyField.prototype.set_disp = function(val) {
 	var v = fmt_money(val); 
 	this.set_disp_html(v);
 }
-CurrencyField.prototype.onmake = function() {
-	if(this.input)this.input.onfocus = function() {
-		if(flt(this.value)==0)this.value=''; 
+CurrencyField.prototype.onmake_input = function() {
+	if(!this.input) return;
+	this.input.onfocus = function() {
+		if(flt(this.value)==0)this.select();
 	}
 }
 
