@@ -606,8 +606,8 @@ if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value
 setTimeout('_last_link_value=null',100);me.run_trigger();}}
 me.input.set_input=function(val){if(val==undefined)val='';me.txt.value=val;}
 me.get_value=function(){return me.txt.value;}
-if((!me.not_in_form)&&in_list(profile.can_create,me.df.options)){me.new_link_area=$a(me.input_area,'div','',{display:'none',textAlign:'right',width:'81%'});var sp=$a(me.new_link_area,'span','link_type',{fontSize:'11px'});sp.innerHTML='New '+me.df.options;sp.onclick=function(){var on_save_callback=function(new_rec){if(new_rec){locals[me.frm.doctype][me.frm.docname][me.df.fieldname]=new_rec;me.refresh();}}
-new_doc(me.df.options,null,1,on_save_callback);}}
+if((!me.not_in_form)&&in_list(profile.can_create,me.df.options)){me.new_link_area=$a(me.input_area,'div','',{display:'none',textAlign:'right',width:'81%'});var sp=$a(me.new_link_area,'span','link_type',{fontSize:'11px'});sp.innerHTML='New '+me.df.options;sp.onclick=function(){var on_save_callback=function(new_rec){if(new_rec){var d=_f.calling_doc_stack.pop();locals[d[0]][d[1]][me.df.fieldname]=new_rec;me.refresh();}}
+_f.calling_doc_stack.push([me.frm.doctype,me.frm.docname]);new_doc(me.df.options,null,1,on_save_callback,me.frm.doctype,me.frm.docname,me.frm.not_in_container);}}
 me.onrefresh=function(){if(me.new_link_area){if(cur_frm.doc.docstatus==0)$ds(me.new_link_area);else $dh(me.new_link_area);}}
 var opts={script:'',json:true,maxresults:10,link_field:me};this.as=new AutoSuggest(me.txt,opts);}
 LinkField.prototype.set_get_query=function(){if(this.get_query)return;if(cur_frm.not_in_container&&cur_frm.parent_doctype){var gl=cur_frm.grids;for(var i=0;i<gl.length;i++){if(gl[i].grid.doctype=this.df.parent){var f=gl[i].grid.get_field(this.df.fieldname);if(f.get_query)this.get_query=f.get_query;break;}}}}
@@ -795,9 +795,9 @@ var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
 if(!frms[doctype]){_f.add_frm(doctype,show_doc,name);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user},show_doc,null,null);}}
 var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){var frm=frms[doctype];if(menuitem)frm.menuitem=menuitem;if(onload)onload(frm);nav_obj.open_notify('Form',doctype,name);if(r&&r.n_tweets)frm.n_tweets[name]=r.n_tweets;if(r&&r.last_comment)frm.last_comments[name]=r.last_comment;frm.show(name,null,_f.frm_con.body,0);if(frm.menuitem)frm.menuitem.show_selected();}else{msgprint('error:There where errors while loading '+doctype+','+name);}}
 new_widget('_f.FrmContainer',show_form,1);}
-function new_doc(doctype,onload,in_dialog,on_save_callback){if(!doctype){if(cur_frm)doctype=cur_frm.doctype;else return;}
+function new_doc(doctype,onload,in_dialog,on_save_callback,cdt,cdn,cnic){if(!doctype){if(cur_frm)doctype=cur_frm.doctype;else return;}
 var show_doc=function(){frm=frms[doctype];if(frm.perm[0][CREATE]==1){if(frm.meta.issingle){var d=doctype;LocalDB.set_default_values(locals[doctype][doctype]);}else
-var d=LocalDB.create(doctype);if(onload)onload(d);if(in_dialog){_f.edit_record(doctype,d,0,on_save_callback);}else{nav_obj.open_notify('Form',doctype,d);frm.show(d,null,_f.frm_con.body,0);}}else{msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');}}
+var d=LocalDB.create(doctype);if(onload)onload(d);if(in_dialog){_f.edit_record(doctype,d,0,on_save_callback,cdt,cdn,cnic);}else{nav_obj.open_notify('Form',doctype,d);frm.show(d,null,_f.frm_con.body,0);}}else{msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');}}
 var show_form=function(){if(!_f.frm_con){_f.frm_con=new _f.FrmContainer();}
 if(!frms[doctype])
 _f.add_frm(doctype,show_doc);else

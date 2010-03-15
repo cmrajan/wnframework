@@ -494,11 +494,14 @@ LinkField.prototype.make_input = function() {
 		sp.onclick = function() { 
 			var on_save_callback = function(new_rec) {
 				if(new_rec) {
-					locals[me.frm.doctype][me.frm.docname][me.df.fieldname] = new_rec;
+					var d = _f.calling_doc_stack.pop(); // patch for composites
+					
+					locals[d[0]][d[1]][me.df.fieldname] = new_rec;
 					me.refresh();
 				}
 			}
-			new_doc(me.df.options, null, 1, on_save_callback); 
+			_f.calling_doc_stack.push([me.frm.doctype, me.frm.docname]);
+			new_doc(me.df.options, null, 1, on_save_callback, me.frm.doctype, me.frm.docname, me.frm.not_in_container); 
 		}
 	}
 

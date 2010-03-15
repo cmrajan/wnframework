@@ -1,9 +1,11 @@
 
 // Open the Form in a Dialog
 _f.frm_dialog = null;
+_f.dialog_stack = [];
+_f.calling_doc_stack = [];
 _f.FrmDialog = function() {
 	var me = this;
-	
+
 	var d = new Dialog(640, 400, 'Edit Row');
 	d.body_wrapper = $a(d.body, 'div', 'dialog_frm');
 	d.done_btn = $a($a(d.body, 'div', '', {margin:'8px'}),'button');
@@ -23,14 +25,19 @@ _f.FrmDialog = function() {
 			me.dialog.hide();
 		}
 	}
-		
+
 	d.onhide = function() {
 		if(_f.cur_grid)
 			_f.cur_grid.refresh_row(_f.cur_grid_ridx, me.dn);
+
+		// composite - Caller is also the same dt 
+		if(me.cdt && me.cur_frm.doctype == me.cdt) {
+			me.cur_frm.show(me.cdn, null, _f.dialog_stack.pop(), me.cnic);
+		}
 	}
 	this.dialog = d;
 }
-_f.edit_record = function(dt, dn, from_grid, on_save_callback) {
+_f.edit_record = function(dt, dn, from_grid, on_save_callback, cdt, cdn, cnic) {
 	var d = new _f.FrmDialog();
 
 	var show_dialog = function() {
@@ -44,13 +51,21 @@ _f.edit_record = function(dt, dn, from_grid, on_save_callback) {
 		if(d.cur_frm) { 
 			d.cur_frm.hide(); 
 		}
-			
+		
+		if(dt==cdt) {
+			_f.dialog_stack.push(f.parent);
+		}
 		f.show(dn, null, d.dialog.body_wrapper, 1);
 	
 		d.cur_frm = f;
 		d.dn = dn;
 		d.from_grid = from_grid;
 		d.on_save_callback = on_save_callback;
+		
+		// calling record
+		d.cdt = cdt;
+		d.cdn = cdn;
+		d.cnic = cnic
 		
 		if(from_grid)
 			d.dialog.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
@@ -454,10 +469,9 @@ _f.Frm.prototype.setup_client_script = function() {
 
 _f.Frm.prototype.set_parent = function(parent) {
 	if(parent) {
+		this.parent = parent;
 		if(this.wrapper)
 			parent.appendChild(this.wrapper);
-		else
-			this.parent = parent;
 	}
 }
 

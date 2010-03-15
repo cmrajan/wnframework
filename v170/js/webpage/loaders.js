@@ -115,7 +115,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 // -------------------------------------------------------------------------------
 
 
-function new_doc(doctype, onload, in_dialog, on_save_callback) {	
+function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {	
 	if(!doctype) {
 		if(cur_frm)doctype = cur_frm.doctype; else return;
 	}
@@ -132,9 +132,8 @@ function new_doc(doctype, onload, in_dialog, on_save_callback) {
 				
 			if(onload)onload(d);
 			
-			
 			if(in_dialog) {
-				_f.edit_record(doctype, d, 0, on_save_callback);		
+				_f.edit_record(doctype, d, 0, on_save_callback, cdt, cdn, cnic);
 			} else {
 				nav_obj.open_notify('Form',doctype,d);
 				frm.show(d, null, _f.frm_con.body, 0);
