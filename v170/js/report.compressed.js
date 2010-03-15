@@ -135,14 +135,14 @@ if(f.fieldname!='docstatus')
 me.rb.orig_sort_list.push([f.label,'`tab'+f.parent+'`.`'+f.fieldname+'`']);if(f.def_filter)
 tmp.input.checked=true;}
 _r.ReportColumnPicker=function(rb){this.rb=rb;this.picker_area=$a(this.rb.mytabs.tabs['Select Columns'].tab_body,'div','finder_picker_area');this.all_fields=[];this.sel_idx=0;this.make_body();}
-_r.ReportColumnPicker.prototype.make_body=function(){var t=make_table(this.picker_area,1,3,'100%',['33%','34%','33%'],{verticalAlign:'middle',textAlign:'center'});$a($td(t,0,0),'h3','',{marginBottom:'8px'}).innerHTML='Columns';this.unsel_fields=$a($td(t,0,0),'select','',{height:'200px',width:'80%',border:'1px solid #AAA'});this.unsel_fields.multiple=true;this.unsel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}
+_r.ReportColumnPicker.prototype.make_body=function(){var t=make_table(this.picker_area,1,3,'100%',['35%','30%','35%'],{verticalAlign:'middle',textAlign:'center'});$a($td(t,0,0),'h3','',{marginBottom:'8px'}).innerHTML='Columns';this.unsel_fields=$a($td(t,0,0),'select','',{height:'200px',width:'100%',border:'1px solid #AAA'});this.unsel_fields.multiple=true;this.unsel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}
 var me=this;this.up_btn=$a($a($td(t,0,1),'div'),'button','',{width:'70px'});this.up_btn.innerHTML='Up &uarr;';this.up_btn.onclick=function(){me.move_up();}
 this.add_all=$a($a($td(t,0,1),'div'),'button','',{width:'40px'});this.add_all.innerHTML='&gt;&gt;';this.add_all.onclick=function(){me.move(me.unsel_fields,'add',1);}
 this.add_btn=$a($a($td(t,0,1),'div'),'button','',{width:'110px'});this.add_btn.innerHTML='<b>Add &gt;</b>';this.add_btn.onclick=function(){me.move(me.unsel_fields,'add');}
 this.remove_btn=$a($a($td(t,0,1),'div'),'button','',{width:'110px'});this.remove_btn.innerHTML='<b>&lt; Remove</b>';this.remove_btn.onclick=function(){me.move(me.sel_fields,'remove');}
 this.remove_all=$a($a($td(t,0,1),'div'),'button','',{width:'40px'});this.remove_all.innerHTML='&lt;&lt;';this.remove_all.onclick=function(){me.move(me.sel_fields,'remove',1);}
 this.dn_btn=$a($a($td(t,0,1),'div'),'button','',{width:'70px'});this.dn_btn.innerHTML='Down &darr;';this.dn_btn.onclick=function(){me.move_down();}
-$a($td(t,0,2),'h3','',{marginBottom:'8px'}).innerHTML='Seleted Columns';this.sel_fields=$a($td(t,0,2),'select','',{height:'200px',width:'80%',border:'1px solid #AAA'});this.sel_fields.multiple=true;this.sel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}}
+$a($td(t,0,2),'h3','',{marginBottom:'8px'}).innerHTML='Seleted Columns';this.sel_fields=$a($td(t,0,2),'select','',{height:'200px',width:'100%',border:'1px solid #AAA'});this.sel_fields.multiple=true;this.sel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}}
 _r.ReportColumnPicker.prototype.get_by_sel_idx=function(s,idx){for(var j=0;j<s.options.length;j++){if(s.options[j].field.sel_idx==idx)
 return s.options[j].field;}
 return{}}

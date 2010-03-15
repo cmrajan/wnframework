@@ -959,11 +959,11 @@ _r.ReportColumnPicker = function(rb) {
 
 _r.ReportColumnPicker.prototype.make_body = function() {
 
-	var t = make_table(this.picker_area, 1, 3, '100%', ['33%','34%','33%'], {verticalAlign:'middle', textAlign:'center'});
+	var t = make_table(this.picker_area, 1, 3, '100%', ['35%','30%','35%'], {verticalAlign:'middle', textAlign:'center'});
 
 	// all fields
 	$a($td(t,0,0), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Columns';
-	this.unsel_fields = $a($td(t,0,0), 'select', '', {height:'200px', width:'80%', border:'1px solid #AAA'});
+	this.unsel_fields = $a($td(t,0,0), 'select', '', {height:'200px', width:'100%', border:'1px solid #AAA'});
 	this.unsel_fields.multiple = true;
 	this.unsel_fields.onchange = function() { for(var i=0; i<this.options.length; i++) this.options[i].field.is_selected = this.options[i].selected; }
 
@@ -995,7 +995,7 @@ _r.ReportColumnPicker.prototype.make_body = function() {
 
 	// multiple fields
 	$a($td(t,0,2), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Seleted Columns';
-	this.sel_fields = $a($td(t,0,2), 'select', '', {height:'200px', width:'80%', border:'1px solid #AAA'});
+	this.sel_fields = $a($td(t,0,2), 'select', '', {height:'200px', width:'100%', border:'1px solid #AAA'});
 	this.sel_fields.multiple = true;
 	this.sel_fields.onchange = function() { for(var i=0; i<this.options.length; i++) this.options[i].field.is_selected = this.options[i].selected; }
 

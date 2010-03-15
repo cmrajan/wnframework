@@ -2,6 +2,7 @@
 
 // dialog container
 var popup_cont;
+var session = {};
 
 function startup() {
 
@@ -26,7 +27,9 @@ function startup() {
 		account_name = r.account_name;
 		home_page = r.home_page;
 
-		sys_defaults = r.sysdefaults;		
+		sys_defaults = r.sysdefaults;
+		// bc
+		session.rt = profile.can_read;
 	}
 	
 	var setup_history = function(r) {
