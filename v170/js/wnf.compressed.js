@@ -916,8 +916,8 @@ me.cur_page.onshow(me.cur_page);}
 this.setup();}
 var popup_cont;var session={};function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);popup_cont=$a(document.getElementsByTagName('body')[0],'div');var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;session.rt=profile.can_read;}
 var setup_history=function(r){rename_observers.push(nav_obj);}
-var setup_events=function(){addEvent('keypress',function(ev,target){for(var i in keypress_observers){if(keypress_observers[i])
-keypress_observers[i].notify_keypress(ev,(ev.keyCode?ev.keyCode:ev.charCode));}});addEvent('click',function(ev,target){for(var i=0;i<click_observers.length;i++){if(click_observers[i])
+var setup_events=function(){addEvent('keyup',function(ev,target){for(var i in keypress_observers){if(keypress_observers[i])
+keypress_observers[i].notify_keypress(ev,ev.keyCode);}});addEvent('click',function(ev,target){for(var i=0;i<click_observers.length;i++){if(click_observers[i])
 click_observers[i].notify_click(ev,target);}});if(isIE){$op($i('dialog_back'),60);}}
 var callback=function(r,rt){if(r.exc)msgprint(r.ext);setup_globals(r);setup_history(r);setup_events();page_body=new Body();page_body.run_startup_code();page_body.setup_sidebar_menu();for(var i=0;i<startup_list.length;i++){startup_list[i]();}
 $dh('startup_div');$ds('body_div');var t=to_open();if(t){historyChange(t);}else if(home_page){loadpage(home_page);}}

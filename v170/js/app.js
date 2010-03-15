@@ -37,10 +37,10 @@ function startup() {
 	}
 	
 	var setup_events = function() {
-		addEvent('keypress', function(ev, target) {
+		addEvent('keyup', function(ev, target) {
 			for(var i in keypress_observers) {
 				if(keypress_observers[i])
-					keypress_observers[i].notify_keypress(ev, (ev.keyCode ? ev.keyCode : ev.charCode));
+					keypress_observers[i].notify_keypress(ev, ev.keyCode);
 			}
 		});
 		addEvent('click', function(ev, target) {
