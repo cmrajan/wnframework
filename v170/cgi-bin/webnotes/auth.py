@@ -243,17 +243,7 @@ class Authentication:
 				self.out_cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')	
 	
 	def set_in_cookies(self):
-		import os
-		cookies = {}
-		if 'HTTP_COOKIE' in os.environ:
-			c = os.environ['HTTP_COOKIE']
-			c = c.split('; ')
-			  
-			for cookie in c:
-				cookie = cookie.split('=')
-				cookies[cookie[0].strip()] = cookie[1].strip()
-				
-		return cookies
+		return webnotes.utils.get_incoming_cookies()
 
 	def call_on_logout_event(self):
 		import webnotes.model.code
