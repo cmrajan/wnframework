@@ -84,7 +84,7 @@ _f.Frm.prototype.hide=function(){$dh(this.wrapper);this.display=0;hide_autosugge
 _f.Frm.prototype.show=function(docname,from_refresh,parent,not_in_container){this.not_in_container=not_in_container;if(!this.not_in_container&&cur_frm&&cur_frm!=this){this.defocus_rest();cur_frm.hide();}
 if(docname)
 this.docname=docname;if(parent)
-this.set_parent(parent);if(this.wrapper&&this.wrapper.style.display.toLowerCase()=='none'){$ds(this.wrapper);this.display=1;this.showtinymce();}
+this.set_parent(parent);if(this.wrapper&&this.wrapper.style.display.toLowerCase()=='none'){$ds(this.wrapper);this.display=1;}
 if(!this.not_in_container)
 cur_frm=this;if(!from_refresh)
 this.refresh();}

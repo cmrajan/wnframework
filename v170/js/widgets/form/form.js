@@ -522,7 +522,6 @@ _f.Frm.prototype.show = function(docname, from_refresh, parent, not_in_container
 	if(this.wrapper && this.wrapper.style.display.toLowerCase()=='none') {
 		$ds(this.wrapper);
 		this.display = 1;
-		this.showtinymce();
 	}
 
 	if(!this.not_in_container) 
