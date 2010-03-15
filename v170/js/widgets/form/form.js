@@ -510,14 +510,16 @@ _f.Frm.prototype.hide = function() {
 _f.Frm.prototype.show = function(docname, from_refresh, parent, not_in_container) {
 	this.not_in_container = not_in_container;
 	
-	if(!this.not_in_container && cur_frm && cur_frm != this) {
+	if(!from_refresh && !this.not_in_container && cur_frm && cur_frm != this) {
 		this.defocus_rest();
 		cur_frm.hide();
 	}
 	if(docname)
 		this.docname = docname;
-	if(parent)
+
+	if(!from_refresh && parent) {
 		this.set_parent(parent);
+	}
 
 	if(this.wrapper && this.wrapper.style.display.toLowerCase()=='none') {
 		$ds(this.wrapper);
@@ -622,7 +624,7 @@ _f.Frm.prototype.refresh = function(no_script) {
 		if(this.layout) this.layout.show();
 
 		// show the record
-		if(!this.display) this.show(this.docname, 1);
+		if(!this.display) this.show(this.docname, 1, null, this.not_in_container);
 	} 
 	//set_frame_dims();
 }

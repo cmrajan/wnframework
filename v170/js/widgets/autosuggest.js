@@ -417,10 +417,7 @@ AutoSuggest.prototype.createList = function(arr) {
 	
 	// remove list after an interval
 	//
-	var me = this;
-	this.toID = setTimeout(function () { me.clearSuggestions() }, this.oP.timeout);
-	cur_autosug = this;
-
+	this.resetTimeout();
 };
 
 AutoSuggest.prototype.changeHighlight = function(key)
@@ -448,6 +445,7 @@ AutoSuggest.prototype.changeHighlight = function(key)
 
 AutoSuggest.prototype.setHighlight = function(n, set_value)
 {
+	this.resetTimeout();
 	var list = this.ul;
 	if (!list)
 		return false;
@@ -482,7 +480,6 @@ AutoSuggest.prototype.setHighlight = function(n, set_value)
 		this.fld.value = this.aSug[this.iHigh-1 ].value;
 	}
 	
-	this.resetTimeout();
 };
 
 
@@ -538,7 +535,6 @@ AutoSuggest.prototype.resetTimeout = function() {
 	cur_autosug = this;
 	clearTimeout(this.toID);
 	clearTimeout(this.clear_timer);
-	var me = this;
 	this.toID = setTimeout(function () { if(cur_autosug)cur_autosug.clearSuggestions(); }, this.oP.timeout);
 };
 

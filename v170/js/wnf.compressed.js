@@ -480,7 +480,7 @@ div.style.left=left+"px";div.style.top=(pos.y+this.fld.offsetHeight+this.oP.offs
 this.body=div;if(isIE){$y(div,{border:'1px solid #444'});}
 this.iHigh=0;if(this.oP.fixed_options&&this.fld.value){for(var i=0;i<this.aSug.length;i++){if(this.aSug[i].value==this.fld.value){this.iHigh=i;break;}}}
 if(!this.iHigh)
-this.changeHighlight(40);var me=this;this.toID=setTimeout(function(){me.clearSuggestions()},this.oP.timeout);cur_autosug=this;};AutoSuggest.prototype.changeHighlight=function(key)
+this.changeHighlight(40);this.resetTimeout();};AutoSuggest.prototype.changeHighlight=function(key)
 {var list=this.ul;if(!list){if(this.aSug)
 this.createList(this.aSug);return false;}
 var n;if(key==40)
@@ -488,14 +488,13 @@ n=this.iHigh+1;else if(key==38)
 n=this.iHigh-1;if(n>list.childNodes.length)
 n=list.childNodes.length;if(n<1)
 n=1;this.setHighlight(n);};AutoSuggest.prototype.setHighlight=function(n,set_value)
-{var list=this.ul;if(!list)
+{this.resetTimeout();var list=this.ul;if(!list)
 return false;if(this.iHigh>0)
 this.clearHighlight();this.iHigh=Number(n);var ele=list.childNodes[this.iHigh-1];ele.className="as_highlight";if(this.body.scrollbars){var cur_y=0;for(var i=0;i<this.iHigh-1;i++)
 cur_y+=(isIE?list.childNodes[i].offsetHeight:list.childNodes[i].clientHeight);if(cur_y<this.body.scrollTop)
 this.body.scrollTop=cur_y;ff_delta=(isFF?cint(this.iHigh/2):0);var h=(isIE?ele.offsetHeight:ele.clientHeight);if(cur_y>=(this.body.scrollTop+this.oP.maxheight-h))
 this.body.scrollTop=cur_y-this.oP.maxheight+h+ff_delta;}
-if(set_value&&this.oP.fixed_options){this.fld.value=this.aSug[this.iHigh-1].value;}
-this.resetTimeout();};AutoSuggest.prototype.clearHighlight=function()
+if(set_value&&this.oP.fixed_options){this.fld.value=this.aSug[this.iHigh-1].value;}};AutoSuggest.prototype.clearHighlight=function()
 {var list=this.ul;if(!list)
 return false;if(this.iHigh>0){list.childNodes[this.iHigh-1].className="";this.iHigh=0;}};AutoSuggest.prototype.setHighlightedValue=function()
 {if(this.iHigh){if(this.custom_select)
@@ -504,7 +503,7 @@ this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selecti
 this.fld.setSelectionRange(this.sInp.length,this.sInp.length);}catch(e){return;}
 this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
 this.oP.callback(this.aSug[this.iHigh-1]);this.fld.value=this.sInp;if(this.fld.onchange)
-this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);var me=this;this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions();},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
+this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions();},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
 if(this.ul)
 delete this.ul;this.iHigh=0;if(this.oP.fixed_options){if(this.fld.field_object&&this.fld.field_object.docname){var d=locals[this.fld.field_object.doctype][this.fld.field_object.docname];if(this.fld.fieldname){this.fld.value=d[this.fld.fieldname];}}else{}}};$ce=function(type,attr,cont,html)
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.bg_color=bg_color?bg_color:'#FFF';this.custom_select=1;this.setup=function(){this.options=options;this.wrapper=$a(parent,'div');if(width)
