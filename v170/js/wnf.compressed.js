@@ -509,9 +509,9 @@ delete this.ul;this.iHigh=0;if(this.oP.fixed_options){if(this.fld.field_object&&
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.bg_color=bg_color?bg_color:'#FFF';this.custom_select=1;this.setup=function(){this.options=options;this.wrapper=$a(parent,'div');if(width)
 $y(this.wrapper,{width:width});this.body_tab=make_table(this.wrapper,1,2,'100%',['100%','18px'],{border:'1px solid #AAA'});this.inp=$a_input($td(this.body_tab,0,0),'text',{'readonly':(editable?null:'readonly')},{width:'96%',border:'0px',padding:'1px'});this.btn=$a($td(this.body_tab,0,1),'img','',{cursor:'pointer',margin:'1px 2px'});this.btn.src='images/ui/down-arrow1.gif';this.inp.onchange=function(){if(me.onchange)me.onchange(this);}
 if(!editable){$y(this.inp,{cursor:'pointer'});this.inp.onclick=this.btn.onclick;}
-this.body_tab.onclick=function(){if(me.as&&me.as.body){me.as.clearSuggestions();return;}
+var oc=function(){if(me.as&&me.as.body){me.as.clearSuggestions();return;}
 me.inp.focus();me.as.createList(me.as.aSug);}
-this.as=new AutoSuggest(this.inp,{fixed_options:true,xdelta:8,ydelta:8,timeout:3000});this.as.aSug=me.create_options(me.options);this.set_background();}
+this.btn.onclick=oc;this.inp.onclick=oc;this.as=new AutoSuggest(this.inp,{fixed_options:true,xdelta:8,ydelta:8,timeout:3000});this.as.aSug=me.create_options(me.options);this.set_background();}
 this.set_width=function(w){w=cint(w);$y(this.inp,{width:(w-20)+'px'});$y(this.body_tab,{width:w+'px'});$y($td(this.body_tab,0,0),{width:(w-18)+'px'})
 $y($td(this.body_tab,0,1),{width:'18px'});}
 this.set_background=function(color){if(color)this.bg_color=color;$y(this.inp,{backgroundColor:this.bg_color});$y($td(this.body_tab,0,0),{backgroundColor:this.bg_color});$y($td(this.body_tab,0,1),{backgroundColor:'#DDD'});}

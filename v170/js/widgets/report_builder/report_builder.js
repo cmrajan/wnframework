@@ -121,7 +121,7 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 		
 		if(my_onload)my_onload(me);
 	}
-	this.make_save_criteria();
+	
 }
 
 // -------------------------------------------------------------------------------------
@@ -141,10 +141,9 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 _r.ReportBuilder.prototype.make_body = function() {
 
 	_r.rb_con.main_title.innerHTML = this.doctype;
-
 	var me = this;
-	
-	this.make_save_criteria();
+
+	this.make_save_criteria();	
 	this.column_picker = new _r.ReportColumnPicker(this);
 	this.report_filters = new _r.ReportFilters(this);
 }
@@ -391,7 +390,6 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 	}
 
 	var me = this;
-	me.make_body();
 
 	var dt = me.parent_dt?me.parent_dt:me.doctype;
 
@@ -530,6 +528,7 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 				if(r.parent_dt)me.parent_dt = r.parent_dt;
 				if(!me.validate_permissions()) 
 					return;
+				me.make_body();
 				me.setup_filters();
 				if(onload)onload(me);
 			} );
@@ -543,6 +542,7 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 		if(!me.validate_permissions()) 
 			return;
 		me.validate_permissions();
+		me.make_body();
 		me.setup_filters();
 		if(onload)onload(me);
 	}
@@ -727,7 +727,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		
 		if(me.get_query) {
 			// custom query method
-			this.query = me.get_query();	
+			this.query = me.get_query();
 
 		} else {
 			// add docstatus conditions

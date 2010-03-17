@@ -25,7 +25,7 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 			this.inp.onclick = this.btn.onclick;
 		}
 
-		this.body_tab.onclick = function() {
+		var oc = function() {
 			if(me.as && me.as.body) {
 				me.as.clearSuggestions();
 				return;
@@ -33,6 +33,10 @@ function SelectWidget(parent, options, width, editable, bg_color) {
 			me.inp.focus();
 			me.as.createList(me.as.aSug);
 		}
+
+		this.btn.onclick = oc;
+		this.inp.onclick = oc;
+		
 		this.as = new AutoSuggest(this.inp, {fixed_options: true, xdelta: 8, ydelta: 8, timeout:3000});
 		this.as.aSug = me.create_options(me.options);
 		this.set_background();
