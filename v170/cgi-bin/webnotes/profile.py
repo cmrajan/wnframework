@@ -30,7 +30,7 @@ class Profile:
 	
 	def get_allow_list(self, key):
 		role_options = ["role = '"+r+"'" for r in self.get_roles()]
-		return [r[0] for r in webnotes.conn.sql('SELECT DISTINCT parent FROM `tabDocPerm` WHERE `%s`=1 AND parent not like "old_parent:%%" AND (%s) order by parent' % (key, ' OR '.join(role_options)))]
+		return [r[0] for r in webnotes.conn.sql('SELECT DISTINCT t1.parent FROM `tabDocPerm` t1, tabDocType t2 WHERE t1.`%s`=1 AND t1.parent not like "old_parent:%%" AND t1.parent = t2.name AND IFNULL(t2.istable,0) = 0 AND (%s) order by t1.parent' % (key, ' OR '.join(role_options)))]
 	
 	def get_create_list(self):
 		cl = self.get_allow_list('create')
