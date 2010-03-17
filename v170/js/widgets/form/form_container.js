@@ -165,7 +165,9 @@ _f.add_frm = function(doctype, onload, opt_name, parent) {
 		return;
 	}
 
-	if(frms[doctype]) { return frms[doctype]; }
+	if(frms[doctype]) { 
+		return frms[doctype]; 
+	}
 
 	// Load Doctype from server
 	var callback = function(r,rt) {
@@ -176,9 +178,7 @@ _f.add_frm = function(doctype, onload, opt_name, parent) {
 
 		if(onload)onload(r,rt);
 	}
-	if(locals['DocType'] && locals['DocType'][doctype]) {
-		callback();
-	} else if(opt_name && (!LocalDB.is_doc_loaded(doctype, opt_name))) {
+	if(opt_name && (!LocalDB.is_doc_loaded(doctype, opt_name))) {
 		// get both
 		$c('webnotes.widgets.form.getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, callback);
 	} else {

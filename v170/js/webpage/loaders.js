@@ -102,7 +102,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 			if(frm.menuitem) frm.menuitem.show_selected();
 
 		} else {
-			msgprint('error:There where errors while loading ' + doctype + ',' + name);
+			msgprint('error:There were errors while loading ' + doctype + ',' + name);
 		}
 	}
 		
