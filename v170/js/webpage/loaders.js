@@ -86,10 +86,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 			// menu item
 			if(menuitem) frm.menuitem = menuitem;
 			if(onload)onload(frm);
-			
-			// back button
-			nav_obj.open_notify('Form',doctype,name);
-			
+						
 			// tweets
 			if(r && r.n_tweets) frm.n_tweets[name] = r.n_tweets;
 			if(r && r.last_comment) frm.last_comments[name] = r.last_comment;
@@ -97,6 +94,9 @@ function loaddoc(doctype, name, onload, menuitem) {
 			
 			// show
 			frm.show(name, null, _f.frm_con.body, 0);
+
+			// back button
+			nav_obj.open_notify('Form',doctype,name);
 
 			// show menuitem selected
 			if(frm.menuitem) frm.menuitem.show_selected();

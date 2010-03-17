@@ -27,8 +27,10 @@ nav_obj.open_notify = function(t, dt, dn) {
 }
 
 nav_obj.rename_notify = function(dt, oldn, newn) {
-	for(var i in nav_obj.ol)
-		if(nav_obj.ol[i][1]==dt && nav_obj.ol[i][2]==oldn) nav_obj.ol[i][2]=newn;
+	for(var i=0;i<nav_obj.ol.length;i++) {
+		var o = nav_obj.ol[i];
+		if(o[1]==dt && o[2]==oldn) o[2]=newn;
+	}
 } 
 
 nav_obj.show_last_open = function() {
