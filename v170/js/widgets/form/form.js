@@ -689,6 +689,7 @@ _f.Frm.prototype.refresh_dependency = function() {
 	}
 	if(!has_dep)return;
 	
+	// checks whether all dependants 
 	var d = locals[me.doctype][me.docname];
 	function all_dependants_clear(f) {
 		if(d[f.df.fieldname])return false;
@@ -714,7 +715,7 @@ _f.Frm.prototype.refresh_dependency = function() {
 			var v = d[f.df.depends_on];
 			if(f.df.depends_on.substr(0,3)=='fn:') {
 				f.guardian_has_value = cur_frm.runclientscript(f.df.depends_on.substr(3), cur_frm.doctype, cur_frm.docname);
-			} else {	
+			} else {
 				if(v || (v==0 && !v.substr)) { 
 					// guardian has value
 				} else { 
@@ -722,20 +723,14 @@ _f.Frm.prototype.refresh_dependency = function() {
 				}
 			}
 		}
-		f.dependencies_clear = all_dependants_clear(f);	
-		//if(f.guardian_has_value || (!f.dependencies_clear)) {
-		if(f.guardian_has_value) {
-			if(f.grid)f.grid.show(); else $ds(f.wrapper);		
-		} else {
-			if(f.grid)f.grid.hide(); else $dh(f.wrapper);		
+		if(f.df.depends_on) {
+			f.dependencies_clear = all_dependants_clear(f);	
+			if(f.guardian_has_value) {
+				if(f.grid)f.grid.show(); else $ds(f.wrapper);		
+			} else {
+				if(f.grid)f.grid.hide(); else $dh(f.wrapper);		
+			}
 		}
-		
-		// show red to indicate dependency missing
-		//if(!f.guardian_has_value && !f.dependencies_clear) {
-		//	if(f.input)f.input.style.color = "RED";
-		//} else {
-		//	if(f.input)f.input.style.color = "BLACK";		
-		//}
 	}
 }
 

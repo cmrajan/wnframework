@@ -109,7 +109,7 @@ if(!has_dep)return;var d=locals[me.doctype][me.docname];function all_dependants_
 var v=d[l[i].df.fieldname];if(v||(v==0&&!v.substr)){return false;}}}
 return true;}
 for(var i=me.fields.length-1;i>=0;i--){var f=me.fields[i];f.guardian_has_value=true;if(f.df.depends_on){var v=d[f.df.depends_on];if(f.df.depends_on.substr(0,3)=='fn:'){f.guardian_has_value=cur_frm.runclientscript(f.df.depends_on.substr(3),cur_frm.doctype,cur_frm.docname);}else{if(v||(v==0&&!v.substr)){}else{f.guardian_has_value=false;}}}
-f.dependencies_clear=all_dependants_clear(f);if(f.guardian_has_value){if(f.grid)f.grid.show();else $ds(f.wrapper);}else{if(f.grid)f.grid.hide();else $dh(f.wrapper);}}}
+if(f.df.depends_on){f.dependencies_clear=all_dependants_clear(f);if(f.guardian_has_value){if(f.grid)f.grid.show();else $ds(f.wrapper);}else{if(f.grid)f.grid.hide();else $dh(f.wrapper);}}}}
 _f.Frm.prototype.setnewdoc=function(docname){if(this.opendocs[docname]){this.docname=docname;return;}
 Meta.make_local_dt(this.doctype,docname);this.docname=docname;var me=this;var viewname=docname;if(this.meta.issingle)
 viewname=this.doctype;var iconsrc='page.gif';if(this.meta.smallicon)

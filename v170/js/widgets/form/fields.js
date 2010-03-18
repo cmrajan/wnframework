@@ -16,7 +16,7 @@ Field.prototype.make_body = function() {
 		this.wrapper = $a(this.parent, 'div');
 	else
 		this.wrapper = document.createElement('div');
-	
+		
 	if(!this.with_label) {
 
 		// simple field with label on top
@@ -163,6 +163,7 @@ Field.prototype.refresh_display = function() {
 			$ds(this.wrapper);
 			$dh(this.input_area);
 			$ds(this.disp_area);
+			this.set_comment();
 		} else { // None
 			$dh(this.wrapper);
 		}
