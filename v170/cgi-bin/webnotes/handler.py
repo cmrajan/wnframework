@@ -368,6 +368,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	# ----------------------------------
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql = webnotes.conn.sql
+	webnotes.session = {'user':'Administrator'}
 
 	import webnotes.model.code
 	
