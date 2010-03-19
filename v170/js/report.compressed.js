@@ -202,14 +202,14 @@ _r.DataTable.prototype.clear_all=function(){if(this.htab&&this.htab.parentNode){
 if(this.tab&&this.tab.parentNode){this.tab.parentNode.removeChild(this.tab);delete this.tab;}
 $dh(this.no_data_tag);}
 _r.DataTable.prototype.has_data=function(){if(this.htab&&this.htab.rows.length)return 1;else return 0;}
-_r.DataTable.prototype.show_result=function(r,rt){var me=this;this.clear_all();if(this.has_headings){this.htab=$a(this.hwrapper,'table');$y(this.twrapper,{top:'25px',borderTop:'0px'});}
-this.tab=$a(this.twrapper,'table');this.colwidths=eval(r.colwidths);this.coltypes=eval(r.coltypes);this.coloptions=eval(r.coloptions);this.colnames=eval(r.colnames);this.rset=eval(r.values);$y(this.tab,{tableLayout:'fixed'});if(this.beforetableprint)this.beforetableprint(this);if(this.rset&&this.rset.length){if(this.has_headings)this.make_head_tab(this.colnames);var start=this.start_rec;var rset_len=this.rset.length;if(rset_len>1000){msgprint("Showing only 1000 records out of "+rset_len+". Use 'Export' to see all records");rset_len=1000;}
+_r.DataTable.prototype.show_result=function(r,rt){var me=this;this.clear_all();this.rset=eval(r.values);if(this.rset&&this.rset.length){if(this.has_headings){this.htab=$a(this.hwrapper,'table');$y(this.twrapper,{top:'25px',borderTop:'0px'});}
+this.tab=$a(this.twrapper,'table');this.colwidths=eval(r.colwidths);this.coltypes=eval(r.coltypes);this.coloptions=eval(r.coloptions);this.colnames=eval(r.colnames);$y(this.tab,{tableLayout:'fixed'});if(this.beforetableprint)this.beforetableprint(this);if(this.has_headings)this.make_head_tab(this.colnames);var start=this.start_rec;var rset_len=this.rset.length;if(rset_len>1000){msgprint("Showing only 1000 records out of "+rset_len+". Use 'Export' to see all records");rset_len=1000;}
 for(var vi=0;vi<rset_len;vi++){var row=this.tab.insertRow(vi);if(this.has_index){var c0=row.insertCell(0);$w(c0,'30px');$a(c0,'div','',{width:'23px'}).innerHTML=start;}
 start++;for(var ci=0;ci<this.rset[vi].length;ci++){this.make_data_cell(vi,ci,this.rset[vi][ci]);}
 if(this.afterrowprint){row.data_cells={};row.data={};for(var ci=0;ci<this.colnames.length;ci++){row.data[this.colnames[ci]]=this.rset[vi][ci];row.data_cells[this.colnames[ci]]=row.cells[ci+1];}f
-this.afterrowprint(row);}}}else{$ds(this.no_data_tag);}
+this.afterrowprint(row);}}
 if(this.rset.length&&this.rset.length>=this.page_len)this.has_next=true;if(r.style){for(var i=0;i<r.style.length;i++){$yt(this.tab,r.style[i][0],r.style[i][1],r.style[i][2]);}}
-if(this.aftertableprint)this.aftertableprint(this.tab);}
+if(this.aftertableprint)this.aftertableprint(this.tab);}else{$ds(this.no_data_tag);}}
 _r.DataTable.prototype.get_col_width=function(i){if(this.colwidths&&this.colwidths.length&&this.colwidths[i])
 return cint(this.colwidths[i])+'px';else return'100px';}
 _r.DataTable.prototype.make_head_tab=function(colnames){var r0=this.htab.insertRow(0);if(this.has_index){var c0=r0.insertCell(0);c0.className='report_head_cell';$w(c0,'30px');$a(c0,'div').innerHTML='Sr';this.total_width=30;}

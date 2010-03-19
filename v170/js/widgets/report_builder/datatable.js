@@ -299,24 +299,25 @@ _r.DataTable.prototype.show_result = function(r, rt) {
 	var me = this;
 	this.clear_all();
 
-	// add 
-	if(this.has_headings) {
-		this.htab = $a(this.hwrapper, 'table');
-		$y(this.twrapper,{top:'25px',borderTop:'0px'});
-	}
-	this.tab = $a(this.twrapper, 'table');
-
-	this.colwidths  = eval(r.colwidths);
-	this.coltypes   = eval(r.coltypes);
-	this.coloptions = eval(r.coloptions);
-	this.colnames = eval(r.colnames);
 	this.rset = eval(r.values);
 
-	$y(this.tab,{tableLayout:'fixed'});
-
-	if(this.beforetableprint)this.beforetableprint(this);
-
 	if(this.rset && this.rset.length) {
+
+		// add 
+		if(this.has_headings) {
+			this.htab = $a(this.hwrapper, 'table');
+			$y(this.twrapper,{top:'25px',borderTop:'0px'});
+		}
+		this.tab = $a(this.twrapper, 'table');
+	
+		this.colwidths  = eval(r.colwidths);
+		this.coltypes   = eval(r.coltypes);
+		this.coloptions = eval(r.coloptions);
+		this.colnames = eval(r.colnames);
+	
+		$y(this.tab,{tableLayout:'fixed'});
+	
+		if(this.beforetableprint)this.beforetableprint(this);
 
 		// heading
 		if(this.has_headings) this.make_head_tab(this.colnames);
@@ -355,23 +356,26 @@ _r.DataTable.prototype.show_result = function(r, rt) {
 				}f
 				this.afterrowprint(row);
 			}
+  
 		}
+
+		// has next page?
+		if(this.rset.length && this.rset.length>=this.page_len)this.has_next = true;
+	
+		// style
+		if(r.style) {
+			for(var i=0;i<r.style.length;i++) {
+				$yt(this.tab,r.style[i][0],r.style[i][1],r.style[i][2]);
+			}
+		}	
+	
+		// after table print
+		if(this.aftertableprint) this.aftertableprint(this.tab);
+
+
 	} else {
 		$ds(this.no_data_tag);
 	}
-  
-	// has next page?
-	if(this.rset.length && this.rset.length>=this.page_len)this.has_next = true;
-
-	// style
-	if(r.style) {
-		for(var i=0;i<r.style.length;i++) {
-			$yt(this.tab,r.style[i][0],r.style[i][1],r.style[i][2]);
-		}
-	}	
-
-	// after table print
-	if(this.aftertableprint) this.aftertableprint(this.tab);
 }
 
 _r.DataTable.prototype.get_col_width = function(i) {

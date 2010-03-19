@@ -278,7 +278,7 @@ class JavascriptMinify(object):
         self._jsmin()
         self.instream.close()
 
-def compress(in_files, out_file, in_type='js', verbose=False,
+def _compress(in_files, out_file, in_type='js', verbose=False,
              temp_file='.temp'):
     temp = open(temp_file, 'w')
     for f in in_files:
@@ -308,3 +308,14 @@ def compress(in_files, out_file, in_type='js', verbose=False,
     print ''
 
     os.remove(temp_file)
+
+def compress(t):
+	if t=='main':
+		_compress(in_files_main, out_file_main)
+	elif t=='form':
+		_compress(in_files_form, out_file_form)
+	elif t=='report':
+		_compress(in_files_report, out_file_report)
+	else:
+		print 'parameter must be one of main, form or report'
+	
