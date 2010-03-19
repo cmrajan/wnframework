@@ -28,6 +28,9 @@ def generate_hash():
 	import sha, time
 	return sha.new(str(time.time())).hexdigest()
 
+def db_exists(dt, dn):
+	return webnotes.conn.sql('select name from `tab%s` where name="%s"' % (dt, dn))
+
 # Cookies
 # ------------------
 
