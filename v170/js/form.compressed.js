@@ -82,7 +82,7 @@ _f.Frm.prototype.set_parent=function(parent){if(parent){this.parent=parent;if(th
 parent.appendChild(this.wrapper);}}
 _f.Frm.prototype.setup_print_layout=function(){if(this.meta.read_only_onload){this.print_wrapper=$a(this.wrapper,'div','',{backgroundColor:'#46A',padding:'32px'});this.print_body=$a(this.print_wrapper,'div','',{backgroundColor:'#FFF',border:'1px solid #444',padding:'32px'});}}
 _f.Frm.prototype.refresh_print_layout=function(){$ds(this.print_wrapper);$dh(this.form_wrapper);var me=this;var print_callback=function(print_html){me.print_body.innerHTML=print_html;}
-_p.build('Standard',print_callback);}
+_p.build(this.default_format,print_callback);}
 _f.Frm.prototype.setup=function(){var me=this;this.fields=[];this.fields_dict={};this.wrapper=$a(this.parent,'div','frm_wrapper');this.setup_print_layout();this.form_wrapper=$a(this.wrapper,'div');if(this.meta.use_template){this.setup_template_layout();}else{this.setup_std_layout();}
 if(this.meta.allow_attach)
 this.setup_attach();this.setup_done=true;}

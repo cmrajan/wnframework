@@ -509,7 +509,7 @@ _f.Frm.prototype.refresh_print_layout = function() {
 	}
 
 	// create print format here
-	_p.build('Standard', print_callback);
+	_p.build(this.default_format, print_callback);
 }
 
 // ======================================================================================
