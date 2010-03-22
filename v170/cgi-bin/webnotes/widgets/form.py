@@ -342,7 +342,7 @@ def _get_print_format(match):
 	content = sql('select html from `tabPrint Format` where name="%s"' % name)
 	return content and content[0][0] or ''
 
-def get_print_format(name):
+def get_print_format():
 	import re
 	import webnotes
 
