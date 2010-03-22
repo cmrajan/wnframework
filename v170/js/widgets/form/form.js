@@ -1,3 +1,11 @@
+// Form page structure
+//
+// + this.parent (can change)
+// 		+ this.wrapper
+//			+ this.form_wrapper
+//			|	+ this.body
+//			+ this.print_wrapper
+
 
 // Open the Form in a Dialog
 _f.frm_dialog = null;
@@ -158,10 +166,16 @@ _f.Frm.prototype.onhide = function() { if(_f.cur_grid_cell) _f.cur_grid_cell.gri
 _f.Frm.prototype.setup_print = function() { 
 	var fl = getchildren('DocFormat', this.meta.name, 'formats', 'DocType');
 	var l = [];	
-	for(var i=0;i<fl.length;i++) l.push(fl[i].format);
+	this.default_format = 'Standard';
+	if(fl.length) {
+		def = fl[0].format;
+		for(var i=0;i<fl.length;i++) 
+			l.push(fl[i].format);
+		
+	}
 	l.push('Standard');
-	this.print_sel = new SelectWidget(null,l);
-	this.print_sel.inp.value = 'Standard';
+	this.print_sel = new SelectWidget('200px',l);
+	this.print_sel.inp.value = this.default_format;
 }
 
 _f.Frm.prototype.print_doc = function() {
@@ -361,23 +375,23 @@ _f.Frm.prototype.setup_meta = function() {
 }
 
 _f.Frm.prototype.setup_std_layout = function() {
-	if(this.not_in_container) $w(this.wrapper, '500px');
+	if(this.not_in_container) $w(this.form_wrapper, '500px');
 	//else $w(this.wrapper, pagewidth + 'px');
 	
 	// headings
-	this.header = $a(this.wrapper, 'div', 'frm_header');
+	this.header = $a(this.form_wrapper, 'div', 'frm_header');
 	this.heading = $a(this.header, 'div', 'frm_heading');
 	this.tip_wrapper = $a(this.header, 'div');
 	this.tab_wrapper = $a(this.header, 'div'); $dh(this.tab_wrapper);
 
 	if(this.meta.section_style=='Tray') {
-		var t = $a(this.wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
+		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
 		var r = t.insertRow(0); var c = r.insertCell(0);
 		c.className='frm_tray_area';
 		this.tray_area = c;
 		this.body = $a(r.insertCell(1), 'div', 'frm_body');
 	} else {
-		this.body = $a(this.wrapper, 'div', 'frm_body');
+		this.body = $a(this.form_wrapper, 'div', 'frm_body');
 	}
 	
 
@@ -435,7 +449,7 @@ _f.Frm.prototype.setup_fields_std = function() {
 }
 
 _f.Frm.prototype.setup_template_layout = function() {
-	this.body = $a(this.wrapper, 'div');
+	this.body = $a(this.form_wrapper, 'div');
 	this.layout = null;
 	this.body.innerHTML = this.meta.dt_template;
 	var dt = this.doctype.replace(/ /g, '');
@@ -476,6 +490,30 @@ _f.Frm.prototype.set_parent = function(parent) {
 	}
 }
 
+// ======================================================================================
+
+_f.Frm.prototype.setup_print_layout = function() {
+	if(this.meta.read_only_onload) {
+		this.print_wrapper = $a(this.wrapper, 'div', '', {backgroundColor:'#46A',padding: '32px'});
+		this.print_body = $a(this.print_wrapper, 'div', '', {backgroundColor:'#FFF', border:'1px solid #444',padding: '32px' });
+	}
+}
+
+_f.Frm.prototype.refresh_print_layout = function() {
+	$ds(this.print_wrapper);
+	$dh(this.form_wrapper);
+
+	var me = this;
+	var print_callback = function(print_html) {
+		me.print_body.innerHTML = print_html;
+	}
+
+	// create print format here
+	_p.build('Standard', print_callback);
+}
+
+// ======================================================================================
+
 _f.Frm.prototype.setup = function() {
 
 	var me = this;
@@ -483,6 +521,12 @@ _f.Frm.prototype.setup = function() {
 	this.fields_dict = {};
 
 	this.wrapper = $a(this.parent, 'div', 'frm_wrapper');
+	
+	// create area for print fomrat
+	this.setup_print_layout();
+	
+	// forms go in forms wrapper
+	this.form_wrapper = $a(this.wrapper, 'div');
 	
 	if(this.meta.use_template) {
 		// template layout
@@ -560,6 +604,26 @@ _f.Frm.prototype.get_doc_perms = function() {
 
 // refresh
 // ======================================================================================
+_f.Frm.prototype.refresh_container = function() {
+	// set title
+	set_title(this.meta.issingle ? this.doctype : this.docname);
+
+	// show / hide buttons
+	_f.frm_con.refresh_toolbar();
+	
+	// set "Done Editing"
+	if(this.editable && this.meta.read_only_onload) {
+		_f.frm_con.set_done_editing(1);
+	} else {	
+		_f.frm_con.set_done_editing(0);
+	}
+	
+	// add to recent
+	if(page_body.wntoolbar) page_body.wntoolbar.rdocs.add(this.doctype, this.docname, 1);
+	
+	// refresh_heading - status etc.
+	this.set_heading();
+}
 
 _f.Frm.prototype.refresh = function(no_script) {
 	if(this.docname) { // document to show
@@ -596,35 +660,46 @@ _f.Frm.prototype.refresh = function(no_script) {
 		}
 
 		// editable
-		if(this.doc.__islocal) this.is_editable[this.docname] = 1; // new is editable
+		if(this.doc.__islocal) 
+			this.is_editable[this.docname] = 1; // new is editable
 		this.editable = this.is_editable[this.docname];
 		
-		if(!this.not_in_container) {
- 			// Client Script
-			set_title(this.meta.issingle ? this.doctype : this.docname);
+		if(this.editable || (!this.editable && this.not_in_container)) {
+			// show form wrapper
+			if(this.print_wrapper) {
+				$dh(this.print_wrapper);
+				$ds(this.form_wrapper);
+			}
 
- 			if(!no_script) this.runclientscript('refresh');
-			page_body.change_to('Forms');
+	 		if(!no_script) this.runclientscript('refresh');
 
-			// show / hide buttons
-			_f.frm_con.refresh_toolbar();
+			if(!this.not_in_container) {				
+				this.refresh_container();
+			}
 
-			// add to recent
-			if(page_body.wntoolbar) page_body.wntoolbar.rdocs.add(this.doctype, this.docname, 1);
-			this.set_heading();
+			// refresh fields		
+			this.refresh_tabs();
+			this.refresh_fields();
+			this.refresh_dependency();
+			if(this.meta.allow_attach) this.refresh_attachments();
+
+			// layout
+			if(this.layout) this.layout.show();
+		
+		} else {
+			// show print wrapper
+			this.refresh_container();
+			if(this.print_wrapper) {
+				this.refresh_print_layout();
+			}
 		}
-
-		// refresh fields		
-		this.refresh_tabs();
-		this.refresh_fields();
-		this.refresh_dependency();
-		if(this.meta.allow_attach) this.refresh_attachments();
-
-		// layout
-		if(this.layout) this.layout.show();
-
+		
 		// show the record
 		if(!this.display) this.show(this.docname, 1, null, this.not_in_container);
+		
+		// show the page
+		page_body.change_to('Forms');
+
 	} 
 	//set_frame_dims();
 }

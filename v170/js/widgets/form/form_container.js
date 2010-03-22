@@ -9,32 +9,38 @@ _f.FrmContainer = function() {
 	this.make_toolbar();
 }
 
+
 _f.FrmContainer.prototype.make_head = function() {
 	var me = this;
 	this.bg_color = '#FFF';
 	this.head = $a(this.wrapper, 'div', '', {margin:'0px 0px 4px 0px'});
 	this.body = $a(this.wrapper,'div');
 
-	// Row 1 - title / btns / toolbar
-	// -----------------------
 
 	var div = $a(this.head, 'div', '');
-	this.tbartab = make_table(div, 1, 3, '100%', ['35%','20%','45%'],{ paddingTop:'2px' });
+	this.tbartab = make_table(div, 1, 2, '100%', ['60%','40%'],{ paddingTop:'2px' });
+	this.tbartab2 = make_table($a(this.head, 'div'), 1, 3, '100%', ['20%','20%', '60%']);
+
 	$y(this.tbartab, {tableLayout:'fixed'});
+
+	// Row 1 - title / details
+	// -----------------------
 	
 	$y($td(this.tbartab,0,0),{padding:'4px'});
 	this.main_title = $a($td(this.tbartab,0,0), 'h1', '',{margin:'0px'});
 
-	// buttons
-	this.button_area = $a($td(this.tbartab,0,1), 'div', '');
+	// details
+	$y($td(this.tbartab,0,1),{textAlign:'right', paddingRight:'12px'});
+	this.sub_title = $a($td(this.tbartab, 0, 1), 'div','',{display:'inline', color:'#888'});
+	this.sub_title.is_inline = 1;
+	this.status_title = $a($td(this.tbartab, 0, 1), 'span','',{marginLeft:'8px'});
+	this.status_title.is_inline = 1;
+	this.last_update_area = $a($td(this.tbartab, 0, 1), 'span','',{marginLeft:'8px', color:'#888'});
+	this.last_update_area.is_inline = 1;
 
-	// buttons 2
-	this.tbar_div = $a($td(this.tbartab,0,2),'div','',{marginRight:'8px', textAlign:'right'})
-
-	// Row 2 - images  / details
+	// Row 2 - images  / btns / toolbar
 	// -------------------------
 
-	this.tbartab2 = make_table($a(this.head, 'div'), 1, 2, '100%', ['50%','50%']);
 
 	// created / modified
 	this.owner_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px',width:'40px',display:'inline'});
@@ -43,19 +49,29 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.mod_img = $a($td(this.tbartab2,0,0), 'img','',{margin:'4px',width:'40px',display:'inline'});
 	this.mod_img.is_inline = 1;
 		
-	// details
-	$y($td(this.tbartab2,0,1),{textAlign:'right', paddingRight:'12px'});
-	this.sub_title = $a($td(this.tbartab2, 0, 1), 'div','',{display:'inline', color:'#888'});
-	this.sub_title.is_inline = 1;
-	this.status_title = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px'});
-	this.status_title.is_inline = 1;
-	this.last_update_area = $a($td(this.tbartab2, 0, 1), 'span','',{marginLeft:'8px', color:'#888'});
-	this.last_update_area.is_inline = 1;
+	// buttons
+	this.button_area = $a($td(this.tbartab2,0,1), 'div', '');
+	this.done_editing_area = $a($td(this.tbartab2,0,1), 'div', '', {margin:'4px 0px'});
 
+	// buttons 2
+	this.tbar_div = $a($td(this.tbartab2,0,2),'div','',{marginRight:'8px', textAlign:'right'})
 
 	// header elements
 	this.head_elements = [this.button_area, this.tbar_div, this.owner_img, this.mod_img, this.sub_title, this.status_title, this.last_update_area];
 	
+}
+
+_f.FrmContainer.prototype.set_done_editing = function(show) {
+	if(show) {
+		var s = $a(this.done_editing_area, 'span', 'link_type');
+		s.innerHTML = 'Done Editing';
+		s.onclick = function() {
+			cur_frm.is_editable[cur_frm.docname] = 0;
+			cur_frm.refresh();
+		}
+	} else {
+		this.done_editing_area.innerHTML = '';
+	}
 }
 
 _f.FrmContainer.prototype.show_head = function() { 

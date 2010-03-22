@@ -193,7 +193,7 @@ _p.render = function(body, style, doc, title) {
 	block.innerHTML = body;
 
 	if(doc && cint(doc.docstatus)==0 && cur_frm.perm[0][SUBMIT])  {
-		var tmp_html = '<div style="text-align: center; padding: 4px; border: 1px solid #000"><div style="font-size: 20px;">Temporary</div>This box will go away after the document is submitted.</div>';
+		var tmp_html = '<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">DRAFT</div>This box will go away after the document is submitted.</div>';
 	}
 
 	style = _p.def_print_style + style;
