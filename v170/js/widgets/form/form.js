@@ -168,7 +168,7 @@ _f.Frm.prototype.setup_print = function() {
 	var l = [];	
 	this.default_format = 'Standard';
 	if(fl.length) {
-		def = fl[0].format;
+		this.default_format = fl[0].format;
 		for(var i=0;i<fl.length;i++) 
 			l.push(fl[i].format);
 		

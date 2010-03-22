@@ -43,7 +43,7 @@ if(this.docname==old)
 this.docname=name;if(this&&this.opendocs[old]){local_dt[dt][name]=local_dt[dt][old];local_dt[dt][old]=null;}
 this.opendocs[old]=false;this.opendocs[name]=true;}
 _f.Frm.prototype.onhide=function(){if(_f.cur_grid_cell)_f.cur_grid_cell.grid.cell_deselect();}
-_f.Frm.prototype.setup_print=function(){var fl=getchildren('DocFormat',this.meta.name,'formats','DocType');var l=[];this.default_format='Standard';if(fl.length){def=fl[0].format;for(var i=0;i<fl.length;i++)
+_f.Frm.prototype.setup_print=function(){var fl=getchildren('DocFormat',this.meta.name,'formats','DocType');var l=[];this.default_format='Standard';if(fl.length){this.default_format=fl[0].format;for(var i=0;i<fl.length;i++)
 l.push(fl[i].format);}
 l.push('Standard');this.print_sel=new SelectWidget('200px',l);this.print_sel.inp.value=this.default_format;}
 _f.Frm.prototype.print_doc=function(){if(this.doc.docstatus==2){msgprint("Cannot Print Cancelled Documents.");return;}
