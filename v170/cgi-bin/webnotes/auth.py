@@ -49,14 +49,20 @@ class Authentication:
 		self.login_flag = 0
 		self.user_id = None
 		
-		self.set_env()
-		self.conn = hasattr(defs, 'single_account') and webnotes.db.Database(use_default=1) or self.set_db()
-		webnotes.conn = self.conn
+		self.app_login = None
+		self.app_password = None
+		
+		self.get_env()
+		self.set_db()
+		self.set_app_db()
+		
+		# make the connections global
+		webnotes.conn, webnotes.app_conn = self.conn, self.app_conn
 		
 		# called from login
 		if form.getvalue('cmd')=='login':
 			if form.getvalue('acx'):
-				self.conn = self.set_db(form.getvalue('acx'))
+				self.set_db(form.getvalue('acx'))
 				webnotes.conn = self.conn
 			
 			self.login()
@@ -89,8 +95,11 @@ class Authentication:
 		
 		# clear defs password - for security
 		#defs.db_password = ''
-		
-	def set_env(self):
+	
+	# Load Domain and IP
+	# =================================================================================
+
+	def get_env(self):
 		import os
 		self.domain = os.environ.get('HTTP_HOST')
 		if self.domain.startswith('www.'):
@@ -98,45 +107,110 @@ class Authentication:
 			
 		self.remote_ip = os.environ.get('REMOTE_ADDR')
 	
-	def set_db(self, acc_id = None):
+	# Make the database connection - either from cookies or from domain info
+	# =================================================================================
+
+	def set_db(self, ac_name = None):
 		res = None
+
+		# Case 1 - Single Account
+		# -----------------------
+		if hasattr(defs, 'single_account'):
+			self.conn = webnotes.db.Database(use_default=1)
+			return
 		
-		# database (account_id) is given
-		if self.cookies.get('account_id'):
+		# database_id (account_id) is given --- not for login
+		# ---------------------------------------------------
+		if (not ac_name) and self.cookies.get('account_id'):
 			self.account_id = self.cookies.get('account_id')
-			return webnotes.db.connect(self.account_id)
-			
+			self.conn = webnotes.db.Database(user = self.account_id)
+			self.conn.use(self.account_id)
+			return
+
 		# account id is given
-		if not acc_id:
-			acc_id = self.cookies.get('__account') or self.form.getvalue('__account')
+		# -------------------
+		if not ac_name:
+			ac_name = self.cookies.get('ac_name') or self.form.getvalue('ac_name')
 		
 		c = webnotes.db.Database(use_default=1)
-		if acc_id:
+		if ac_name:
 			try:
-				res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % acc_id)
-			except: pass
+				res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
+			except: 
+				pass
 			if res:
-				self.account = acc_id
+				self.account = ac_name
+			else:
+				# default account may not have entry
+				if ac_name == defs.db_name:
+					res = [[defs.db_name, defs.db_login],]
 
 		# select database from domain mapping table "Account Domain"
+		# ----------------------------------------------------------
 		else:
 			if c.sql("select name from tabDocType where name='Account Domain'"):
 				res = c.sql("select tabAccount.db_name, tabAccount.db_login, tabAccount.ac_name from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % self.domain)
 			if res:
 				self.account = res[0][2]
+				
+		# get details of app login - not required everytime, use the cookies
+		# ------------------------------------------------------------------
 		
+		try:
+			res_app = c.sql("select app_login from tabAccount where ac_name = %s", self.account)
+			if res_app: 
+				self.app_login = res_app[0][0]
+		except Exception, e:
+			pass
+		
+		# connect
+		# -------
 		if res:
-			c =  webnotes.db.Database(user = res[0][1] or res[0][0])
-			c.use(res[0][0])
+			self.account_id = res[0][0]
+			c = webnotes.db.Database(user = res[0][1] or res[0][0])
+			c.use(self.account_id)
 		else:
 			c =  webnotes.db.Database(use_default = 1)
-		return c
+			
+		self.conn = c
+		
+
+	# setup Application Database
+	# Appication Database is from where Application DocTypes are accesssed
+	# =================================================================================
 	
+	def set_app_db(self):
+		self.app_conn = None
+		
+		# find app_login from defs.py
+		if not self.app_login:
+			if hasattr(defs, 'app_login'):
+				self.app_login = defs.app_login
+	
+			if hasattr(defs, 'app_password'):
+				self.app_password = defs.app_password
+				
+			if self.cookies.get('app_id'):
+				self.app_login = self.cookies.get('app_id')
+
+		if not self.app_login:
+			return
+
+		if self.app_login == self.conn.user:
+			# i am the app_db, do nothing
+			return
+		
+		self.app_conn = webnotes.db.Database(user = self.app_login, password = self.app_password)
+		self.app_conn.use(self.app_login)
+			
 	def check_ip(self):
 		if self.session:
 			if self.session['data']['session_ip'] != self.remote_ip:
 				raise Exception, "Your IP address has changed mid-session. For security reasons, please login again"
-			
+
+	# Load Session
+	# =================================================================================
+
 	def load_session(self, sid):
 		if not sid: 
 			return False
@@ -150,7 +224,9 @@ class Authentication:
 			return True
 		return False
 	
-	# login
+	# Login
+	# =================================================================================
+
 	def login(self, as_guest = 0):
 		if as_guest:
 			res = self.conn.sql("select name from tabProfile where name='Guest' and ifnull(enabled,0)=1")
@@ -195,6 +271,9 @@ class Authentication:
 		if ret and ip:
 			if not (self.remote_ip.startswith(ip[0]) or (remote_ip in ip)):
 				raise Exception, 'Not allowed from this IP Address'
+
+	# Start Session
+	# =================================================================================
 	
 	def start_session(self, user):
 		self.session = {}
@@ -209,6 +288,9 @@ class Authentication:
 		# update profile
 		try: self.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (server.now(), self.remote_ip, session['user']))
 		except: pass
+
+	# Update session, at the end of the request
+	# =================================================================================
 	
 	def update(self):
 		# update session
@@ -223,16 +305,27 @@ class Authentication:
 		
 		# clear out old sessions
 		self.conn.sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > %s OR TIMEDIFF(NOW(), lastupdate) > '72:00'", exp_sec)
+
+	# Set cookies, on login
+	# =================================================================================
 	
 	def set_cookies(self):
 		if self.account_id:
 			self.out_cookies['account_id'] = self.account_id
 			
 		elif self.account:
-			self.out_cookies['__account'] = self.account
+			self.out_cookies['ac_name'] = self.account
+			
+		if self.app_login:
+			self.out_cookies['app_id'] = self.app_login
+		else:
+			self.out_cookies['app_id'] = ''
 			
 		self.out_cookies['sid'] = self.session['sid']
-		
+
+	# Set the remember me cookie, give expiry to cookies
+	# =================================================================================
+
 	def set_remember_me(self):
 		if webnotes.utils.cint(self.form.getvalue('remember_me')):
 			remember_days = self.conn.get_value('Control Panel',None,'remember_for_days') or 7
@@ -244,6 +337,9 @@ class Authentication:
 	
 	def set_in_cookies(self):
 		return webnotes.utils.get_incoming_cookies()
+
+	# Logout
+	# =================================================================================
 
 	def call_on_logout_event(self):
 		import webnotes.model.code

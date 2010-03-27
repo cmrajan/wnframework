@@ -7,7 +7,8 @@ no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable'
 default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
 
 def get_table_fields(doctype):
-	return sql("select options, fieldname from tabDocField where parent='%s' and fieldtype='Table'" % doctype)
+	conn = webnotes.app_conn or webnotes.conn
+	return conn.sql("select options, fieldname from tabDocField where parent='%s' and fieldtype='Table'" % doctype)
 
 def delete_doc(doctype, name):
 	tablefields = get_table_fields(doctype)

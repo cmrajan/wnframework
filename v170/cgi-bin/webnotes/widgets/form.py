@@ -212,8 +212,10 @@ def _do_action(doc, doclist, so, method_name, docstatus):
 def check_integrity(doc):
 	import webnotes
 
+	conn = webnotes.app_conn or webnotes.conn
+
 	# check for integrity / transaction safety
-	res = webnotes.conn.sql('SELECT issingle FROM tabDocType WHERE name="%s"' % doc.doctype)
+	res = conn.sql('SELECT issingle FROM tabDocType WHERE name="%s"' % doc.doctype)
 	if res:
 		is_single = res[0][0]
 	else:
@@ -230,25 +232,25 @@ def check_integrity(doc):
 
 def savedocs():
 	import webnotes.model.doclist
-	
+
 	from webnotes.model.code import get_server_obj
 	from webnotes.model.code import run_server_obj
 	import webnotes.utils
-	
+
 	from webnotes.utils import cint
 
 	sql = webnotes.conn.sql
 	form = webnotes.form
-	
+
 	# action
 	action = form.getvalue('action')
-	
+
 	# get docs	
 	doc, doclist = _get_doclist(webnotes.model.doclist.expand(form.getvalue('docs')))
 
 	# get server object	
 	server_obj = get_server_obj(doc, doclist)
-	
+
 	# check integrity
 	if not check_integrity(doc):
 		return
@@ -261,7 +263,6 @@ def savedocs():
 
 	# saving & post-saving
 	try:
-
 		# validate befor saving and submitting
 		if action in ('Save', 'Submit') and server_obj:
 			if hasattr(server_obj, 'validate'):	
@@ -339,14 +340,18 @@ def savedocs():
 #===========================================================================================
 def _get_print_format(match):
 	name = match.group('name')
-	content = sql('select html from `tabPrint Format` where name="%s"' % name)
+	conn = webnotes.app_conn or webnotes.conn
+
+	content = conn.sql('select html from `tabPrint Format` where name="%s"' % name)
 	return content and content[0][0] or ''
 
 def get_print_format():
 	import re
 	import webnotes
 
-	html = webnotes.conn.sql('select html from `tabPrint Format` where name="%s"' % webnotes.form.getvalue('name'))
+	conn = webnotes.app_conn or webnotes.conn
+
+	html = conn.sql('select html from `tabPrint Format` where name="%s"' % webnotes.form.getvalue('name'))
 	html = html and html[0][0] or ''
 
 	p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)

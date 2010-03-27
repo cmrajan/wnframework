@@ -3,12 +3,16 @@
 
 import webnotes
 
-sql = webnotes.conn.sql
+# prefer Application Database for the schema (if exists)
+sql = webnotes.app_conn and webnotes.app_conn.sql or webnotes.conn.sql
 
 def getcoldef(ftype, length=''):
 	t=ftype.lower()
-	if t in ('date','int','text','time'):
+	if t in ('date','text','time'):
 		dt = t
+	elif t == 'int':
+		dt = 'int'
+		if not length: length = '11'
 	elif t in ('currency'): 
 		dt = 'decimal'
 		if not length: length = '14,2' 
@@ -49,7 +53,8 @@ def _add_column(f, dt):
 	ftype =  getcoldef(f[2], f[3])
 	if ftype:
 		fn = _validate_column_name(f[1]) # name or label
-		sql("alter table `tab%s` add `%s` %s" % (dt, fn, ftype))
+		# always user db
+		webnotes.conn.sql("alter table `tab%s` add `%s` %s" % (dt, fn, ftype))
 
 		
 # Update Columns In Database
@@ -59,13 +64,20 @@ def _validate_type_change(new, old):
 	if not old:
 		return
 	if ((old.lower() in ['text','small text','code','text editor']) and (new.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old.lower() in ['data','select','link']) and (new.lower() in ['date','int','currency','float','time','table'])):
-		webnotes.msgprint('Coversion from %s to %s is not allowed' % (new, old))
+		webnotes.msgprint('Coversion from %s to %s is not allowed. Please contact your Administrator' % (new, old))
 		raise Exception		
 
 def _change_column(f, dt, col_def):
 	if col_def and f[0]:
-		sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], _validate_column_name(f[1]), col_def))
-		webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
+		# always user db
+		try:
+			webnotes.conn.sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], _validate_column_name(f[1]), col_def))
+		except Exception, e:
+			if e.args[0] == 1054:
+				_add_column(f, dt)
+			else:
+				raise e
+		#webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
 			
 def updatecolumns(doctype):
 	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
@@ -73,8 +85,9 @@ def updatecolumns(doctype):
 	else:
 		flist = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype FROM tabDocField WHERE parent = '%s'" % doctype)
 
-	# list of existing columns
-	cur_fields = sql("DESC `tab%s`" % (doctype))
+	# list of existing columns - always from user db
+	cur_fields = webnotes.conn.sql("DESC `tab%s`" % (doctype))
+			
 
 	old_fields = [f[0] for f in flist]
 
@@ -98,6 +111,7 @@ def updatecolumns(doctype):
 		for e in cur_fields:
 			if e[0]==f[1]:
 				cur_def = e[1]
+				break
 		
 		# changed
 		if change or (cur_def and col_def.lower() != cur_def.lower()):
@@ -118,7 +132,8 @@ def updateindex(doctype):
 	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE search_index=1 and parent='%s'" % doctype)
 	for f in addlist:
 		try:
-			sql("alter table `tab%s` add index %s(%s)" % (doctype, f[0], f[0]))
+			# ???? check if index exists??
+			webnotes.conn.sql("alter table `tab%s` add index %s(%s)" % (doctype, f[0], f[0]))
 		except:
 			pass
 
@@ -126,7 +141,7 @@ def updateindex(doctype):
 	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=0 and parent='%s'" % doctype)
 	for f in addlist:
 		try:
-			sql("alter table `tab%s` drop index %s" % (doctype, f[0]))
+			webnotes.conn.sql("alter table `tab%s` drop index %s" % (doctype, f[0]))
 		except:
 			pass
 
@@ -135,13 +150,13 @@ def updateindex(doctype):
 
 def update_engine(doctype=None, engine='InnoDB'):
 	if doctype:
-		sql("ALTER TABLE `tab%s` ENGINE = '%s'" % (doctype, engine))
+		webnotes.conn.sql("ALTER TABLE `tab%s` ENGINE = '%s'" % (doctype, engine))
 	else:
 		for t in sql("show tables"):
-			sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
+			webnotes.conn.sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
 
 def create_table(dt):
-	sql("""
+	webnotes.conn.sql("""
 		create table `tab%s` (
 			name varchar(120) not null primary key, 
 			creation datetime, 
@@ -155,15 +170,13 @@ def create_table(dt):
 			idx int(8),
 			index parent(parent)) ENGINE=InnoDB""" % (dt))
 
-def updatedb(doctype):
-	dt = doctype.name
-
+def updatedb(dt):
 	# if single type, nothing to do
 	if sql("select issingle from tabDocType where name=%s", dt)[0][0]:
 		return
 
 	# create table
-	names = [rec[0].lower() for rec in sql('SHOW TABLES')]
+	names = [rec[0].lower() for rec in webnotes.conn.sql('SHOW TABLES')]
 	if not (('tab'+dt).lower() in names):  
 		create_table(dt)
 
@@ -171,4 +184,47 @@ def updatedb(doctype):
 	updatecolumns(dt)
 
 	# update index
-	updateindex(dt)		
+	updateindex(dt)
+
+# Synchronize tables from Application Database, if exists
+# -------------------------------------------------------
+
+def create_adt_update_table():
+	webnotes.conn.sql("""
+		create table `tabDocType Update Register` (
+			name varchar(120) not null primary key, 
+			modified datetime) ENGINE=InnoDB""")
+
+def sync_dt(dt):
+	if not webnotes.app_conn:
+		return
+
+	# check modified date
+	t1 = webnotes.app_conn.sql("SELECT modified from `tabDocType` where name='%s'" % dt)
+	try:
+		t2 = webnotes.conn.sql("SELECT modified from `tabDocType Update Register` where name='%s'" % dt)
+	except Exception, e:
+		if e.args[0] == 1146:
+			# No table created yet (?), create one
+			webnotes.conn.sql('COMMIT')
+			create_adt_update_table()
+			t2 = None
+			webnotes.conn.sql('START TRANSACTION')
+		else:
+			raise e
+	
+	# new
+	if not t2:
+		# first time creation
+		updatedb(dt)
+		
+		webnotes.conn.sql("INSERT INTO `tabDocType Update Register`(name, modified) VALUES (%s, %s)", (dt, t1[0][0]))
+	
+	# exists
+	elif t1[0][0] != t2[0][0]:
+		# if different, sync the databases
+		updatedb(dt)
+
+		# update the register
+		webnotes.conn.sql("UPDATE `tabDocType Update Register` set modified = %s where name=%s", (t1[0][0], dt))
+

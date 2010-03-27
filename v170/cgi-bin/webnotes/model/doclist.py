@@ -123,27 +123,6 @@ def getvaluelist(doclist, fieldname):
 		l.append(d.fields[fieldname])
 	return l
 
-# Get Children
-# ------------
-
-def getchildren(name, childtype, field='', parenttype=''):
-	
-	tmp = ''
-	if field: 
-		tmp = ' and parentfield="%s" ' % field
-	if parenttype: 
-		tmp = ' and parenttype="%s" ' % parenttype
-
-	dataset = webnotes.conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
-
-	l = []
-	for i in range(len(dataset)):
-		d = webnotes.model.doc.Document()
-		d.doctype = childtype
-		d.loadfields(dataset, i, webnotes.conn.get_description())
-		l.append(d)
-	return l
-
 
 def _make_html(doc, link_list):
 

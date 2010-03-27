@@ -33,12 +33,15 @@ class DocType:
 	def __init__(self, d, dl):
 		self.doc, self.doclist = d, dl'''
 
-	sc_compiled = webnotes.conn.get_value('DocType', dt, 'server_code_compiled')
+	# load from application or main
+	conn = webnotes.app_conn or webnotes.conn
+
+	sc_compiled = conn.get_value('DocType', dt, 'server_code_compiled')
 	if sc_compiled:
 		ex_code = marshal.loads(sc_compiled)
 	if not sc_compiled:
-		sc_core = cstr(webnotes.conn.get_value('DocType', dt, 'server_code_core'))
-		sc = cstr(webnotes.conn.get_value('DocType', dt, 'server_code'))
+		sc_core = cstr(conn.get_value('DocType', dt, 'server_code_core'))
+		sc = cstr(conn.get_value('DocType', dt, 'server_code'))
 		
 		if sc_core or sc:
 			ex_code = sc_core + sc

@@ -231,7 +231,7 @@ if(d[0]=='HTML'){if(d[2])row.innerHTML=d[2];this.widgets[d[1]]=row;}
 else if(d[0]=='Check'){var i=$a_input(c2,'checkbox','',{width:'20px'});c1.innerHTML=d[1];this.widgets[d[1]]=i;}
 else if(d[0]=='Data'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a(c2,'input');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
 else if(d[0]=='Password'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a_input(c2,'password');if(d[3])$a(c2,'div','comment').innerHTML=d[3];}
-else if(d[0]=='Select'){c1.innerHTML=d[1];this.widgets[d[1]]=new SelectWidget(c2,[],'200px');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
+else if(d[0]=='Select'){c1.innerHTML=d[1];this.widgets[d[1]]=new SelectWidget(c2,[],'160px');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
 else if(d[0]=='Text'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a(c2,'textarea');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
 else if(d[0]=='Button'){c2.style.height='32px';c2.style.textAlign='right';var b=$a(c2,'button');b.innerHTML=d[1];b.dialog=me;if(d[2]){b._onclick=d[2];b.onclick=function(){this._onclick(me);}}
 $(b).button({icons:{primary:'ui-icon-circle-triangle-e'}});this.widgets[d[1]]=b;}}
@@ -427,6 +427,12 @@ tab.onclick=function(){this.show();}
 this.tabs[n]=tab;return tab;}
 TabbedPage.prototype.disable_tab=function(n){if(this.cur_tab==this.tabs[n])this.tabs[n].hide();$dh(this.tabs[n])}
 TabbedPage.prototype.enable_tab=function(n){$di(this.tabs[n])}
+var def_ph_style={wrapper:{marginBottom:'32px'},main_heading:{fontSize:'20px',fontWeight:'bold',marginBottom:'8px'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#777'},toolbar_area:{margin:'0px',marginBottom:'4px',padding:'2px 4px',backgroundColor:'#DDD'},tag_area:{color:'#888',marginBottom:'4px',textAlign:'right',fontSize:'10px'},close_btn:{cursor:'pointer',width:'60px',float:'right',padding:'1px',paddingRight:'20px',background:"url('images/icons/close.gif') right top no-repeat"}}
+function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','',def_ph_style.wrapper);this.t1=make_table(this.wrapper,1,2,'100%',[null,'100px']);this.main_head=$a($td(this.t1,0,0),'div','',def_ph_style.main_heading);this.sub_head=$a($td(this.t1,0,0),'div','',def_ph_style.sub_heading);this.toolbar_area=$a(this.wrapper,'div','',def_ph_style.toolbar_area);this.tag_area=$a(this.wrapper,'div','',def_ph_style.tag_area);$y($td(this.t1,0,1),{textAlign:'right'});this.close_btn=$a($td(this.t1,0,1),'div','',def_ph_style.close_btn);this.close_btn.innerHTML='Close';this.close_btn.onclick=function(){nav_obj.show_last_open();}
+if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;}
+PageHeader.prototype.add_button=function(label,fn,bold,icon){var btn=$a(this.toolbar_area,'button');btn.innerHTML=label;btn.onclick=fn;if(bold)$y(btn,{fontWeight:'bold'});$(btn).button({icons:{primary:icon}});}
+PageHeader.prototype.clear_toolbar=function(){this.toolbar_area.innerHTML='';}
+PageHeader.prototype.make_buttonset=function(){$(this.toolbar_area).buttonset();}
 var cur_autosug;function hide_autosuggest(){if(cur_autosug)cur_autosug.clearSuggestions();}
 function AutoSuggest(id,param){this.fld=$i(id);if(!this.fld){return 0;alert('AutoSuggest: No ID');}
 this.init();this.oP=param?param:{};var k,def={minchars:1,meth:"get",varname:"input",className:"autosuggest",timeout:2000,delay:1000,offsety:-5,shownoresults:true,noresults:"No results!",maxheight:250,cache:true,maxentries:25,fixed_options:false,xdelta:0,ydelta:5}

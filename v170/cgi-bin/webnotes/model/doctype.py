@@ -5,7 +5,8 @@ import webnotes.model.doc
 
 from webnotes.utils import cstr
 
-sql = webnotes.conn.sql
+# prefer Application Database for the schema (if exists)
+sql = webnotes.app_conn and webnotes.app_conn.sql or webnotes.conn.sql
 
 class _DocType:
 	def __init__(self, name):
@@ -17,7 +18,7 @@ class _DocType:
 		cache_modified = sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
 		if not (cache_modified and modified[0][0]==cache_modified[0][0]):
 			is_modified = 1
-		return modified, is_modified, cache_modified	
+		return modified, is_modified, cache_modified
 
 	def get_parent_dt(self):
 		# really required??? --- check
@@ -25,9 +26,11 @@ class _DocType:
 		return parent_dt and parent_dt[0][0] or ''
 
 	def _get_client_script(self, match):
+		conn = webnotes.app_conn or webnotes.conn
+		
 		name = match.group('name')
-		csc = webnotes.conn.get_value('DocType',name,'client_script_core')
-		cs = webnotes.conn.get_value('DocType',name,'client_script')
+		csc = conn.get_value('DocType',name,'client_script_core')
+		cs = conn.get_value('DocType',name,'client_script')
 		return str(csc or '') + '\n' + str(cs or '')
 
 	def _update_cache(self, cache_modified, modified, doclist):
@@ -65,7 +68,8 @@ class _DocType:
 					op = [oc.replace('__user', webnotes.session['user']) for oc in op]
 					
 					try:
-						ol = sql("select name from `tab%s` where %s docstatus!=2 order by name asc" % (t, op and (' AND '.join(op) + ' AND ') or ''))
+						# select options will always come from the user db
+						ol = webnotes.conn.sql("select name from `tab%s` where %s docstatus!=2 order by name asc" % (t, op and (' AND '.join(op) + ' AND ') or ''))
 					except:
 						webnotes.msgprint("Error in Select Options for %s" % d.fieldname)
 				ol = [''] + [o[0] or '' for o in ol]
@@ -107,25 +111,28 @@ class _DocType:
 
 def scrub_field_names(doclist):
 	restricted = ('name','parent','idx','owner','creation','modified','modified_by','parentfield','parenttype')
+	conn = webnotes.app_conn or webnotes.conn
+	
 	for d in doclist:
 		if d.parent and d.fieldtype:
 			if (not d.fieldname) and (d.fieldtype.lower() in ('data', 'select', 'int', 'float', 'currency', 'table', 'text', 'link', 'date', 'code', 'check', 'read only', 'small text', 'time', 'text editor')):
 				d.fieldname = d.label.strip().lower().replace(' ','_')
 				if d.fieldname in restricted:
 					d.fieldname = d.fieldname + '1'
-				webnotes.conn.set(d, 'fieldname', d.fieldname)
+				conn.set(d, 'fieldname', d.fieldname)
 
 def compile_code(doc):
+	conn = webnotes.app_conn or webnotes.conn
 	if doc.server_code or doc.server_code_core:
 		import marshal
 		try:
 			code = compile(cstr(doc.server_code_core) + '\n' + cstr(doc.server_code), '<string>', 'exec')
-			webnotes.conn.set(doc, 'server_code_compiled', marshal.dumps(code))
-			webnotes.conn.set(doc, 'server_code_error', ' ')
+			conn.set(doc, 'server_code_compiled', marshal.dumps(code))
+			conn.set(doc, 'server_code_error', ' ')
 		except:
-			webnotes.conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
+			conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
 
-def clear_cache(doc):
+def clear_cache():
 	sql("delete from __DocTypeCache")
 
 def update_doctype(doclist):
@@ -136,7 +143,7 @@ def update_doctype(doclist):
 	
 	# make schma changes
 	import db_schema
-	db_schema.updatedb(doc)
+	db_schema.updatedb(doc.name)
 	
 	# reload record
 	for d in doclist:
@@ -146,7 +153,7 @@ def update_doctype(doclist):
 	compile_code(doc)
 		
 	# change modifed of parent doctype (to clear the cache)
-	clear_cache(doc)
+	clear_cache()
 	
 #=================================================================================
 

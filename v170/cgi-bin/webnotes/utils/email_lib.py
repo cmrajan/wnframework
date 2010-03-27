@@ -121,6 +121,8 @@ class EMail:
 		if self.cc:
 			self.msg['CC'] = ', '.join([r.strip() for r in self.cc])
 		
+		#msgprint('<pre><code>'+self.msg.as_string()+'</code></pre>')
+				
 		sess.sendmail(self.sender, self.recipients, self.msg.as_string())
 		
 		try:
@@ -183,7 +185,8 @@ def send_form():
 		email = EMail(sendfrom, recipients, subject)
 		email.cc = [form.getvalue('cc'),]
 
-		email.set_message(form.getvalue('message') or 'No text')
+		if form.getvalue('message'):
+			email.set_message(form.getvalue('message') or 'No text')
 		email.set_message(form.getvalue('body'))
 		
 		for a in al:

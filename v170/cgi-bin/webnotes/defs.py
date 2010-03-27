@@ -8,7 +8,7 @@ db_name = 'accounts'
 db_login = 'accounts'
 db_password = 'ac_user09'
 
-# default 
+# root
 root_login = 'root'
 root_password = 'test123'
 	

@@ -1,5 +1,7 @@
 import webnotes
+import webnotes.model.db_schema
 
+conn = webnotes.conn
 sql = webnotes.conn.sql
 
 from webnotes.utils import *
@@ -46,21 +48,21 @@ class Document:
 	# -------------
 
 	def loadfromdb(self, doctype = None, name = None):
-		
+
 		if name: self.name = name
 		if doctype: self.doctype = doctype
-		
+
 		r = sql("select issingle from tabDocType where name='%s'" % self.doctype)
 		issingle = r and r[0][0] or 0
 				
 		if issingle:
 			self.loadsingle()
 		else:
-			dataset = sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
+			dataset = conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
 			if not dataset:
 				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name))
 				raise Exception
-			self.loadfields(dataset, 0, webnotes.conn.get_description())
+			self.loadfields(dataset, 0, conn.get_description())
 
 	# Load Fields from dataset
 	# ------------------------
@@ -161,7 +163,7 @@ class Document:
 		if not self.owner:
 			self.owner = webnotes.session['user']
 
-		if webnotes.conn.exists(self.doctype, self.name):
+		if sql('select name from `tab%s` where name=%s' % (self.doctype,'%s'), self.name):
 			raise NameError, 'Name %s already exists' % self.name
 		
 		if not self.name:
@@ -273,21 +275,26 @@ class Document:
 				if not ignore_fields:
 					# update all in one query
 					r = sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
-	
+
 	# Save values
 	# -----------
-	
 	def save(self, new=0, check_links=1, ignore_fields=0):
-
-		res = sql('select autoname, issingle, istable, name_case from tabDocType where name="%s"' % self.doctype, as_dict=1)
+		# sync metadata if from app db
+		webnotes.model.db_schema.sync_dt(self.doctype)
+		
+		# get basic info about the dt
+		app_conn = webnotes.app_conn or webnotes.conn
+		
+		res = app_conn.sql('select autoname, issingle, istable, name_case from tabDocType where name="%s"' % self.doctype, as_dict=1)
 		res = res and res[0] or {}
 
-		# make new		
+		# if required, make new
 		if new or (not new and self.fields.get('__islocal')) and (not res.get('issingle')):
 			r = self._makenew(res.get('autoname'), res.get('istable'), res.get('name_case'))
 			if r: 
 				return r
-
+		
+		# save the values
 		self.update_values(res.get('issingle'), check_links and self.make_link_list() or {}, ignore_fields)
 		self._clear_temp_fields()
 		
@@ -374,35 +381,89 @@ def make_autoname(key, doctype=''):
 # -----------------------
 
 def getseries(key, digits, doctype=''):
-	ttl = webnotes.conn.get_testing_tables()
+	ttl = conn.get_testing_tables()
 
 	# series created ?
-	if sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
+	if webnotes.conn.sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
 
 		# yes, update it
-		sql("update tabSeries set current = current+1 where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		webnotes.conn.sql("update tabSeries set current = current+1 where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
 
 		# find the series counter
-		r = sql("select current from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		r = webnotes.conn.sql("select current from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
 		n = r[0][0]
 	else:
 	
 		# no, create it
-		sql("insert into tabSeries (name, current) values ('%s', 1)" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		webnotes.conn.sql("insert into tabSeries (name, current) values ('%s', 1)" % key, allow_testing = (doctype in ttl) and 0 or 1)
 		n = 1
 	return ('%0'+str(digits)+'d') % n
 
+
+# Get Children
+# ------------
+
+def getchildren(name, childtype, field='', parenttype='', is_adt = 0):
+	
+	tmp = ''
+	if field: 
+		tmp = ' and parentfield="%s" ' % field
+	if parenttype: 
+		tmp = ' and parenttype="%s" ' % parenttype
+
+	dataset = conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
+
+	l = []
+	
+	for i in range(len(dataset)):
+		d = webnotes.model.doc.Document()
+		d.doctype = childtype
+		d.loadfields(dataset, i, conn.get_description())
+		l.append(d)
+	return l
+
+# check if the DocType is application doctype
+# -------------------------------------------
+
+def get_is_adt(dt):
+	if not webnotes.app_conn:
+		return
+		
+	adt = webnotes.conn.get_value('Control Panel',None,'app_dt')
+	adt = adt and adt.split('\n')
+
+	if not adt:
+		adt = ['DocType', 'DocField', 'DocPerm', 'Page', 'Role', 'Page Role']
+
+	if dt in adt:
+		return 1
+	else:
+		return 0
+
+# called from everywhere
+# load a record and its child records and bundle it in a list - doclist
+# ---------------------------------------------------------------------
+
 def get(dt, dn=''):
+	global conn
+
 	import webnotes.model
-	import webnotes.model.doclist
 
 	dn = dn or dt
+	is_adt = get_is_adt(dt)
+	
+	# check if ADT
+	if is_adt:
+		conn = webnotes.app_conn
+	else:
+		conn = webnotes.conn	
+	sql = conn.sql
 
 	doc = Document(dt, dn)
 	
 	tablefields = webnotes.model.get_table_fields(dt)
 	doclist = [doc,]
 	for t in tablefields:
-		doclist += webnotes.model.doclist.getchildren(doc.name, t[0], t[1], dt)
+		doclist += getchildren(doc.name, t[0], t[1], dt, is_adt)
 
 	return doclist

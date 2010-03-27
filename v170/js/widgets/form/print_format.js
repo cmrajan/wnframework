@@ -14,15 +14,13 @@ _p.make_dialog = function() {
 	_p.dialog = d;
 	d.onshow = function() {
 		var c = d.widgets['Select'];
-		if(c.cur_sel)c.removeChild(c.cur_sel);
 		c.appendChild(cur_frm.print_sel.wrapper);
 		c.cur_sel = cur_frm.print_sel.wrapper;
 	}
 }
 
 _p.field_tab = function(layout_cell) {
-	var t = $a(layout_cell, 'table');
-	$w(t, '100%');
+	var t = $a(layout_cell, 'table', '', {width:'100%'});
 	var r = t.insertRow(0); this.r = r;
 	r.insertCell(0); r.insertCell(1);
 	r.cells[0].className='datalabelcell';
@@ -159,6 +157,7 @@ _p.print_std = function() {
 	}
 
 	pf_list = []; // cleanup
+	html = html.replace(/<td>/g, '\n<td>');
 	return html;
 }
 
@@ -225,32 +224,36 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 	var fl = fields_list[tabletype];
 	var ds = getchildren(tabletype, dn, fieldname, dt);
 	var tl = [];
+	var cell_style = {border:'1px solid #000', padding:'2px', verticalAlign:'top'};
 	
 	var make_table = function(fl) {
 		var w = document.createElement('div');
-		var t = $a(w, 'table', (cssClass ? cssClass : 'simpletable'));
+		var t = $a(w, 'table', '', {width:'100%', borderCollapse:'collapse', marginBottom:'10px'});
 		t.wrapper = w;
-		$w(t, '100%');
 		
 		// head row
 		t.insertRow(0);
 		var c_start = 0;
 	 	if(fl[0]=='SR') {
-			t.rows[0].insertCell(0).innerHTML = head_labels?head_labels[0]:' ';
-	 		$w(t.rows[0].cells[0], '30px');
+			var cell = t.rows[0].insertCell(0)
+			cell.innerHTML = head_labels?head_labels[0]:' ';
+	 		$y(cell, {width:'30px'});
+	 		$y(cell, cell_style)
+
 			c_start = 1;
 		}
 
 		for(var c=c_start;c<fl.length;c++) {
 			var cell = t.rows[0].insertCell(c);
+			$y(cell, cell_style)
 			if(head_labels)
 				cell.innerHTML = head_labels[c];
 			else
 				cell.innerHTML = fl[c].label;
 			if(fl[c].width)
-				$w(cell, fl[c].width);
+				$y(cell, {width:fl[c].width});
 			if(widths)
-				$w(cell, widths[c]);
+				$y(cell, {width: widths[c]});
 			if(fl[c].fieldtype=='Currency')
 				$y(cell,{textAlign: 'right'});
 			cell.style.fontWeight = 'bold';
@@ -302,11 +305,17 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 			var rowidx = t.rows.length; 
 			sr++
 			var row = t.insertRow(rowidx);
-			if(c_start) { row.insertCell(0).innerHTML = sr; }
+			if(c_start) { 
+				var cell = row.insertCell(0);
+				cell.innerHTML = sr;
+				$y(cell, cell_style);
+			}
 			
 			// add values
 			for(var c=c_start;c<fl.length;c++) {
 				var cell = row.insertCell(c);
+				$y(cell, cell_style);
+
 				$s(cell, ds[r][fl[c].fieldname], fl[c].fieldtype);
 				if(fl[c].fieldtype=='Currency')
 					cell.style.textAlign = 'right';

@@ -351,6 +351,9 @@ def backupdb(form, session):
 import webnotes.auth
 import webnotes.db
 
+# reset password
+# ---------------------------------------------------------------------
+
 if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql = webnotes.conn.sql
@@ -362,10 +365,10 @@ if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 		webnotes.errprint(str(e))
 		sql("ROLLBACK")
 	
-	
+# pre-login access - for registration etc.
+# ---------------------------------------------------------------------
+
 elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
-	# register
-	# ----------------------------------
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql = webnotes.conn.sql
 	webnotes.session = {'user':'Administrator'}
@@ -379,6 +382,9 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
 		sql("ROLLBACK")
+
+# main stuff
+# ---------------------------------------------------------------------
 
 else:
 

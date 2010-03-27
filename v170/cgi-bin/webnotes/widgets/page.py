@@ -2,13 +2,16 @@ import webnotes
 import webnotes.model.doc
 import webnotes.model.code
 
+conn = webnotes.app_conn or webnotes.conn
+
 class Page:
 	def __init__(self, name):
 		self.name = name
 
 	def _page_import(self, match):
 		name = match.group('name')
-		content = sql('select script from `tabPage` where name=%s', name)
+
+		content = conn.sql('select script from `tabPage` where name=%s', name)
 		return content and content[0][0] or ''
 
 	def get_script(self, script):
