@@ -4,11 +4,11 @@
 
 var def_ph_style = {
 	wrapper: {marginBottom:'32px'}
-	,main_heading: { fontSize:'20px', fontWeight:'bold', marginBottom:'8px' }
+	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px' }
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#777' }
 	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#DDD' }
 	,tag_area: { color:'#888', marginBottom:'4px', textAlign:'right', fontSize:'10px' }
-	,close_btn: { cursor:'pointer', width:'60px', float:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat" }
+	,close_btn: { cursor:'pointer', width:'60px', cssFloat:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat" }
 }
 
 function PageHeader(parent, main_text, sub_text) {

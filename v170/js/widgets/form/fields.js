@@ -21,10 +21,8 @@ Field.prototype.make_body = function() {
 
 		// simple field with label on top
 		this.label_area = $a(this.wrapper, 'div');
-		this.comment_area = $a(this.wrapper, 'div', 'comment');
 		if(this.in_grid) {
 			$dh(this.label_area);
-			$dh(this.comment_area);
 		}
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
@@ -36,13 +34,16 @@ Field.prototype.make_body = function() {
 		var lc = r.insertCell(0); this.input_cell = r.insertCell(1);
 		lc.className='datalabelcell'; this.input_cell.className = 'datainputcell';
 		
-		var lt = make_table($a(lc,'div'),1,2,'100%',[null,'20px']);
-		this.label_icon = $a($td(lt,0,1),'img'); $dh(this.label_icon);
+		var lt = make_table($a(lc,'div'),1,3,'100%',[null,'20px','20px']);
+		this.label_icon = $a($td(lt,0,2),'img'); $dh(this.label_icon);
 		this.label_icon.src = 'images/icons/error.gif';
+
+		this.help_icon = $a($td(lt,0,1),'img','',{cursor:'pointer'}); $dh(this.help_icon);
+		this.help_icon.src = 'images/icons/help.gif';
+
 		this.label_cell= $td(lt,0,0);
 		this.input_area = $a(this.input_cell, 'div', 'input_area');
 		this.disp_area = $a(this.input_cell, 'div');
-		this.comment_area = $a(this.input_cell, 'div', 'comment', {width:'80%', fontSize:'11px'});
 	}
 	if(this.onmake)this.onmake();
 }
@@ -56,17 +57,11 @@ Field.prototype.set_label = function() {
 
 Field.prototype.set_comment = function() {
 	var me = this;
-	this.comment_area.innerHTML = '';
 	if(this.df.description) {
-		if(this.df.description.length > 100) {
-			$($a(this.comment_area, 'div')).html(this.df.description.substr(0,100) + '...');
-			$($a($a(this.comment_area, 'div'),'span', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
-		} else {
-			this.comment_area.innerHTML = replace_newlines(this.df.description);
-		}
-		$ds(this.comment_area);
+		$ds(this.help_icon);
+		this.help_icon.onclick = function() { msgprint(me.df.description) };
 	} else {
-		$dh(this.comment_area);
+		$dh(this.help_icon);
 	}
 }
 
@@ -455,7 +450,7 @@ var _last_link_value = null;
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
-	makeinput_popup(this, 'images/icons/magnifier.gif', 'images/icons/arrow_right.gif');
+	makeinput_popup(this, 'images/icons/magnifier.gif', 'images/icons/arrow_right.gif', 'images/icons/add.gif');
 	var me = this;
 
 	me.btn.onclick = function() {
@@ -489,11 +484,11 @@ LinkField.prototype.make_input = function() {
 	me.get_value = function() {
 		return me.txt.value;
 	}
+	
+	me.can_create = 0;
 	if((!me.not_in_form) && in_list(profile.can_create, me.df.options)) {
-		me.new_link_area = $a(me.input_area,'div','',{display:'none',textAlign:'right',width:'81%'});
-		var sp = $a(me.new_link_area, 'span', 'link_type',{fontSize:'11px'});
-		sp.innerHTML = 'New ' + me.df.options;
-		sp.onclick = function() { 
+		me.can_create = 1;
+		me.btn2.onclick = function() { 
 			var on_save_callback = function(new_rec) {
 				if(new_rec) {
 					var d = _f.calling_doc_stack.pop(); // patch for composites
@@ -508,10 +503,8 @@ LinkField.prototype.make_input = function() {
 	}
 
 	me.onrefresh = function() {
-		if(me.new_link_area) {
-			if(cur_frm.doc.docstatus==0) $ds(me.new_link_area);
-			else $dh(me.new_link_area);
-		}
+		if(me.can_create && cur_frm.doc.docstatus==0) $ds(me.btn2);
+		else $dh(me.btn2);
 	}
 	
 	// add auto suggest
@@ -884,7 +877,7 @@ TimeField.prototype.set_disp=function(v) {
 // ======================================================================================
 // Used by date and link fields
 
-function makeinput_popup(me, iconsrc, iconsrc1) {
+function makeinput_popup(me, iconsrc, iconsrc1, iconsrc2) {
 	me.input = $a(me.input_area, 'div');
 	me.input.onchange = function() { /*alert('in_oc'); me.txt.onchange();*/ }
 	
@@ -910,13 +903,23 @@ function makeinput_popup(me, iconsrc, iconsrc1) {
 	me.btn.style.margin = '4px 2px 2px 8px';
 
 	if(iconsrc1) {
+		var c2 = tab.rows[0].insertCell(2);
 		$w(c1, '18px');
-		me.btn1 = $a(tab.rows[0].insertCell(2), 'img', 'btn-img');
+		me.btn1 = $a(c2, 'img', 'btn-img');
 		me.btn1.src = iconsrc1;
 		me.btn1.setAttribute('title','Open Link');
 		me.btn1.style.margin = '4px 2px 2px 0px';
 	}
-	
+
+	if(iconsrc2) {
+		$w(c2, '18px');
+		me.btn2 = $a(tab.rows[0].insertCell(3), 'img', 'btn-img');
+		me.btn2.src = iconsrc2;
+		me.btn2.setAttribute('title','Create New');
+		me.btn2.style.margin = '4px 2px 2px 0px';
+		$dh(me.btn2);
+	}
+		
 	if(me.df.colour)
 		me.txt.style.background = '#'+me.df.colour.split(':')[1];
 	me.txt.name = me.df.fieldname;

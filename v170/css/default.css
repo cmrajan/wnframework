@@ -883,7 +883,7 @@ div.todo_links div {
 	border-collapse: collapse;
 }
 
-.datalabelcell { padding: 4px 0px; width: 120px; vertical-align: top; }
+.datalabelcell { padding: 4px 0px; width: 160px; vertical-align: top; }
 .datainputcell { padding: 4px 0px; }
 
 .input_area input { width: 80%; font-size: 12px; }

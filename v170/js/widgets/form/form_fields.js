@@ -110,17 +110,6 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor:'#EEE'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
 	}
-
-	// description
-	if(this.df.description) {
-		var d = $a(head, 'div', '', {margin:'0px', padding:'0px 8px 8px 8px', backgroundColor:'#EEE'});
-		if(this.df.description.length > 240) {
-			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
-			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
-		} else {
-			$($a(d, 'div')).html(replace_newlines(this.df.description));
-		}
-	}
 	
 	if(!static) {	
 		if(this.df.label) {
@@ -128,10 +117,20 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 			
 		} else if(!has_col) {
 			// divider
-			$y(head,{margin:'8px', borderBottom:'2px solid #445'});
+			$y(head,{margin:'8px', borderBottom:'1px solid #AAA'});
 		}
 	}
 
+	// description
+	if(this.df.description) {
+		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor:'#EEE'});
+		if(this.df.description.length > 240) {
+			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
+			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
+		} else {
+			$($a(d, 'div')).html(replace_newlines(this.df.description));
+		}
+	}
 }
 
 _f.cur_sec_header = null;

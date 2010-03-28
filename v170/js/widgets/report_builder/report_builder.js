@@ -11,37 +11,25 @@ _r.ReportContainer = function() {
 
 	var div = $a(this.wrapper, 'div');
 	var inner = $a(div, 'div', '', {padding:'6px 8px 4px 8px'});
-		
-	var htab = make_table(inner, 1,2, '100%', ['80%','20%']);
 	
-	this.main_title = $a($td(htab,0,0),'h1');
-		
-	// close button
-	$y($td(htab,0,1),{textAlign:'right'});
-	this.close_btn = $a($a($td(htab,0,1),'div','',{padding: '2px', margin:'0px'}), 'img', '', {cursor:'pointer'});
-	this.close_btn.src="images/icons/close.gif";
-	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
+	this.page_head = new PageHeader(inner);
 
-	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
+	// buttons
 
-	// row 2
-	var htab = make_table($a(div,'div','',{padding:'4px'}), 1,2, '100%', ['80%','20%']);
+	var runbtn = this.page_head.add_button('Run', function() { if(me.cur_rb){
+		me.cur_rb.dt.start_rec = 1;
+		me.cur_rb.dt.run();} 
+	}, 1, 'ui-icon-circle-triangle-e');
 
-	this.button_area = $a($td(htab,0,0),'div');
-	this.button_area2 = $a($td(htab,0,1),'div',{marginTop:'8px'});
-	$y($td(htab,0,1),{textAlign:'right'});
 
 	// new
 	if(has_common(['Administrator', 'System Manager'], user_roles)) {
 		// save
-		var savebtn = $a(this.button_area2,'span','link_type',{marginRight:'8px'});
-		savebtn.innerHTML = 'Save';
-		savebtn.onclick = function() {if(me.cur_rb) me.cur_rb.save_criteria(); };
+		
+		var savebtn = this.page_head.add_button('Save', function() {if(me.cur_rb) me.cur_rb.save_criteria(); }, 0, 'ui-icon-disk');
 		
 		// advanced
-		var advancedbtn = $a(this.button_area2,'span','link_type');
-		advancedbtn.innerHTML = 'Advanced';
-		advancedbtn.onclick = function() { 
+		var fn = function() { 
 			if(me.cur_rb) {
 				if(!me.cur_rb.current_loaded) {
 					msgprint("error:You must save the report before you can set Advanced features");
@@ -50,25 +38,14 @@ _r.ReportContainer = function() {
 				loaddoc('Search Criteria', me.cur_rb.sc_dict[me.cur_rb.current_loaded]);
 			}
 		};
+		var advancedbtn = this.page_head.add_button('Advanced Settings', fn);
 	}
 	
-	// buttons
-	var runbtn = $a(this.button_area, 'button', '', {fontSize:'14px'});
-	runbtn.innerHTML = 'Run'.bold();
-	runbtn.onclick = function() { if(me.cur_rb){
-		me.cur_rb.dt.start_rec = 1;
-		me.cur_rb.dt.run();} 
-	}
-	$dh(this.button_area);
 	
 	this.rb_area = $a(this.wrapper, 'div');
 
 	// set a type
 	this.set_dt = function(dt, onload) {
-		$dh(me.home_area);
-		$ds(me.rb_area);
-		$ds(me.button_area);
-
 		my_onload = function(f) {
 			if(!f.forbidden) {
 				me.cur_rb = f;
@@ -117,7 +94,7 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 		$ds(me.wrapper);
 		
 		// reset main title
-		_r.rb_con.main_title.innerHTML = me.doctype;
+		this.set_main_title('Report: ' + me.doctype);
 		
 		if(my_onload)my_onload(me);
 	}
@@ -140,7 +117,7 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 
 _r.ReportBuilder.prototype.make_body = function() {
 
-	_r.rb_con.main_title.innerHTML = this.doctype;
+	this.set_main_title('Report: ' + this.doctype);
 	var me = this;
 
 	this.make_save_criteria();	
@@ -271,7 +248,7 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 	
 	this.set_sort_options();
 	
-	_r.rb_con.main_title.innerHTML = this.doctype;
+	this.set_main_title('Report: ' + this.doctype);
 
 	this.current_loaded = null;
 	this.customized_filters = null;
@@ -285,6 +262,11 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 }
 
 // -------------------------------------------------------------------------------------
+
+_r.ReportBuilder.prototype.set_main_title = function(t) {
+	_r.rb_con.page_head.main_head.innerHTML = t;
+	set_title(t);
+}
 
 _r.ReportBuilder.prototype.select_column = function(dt, label, value) {
 	if(value==null)value = 1;
@@ -372,7 +354,7 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	}
 	this.current_loaded = criteria_name;
 	// load additional fields sort option
-	_r.rb_con.main_title.innerHTML = criteria_name;	
+	this.set_main_title(criteria_name);
 }
 
 //
