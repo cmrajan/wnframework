@@ -17,20 +17,6 @@ _f.FrmContainer.prototype.make_head = function() {
 	this.body = $a(this.wrapper,'div');
 
 	this.page_head = new PageHeader(this.head);
-
-	this.done_editing_area = $a(this.head, 'div', '', {margin:'4px 0px'});
-}
-
-_f.FrmContainer.prototype.set_done_editing = function(show) {
-	this.done_editing_area.innerHTML = '';
-	if(show) {
-		var s = $a(this.done_editing_area, 'span', 'link_type');
-		s.innerHTML = 'Done Editing';
-		s.onclick = function() {
-			cur_frm.is_editable[cur_frm.docname] = 0;
-			cur_frm.refresh();
-		}
-	} 
 }
 
 _f.FrmContainer.prototype.show_head = function() { 
@@ -53,8 +39,15 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	this.page_head.clear_toolbar();
 
 	// Edit
-	if(!cur_frm.editable)
-		this.page_head.add_button('Edit', function() { cur_frm.edit_doc(), 0, 'ui-icon-document' });
+	if(cur_frm.meta.read_only_onload) {
+		if(!cur_frm.editable)
+			this.page_head.add_button('Edit', function() { cur_frm.edit_doc() }, 0, 'ui-icon-document' );
+		else
+			this.page_head.add_button('Done Editing', function() { 
+				cur_frm.is_editable[cur_frm.docname] = 0;
+				cur_frm.refresh(); }, 0, 'ui-icon-document' );	
+	}
+
 	
 	// Save
 	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[WRITE])
@@ -90,7 +83,7 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	if(!frm.meta.allow_copy)
 		this.page_head.add_button('Copy', function() { cur_frm.copy_doc(); }, 0, 'ui-icon-copy');
 		
-	this.page_head.make_buttonset();
+	//this.page_head.make_buttonset();
 	
 }
 

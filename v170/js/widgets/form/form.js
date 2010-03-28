@@ -619,13 +619,6 @@ _f.Frm.prototype.refresh_container = function() {
 	// show / hide buttons
 	_f.frm_con.refresh_toolbar();
 	
-	// set "Done Editing"
-	if(this.editable && this.meta.read_only_onload) {
-		_f.frm_con.set_done_editing(1);
-	} else {	
-		_f.frm_con.set_done_editing(0);
-	}
-	
 	// add to recent
 	if(page_body.wntoolbar) page_body.wntoolbar.rdocs.add(this.doctype, this.docname, 1);
 	

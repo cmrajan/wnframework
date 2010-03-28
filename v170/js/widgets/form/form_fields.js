@@ -63,7 +63,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	this.label.innerHTML = this.df.label?this.df.label:'';
 	
 	// indent
-	$y(this.row.body, { margin:'32px' });
+	$y(this.row.body, { margin:'24px' });
 
 	// exp / collapse
 	$y($td(t,0,1),{textAlign:'right'});
