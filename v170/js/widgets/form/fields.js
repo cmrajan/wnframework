@@ -26,6 +26,7 @@ Field.prototype.make_body = function() {
 		}
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
+		this.help_icon = null;
 	} else {
 		
 		// 2 column layout with label on LHS	
@@ -57,6 +58,7 @@ Field.prototype.set_label = function() {
 
 Field.prototype.set_comment = function() {
 	var me = this;
+	if(!this.help_icon) return;
 	if(this.df.description) {
 		$ds(this.help_icon);
 		this.help_icon.onclick = function() { msgprint(me.df.description) };
