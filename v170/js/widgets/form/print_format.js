@@ -53,11 +53,11 @@ _p.print_std = function() {
 	}
 
 	// heading
-	var h1 = $a(layout.cur_row.header, 'h1', '', {marginBottom:'8px'}); 
-	h1.innerHTML = dn;
+	var h1 = $a(layout.cur_row.header, 'h1', '', {fontSize:'22px', marginBottom:'8px'}); 
+	h1.innerHTML = dt;
 	
-	var h2 = $a(layout.cur_row.header, 'div', '', {marginBottom:'8px', paddingBottom:'8px', borderBottom:(layout.with_border ? '0px' : '1px solid #000' )});
-	h2.innerHTML = dt;
+	var h2 = $a(layout.cur_row.header, 'div', '', {fontSize:'16px', color:'#888', marginBottom:'8px', paddingBottom:'8px', borderBottom:(layout.with_border ? '0px' : '1px solid #000' )});
+	h2.innerHTML = dn;
 	
 	var fl = getchildren('DocField', dt, 'fields', 'DocType');
 
