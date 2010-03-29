@@ -235,13 +235,13 @@ class Authentication:
 			self.user_id = res[0][0]
 		else:
 			self.user_id = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
-			if self.user_id: self.call_on_login_event()
 		
 		if self.user_id:
 			self.validate_ip(self.user_id)
 			self.start_session(self.user_id)
 			if not as_guest:
 				self.out['message'] = 'Logged In'
+				self.call_on_login_event()
 			return True
 	
 	def call_on_login_event(self):
