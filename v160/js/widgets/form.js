@@ -3328,7 +3328,8 @@ function print_makepage(body, style, doc, title) {
 		}
 		jslist = block.getElementsByTagName('script');
 	}
-	var main_html = block.innerHTML.replace(/<td>/g, '\n<td>');
+	var main_html = block.innerHTML;
+	main_html = main_html.replace(/<td>/g, '\n<td>');
 	return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 		+ '<html><head>'
 		+'<title>'+title+'</title>'
