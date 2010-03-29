@@ -170,6 +170,7 @@ class Authentication:
 			c = webnotes.db.Database(user = res[0][1] or res[0][0])
 			c.use(self.account_id)
 		else:
+			self.account_id = defs.db_name
 			c =  webnotes.db.Database(use_default = 1)
 			
 		self.conn = c
