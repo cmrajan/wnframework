@@ -3333,7 +3333,7 @@ function print_makepage(body, style, doc, title) {
 		+'<title>'+title+'</title>'
 		+'<style>'+style+'</style>'
 		+'</head><body>'
-		+ (tmp_html + block.innerHTML).replace(/<td>/g, '\n<td>');
+		+ (tmp_html + block.innerHTML).replace(/<td>/g, '\n<td>')
 		+'</body></html>';
 }
 
