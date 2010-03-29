@@ -3328,12 +3328,13 @@ function print_makepage(body, style, doc, title) {
 		}
 		jslist = block.getElementsByTagName('script');
 	}
+	var main_html = block.innerHTML.replace(/<td>/g, '\n<td>');
 	return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 		+ '<html><head>'
 		+'<title>'+title+'</title>'
 		+'<style>'+style+'</style>'
 		+'</head><body>'
-		+ tmp_html + block.innerHTML.replace(/<td>/g, '\n<td>')
+		+ tmp_html + main_html
 		+'</body></html>';
 }
 
@@ -3439,7 +3440,7 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 				var cell = row.insertCell(c);
 				$y(cell, cell_style)
 
-				$s(cell, '\n' + ds[r][fl[c].fieldname], fl[c].fieldtype);
+				$s(cell, ds[r][fl[c].fieldname], fl[c].fieldtype);
 				if(fl[c].fieldtype=='Currency')
 					cell.style.textAlign = 'right';
 			}
