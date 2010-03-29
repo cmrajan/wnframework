@@ -3333,7 +3333,7 @@ function print_makepage(body, style, doc, title) {
 		+'<title>'+title+'</title>'
 		+'<style>'+style+'</style>'
 		+'</head><body>'
-		+ (tmp_html + block.innerHTML).replace(/<td>/g, '\n<td>')
+		+ tmp_html + block.innerHTML.replace(/<td>/g, '\n<td>')
 		+'</body></html>';
 }
 
@@ -3439,7 +3439,7 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 				var cell = row.insertCell(c);
 				$y(cell, cell_style)
 
-				$s(cell, ds[r][fl[c].fieldname], fl[c].fieldtype);
+				$s(cell, '\n' + ds[r][fl[c].fieldname], fl[c].fieldtype);
 				if(fl[c].fieldtype=='Currency')
 					cell.style.textAlign = 'right';
 			}
