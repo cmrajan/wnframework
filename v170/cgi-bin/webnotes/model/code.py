@@ -73,4 +73,4 @@ def updatedb(doctype, userfields = [], args = {}):
 	pass
 
 def check_syntax(code):
-	pass
+	return ''
