@@ -101,9 +101,6 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 			except: 
 				pass
 
-		elif hasattr(so, 'on_update'):
-			so.on_update()
-
 	if webnotes.conn.in_transaction: sql("COMMIT")
 
 	return doc.name + (' Upgraded: %s fields added' % added)
