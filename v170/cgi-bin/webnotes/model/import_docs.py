@@ -96,10 +96,12 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 		# update database (in case of DocType)
 		if so.doc.doctype=='DocType':
 			import webnotes.model.doctype
-			try: webnotes.model.doctype.update_doctype(so.doclist)
-			except: pass
+			try: 
+				webnotes.model.doctype.update_doctype(so.doclist)
+			except: 
+				pass
 
-		if hasattr(so, 'on_update'):
+		elif hasattr(so, 'on_update'):
 			so.on_update()
 
 	if webnotes.conn.in_transaction: sql("COMMIT")
