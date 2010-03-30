@@ -68,6 +68,9 @@ def run_server_obj(server_obj, method_name, arg=None):
 		else:
 			return getattr(server_obj, method_name)()
 			
+# deprecated methods for ensuring smooth transfer from v160 apps
 def updatedb(doctype, userfields = [], args = {}):
 	pass
-	# deprecated
+
+def check_syntax(code):
+	pass
