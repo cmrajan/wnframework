@@ -23,6 +23,7 @@ import MySQLdb, time, defs, Cookie
 
 session = {'user':'Administrator'}
 cookies = Cookie.SimpleCookie()
+version = 'v160'
 
 mail_server = defs.mail_server or 'localhost'
 mail_login = defs.mail_login or 'test'
