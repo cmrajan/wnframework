@@ -66,3 +66,7 @@ def run_server_obj(server_obj, method_name, arg=None):
 			return getattr(server_obj, method_name)(arg)
 		else:
 			return getattr(server_obj, method_name)()
+			
+def updatedb(doctype, userfields = [], args = {}):
+	pass
+	# deprecated
