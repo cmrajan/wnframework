@@ -46,6 +46,8 @@ nav_obj.show_last_open = function() {
 		loaddoc(l[1],l[2]);
 	} else if(l[0]=='Application') {
 		loadapp(l[1]);
+	} else if(l[0]=='DocBrowser') {
+		loaddocbrowser(l[1]);
 	}
 }
 
@@ -79,5 +81,8 @@ function historyChange(newLocation, historyData) {
 	} else if(t[0]=='Application') {
 		_history_current = newLocation;
 		loadapp(t[1]);
+	} else if(t[0]=='DocBrowser') {
+		_history_current = newLocation;
+		loaddocbrowser(t[1]);
 	}
 };

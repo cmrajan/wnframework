@@ -225,3 +225,19 @@ function loadscript(src, call_back) {
 		}
 	}
 }
+
+// Load DocBrowser
+// -------------------------------------------------------------------------------
+
+function loaddocbrowser(dt, label, fields) {
+	var show = function() {
+		doc_browser.show(dt, label, fields);
+		nav_obj.open_notify('DocBrowser',dt,'');
+	}
+	
+	if(doc_browser) 
+		show();
+	else
+		new_widget('DocBrowser', function(b) { doc_browser = b; show(); });
+		
+}

@@ -347,7 +347,7 @@ break;case'HTML':var tmp=$a(layout.cur_cell,'div');tmp.innerHTML=f.options;break
 r.cells[0].innerHTML=f.label?f.label:f.fieldname;$s(r.cells[1],_f.get_value(dt,dn,f.fieldname),f.fieldtype);if(f.fieldtype=='Currency')
 $y(r.cells[1],{textAlign:'left'});}}}}
 layout.close_borders();var html='';for(var i=0;i<pf_list.length;i++){if(pf_list[i].wrapper){html+=pf_list[i].wrapper.innerHTML;}else if(pf_list[i].innerHTML){html+=pf_list[i].innerHTML;}else{html+=pf_list[i];}}
-pf_list=[];html=html.replace(/<td>/g,'\n<td>');return html;}
+pf_list=[];return html;}
 _p.print_style=".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:top; }"
 +".datainputcell { padding: 2px 0px; width: 62%; text-align:left; }"
 +".sectionHeading { font-size: 16px; font-weight: bold; margin: 8px 0px }"
@@ -366,7 +366,7 @@ return'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/h
 +'<style>'+style+'</style>'
 +'</head><body>'
 +tmp_html
-+block.innerHTML
++block.innerHTML.replace(/<td/g,'\n<td')
 +'</body></html>';}
 print_table=function(dt,dn,fieldname,tabletype,cols,head_labels,widths,condition,cssClass){var fl=fields_list[tabletype];var ds=getchildren(tabletype,dn,fieldname,dt);var tl=[];var cell_style={border:'1px solid #000',padding:'2px',verticalAlign:'top'};var make_table=function(fl){var w=document.createElement('div');var t=$a(w,'table','',{width:'100%',borderCollapse:'collapse',marginBottom:'10px'});t.wrapper=w;t.insertRow(0);var c_start=0;if(fl[0]=='SR'){var cell=t.rows[0].insertCell(0)
 cell.innerHTML=head_labels?head_labels[0]:' ';$y(cell,{width:'30px'});$y(cell,cell_style)

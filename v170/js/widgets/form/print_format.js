@@ -157,7 +157,6 @@ _p.print_std = function() {
 	}
 
 	pf_list = []; // cleanup
-	html = html.replace(/<td>/g, '\n<td>');
 	return html;
 }
 
@@ -212,12 +211,12 @@ _p.render = function(body, style, doc, title) {
 	}
 	return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 		+ '<html><head>'
-		+'<title>'+title+'</title>'
-		+'<style>'+style+'</style>'
-		+'</head><body>'
-		+tmp_html
-		+ block.innerHTML
-		+'</body></html>';
+		+ '<title>'+title+'</title>'
+		+ '<style>'+style+'</style>'
+		+ '</head><body>'
+		+ tmp_html
+		+ block.innerHTML.replace(/<td/g, '\n<td')
+		+ '</body></html>';
 }
 
 print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, condition, cssClass) {

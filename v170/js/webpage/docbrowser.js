@@ -5,30 +5,27 @@ DocBrowser = function() {
 
 	this.my_page = page_body.add_page('DocBrowser');
 	this.wrapper = $a(this.my_page,'div','',{margin:'8px'});
-	var head = $a(this.wrapper,'div','',{marginBottom:'8px'});
-	this.head_tab = make_table(head, 1, 3, '100%', ['80px', null, '30%'], {verticalAlign:'middle'});
+	this.head = $a(this.wrapper,'div','',{marginBottom:'8px'});
 }
 
-DocBrowser.prototype.show = function(dt, img, label, field_list) {
+DocBrowser.prototype.show = function(dt, label, field_list) {
 	if(this.cur_list) 
 		$dh(this.cur_list.wrapper);
 
 	if(!this.lists[dt]) {
-		this.make(dt, img, label, field_list);	
+		this.make(dt, label, field_list);	
 	} else {
 		$ds(this.lists[dt].wrapper);
 	}
 	page_body.change_to('DocBrowser');
+	set_title(this.label);
 }
 
-DocBrowser.prototype.make = function(dt, img, label, field_list) {
+DocBrowser.prototype.make = function(dt, label, field_list) {
 	var me = this;
+	me.label = label ? label : dt;
 	if(me.dt_details[dt]) {
-		// header
-		$td(me.head_tab,0,1).innerHTML = '<h1>' + label + '</h1>';
-		if(img) 
-			$td(me.head_tab,0,0).appendChild(img);
-	
+		me.page_head = new PageHeader(me.head, me.label);
 		// make the list
 		me.make_the_list(dt);
 		me.cur_list = me.lists[dt];
@@ -37,7 +34,7 @@ DocBrowser.prototype.make = function(dt, img, label, field_list) {
 		$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + field_list, 
 		function(r,rt) { 
 			me.dt_details[dt] = r.message; 
-			if(r.message) me.make(dt, img, label, field_list); });
+			if(r.message) me.make(dt, label, field_list); });
 	}
 	
 }
