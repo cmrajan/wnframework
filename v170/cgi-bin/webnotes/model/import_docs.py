@@ -116,8 +116,6 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	from webnotes.model import get_table_fields
 	
 	sql = webnotes.conn.sql
-
-	global in_transaction
 	override = 0
 	
 	if not doclist:
