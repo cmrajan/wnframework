@@ -153,7 +153,7 @@ AutoSuggest.prototype.find_nearest = function (key) {
 	
 	for(var i = st; i<this.aSug.length; i++) {
 		if(this.aSug[i].value.substr(0,this.user_inp.length).toLowerCase()==this.user_inp) {
-			this.setHighlight(i+1, true);
+			this.setHighlight(i+1);
 			this.resetTimeout();
 			return;
 		}
@@ -164,7 +164,7 @@ AutoSuggest.prototype.find_nearest = function (key) {
 	// begin at the top
 	for(var i = 0; i<st; i++) {
 		if(this.aSug[i].value.substr(0,this.user_inp.length).toLowerCase()==this.user_inp) {
-			this.setHighlight(i+1, true);
+			this.setHighlight(i+1);
 			this.resetTimeout();
 			return;
 		}
@@ -443,7 +443,7 @@ AutoSuggest.prototype.changeHighlight = function(key)
 	this.setHighlight(n);
 };
 
-AutoSuggest.prototype.setHighlight = function(n, set_value)
+AutoSuggest.prototype.setHighlight = function(n)
 {
 	this.resetTimeout();
 	var list = this.ul;
@@ -476,7 +476,7 @@ AutoSuggest.prototype.setHighlight = function(n, set_value)
 	}
 
 	// set it the field (but do not call onchange as this field still has focus)
-	if(set_value && this.oP.fixed_options) {
+	if(this.oP.fixed_options) {
 		this.fld.value = this.aSug[this.iHigh-1 ].value;
 	}
 	

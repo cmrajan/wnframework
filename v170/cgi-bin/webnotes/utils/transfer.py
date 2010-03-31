@@ -23,7 +23,7 @@ def accept_module(super_doclist):
 def get_module_items(mod):
 	import webnotes
 
-	transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','Search Criteria','Menu Item','TDS Category','TDS Rate Chart']
+	transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','Search Criteria','TDS Category','TDS Rate Chart']
 	dl = ['Module Def,'+mod]
 	  
 	for dt in transfer_types:

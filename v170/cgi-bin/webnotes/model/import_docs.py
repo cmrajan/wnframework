@@ -169,7 +169,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	for df in doclist[1:]:
 		try:
 			d = Document(fielddata = df)
-			d.save(new = 1, ignore_fields = ignore)
+			d.save(new = 1, ignore_fields = ignore, check_links=0)
 			dl.append(d)
 		except:
 			pass # ignore tables
@@ -308,6 +308,12 @@ class CSVImport:
 			tmpd = d.split('/')
 			if len(tmpd)==3:
 				out = tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
+
+		elif d and self.import_date_format=='dd/mm/yy':
+			tmpd = d.split('/')
+			if len(tmpd)==3:
+				out = '20'+tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
+
 		
 		return out
 		

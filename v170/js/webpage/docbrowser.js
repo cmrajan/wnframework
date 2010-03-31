@@ -5,30 +5,37 @@ DocBrowser = function() {
 
 	this.my_page = page_body.add_page('DocBrowser');
 	this.wrapper = $a(this.my_page,'div','',{margin:'8px'});
-	this.head = $a(this.wrapper,'div','',{marginBottom:'8px'});
 }
 
 DocBrowser.prototype.show = function(dt, label, field_list) {
 	if(this.cur_list) 
-		$dh(this.cur_list.wrapper);
+		$dh(this.cur_list);
 
-	if(!this.lists[dt]) {
-		this.make(dt, label, field_list);	
+	var l = this.lists[dt];
+	if(l) {
+		$ds(l);
+		this.cur_list = l;
+		set_title(l._label);
 	} else {
-		$ds(this.lists[dt].wrapper);
+		this.make(dt, label, field_list);
 	}
+	
 	page_body.change_to('DocBrowser');
-	set_title(this.label);
 }
 
 DocBrowser.prototype.make = function(dt, label, field_list) {
 	var me = this;
-	me.label = label ? label : dt;
+	label = label ? label : dt;
 	if(me.dt_details[dt]) {
-		me.page_head = new PageHeader(me.head, me.label);
+		// make a new wrapper
+		var w = $a(this.wrapper, 'div');
+		w.head = $a(w,'div','',{marginBottom:'8px'});
+
+		me.page_head = new PageHeader(w.head, label);
 		// make the list
-		me.make_the_list(dt);
-		me.cur_list = me.lists[dt];
+		me.make_the_list(dt, w);
+		me.cur_list = w;
+		me.cur_list._label = label;
 
 	} else {
 		$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + field_list, 
@@ -39,7 +46,7 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 	
 }
 
-DocBrowser.prototype.make_the_list  = function(dt) {
+DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	var me = this;
 	var lst = new Listing(dt);
 	lst.cl = me.dt_details[dt].columns;
@@ -89,7 +96,7 @@ DocBrowser.prototype.make_the_list  = function(dt) {
 			
 		lst.add_sort(i+1, lst.cl[i][0]);
 	}
-	lst.make(me.wrapper);
+	lst.make(wrapper);
 
 	var sf = me.dt_details[dt].filters;
 	for(var i=0;i< sf.length;i++) {
@@ -102,7 +109,7 @@ DocBrowser.prototype.make_the_list  = function(dt) {
 			lst.add_filter(label, ftype, fopts, dt, fname, (in_list(['Data','Text','Link'], ftype) ? 'LIKE' : ''));
 		}
 	}
-	me.lists[dt] = lst;
+	me.lists[dt] = wrapper;
 		
 	// default sort
 	lst.set_default_sort('name', in_list(lst.coltypes, 'Date') ? 'DESC' : 'ASC');
