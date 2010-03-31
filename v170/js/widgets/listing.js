@@ -22,6 +22,7 @@ function Listing(head_text, no_index, no_loading) {
 	this.page_len = 20;
 	this.paging_len = 5;
 	this.filters_per_line = 3;
+	this.cell_idx = 0;
 	this.head_text = head_text ? head_text : 'Result';
 	this.keyword = 'records';
 	this.no_index = no_index;
@@ -261,13 +262,19 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	$ds(this.filter_wrapper);
 
 	// create new table (or new line)
-	if((!this.inp_tab) || (this.inp_tab.rows[0].cells.length==this.filters_per_line)) {
+	if((!this.inp_tab) || (this.cell_idx==this.filters_per_line)) {
 		this.inp_tab = $a(this.filter_area.div, 'table','',{width:'100%'});
-		this.inp_tab.insertRow(0);	
+		this.inp_tab.insertRow(0);
+		for(var i=0;i<this.filters_per_line;i++) {
+			this.inp_tab.rows[0].insertCell(i);
+		}
+		this.cell_idx = 0;
 	}
 
 	
-	var c= this.inp_tab.rows[0].insertCell(this.inp_tab.rows[0].cells.length);
+	var c= this.inp_tab.rows[0].cells[this.cell_idx];
+	this.cell_idx++;
+	
 	$y(c,{width:cint(100/this.filters_per_line) + '%',textAlign:'left',verticalAlign:'top'});
 	
 	var d1= $a(c,'div'); d1.innerHTML = label; $y(d1,{marginBottom:'2px'});
