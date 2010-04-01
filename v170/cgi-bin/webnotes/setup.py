@@ -144,6 +144,7 @@ def import_db(source, target='', is_accounts=0):
 	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target, source_path))
 
 	sql("use %s;" % target)
+	sql("DROP TABLE IF EXISTS `__DocTypeCache`")
 	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT)")
 	sql("update tabProfile set password = password('admin') where name='Administrator'")
 	sql("update tabDocType set server_code_compiled = NULL")
