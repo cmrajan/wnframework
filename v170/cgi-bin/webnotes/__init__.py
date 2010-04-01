@@ -4,6 +4,7 @@ version = 'v170'
 
 auth_obj = None
 conn = None
+app_conn = None
 form = None
 session = None
 user = None
