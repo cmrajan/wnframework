@@ -247,12 +247,12 @@ class Authentication:
 	
 	def call_on_login_event(self):
 		import webnotes.model.code
-		cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
-		if hasattr(cp, 'on_login'):
-			try:
+		try:
+			cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
+			if hasattr(cp, 'on_login'):
 				cp.on_login(self)
-			except:
-				pass
+		except:
+			pass
 	
 	def check_password(self, user, pwd):
 		if not (user and pwd):
