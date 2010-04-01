@@ -71,7 +71,7 @@ class _DocType:
 						# select options will always come from the user db
 						ol = webnotes.conn.sql("select name from `tab%s` where %s docstatus!=2 order by name asc" % (t, op and (' AND '.join(op) + ' AND ') or ''))
 					except:
-						webnotes.msgprint("Error in Select Options for %s" % d.fieldname)
+						ol = []
 				ol = [''] + [o[0] or '' for o in ol]
 				d.options = '\n'.join(ol)
 
