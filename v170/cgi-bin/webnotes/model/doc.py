@@ -278,12 +278,13 @@ class Document:
 
 	# Save values
 	# -----------
-	def save(self, new=0, check_links=1, ignore_fields=0):
-		# sync metadata if from app db
-		webnotes.model.db_schema.sync_dt(self.doctype)
-	
+	def save(self, new=0, check_links=1, ignore_fields=0):	
 		res = sql('select autoname, issingle, istable, name_case from tabDocType where name="%s"' % self.doctype, as_dict=1)
 		res = res and res[0] or {}
+
+		# sync tables by latest metadata from app db -- for non singles
+		if not res.get('issingle'):
+			webnotes.model.db_schema.sync_dt(self.doctype)
 
 		# if required, make new
 		if new or (not new and self.fields.get('__islocal')) and (not res.get('issingle')):

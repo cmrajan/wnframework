@@ -91,14 +91,17 @@ class Database:
 	def _scrub_table(self, tn, adt_list):
 		if tn.startswith('`'):
 			tn = tn[1:-1]
+			
+		if tn.startswith('tab'):
+			tn = tn[3:]
 
-		if t.value in self.adt_list:
-			return true
+		if tn in adt_list:
+			return 1
 
 	def parse_for_metadata(self, query, adt_list):
 		#try:
 		import sqlparse
-			
+		
 		# parse
 		tokens = sqlparse.parse(query)[0].tokens
 		tablist = []
@@ -109,17 +112,20 @@ class Database:
 		
 		tflag = 0
 		for t in tokens:
+
 			if type(t).__name__ == 'Token' and str(t.ttype)=='Token.Keyword' and t.value.lower()=='from':
 				tflag = 1
-			
-			# find the tables
-			elif tflag and type(t).__name__=='Indentifier':
-				return self._scrub_table(t.tokens[0].value, adt_list)
 
 			# find tables from a list
-			elif tflag and type(t).__name__=='IndentifierList':
-				return self._scrub_table(t.getIdentifiers()[0].tokens[0].value, adt_list)
-				
+			elif tflag and type(t).__name__=='IdentifierList':
+				return self._scrub_table(str(t.get_identifiers()[0].tokens[0]), adt_list)
+							
+			# find the tables
+			elif tflag and type(t).__name__=='Identifier':
+				return self._scrub_table(t.tokens[0].value, adt_list)
+		
+		return 0
+		
 	# ======================================================================================
 
 	def get_description(self):
