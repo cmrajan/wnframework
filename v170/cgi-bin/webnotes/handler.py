@@ -34,6 +34,10 @@ def startup():
 	doclist += webnotes.model.doc.get('Control Panel')
 	cp = doclist[0]
 	
+	# get startup_code from app_conn
+	if webnotes.app_conn:
+		cp.startup_code = webnotes.app_conn.get_value("Control Panel", None, "startup_code")
+	
 	doclist += webnotes.model.doctype.get('Event')
 	doclist += webnotes.model.doctype.get('Search Criteria')
 	home_page = webnotes.user.get_home_page()
