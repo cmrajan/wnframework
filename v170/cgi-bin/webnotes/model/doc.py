@@ -281,11 +281,8 @@ class Document:
 	def save(self, new=0, check_links=1, ignore_fields=0):
 		# sync metadata if from app db
 		webnotes.model.db_schema.sync_dt(self.doctype)
-		
-		# get basic info about the dt
-		app_conn = webnotes.app_conn or webnotes.conn
-		
-		res = app_conn.sql('select autoname, issingle, istable, name_case from tabDocType where name="%s"' % self.doctype, as_dict=1)
+	
+		res = sql('select autoname, issingle, istable, name_case from tabDocType where name="%s"' % self.doctype, as_dict=1)
 		res = res and res[0] or {}
 
 		# if required, make new

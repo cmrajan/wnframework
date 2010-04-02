@@ -203,6 +203,11 @@ class Authentication:
 		
 		self.app_conn = webnotes.db.Database(user = self.app_login, password = self.app_password)
 		self.app_conn.use(self.app_login)
+		self.app_conn.is_app_conn = 1
+		
+		# setup list of application doctypes
+		webnotes.adt_list = self.app_conn.get_value("Control Panel", None, 'adt_list')
+		webnotes.adt_list = webnotes.adt_list and webnotes.adt_list.split() or ['DocType', 'DocField', 'DocPerm', 'Role', 'Page', 'Page Role', 'Module Def', 'Print Format', 'Search Criteria']
 			
 	def check_ip(self):
 		if self.session:

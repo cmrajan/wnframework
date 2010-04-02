@@ -17,6 +17,7 @@ class Database:
 		self.is_testing = 0
 		self.in_transaction = 0
 		self.testing_tables = []
+		self.is_app_conn = 0
 		
 		self.connect()
 	
@@ -57,11 +58,16 @@ class Database:
 	
 	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1):
 		# check security
-		#self.validate_query(query)
+		import webnotes
 	
 		# replace 'tab' by 'test' if testing
 		if self.is_testing and allow_testing:
 			query = self.replace_tab_by_test(query)
+
+		# metadata separation
+		if not self.is_app_conn and webnotes.app_conn and webnotes.adt_list:
+			if self.parse_for_metadata(query, webnotes.adt_list):
+				return webnotes.app_conn.sql(query, values, as_dict, as_list, allow_testing)
 
 		# in transaction validations
 		self.check_transaction_status(query)
@@ -79,6 +85,42 @@ class Database:
 			return self.convert_to_lists(self._cursor.fetchall())
 		else:
 			return self._cursor.fetchall()
+
+	# Check whether the query is from metadata
+	# ======================================================================================
+	def _scrub_table(self, tn, adt_list):
+		if tn.startswith('`'):
+			tn = tn[1:-1]
+
+		if t.value in self.adt_list:
+			return true
+
+	def parse_for_metadata(self, query, adt_list):
+		#try:
+		import sqlparse
+			
+		# parse
+		tokens = sqlparse.parse(query)[0].tokens
+		tablist = []
+		
+		# only for selects - never update or delete metadata
+		if tokens[0].value.lower() != 'select':
+			return query
+		
+		tflag = 0
+		for t in tokens:
+			if type(t).__name__ == 'Token' and str(t.ttype)=='Token.Keyword' and t.value.lower()=='from':
+				tflag = 1
+			
+			# find the tables
+			elif tflag and type(t).__name__=='Indentifier':
+				return self._scrub_table(t.tokens[0].value, adt_list)
+
+			# find tables from a list
+			elif tflag and type(t).__name__=='IndentifierList':
+				return self._scrub_table(t.getIdentifiers()[0].tokens[0].value, adt_list)
+				
+	# ======================================================================================
 
 	def get_description(self):
 		return self._cursor.description
