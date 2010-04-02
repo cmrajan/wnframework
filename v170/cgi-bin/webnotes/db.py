@@ -97,6 +97,8 @@ class Database:
 
 		if tn in adt_list:
 			return 1
+		else:
+			return 0
 
 	def parse_for_metadata(self, query, adt_list):
 		#try:
@@ -108,7 +110,7 @@ class Database:
 		
 		# only for selects - never update or delete metadata
 		if tokens[0].value.lower() != 'select':
-			return query
+			return 0
 		
 		tflag = 0
 		for t in tokens:
