@@ -207,8 +207,8 @@ class Authentication:
 		
 		# setup list of application doctypes
 		webnotes.adt_list = self.conn.get_value("Control Panel", None, 'adt_list')
-		webnotes.adt_list = webnotes.adt_list and webnotes.adt_list.split() or ['DocType', 'DocField', 'DocPerm', 'Role', 'Page', 'Page Role', 'Module Def', 'Print Format', 'Search Criteria']
-			
+		webnotes.adt_list = webnotes.adt_list and webnotes.adt_list.split('\n') or ['DocType', 'DocField', 'DocPerm', 'Role', 'Page', 'Page Role', 'Module Def', 'Print Format', 'Search Criteria']
+	
 	def check_ip(self):
 		if self.session:
 			if self.session['data']['session_ip'] != self.remote_ip:
