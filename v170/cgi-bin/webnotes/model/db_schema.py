@@ -202,7 +202,7 @@ def sync_dt(dt):
 	# check modified date
 	t1 = webnotes.app_conn.sql("SELECT modified from `tabDocType` where name='%s'" % dt)
 	try:
-		t2 = webnotes.conn.sql("SELECT modified from `tabDocType Update Register` where name='%s'" % dt)
+		t2 = webnotes.conn.sql("SELECT modified from `tabDocType Update Register` where name='%s'" % dt, ignore_no_table = 0)
 	except Exception, e:
 		if e.args[0] == 1146:
 			# No table created yet (?), create one

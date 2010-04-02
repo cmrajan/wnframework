@@ -56,7 +56,7 @@ class Database:
 			webnotes.msgprint('Not allowed to execute query')
 			raise Execption
 	
-	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1):
+	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1, ignore_no_table = 1):
 		# check security
 		import webnotes
 	
@@ -73,10 +73,16 @@ class Database:
 		self.check_transaction_status(query)
 		
 		# execute
-		if values!=():
-			self._cursor.execute(query, values)
-		else:
-			self._cursor.execute(query)	
+		try:
+			if values!=():
+				self._cursor.execute(query, values)
+			else:
+				self._cursor.execute(query)	
+		except Exception, e:
+			if ignore_no_table and e.args[0]==1146: # Table not found = no records
+				return ()
+			else:
+				raise e
 
 		# scrub out put if required
 		if as_dict:
