@@ -73,16 +73,16 @@ class Database:
 		self.check_transaction_status(query)
 		
 		# execute
-		#try:
-		if values!=():
-			self._cursor.execute(query, values)
-		else:
-			self._cursor.execute(query)	
-		#except Exception, e:
-		#	if ignore_no_table e.args[0]==1146: # Table not found = no records
-		#		return ()
-		#	else:
-		#		raise e
+		try:
+			if values!=():
+				self._cursor.execute(query, values)
+			else:
+				self._cursor.execute(query)	
+		except Exception, e:
+			if ignore_no_table and e.args[0]==1146: # Table not found = no records
+				return ()
+			else:
+				raise e
 
 		# scrub out put if required
 		if as_dict:
