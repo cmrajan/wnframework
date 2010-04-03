@@ -5,7 +5,6 @@ var popup_cont;
 var session = {};
 
 function startup() {
-
 	//initialize our DHTML history
 	dhtmlHistory.initialize();
 
@@ -63,7 +62,7 @@ function startup() {
 		setup_history(r);
 		setup_events();
 
-		page_body = new Body();
+		var a = new Body();
 		page_body.run_startup_code();		
 		page_body.setup_sidebar_menu();
 		

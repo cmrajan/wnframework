@@ -6,10 +6,10 @@ var def_ph_style = {
 	wrapper: {marginBottom:'32px'}
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px' }
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555' }
-	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#DDD', display:'none'}
+	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#CDF', display:'none'}
 	,separator: { border:'1px solid #000' } // show this when there is no toolbar
 	,tag_area: { color:'#888', marginBottom:'4px', textAlign:'right', fontSize:'10px' }
-	,close_btn: { cursor:'pointer', width:'60px', cssFloat:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat" }
+	,close_btn: { cursor:'pointer', width:'44px', cssFloat:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat" }
 }
 
 function PageHeader(parent, main_text, sub_text) {
@@ -25,6 +25,10 @@ function PageHeader(parent, main_text, sub_text) {
 	// close btn
 	$y($td(this.t1, 0, 1),{textAlign:'right'});
 	this.close_btn = $a($td(this.t1, 0, 1), 'div', '', def_ph_style.close_btn);
+	
+	this.close_btn.onmouseover = function() { $y(this,{color:'#00B', textDecoration:'underline'}) }
+	this.close_btn.onmouseout = function() { $y(this,{color:'#000', textDecoration:'none'}) }
+	
 	this.close_btn.innerHTML = 'Close';
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
@@ -38,10 +42,13 @@ PageHeader.prototype.add_button = function(label, fn, bold, icon) {
 	btn.onclick = fn;
 	if(bold)$y(btn, {fontWeight: 'bold'});
 	$(btn).button({icons:{ primary: icon }});
+	this.show_toolbar();
+}
+
+PageHeader.prototype.show_toolbar = function() {
 	$dh(this.separator);
 	$ds(this.toolbar_area);
 }
-
 PageHeader.prototype.clear_toolbar = function() {
 	this.toolbar_area.innerHTML = '';
 }

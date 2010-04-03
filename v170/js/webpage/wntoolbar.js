@@ -10,8 +10,8 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CCC', paddingLeft: '24px', background:'url("images/logos/wnf24.gif") left no-repeat', backgroundPosition: '4px 2px'});
-		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['30%','45%','25%'],{padding:'2px'});
+		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CDF' /*, paddingLeft: '24px', background:'url("images/logos/wnf24.gif") left no-repeat', backgroundPosition: '4px 2px'*/});
+		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['55%','20%','25%'],{padding:'2px'});
 		
 		// model tab
 		$y($td(this.body_tab, 0, 1),{paddingTop:'3px', paddingBottom:'0px'});
@@ -19,11 +19,11 @@ function WNToolbar(parent) {
 		
 		this.menu = new MenuToolbar($td(this.body_tab,0,0));
 		this.setup_home();
+		this.setup_new();
 		this.setup_recent();
 		this.setup_options();
 		this.setup_help();
 
-		this.setup_new();
 		this.setup_report_builder();
 
 		this.setup_logout();
@@ -33,7 +33,7 @@ function WNToolbar(parent) {
 	// Options
 	// ----------------------------------------------------------------------------------------
 	this.setup_options = function() {
-		var tm = this.menu.add_top_menu('Options', function() { });
+		var tm = this.menu.add_top_menu('Options', function() { }, "images/ui/down-arrow1.gif");
 		
 		var fn = function() {
 			if(this.dt=='Page')
@@ -56,14 +56,14 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_home = function() {
-		this.menu.add_top_menu('Home', function() { loadpage(home_page); } );
+		this.menu.add_top_menu('<b>Home</b>', function() { loadpage(home_page); });
 	}
 
 	// Recent
 	// ----------------------------------------------------------------------------------------
 	this.setup_recent = function() {
 	
-		this.rdocs = me.menu.add_top_menu('Recent', function() {  } );
+		this.rdocs = me.menu.add_top_menu('Recent', function() {  }, "images/ui/down-arrow1.gif");
 		this.rdocs.items = {};
 	
 		var fn = function() { // recent is only for forms
@@ -126,7 +126,7 @@ function WNToolbar(parent) {
 	// Tools
 	// ----------------------------------------------------------------------------------------
 	this.setup_help = function() {
-		me.menu.add_top_menu('Tools', function() {  } );
+		me.menu.add_top_menu('Tools', function() {  }, "images/ui/down-arrow1.gif");
 		this.menu.add_item('Tools','Error Console', function() { err_console.show(); });
 		this.menu.add_item('Tools','Start / Finish Testing Mode', function() { me.enter_testing(); });
 		if(has_common(user_roles,['Administrator','System Manager'])) {
@@ -139,17 +139,37 @@ function WNToolbar(parent) {
 	// New
 	// ----------------------------------------------------------------------------------------
 	this.setup_new = function() {	
-		this.new_sel = new SelectWidget($td(this.model_tab, 0, 0), profile.can_create.sort(), '90%');
-		this.new_sel.inp.value='Create New...';
-		this.new_sel.inp.onchange = function() { new_doc(me.new_sel.inp.value); this.value = 'Create New...'; }
+		me.menu.add_top_menu('Create New...', function() { me.show_new(); } );
+		me.show_new = function() {
+			if(!me.new_dialog) {
+				var d = new Dialog(240, 140, "Create a new record");
+				d.make_body(
+					[['HTML','Select']
+					,['Button','Go', function() { me.new_dialog.hide(); new_doc(me.new_sel.inp.value); }]]);
+				me.new_dialog = d;			
+				me.new_sel = new SelectWidget(d.widgets['Select'], profile.can_create.sort(), '200px');
+			}
+			me.new_dialog.show();
+		}
+
+		//this.new_sel.inp.onchange = function() { new_doc(me.new_sel.inp.value); this.value = 'Create New...'; }
 	}
 	
 	// Report Builder
 	// ----------------------------------------------------------------------------------------
 	this.setup_report_builder = function() {
-		this.rb_sel = new SelectWidget($td(this.model_tab, 0, 1), profile.can_get_report.sort(), '90%');
-		this.rb_sel.inp.value = 'Report Builder...';
-		this.rb_sel.inp.onchange = function() { loadreport(me.rb_sel.inp.value, null, null, 1); this.value = 'Report Builder...'; }
+		me.menu.add_top_menu('Report Builder...', function() { me.show_rb(); } );
+		me.show_rb = function() {
+			if(!me.rb_dialog) {
+				var d = new Dialog(240, 140, "Build a report for");
+				d.make_body(
+					[['HTML','Select']
+					,['Button','Go', function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); }]]);
+				me.rb_dialog = d;			
+				me.rb_sel = new SelectWidget(d.widgets['Select'], profile.can_get_report.sort(), '200px');
+			}
+			me.rb_dialog.show();
+		}		
 	}
 
 	// Setup Search
@@ -157,7 +177,17 @@ function WNToolbar(parent) {
 
 	this.setup_search = function() {
 
-		this.search_sel = new SelectWidget($td(this.model_tab, 0, 2), [], '90%');
+		$y(page_body.search_area, {padding: '8px 0px'});
+		
+		// table
+		var d = $a(page_body.search_area, 'div', '', {cssFloat:'right'});
+		var t = make_table(d, 1, 3, null,['18px', '130px', '60px'], {padding: '2px', verticalAlign:'middle', textAlign:'right'});
+		
+		// icon
+		var img = $a($td(t, 0, 0), 'img'); img.src='images/icons/magnifier.gif';
+
+		// select
+		this.search_sel = new SelectWidget($td(t, 0, 1), [], '120px');
 		this.search_sel.inp.value = 'Search...';
 		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
 		
@@ -169,7 +199,12 @@ function WNToolbar(parent) {
 		}
 
 		me.search_sel.set_options(profile.can_read.sort());
-		me.search_sel.inp.onchange = function() { open_quick_search(); this.value = 'Search...'; }
+		me.search_sel.onchange = function() { open_quick_search(); this.value = 'Search...'; }
+
+		// button
+		me.search_btn = $a($td(t, 0, 2), 'button')
+		$(me.search_btn).html('Search');
+		me.search_btn.onclick = function() { open_quick_search(); this.value = 'Search...'; }
 		
 		startup_list.push(makeselector);
 	}
@@ -178,12 +213,15 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
-		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px', paddingLeft:'16px', textAlign:'right'});
-		var t = make_table(w, 1, 3, null, [null, null, null], {padding: '2px 6px', borderLeft:'1px solid #CCC', fontSize: '13px'});
+		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px'});
+		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'13px'});
+		$y(t,{cssFloat:'right'});
 		$y($td(t,0,0),{border:'0px'});
 		$td(t,0,0).innerHTML = user_fullname;
-		$td(t,0,1).innerHTML = '<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';
-		$td(t,0,2).innerHTML = '<span class="link_type" onclick="logout()">Logout</span>';
+		$td(t,0,1).innerHTML = '<span class="link_type" style="font-weight: bold" onclick="get_help()">Help</span>';
+		$td(t,0,2).innerHTML = '<span class="link_type" style="font-weight: bold" onclick="get_feedback()">Feedback</span>';
+		$td(t,0,3).innerHTML = '<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';
+		$td(t,0,4).innerHTML = '<span class="link_type" onclick="logout()">Logout</span>';
 	}
 
 	this.download_backup = function() {
@@ -225,4 +263,24 @@ function WNToolbar(parent) {
 		);
 	}
 	this.setup();
+}
+
+var get_help = function() {
+	msgprint('Help not implemented');
+}
+
+var get_feedback = function() {
+	// dialog
+	var d = new Dialog(640, 320, "Please give your feedback");
+	d.make_body(
+		[['Text','Feedback']
+		,['Button','Send', function() { 
+			$c_obj('Feedback Control', 'get_feedback', d.widgets['Feedback'].value, function(r,rt) { 
+				d.hide(); if(r.message) msgprint(r.message); 
+			})
+		} ]]
+	);
+	d.show();
+	
+	// send to Feedback Control
 }

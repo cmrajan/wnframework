@@ -86,18 +86,16 @@ ul.menu_toolbar li {
 }
 
 .top_menu {
-	display: block;
-	text-decoration: underline;
 	margin: 0px;
-	margin: 0px 8px;
-	padding: 3px 6px;
+	margin: 0px 2px;
+	padding: 2px;
+	display:block;
 	cursor: pointer;
 	font-size: 13px;
 	color: #00B;
 }
 .top_menu_mo {
-	color: #FFF;
-	background-color: #666;
+	background-color: #CDF;
 }
 
 div.menu_toolbar_dropdown {

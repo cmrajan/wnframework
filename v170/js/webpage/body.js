@@ -3,6 +3,8 @@
 	+ body
 		+ wntoolbar
 		+ header
+			+ banner_area
+			+ search_area
 		+ body_spinner
 		+ body
 			+ left_sidebar
@@ -17,6 +19,7 @@ function Body() {
 	this.left_sidebar = null;
 	this.right_sidebar = null;
 	var me = this;
+	page_body = this;
 
 	this.no_of_columns = function() {
 		var n = 1;
@@ -59,8 +62,8 @@ function Body() {
 	this.setup_header_footer = function() {		
 		// header
 		var hh = this.cp.header_height ? (cint(this.cp.header_height) + 'px') : '40px';
-		$y(this.header, {height:hh}); 
-		if(this.cp.client_name)this.header.innerHTML = this.cp.client_name;
+		$y(this.header, {height:hh, borderBottom:'1px solid #CCC'}); 
+		if(this.cp.client_name)this.banner_area.innerHTML = this.cp.client_name;
 
 		// footer
 		var fh = this.cp.footer_height ? (cint(this.cp.footer_height) + 'px') : '0px';
@@ -81,20 +84,19 @@ function Body() {
 	
 	this.setup = function() {
 		this.cp = locals['Control Panel']['Control Panel'];
-
-		// core areas;
-		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
-			this.wntoolbar = new WNToolbar($i('body_div'));
-		}
 		
 		this.wrapper = $a($i('body_div'),'div');
+		this.wntoolbar_area = $a(this.wrapper, 'div');
 		this.header = $a(this.wrapper, 'div');
+		this.header_tab = make_table(this.header, 1, 2, '100%', ['68%', '32%']);
+		this.banner_area = $td(this.header_tab, 0, 0);
+		this.search_area = $td(this.header_tab, 0, 1);
+		
 		this.topmenu = $a(this.wrapper, 'div');
 		this.breadcrumbs = $a(this.wrapper, 'div');
 		this.body = $a(this.wrapper, 'div');
 		this.body_spinner = $a(this.wrapper, 'div', '', {height:'400px', background:'url("images/ui/loading-old.gif") center no-repeat'});
 		this.footer = $a(this.wrapper, 'div');
-	
 		
 		// sidebars
 		if(user_defaults.hide_sidebars) {
@@ -106,6 +108,11 @@ function Body() {
 	
 		// headers & footer
 		this.setup_header_footer();
+
+		// core areas;
+		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
+			this.wntoolbar = new WNToolbar(this.wntoolbar_area);
+		}
 		
 		// page width
 		if(this.cp.page_width) $y(this.wrapper,{width:cint(this.cp.page_width) + 'px'});

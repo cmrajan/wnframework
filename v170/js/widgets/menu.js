@@ -11,20 +11,28 @@ function MenuToolbar(parent) {
 	this.top_menu_mo_style = 'top_menu_mo';
 	
 }
-MenuToolbar.prototype.add_top_menu = function(label, onclick) {
+MenuToolbar.prototype.add_top_menu = function(label, onclick, add_icon) {
 	var li = $a(this.ul, 'li');
-	var a = $a(li, 'a', this.top_menu_style);
+	$y(li, {marginRight:'8px'});
+	var a = $a(li, 'div', this.top_menu_style);
+	var a2 = $a(a, 'span', '', {textDecoration: 'underline'});
+	a2.innerHTML = label;
+
+	if(add_icon) {
+		var img = $a(a, 'img', '', { }); img.src=add_icon;
+		$y(a, {marginLeft:'0px'});
+	}
+	
 	li.label = a;
 
 	var me = this;
 	a.onclick = function() { onclick(); } ;
-	a.innerHTML = label;
 	a.onmouseover = function() { 
 		this.set_selected();
-		if(a.my_mouseover)a.my_mouseover(this);
+		if(this.my_mouseover)this.my_mouseover(this);
 	}
 	a.onmouseout = function() { 
-		if(a.my_mouseout)a.my_mouseout(this);
+		if(this.my_mouseout)this.my_mouseout(this);
 		this.set_unselected();
 	}
 	a.set_unselected = function() {
