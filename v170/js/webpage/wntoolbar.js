@@ -11,7 +11,7 @@ function WNToolbar(parent) {
 	
 	this.setup = function() {
 		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CDF' /*, paddingLeft: '24px', background:'url("images/logos/wnf24.gif") left no-repeat', backgroundPosition: '4px 2px'*/});
-		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['55%','20%','25%'],{padding:'2px'});
+		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['65%','10%','25%'],{padding:'2px'});
 		
 		// model tab
 		$y($td(this.body_tab, 0, 1),{paddingTop:'3px', paddingBottom:'0px'});
@@ -188,7 +188,7 @@ function WNToolbar(parent) {
 
 		// select
 		this.search_sel = new SelectWidget($td(t, 0, 1), [], '120px');
-		this.search_sel.inp.value = 'Search...';
+		this.search_sel.inp.value = 'Select...';
 		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
 		
 		function open_quick_search() {
@@ -199,12 +199,12 @@ function WNToolbar(parent) {
 		}
 
 		me.search_sel.set_options(profile.can_read.sort());
-		me.search_sel.onchange = function() { open_quick_search(); this.value = 'Search...'; }
+		me.search_sel.onchange = function() { open_quick_search(); this.value = 'Select...'; }
 
 		// button
 		me.search_btn = $a($td(t, 0, 2), 'button')
 		$(me.search_btn).html('Search');
-		me.search_btn.onclick = function() { open_quick_search(); this.value = 'Search...'; }
+		me.search_btn.onclick = function() { open_quick_search(); this.value = 'Select...'; }
 		
 		startup_list.push(makeselector);
 	}

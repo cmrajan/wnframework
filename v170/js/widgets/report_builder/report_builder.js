@@ -263,8 +263,9 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 
 // -------------------------------------------------------------------------------------
 
-_r.ReportBuilder.prototype.set_main_title = function(t) {
+_r.ReportBuilder.prototype.set_main_title = function(t, t1) {
 	_r.rb_con.page_head.main_head.innerHTML = t;
+	_r.rb_con.page_head.sub_head.innerHTML = (t1 ? t1 : '');
 	set_title(t);
 }
 
@@ -354,7 +355,7 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	}
 	this.current_loaded = criteria_name;
 	// load additional fields sort option
-	this.set_main_title(criteria_name);
+	this.set_main_title(criteria_name, sc.description);
 }
 
 //

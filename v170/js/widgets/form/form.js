@@ -213,6 +213,7 @@ _f.Frm.prototype.email_doc = function() {
 // ======================================================================================
 
 _f.Frm.prototype.set_heading = function() {
+	var me = this;
 
 	// main title	
 	_f.frm_con.page_head.main_head.innerHTML = this.doctype;
@@ -227,7 +228,7 @@ _f.Frm.prototype.set_heading = function() {
 	var tn = $i('rec_'+this.doctype+'-'+this.docname);
 	var set_st = function(col) { if(tn)$bg(tn,col); }
 	var make_span = function(label, col) {
-		var s= $a(null, 'span', '', {padding: '2px', backgroundColor:col, color:'#FFF', fontWeight:'bold', marginLeft:'8px', fontSize:'11px'});
+		var s= $a(null, 'span', '', {padding: '2px', backgroundColor:col, color:'#FFF', fontWeight:'bold', marginLeft:(me.meta.issingle ? '0px' : '8px'), fontSize:'11px'});
 		s.innerHTML = label;
 		return s;
 	}

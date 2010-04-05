@@ -9,20 +9,19 @@ function MenuToolbar(parent) {
 
 	this.top_menu_style = 'top_menu';
 	this.top_menu_mo_style = 'top_menu_mo';
+	this.top_menu_icon_style = 'top_menu_icon';
 	
 }
 MenuToolbar.prototype.add_top_menu = function(label, onclick, add_icon) {
 	var li = $a(this.ul, 'li');
 	$y(li, {marginRight:'8px'});
 	var a = $a(li, 'div', this.top_menu_style);
-	var a2 = $a(a, 'span', '', {textDecoration: 'underline'});
-	a2.innerHTML = label;
-
-	if(add_icon) {
-		var img = $a(a, 'img', '', { }); img.src=add_icon;
-		$y(a, {marginLeft:'0px'});
-	}
+	if(add_icon)
+		a.className = this.top_menu_style + ' ' + this.top_menu_icon_style;
 	
+	a.def_class = a.className;
+	a.innerHTML = label;
+		
 	li.label = a;
 
 	var me = this;
@@ -38,12 +37,12 @@ MenuToolbar.prototype.add_top_menu = function(label, onclick, add_icon) {
 	a.set_unselected = function() {
 		if(this.dropdown && this.dropdown.is_active)
 			return;
-		this.className = me.top_menu_style;
+		this.className = this.def_class;
 		me.is_active = 0;
 	}
 	a.set_selected = function() { 
 		if(me.cur_top_menu)me.cur_top_menu.set_unselected();
-		this.className = me.top_menu_style+' '+me.top_menu_mo_style;
+		this.className = this.def_class + ' '+me.top_menu_mo_style;
 		me.cur_top_menu = this;
 		me.is_active = 1;
 	}
