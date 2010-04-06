@@ -90,9 +90,15 @@ function to_open() {
 }
 
 function logout() {
-	$c('logout', args = {}, function() { 
-		if(login_file) window.location.href = login_file;
-		else window.location.reload();
+	$c('logout', args = {}, function(r,rt) { 
+		if(r.exc) {
+			msgprint(r.exc);
+			return;
+		}
+		if(login_file) 
+			window.location.href = login_file;
+		else 
+			window.location.reload();
 	});
 }
 

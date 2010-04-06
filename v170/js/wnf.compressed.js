@@ -945,7 +945,10 @@ if($i('startup_div'))
 $c('startup',{},callback,null,1);}
 function to_open(){if(get_url_arg('page'))
 return get_url_arg('page');}
-function logout(){$c('logout',args={},function(){if(login_file)window.location.href=login_file;else window.location.reload();});}
+function logout(){$c('logout',args={},function(r,rt){if(r.exc){msgprint(r.exc);return;}
+if(login_file)
+window.location.href=login_file;else
+window.location.reload();});}
 _p.def_print_style="html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
 +"\nbody { margin: 12px; }"
 +"\npre { margin:0; padding:0;}"
