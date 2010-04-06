@@ -710,9 +710,9 @@ this.setup_report_builder=function(){me.menu.add_top_menu('Report Builder...',fu
 me.rb_dialog.show();}}
 this.setup_search=function(){$y(page_body.search_area,{padding:'8px 0px'});var d=$a(page_body.search_area,'div','',{cssFloat:'right'});var t=make_table(d,1,3,null,['18px','130px','60px'],{padding:'2px',verticalAlign:'middle',textAlign:'right'});var img=$a($td(t,0,0),'img');img.src='images/icons/magnifier.gif';this.search_sel=new SelectWidget($td(t,0,1),[],'120px');this.search_sel.inp.value='Select...';$y($td(this.model_tab,0,3),{paddingTop:'0px'});function open_quick_search(){if(me.search_sel.inp.value)
 selector.set_search(me.search_sel.inp.value);me.search_sel.disabled=1;selector.show();}
-me.search_sel.set_options(profile.can_read.sort());me.search_sel.onchange=function(){open_quick_search();this.value='Select...';}
+me.search_sel.set_options(profile.can_read.sort());me.search_sel.onchange=function(){open_quick_search();}
 me.search_btn=$a($td(t,0,2),'button')
-$(me.search_btn).html('Search');me.search_btn.onclick=function(){open_quick_search();this.value='Select...';}
+$(me.search_btn).html('Search');me.search_btn.onclick=function(){open_quick_search();}
 startup_list.push(makeselector);}
 this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px'});var t=make_table(w,1,5,null,[],{padding:'2px 4px',borderLeft:'1px solid #CCC',fontSize:'13px'});$y(t,{cssFloat:'right'});$y($td(t,0,0),{border:'0px'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span class="link_type" style="font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span class="link_type" style="font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';$td(t,0,4).innerHTML='<span class="link_type" onclick="logout()">Logout</span>';}
 this.download_backup=function(){window.location=outUrl+"?cmd=backupdb&read_only=1&__account="+account_id

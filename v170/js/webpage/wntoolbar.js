@@ -199,12 +199,12 @@ function WNToolbar(parent) {
 		}
 
 		me.search_sel.set_options(profile.can_read.sort());
-		me.search_sel.onchange = function() { open_quick_search(); this.value = 'Select...'; }
+		me.search_sel.onchange = function() { open_quick_search(); }
 
 		// button
 		me.search_btn = $a($td(t, 0, 2), 'button')
 		$(me.search_btn).html('Search');
-		me.search_btn.onclick = function() { open_quick_search(); this.value = 'Select...'; }
+		me.search_btn.onclick = function() { open_quick_search(); }
 		
 		startup_list.push(makeselector);
 	}

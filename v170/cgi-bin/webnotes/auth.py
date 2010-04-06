@@ -63,6 +63,7 @@ class Authentication:
 		if form.getvalue('cmd')=='login':
 			if form.getvalue('acx'):
 				self.set_db(form.getvalue('acx'))
+				self.set_app_db()
 				webnotes.conn = self.conn
 			
 			self.login()
