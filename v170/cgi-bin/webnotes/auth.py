@@ -122,7 +122,7 @@ class Authentication:
 		
 		# database_id (account_id) is given --- not for login
 		# ---------------------------------------------------
-		if (not ac_name) and self.cookies.get('account_id'):
+		if not (ac_name or self.form.getvalue('ac_name')) and self.cookies.get('account_id'):
 			self.account_id = self.cookies.get('account_id')
 			self.conn = webnotes.db.Database(user = self.account_id)
 			self.conn.use(self.account_id)
