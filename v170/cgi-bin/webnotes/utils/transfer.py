@@ -9,7 +9,7 @@ def accept_module(super_doclist):
 	msg, i = [], 0
 
 	for dl in super_doclist:
-		msg.append(set_doc(dl, 1, 1, 1))
+		msg.append(set_doc(dl, 1, 1, 1, 0))
 	msg = '<br>'.join(msg)
 
 	if not webnotes.conn.in_transaction:

@@ -196,7 +196,7 @@ class Database:
 
 	def exists(self, dt, dn):
 		try:
-			return self.sql('select name from `tab%s` where name="%s"' % (dt, dn.replace('"',"'")))
+			return self.sql('select name from `tab%s` where name=%s' % (dt, '%s'), dn)
 		except:
 			return None
 

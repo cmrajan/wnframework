@@ -109,7 +109,7 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 # Used by transfer
 # --------------------------------------------------------------------
 
-def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
+def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 	from webnotes.model.doc import Document
 	from webnotes.model.code import get_obj
 	from webnotes.model.code import get_server_obj
@@ -132,13 +132,20 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 		if ovr:
 			# Special Treatement
 			# ------------------
-			if webnotes.conn.exists('DocType', 'Transfer Control'):
-				tc = get_obj('Transfer Control')
-				if tc.override_transfer.has_key(doc.doctype):
-					return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate) # done
+			if allow_transfer_control:
+				if webnotes.conn.exists('DocType', 'Transfer Control'):
+					tc = get_obj('Transfer Control')
+					if tc.override_transfer.has_key(doc.doctype):
+						return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate) # done
 			
-			if doc.doctype == 'DocType':
-				return ovr_doctype(doclist, ovr, ignore, onupdate) # done
+				if doc.doctype == 'DocType':
+					return ovr_doctype(doclist, ovr, ignore, onupdate) # done
+
+			# check modified timestamp
+			# ------------------------
+			ts = sql("select modified from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]
+			if str(ts)==doc.modified:
+				return doc.name + ": No update"
 
 			# Replace the record
 			# ------------------
@@ -159,7 +166,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 		else:
 			if webnotes.conn.in_transaction: 
 				sql("ROLLBACK")
-			return doc.name + " Exists / No change"
+			return doc.name + ": Exists / No change"
 
 	# save main
 	doc.save(new = 1, ignore_fields = ignore, check_links=0)
