@@ -117,10 +117,11 @@ def import_db(source, target='', is_accounts=0):
 	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
 
 	# default, use current user id
-	conn = webnotes.conn
+	if webnotes.conn:
+		conn = webnotes.conn
 	
-	if conn.in_transaction:
-		conn.sql('COMMIT')
+		if conn.in_transaction:
+			conn.sql('COMMIT')
 
 	# login as root (if set)
 	if defs.root_login:
@@ -174,7 +175,12 @@ def get_source_path(s):
 
 
 def create_account_doctype():
-	
+	# update accounts
+	import webnotes.db
+
+	webnotes.conn = webnotes.db.Database(use_default = 1)
+	webnotes.session = {'user':'setup.py'}	
+
 	from webnotes.model.doc import Document
 	import webnotes.model.db_schema
 
@@ -184,25 +190,31 @@ def create_account_doctype():
 	ac.autoname = 'AC.#####'
 	ac.save(1)
 		
-	f = addchild(ac, 'fields', 'DocField')
+	f = ac.addchild('fields', 'DocField')
 	f.label = 'Account Name'
 	f.fieldname = 'ac_name'
 	f.fieldtype = 'Data'
 	f.save()
 
-	f = addchild(ac, 'fields', 'DocField')
+	f = ac.addchild('fields', 'DocField')
 	f.label = 'Database Name'
 	f.fieldname = 'db_name'
 	f.fieldtype = 'Data'
 	f.save()
 
-	f = addchild(ac, 'fields', 'DocField')
+	f = ac.addchild('fields', 'DocField')
 	f.label = 'Database Login'
 	f.fieldname = 'db_login'
 	f.fieldtype = 'Data'
 	f.save()
+
+	f = ac.addchild('fields', 'DocField')
+	f.label = 'App Login'
+	f.fieldname = 'app_login'
+	f.fieldtype = 'Data'
+	f.save()
 		
-	f = addchild(ac, 'permissions', 'DocPerm')
+	f = ac.addchild('permissions', 'DocPerm')
 	f.role = 'Administrator'
 	f.read = 1
 	f.write = 1
@@ -272,11 +284,6 @@ if __name__=='__main__':
 	
 	if sys.argv[1]=='install':
 		# create the first account
-		
-		import webnotes.db
-		
-		print "Connecting to MySQL..." 
-		webnotes.conn = webnotes.db.Database(use_default = 1)
 		
 		print "Importing Framework.sql..." 
 		import_db("Framework", "accounts")
