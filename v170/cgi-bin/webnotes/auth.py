@@ -207,7 +207,7 @@ class Authentication:
 		self.app_conn.is_app_conn = 1
 		
 		# setup list of application doctypes
-		webnotes.adt_list = self.conn.get_value("Control Panel", None, 'adt_list')
+		webnotes.adt_list = self.app_conn.get_value("Control Panel", None, 'adt_list')
 		webnotes.adt_list = webnotes.adt_list and webnotes.adt_list.split('\n') or ['DocType', 'DocField', 'DocPerm', 'Role', 'Page', 'Page Role', 'Module Def', 'Print Format', 'Search Criteria']
 	
 	def check_ip(self):
