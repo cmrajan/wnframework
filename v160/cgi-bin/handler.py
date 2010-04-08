@@ -1024,6 +1024,7 @@ def runscript(form, session):
 def runserverobj(form, session):
 	global errdoc, errdoctype, errmethod
 
+	main_doc = None
 	method = form.getvalue('method')
 	errmethod = method
 	doclist, clientlist = [], []
@@ -1050,8 +1051,9 @@ def runserverobj(form, session):
 			if doc.fields.get('parent'):
 				doclist.append(doc)	
 	
-		errdoc = main_doc.name
-		errdoctype = main_doc.doctype
+		if main_doc:
+			errdoc = main_doc.name
+			errdoctype = main_doc.doctype
 	
 		so = server.get_server_obj(main_doc, doclist)
 				
