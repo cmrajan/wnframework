@@ -9,11 +9,14 @@ _p.make_dialog = function() {
 	var d = new Dialog(360, 140, "Print Formats");
 	d.make_body(
 		[['HTML','Select']
-		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), _p.go); }]]);
+		,['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats']
+		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), _p.go, d.widgets['No Letterhead'].checked); }]]);
 	
 	_p.dialog = d;
 	d.onshow = function() {
 		var c = d.widgets['Select'];
+		if(c.cur_sel && c.cur_sel.parentNode == c)
+			c.removeChild(c.cur_sel);
 		c.appendChild(cur_frm.print_sel.wrapper);
 		c.cur_sel = cur_frm.print_sel.wrapper;
 	}
@@ -167,25 +170,25 @@ _p.print_style = ".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:to
 
 _p.formats = {}
 
-_p.build = function(fmtname, onload) {
+_p.build = function(fmtname, onload, no_letterhead) {
 	if(!cur_frm) { alert('No Document Selected'); return; }
 	var doc = locals[cur_frm.doctype][cur_frm.docname];
 	if(fmtname=='Standard') {
-		onload(_p.render(_p.print_std(), _p.print_style, doc, doc.name));
+		onload(_p.render(_p.print_std(), _p.print_style, doc, doc.name,no_letterhead));
 	} else {
 		if(!_p.formats[fmtname]) // not loaded, get data
 			$c('webnotes.widgets.form.get_print_format', {'name':fmtname }, 
 				function(r,t) { 
 					_p.formats[fmtname] = r.message;
-					onload(_p.render(_p.formats[fmtname], '', doc, doc.name)); 
+					onload(_p.render(_p.formats[fmtname], '', doc, doc.name,no_letterhead)); 
 				}
 			);
 		else // loaded
-			onload(_p.render(_p.formats[fmtname], '', doc, doc.name));	
+			onload(_p.render(_p.formats[fmtname], '', doc, doc.name,no_letterhead));	
 	}
 }
 
-_p.render = function(body, style, doc, title) {
+_p.render = function(body, style, doc, title, no_letterhead) {
 	var block = document.createElement('div');
 	var tmp_html = '';
 	block.innerHTML = body;

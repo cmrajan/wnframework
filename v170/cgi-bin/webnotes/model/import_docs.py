@@ -145,7 +145,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 			# ------------------------
 			ts = sql("select modified from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]
 			if str(ts)==doc.modified:
-				return doc.name + ": No update"
+				return doc.name + ": <span style='color: #888'>No update</span>"
 
 			# Replace the record
 			# ------------------
@@ -192,7 +192,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 	if webnotes.conn.in_transaction: 
 		sql("COMMIT")
 
-	return doc.name + ' Completed'	
+	return doc.name + ' <span style="color:GREEN; font-weight:bold">Completed</span>'
 
 #=============================================================================================
 	
