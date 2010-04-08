@@ -1,6 +1,7 @@
 # Search
 import webnotes
 
+# this is called when a new doctype is setup for search - to set the filters
 def getsearchfields():
 
 	sf = webnotes.conn.sql("select search_fields from tabDocType where name=%s", webnotes.form.getvalue("doctype"))
@@ -21,8 +22,7 @@ def getsearchfields():
 	webnotes.response['searchfields'] = [['name', 'ID', 'Data', '']] + res
 
 def make_query(fields, dt, key, txt, start, length):
-	return  """
-		SELECT %(fields)s 
+	return  """SELECT %(fields)s 
 		FROM `tab%(dt)s` 
 		WHERE `tab%(dt)s`.`%(key)s` LIKE '%(txt)s' AND `tab%(dt)s`.docstatus != 2
 		ORDER BY `tab%(dt)s`.`%(key)s` 
@@ -34,7 +34,7 @@ def make_query(fields, dt, key, txt, start, length):
 			'start': start, 
 			'len': length
 		}
-		
+
 def get_std_fields_list(dt, key):
 	# get additional search fields
 	sflist = webnotes.conn.sql("select search_fields from tabDocType where name = '%s'" % dt)
@@ -68,6 +68,7 @@ def scrub_custom_query(query, txt):
 		
 	return query
 
+# this is called by the Link Field
 def search_link():
 	import webnotes.widgets.query_builder
 
@@ -83,7 +84,8 @@ def search_link():
 
 	# make output
 	webnotes.response['results'] = build_for_autosuggest(res)
-	
+
+# this is called by the search box
 def search_widget():
 	import webnotes.widgets.query_builder
 
@@ -96,5 +98,5 @@ def search_widget():
 		query = scrub_custom_query(user_query, txt)
 	else:
 		query = make_query(', '.join(get_std_fields_list(dt, key)), dt, key, txt, webnotes.form.getvalue('start') or 0, webnotes.form.getvalue('page_len') or 50)
-		
+	
 	webnotes.widgets.query_builder.runquery(query)

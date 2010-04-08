@@ -67,7 +67,7 @@ class Database:
 		# metadata separation
 		if not self.is_app_conn and webnotes.app_conn and webnotes.adt_list:
 			if self.parse_for_metadata(query, webnotes.adt_list):
-				return webnotes.app_conn.sql(query, values, as_dict, as_list, allow_testing)
+				return webnotes.app_conn.sql(query, values, as_dict, as_list, allow_testing, ignore_no_table)
 
 		# in transaction validations
 		self.check_transaction_status(query)
@@ -115,7 +115,7 @@ class Database:
 		tablist = []
 		
 		# only for selects - never update or delete metadata
-		if tokens[0].value.lower() != 'select':
+		if tokens[0].value.lstrip().lower() != 'select':
 			return 0
 		
 		tflag = 0
