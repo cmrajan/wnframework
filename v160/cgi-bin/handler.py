@@ -1051,7 +1051,7 @@ def runserverobj(form, session):
 			if doc.fields.get('parent'):
 				doclist.append(doc)	
 	
-		if main_doc:
+		if main_doc.fields:
 			errdoc = main_doc.name
 			errdoctype = main_doc.doctype
 	
