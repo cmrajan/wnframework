@@ -10,7 +10,7 @@ db_password = 'ac_user09'
 
 # root
 root_login = 'root'
-root_password = 'test123'
+root_password = 'webnotes'
 	
 # default mail server
 mail_server = 'localhost'
@@ -20,6 +20,6 @@ mail_password = 'test'
 # new accounts will be created with this prefix
 server_prefix = 's3u'
 
-mysql_path = '/usr/local/mysql/bin/'
+mysql_path = ''
 
 user_timezone = 'Asia/Calcutta'
