@@ -78,8 +78,12 @@ function Body() {
 			set_style(this.cp.startup_css);
 		
 		// startup code
-		if(this.cp.startup_code)
-			eval(this.cp.startup_code);
+		try{
+			if(this.cp.startup_code)
+				eval(this.cp.startup_code);
+		} catch(e) {
+			// pass
+		}
 	}
 	
 	this.setup = function() {
