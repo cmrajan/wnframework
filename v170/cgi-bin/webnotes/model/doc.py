@@ -427,7 +427,7 @@ def get_is_adt(dt):
 	if not webnotes.app_conn:
 		return
 		
-	adt = webnotes.adt_list.split('\n')
+	adt = webnotes.adt_list
 
 	if not adt:
 		adt = ['DocType', 'DocField', 'DocPerm', 'Page', 'Role', 'Page Role']
