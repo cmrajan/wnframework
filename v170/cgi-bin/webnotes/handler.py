@@ -142,7 +142,9 @@ def uploadfile():
 	dt = form.getvalue('doctype')
 	dn = form.getvalue('docname')
 	at_id = form.getvalue('at_id')
-		
+	
+	webnotes.response['type'] = 'iframe'
+	
 	if 'filedata' in form:
 		i = form['filedata']
       
@@ -165,8 +167,6 @@ def uploadfile():
 		webnotes.response['result'] = """
 		<script type='text/javascript'>msgprint("No file")</script>"""
 	
-	webnotes.response['type'] = 'iframe'
-
 # File upload (from scripts)
 # ------------------------------------------------------------------------------------
 
@@ -466,7 +466,11 @@ if out.get('type')=='csv':
 elif out.get('type')=='iframe':
 	print "Content-Type: text/html"
 	print
-	print out['result']
+	if out.get('result'):
+		print out['result']
+	if webnotes.debug_log:
+		print '''<script type='text/javascript'>alert("%s");</script>''' % ('-------'.join(webnotes.debug_log).replace('"', '').replace('\n',''))
+
 elif out.get('type')=='download':
 	import mimetypes
 	print "Content-Type: %s" % (mimetypes.guess_type(out['filename'])[0] or 'application/unknown')
