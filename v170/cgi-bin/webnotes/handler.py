@@ -511,7 +511,7 @@ else:
 	try:
 		str_out = json.dumps(out)
 	except:
-		str_out = str(out).replace(', None', '""')
+		str_out = str(out).replace(', None', ', ""')
 	
 	if acceptsGzip and len(str_out)>512:
 		out_buf = compressBuf(str_out)
