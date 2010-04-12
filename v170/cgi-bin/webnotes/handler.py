@@ -507,8 +507,11 @@ else:
 		import json
 	except: # python 2.4
 		import simplejson as json
-		
-	str_out = json.dumps(out)
+	
+	try:
+		str_out = json.dumps(out)
+	except:
+		str_out = str(out)
 	
 	if acceptsGzip and len(str_out)>512:
 		out_buf = compressBuf(str_out)
