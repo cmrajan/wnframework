@@ -37,7 +37,10 @@ class Document:
 		if name:
 			self.fields['name'] = name
 		self.__initialized = 1
-			
+
+		if doctype:
+			self.set_connection()
+
 		if (doctype and name):
 			self.loadfromdb(doctype, name)
 
@@ -46,6 +49,15 @@ class Document:
 
 	# Load Document
 	# -------------
+
+	def set_connection(self):
+		# check if ADT and set conn accordingly
+		is_adt = get_is_adt(self.doctype)
+		if is_adt:
+			conn = webnotes.app_conn
+		else:
+			conn = webnotes.conn	
+			sql = conn.sql
 
 	def loadfromdb(self, doctype = None, name = None):
 
@@ -401,7 +413,7 @@ def getseries(key, digits, doctype=''):
 # Get Children
 # ------------
 
-def getchildren(name, childtype, field='', parenttype='', is_adt = 0):
+def getchildren(name, childtype, field='', parenttype=''):
 	
 	tmp = ''
 	if field: 
@@ -424,15 +436,16 @@ def getchildren(name, childtype, field='', parenttype='', is_adt = 0):
 # -------------------------------------------
 
 def get_is_adt(dt):
+	# has connection ?
 	if not webnotes.app_conn:
-		return
-		
-	adt = webnotes.adt_list
+		return 0
+	
+	# has list ?
+	if not webnotes.adt_list:
+		return 0
 
-	if not adt:
-		adt = ['DocType', 'DocField', 'DocPerm', 'Page', 'Role', 'Page Role']
-
-	if dt in adt:
+	# return
+	if dt in webnotes.adt_list:
 		return 1
 	else:
 		return 0
@@ -441,26 +454,26 @@ def get_is_adt(dt):
 # load a record and its child records and bundle it in a list - doclist
 # ---------------------------------------------------------------------
 
-def get(dt, dn=''):
+def get(dt, dn='', with_children = 1):
 	global conn
 
 	import webnotes.model
 
 	dn = dn or dt
-	is_adt = get_is_adt(dt)
-	
-	# check if ADT
-	if is_adt:
-		conn = webnotes.app_conn
-	else:
-		conn = webnotes.conn	
-	sql = conn.sql
 
+	# load the main doc
 	doc = Document(dt, dn)
 	
+	if not with_children:
+		# done
+		return [doc,]
+	
+	# get all children types
 	tablefields = webnotes.model.get_table_fields(dt)
+
+	# load chilren
 	doclist = [doc,]
 	for t in tablefields:
-		doclist += getchildren(doc.name, t[0], t[1], dt, is_adt)
+		doclist += getchildren(doc.name, t[0], t[1], dt)
 
 	return doclist

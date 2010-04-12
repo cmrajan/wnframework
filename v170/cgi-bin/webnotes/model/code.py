@@ -56,7 +56,7 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 		if with_children:
 			doclist = get(dt, dn)
 		else:
-			doclist = [Document(dt, dn),]
+			doclist = get(dt, dn, with_children = 0)
 		return get_server_obj(doclist[0], doclist)
 	else:
 		return get_server_obj(doc, doclist)
