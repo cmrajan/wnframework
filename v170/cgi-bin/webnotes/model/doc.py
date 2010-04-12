@@ -51,6 +51,7 @@ class Document:
 	# -------------
 
 	def set_connection(self):
+		global conn, sql
 		# check if ADT and set conn accordingly
 		is_adt = get_is_adt(self.doctype)
 		if is_adt:
