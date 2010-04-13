@@ -3,6 +3,7 @@
 
 import webnotes
 
+# called in the on_update method
 def update_nsm(doc_obj):
 	# get fields, data from the DocType
 	d = doc_obj.doc
@@ -14,12 +15,14 @@ def update_nsm(doc_obj):
 	p, op = d.fields[pf], d.fields[opf]
 
 	# has parent changed (?) or parent is None (root)
-	if (op != p) or op==None:
-		rebuild_tree(doc_obj.doc.doctype, pf)
-		
-		# set old parent
-		webnotes.conn.set(d, opf, p or '')
-
+	if not doc_obj.doc.lft and not doc_obj.doc.rgt:
+		update_add_node(doc_obj.doc.doctype, doc_obj.doc.name, p or '', pf)
+	elif op != p:
+		update_remove_node(doc_obj.doc.doctype, doc_obj.doc.name)
+		update_add_node(doc_obj.doc.doctype, doc_obj.doc.name, p or '', pf)
+	# set old parent
+	webnotes.conn.set(d, opf, p or '')
+	
 def rebuild_tree(doctype, parent_field):
 	# get all roots
 	right = 1
@@ -46,18 +49,18 @@ def rebuild_node(doctype, parent, left, parent_field):
 def update_add_node(doctype, name, parent, parent_field):
 	# get the last sibling of the parent
 	if parent:
-		right = webnotes.conn.sql("select rgt from `tab%s` where name='%s'" % (doctype, parent))[0][0] - 1
+		right = webnotes.conn.sql("select rgt from `tab%s` where name='%s'" % (doctype, parent))[0][0]
 	else: # root
 		right = webnotes.conn.sql("select max(rgt) from `tab%s` where `%s` is null or `%s`=''" % (doctype, parent_field, parent_field))[0][0]
 	right = right or 1
 	
 	# update all on the right
-	webnotes.conn.sql("update `tab%s` set rgt = rgt+2 where rgt > %s" %(doctype,right))
-	webnotes.conn.sql("update `tab%s` set lft = lft+2 where lft > %s" %(doctype,right))
+	webnotes.conn.sql("update `tab%s` set rgt = rgt+2 where rgt >= %s" %(doctype,right))
+	webnotes.conn.sql("update `tab%s` set lft = lft+2 where lft >= %s" %(doctype,right))
 	
 	#$ update index of new node
-	webnotes.conn.sql("update `tab%s` set lft=%s, rgt=%s where name='%s'" % (doctype,right+1,(right+2),name))
-	return right+1
+	webnotes.conn.sql("update `tab%s` set lft=%s, rgt=%s where name='%s'" % (doctype,right,right+1,name))
+	return right
 
 def update_remove_node(doctype, name):
 	left = webnotes.conn.sql("select lft from `tab%s` where name='%s'" % (doctype,name))
