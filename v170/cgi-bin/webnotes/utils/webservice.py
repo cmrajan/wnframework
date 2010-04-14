@@ -37,10 +37,12 @@ class FrameworkServer:
 			if ret.get('message') and ret.get('message')!='Logged In':
 				raise Exception, ret.get('message')
 				
-			self._set_cookies(res)
+			self._extract_cookies(res)
 
 			self.account_id = cookies.get('account_id')
+			self.app_id = cookies.get('app_id')
 			self.sid = cookies.get('sid')
+			
 			self.login_response = ret
 				
 	def http_get_response(self, method, args):
@@ -69,7 +71,7 @@ class FrameworkServer:
 	
 		return conn.getresponse()
 	
-	def _set_cookies(self, res):
+	def _extract_cookies(self, res):
 		h = res.getheader('set-cookie')
 		if h:
 			h=h.replace(',',';')

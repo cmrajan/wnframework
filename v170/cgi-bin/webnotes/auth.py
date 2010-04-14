@@ -82,7 +82,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or self.form.getvalue('sid'):
+		if self.login_flag or (self.form.getvalue('cmd')=='login') and self.form.getvalue('sid'):
 			self.set_cookies()
 			self.set_remember_me()
 		
@@ -132,7 +132,7 @@ class Authentication:
 		# account id is given
 		# -------------------
 		if not ac_name:
-			ac_name = self.cookies.get('ac_name') or self.form.getvalue('ac_name')
+			ac_name = self.form.getvalue('ac_name') or self.cookies.get('ac_name')
 		
 		c = webnotes.db.Database(use_default=1)
 		if ac_name:
@@ -192,9 +192,10 @@ class Authentication:
 	
 			if hasattr(defs, 'app_password'):
 				self.app_password = defs.app_password
-				
-			if self.cookies.get('app_id'):
-				self.app_login = self.cookies.get('app_id')
+		
+			a = self.cookies.get('app_id') or (self.form.getvalue('cmd')=='login') and webnotes.form.getvalue('app_id')
+			if a:
+				self.app_login = a
 
 		if not self.app_login:
 			return
