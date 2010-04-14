@@ -82,7 +82,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or (form.getvalue('cmd')=='login') and form.getvalue('sid'):
+		if self.login_flag or form.getvalue('sid'):
 			self.set_cookies()
 			self.set_remember_me()
 		
@@ -192,7 +192,7 @@ class Authentication:
 			if hasattr(defs, 'app_password'):
 				self.app_password = defs.app_password
 		
-			a = self.cookies.get('app_id') or (self.form.getvalue('cmd')=='login') and self.form.getvalue('app_id')
+			a = self.cookies.get('app_id') or self.form.getvalue('app_id')
 			if a:
 				self.app_login = a
 
