@@ -58,7 +58,7 @@ class Authentication:
 		self.set_app_db()
 		
 		# make the connections global
-		webnotes.conn, webnotes.app_conn = self.conn, self.app_conn
+		webnotes.conn = self.conn
 		
 		# called from login
 		if form.getvalue('cmd')=='login':
@@ -82,7 +82,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or (self.form.getvalue('cmd')=='login') and self.form.getvalue('sid'):
+		if self.login_flag or (form.getvalue('cmd')=='login') and form.getvalue('sid'):
 			self.set_cookies()
 			self.set_remember_me()
 		
@@ -183,7 +183,6 @@ class Authentication:
 	# =================================================================================
 	
 	def set_app_db(self):
-		self.app_conn = None
 		
 		# find app_login from defs.py
 		if not self.app_login:
@@ -193,7 +192,7 @@ class Authentication:
 			if hasattr(defs, 'app_password'):
 				self.app_password = defs.app_password
 		
-			a = self.cookies.get('app_id') or (self.form.getvalue('cmd')=='login') and webnotes.form.getvalue('app_id')
+			a = self.cookies.get('app_id') or (self.form.getvalue('cmd')=='login') and self.form.getvalue('app_id')
 			if a:
 				self.app_login = a
 
@@ -204,12 +203,12 @@ class Authentication:
 			# i am the app_db, do nothing
 			return
 		
-		self.app_conn = webnotes.db.Database(user = self.app_login, password = self.app_password)
-		self.app_conn.use(self.app_login)
-		self.app_conn.is_app_conn = 1
+		webnotes.app_conn = webnotes.db.Database(user = self.app_login, password = self.app_password)
+		webnotes.app_conn.use(self.app_login)
+		webnotes.app_conn.is_app_conn = 1
 		
 		# setup list of application doctypes
-		webnotes.adt_list = self.app_conn.get_value("Control Panel", None, 'adt_list')
+		webnotes.adt_list = webnotes.app_conn.get_value("Control Panel", None, 'adt_list')
 		webnotes.adt_list = webnotes.adt_list and webnotes.adt_list.split('\n') or ['DocType', 'DocField', 'DocPerm', 'Role', 'Page', 'Page Role', 'Module Def', 'Print Format', 'Search Criteria']
 	
 	def check_ip(self):
@@ -268,7 +267,7 @@ class Authentication:
 	def call_on_login_pre_session(self):
 		import webnotes.model.code
 		try:
-			self.cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
+			self.cp = webnotes.model.code.get_obj('Control Panel')
 			if hasattr(self.cp, 'on_login'):
 				self.cp.on_login(self)
 		except:
