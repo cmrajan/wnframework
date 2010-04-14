@@ -364,8 +364,9 @@ class Authentication:
 		if hasattr(cp, 'on_logout'):
 			cp.on_logout(self)
 
-	def logout(self):
-		self.call_on_logout_event()
+	def logout(self, call_on_logout = 1):
+		if call_on_logout:
+			self.call_on_logout_event()
 
 		webnotes.conn.sql('delete from tabSessions where sid="%s"' % webnotes.session['sid'])
 		self.out_cookies['sid'] = ''
