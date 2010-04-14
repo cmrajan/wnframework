@@ -269,7 +269,7 @@ class Authentication:
 		try:
 			self.cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 			if hasattr(cp, 'on_login'):
-				cp.on_login(self)
+				self.cp.on_login(self)
 		except:
 			pass
 
@@ -277,7 +277,7 @@ class Authentication:
 		if not self.cp:
 			return
 		if hasattr(cp, 'on_login_post_session'):
-			cp.on_login_post_session(self)
+			self.cp.on_login_post_session(self)
 	
 	def check_password(self, user, pwd):
 		if not (user and pwd):
