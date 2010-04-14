@@ -48,6 +48,7 @@ class Authentication:
 		self.out = out
 		self.login_flag = 0
 		self.user_id = None
+		self.cp = None
 		
 		self.app_login = None
 		self.app_password = None
@@ -249,23 +250,34 @@ class Authentication:
 			# if not guest, then do login
 			if not as_guest:
 				self.out['message'] = 'Logged In'
-				self.call_on_login_event()
+				self.call_on_login_pre_session()
 
 			# validate blocked IP
 			self.validate_ip(self.user_id)
 
 			# start session
 			self.start_session(self.user_id)
+			
+			# second on_login method - post session
+			if not as_guest:
+				self.call_on_login_post_session()
+				
 			return True
 	
-	def call_on_login_event(self):
+	def call_on_login_pre_session(self):
 		import webnotes.model.code
 		try:
-			cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
+			self.cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 			if hasattr(cp, 'on_login'):
 				cp.on_login(self)
 		except:
 			pass
+
+	def call_on_login_post_session(self):
+		if not self.cp:
+			return
+		if hasattr(cp, 'on_login_post_session'):
+			cp.on_login_post_session(self)
 	
 	def check_password(self, user, pwd):
 		if not (user and pwd):
