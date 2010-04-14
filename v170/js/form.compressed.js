@@ -5,8 +5,8 @@ _f.FrmContainer.prototype.show_head=function(){$ds(this.head);}
 _f.FrmContainer.prototype.hide_head=function(){$dh(this.head);}
 _f.FrmContainer.prototype.make_toolbar=function(){}
 _f.FrmContainer.prototype.refresh_btns=function(){var me=this;var frm=cur_frm;var p=frm.get_doc_perms();this.page_head.clear_toolbar();if(cur_frm.meta.read_only_onload){if(!cur_frm.editable)
-this.page_head.add_button('Edit',function(){cur_frm.edit_doc()},0,'ui-icon-document');else
-this.page_head.add_button('Done Editing',function(){cur_frm.is_editable[cur_frm.docname]=0;cur_frm.refresh();},0,'ui-icon-document');}
+this.page_head.add_button('Edit',function(){cur_frm.edit_doc()},1,'ui-icon-document');else
+this.page_head.add_button('Done Editing',function(){cur_frm.is_editable[cur_frm.docname]=0;cur_frm.refresh();},1,'ui-icon-document');}
 if(cur_frm.editable&&cint(frm.doc.docstatus)==0&&p[WRITE])
 this.page_head.add_button('Save',function(){cur_frm.save('Save');},1,'ui-icon-disk');if(cur_frm.editable&&cint(frm.doc.docstatus)==0&&p[SUBMIT]&&(!frm.doc.__islocal))
 this.page_head.add_button('Submit',function(){cur_frm.savesubmit();},0,'ui-icon-locked');if(cur_frm.editable&&cint(frm.doc.docstatus)==1&&p[CANCEL])
