@@ -243,12 +243,19 @@ class Authentication:
 		else:
 			self.user_id = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
 		
+		# yes allowed to create session
 		if self.user_id:
-			self.validate_ip(self.user_id)
-			self.start_session(self.user_id)
+		
+			# if not guest, then do login
 			if not as_guest:
 				self.out['message'] = 'Logged In'
 				self.call_on_login_event()
+
+			# validate blocked IP
+			self.validate_ip(self.user_id)
+
+			# start session
+			self.start_session(self.user_id)
 			return True
 	
 	def call_on_login_event(self):
