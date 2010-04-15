@@ -63,7 +63,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	this.label.innerHTML = this.df.label?this.df.label:'';
 	
 	// indent
-	$y(this.row.body, { margin:'24px' });
+	$y(this.row.body, { margin:'16px 24px' });
 
 	// exp / collapse
 	$y($td(t,0,1),{textAlign:'right'});
@@ -107,11 +107,9 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	}
 	
 	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor:'#EEE'});
+		this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor: '#EEE'});
 		this.label.innerHTML = this.df.label?this.df.label:'';
-	}
-	
-	if(!static) {	
+	} else {	
 		if(this.df.label) {
 			this.make_collapsible(head);
 			
@@ -123,7 +121,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 
 	// description
 	if(this.df.description) {
-		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor:'#EEE'});
+		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor: (static ? '#EEE' : '')});
 		if(this.df.description.length > 240) {
 			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
 			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });

@@ -14,8 +14,14 @@ def accept_module(super_doclist):
 
 	if not webnotes.conn.in_transaction:
 		webnotes.conn.sql("START TRANSACTION")
+
+	# clear over-written records / deleted child records
 	webnotes.utils.clear_recycle_bin()
+	
+	# clear cache
+	webnotes.conn.sql("DELETE from __DocTypeCache")
 	webnotes.conn.sql("COMMIT")
+
 
 	return msg
 
