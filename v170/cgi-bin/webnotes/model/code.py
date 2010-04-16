@@ -47,7 +47,7 @@ class DocType:
 		if sc_core or sc:
 			ex_code = sc_core + sc
 	
-	return execute(ex_code, doc, doclist)
+	return execute(ex_code.strip(), doc, doclist)
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:
