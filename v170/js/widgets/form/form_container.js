@@ -33,13 +33,12 @@ _f.FrmContainer.prototype.make_toolbar = function() {
 _f.FrmContainer.prototype.refresh_btns= function() {
 
 	var me = this;
-	var frm = cur_frm;
-	var p = frm.get_doc_perms();
+	var p = cur_frm.get_doc_perms();
 	
 	this.page_head.clear_toolbar();
 
 	// Edit
-	if(cur_frm.meta.read_only_onload) {
+	if(cur_frm.meta.read_only_onload && !cur_frm.doc.__islocal) {
 		if(!cur_frm.editable)
 			this.page_head.add_button('Edit', function() { cur_frm.edit_doc() }, 1, 'ui-icon-document' );
 		else
@@ -50,19 +49,19 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 
 	
 	// Save
-	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[WRITE])
+	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==0 && p[WRITE])
 		this.page_head.add_button('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk');
 	
 	// Submit
-	if(cur_frm.editable && cint(frm.doc.docstatus)==0 && p[SUBMIT] && (!frm.doc.__islocal))
+	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==0 && p[SUBMIT] && (!cur_frm.doc.__islocal))
 		this.page_head.add_button('Submit', function() { cur_frm.savesubmit(); }, 0, 'ui-icon-locked');
 	
 	// Cancel
-	if(cur_frm.editable && cint(frm.doc.docstatus)==1  && p[CANCEL])
+	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==1  && p[CANCEL])
 		this.page_head.add_button('Cancel', function() { cur_frm.savecancel() }, 0, 'ui-icon-closethick');
 
 	// Amend
-	if(cint(frm.doc.docstatus)==2  && p[AMEND])
+	if(cint(cur_frm.doc.docstatus)==2  && p[AMEND])
 		this.page_head.add_button('Amend', function() { cur_frm.amend_doc() }, 0, 'ui-icon-scissors');
 	
 	// New
@@ -72,19 +71,17 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	this.page_head.add_button('Refresh', function() { cur_frm.reload_doc(); }, 0, 'ui-icon-refresh');
 	
 	// Print
-	if(!frm.meta.allow_print)
+	if(!cur_frm.meta.allow_print)
 		this.page_head.add_button('Print', function() { cur_frm.print_doc(); }, 0, 'ui-icon-print');
 	
 	// Email
-	if(!frm.meta.allow_email)
+	if(!cur_frm.meta.allow_email)
 		this.page_head.add_button('Email', function() { cur_frm.email_doc(); }, 0, 'ui-icon-mail-closed');
 	
 	// Copy
-	if(!frm.meta.allow_copy)
+	if(!cur_frm.meta.allow_copy)
 		this.page_head.add_button('Copy', function() { cur_frm.copy_doc(); }, 0, 'ui-icon-copy');
-		
-	//this.page_head.make_buttonset();
-	
+			
 }
 
 _f.FrmContainer.prototype.show_toolbar = function() {

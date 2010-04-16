@@ -308,7 +308,7 @@ Field.prototype.activate = function(docname) {
 	if(this.txt) {
 		try{this.txt.focus();} catch(e){} // IE Fix - Unexpected call???
 		this.txt.isactive = true;
-		this.btn.isactive = true;
+		if(this.btn)this.btn.isactive = true;
 		this.txt.field_object = this;
 	}
 }
@@ -455,11 +455,13 @@ LinkField.prototype.make_input = function() {
 	makeinput_popup(this, 'images/icons/magnifier.gif', 'images/icons/arrow_right.gif', 'images/icons/add.gif');
 	var me = this;
 
+	// magnifier - search
 	me.btn.onclick = function() {
 		selector.set(me, me.df.options, me.df.label);
 		selector.show(me.txt);
 	}
 	
+	// open
 	if(me.btn1)me.btn1.onclick = function() {
 		if(me.txt.value && me.df.options) { loaddoc(me.df.options, me.txt.value); }
 	}
@@ -722,8 +724,9 @@ SelectField.prototype.make_input = function() {
 		this.input = new SelectWidget(this.input_area, [], '80%');	
 		$y(this.input.wrapper, {marginLeft:'1px'});
 
-		this.txt = this.input.inp;		
-		this.btn = this.input.btn;
+		this.txt = this.input.inp;
+		if(this.input.custom_select) 
+			this.btn = this.input.btn;
 
 		// for reference
 		this.txt.field_object = this;

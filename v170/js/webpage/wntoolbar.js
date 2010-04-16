@@ -147,6 +147,9 @@ function WNToolbar(parent) {
 				d.make_body(
 					[['HTML','Select']
 					,['Button','Go', function() { me.new_dialog.hide(); new_doc(me.new_sel.inp.value); }]]);
+				d.onshow = function(){
+					me.new_sel.inp.focus();	
+				}
 				me.new_dialog = d;
 				me.new_sel = new SelectWidget(d.widgets['Select'], profile.can_create.sort(), '200px');
 				me.new_sel.onchange = function() { me.new_dialog.hide(); new_doc(me.new_sel.inp.value); }
@@ -167,6 +170,9 @@ function WNToolbar(parent) {
 				d.make_body(
 					[['HTML','Select']
 					,['Button','Go', function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); }]]);
+				d.onshow = function(){
+					me.rb_sel.inp.focus();	
+				}
 				me.rb_dialog = d;			
 				me.rb_sel = new SelectWidget(d.widgets['Select'], profile.can_get_report.sort(), '200px');
 				me.rb_sel.onchange = function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); };
@@ -195,8 +201,8 @@ function WNToolbar(parent) {
 		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
 		
 		function open_quick_search() {
-			if(me.search_sel.inp.value)
-				selector.set_search(me.search_sel.inp.value);
+			var v = sel_val(me.search_sel);
+			if(v) selector.set_search(v);
 			me.search_sel.disabled = 1;
 			selector.show();
 		}

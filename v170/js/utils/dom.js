@@ -24,18 +24,20 @@ function set_opacity(ele, ieop) {
 // Dom
 
 function empty_select(s) {
-	if(s.custom_select) s.empty();
+	if(s.custom_select) { s.empty(); return; }
+	if(s.inp)s = s.inp;
 	if(s) { 
 		var tmplen = s.length; for(var i=0;i<tmplen; i++) s.options[0] = null; 
 	} 
 }
 
-function sel_val(sel) { 
-	if(sel.custom_select) {
-		return sel.inp.value ? sel.inp.value : '';
+function sel_val(s) { 
+	if(s.custom_select) {
+		return s.inp.value ? s.inp.value : '';
 	}
+	if(s.inp)s = s.inp;
 	try {
-		if(sel.selectedIndex<sel.options.length) return sel.options[sel.selectedIndex].value;
+		if(s.selectedIndex<s.options.length) return s.options[s.selectedIndex].value;
 		else return '';
 	} catch(err) { return ''; /* IE fix */ }
 }
@@ -46,6 +48,7 @@ function add_sel_options(s, list, sel_val, o_style) {
 		if(sel_val) s.inp.value = sel_val;
 		return;
 	}
+	if(s.inp)s = s.inp;
 	for(var i in list){
 		var o = new Option(list[i], list[i], false, (list[i]==sel_val? true : false));
 		if(o_style) $y(o, o_style);
