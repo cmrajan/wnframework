@@ -722,12 +722,13 @@ SelectField.prototype.make_input = function() {
 
 		// Single select
 		this.input = new SelectWidget(this.input_area, [], '80%');	
-		$y(this.input.wrapper, {marginLeft:'1px'});
 
 		this.txt = this.input.inp;
-		if(this.input.custom_select) 
+		if(this.input.custom_select) {
 			this.btn = this.input.btn;
-
+			$y(this.input.wrapper, {marginLeft:'1px'});
+		}
+		
 		// for reference
 		this.txt.field_object = this;
 		this.txt.fieldname = this.df.fieldname;
