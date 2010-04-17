@@ -293,8 +293,10 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	inp.parent_tab = this.input_tab;
 	$y(inp.wrapper,{width:'140px'});
 	inp.refresh();
-	if(!inp.input.custom_select)
+	
+	if(!inp.input.custom_select && !inp.input.txt)
 		$y(inp.input,{width:'100%'});
+	
 	inp.tn = tname; inp.fn = fname; inp.condition = cond;
 	
 	var me = this;
