@@ -294,8 +294,8 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	$y(inp.wrapper,{width:'140px'});
 	inp.refresh();
 	
-	if(!inp.input.custom_select && !inp.input.txt)
-		$y(inp.input,{width:'100%'});
+	//if(!inp.input.custom_select && !inp.input.txt)
+	//	$y(inp.input,{width:'100%'});
 	
 	inp.tn = tname; inp.fn = fname; inp.condition = cond;
 	
