@@ -23,7 +23,13 @@ nav_obj.open_notify = function(t, dt, dn) {
 	dt = encodeURIComponent(dt);
 	if(dn)dn = encodeURIComponent(dn);
 	
-	dhtmlHistory.add(t+'/'+ dt + (dn ? ('/'+dn): ''),'');
+	var id = t+'/'+ dt + (dn ? ('/'+dn): '')
+	
+	// option to add to analytics engine
+	if(nav_obj.on_open)
+		nav_obj.on_open(id);
+	
+	dhtmlHistory.add(id,'');
 }
 
 nav_obj.rename_notify = function(dt, oldn, newn) {

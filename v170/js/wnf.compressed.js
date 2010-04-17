@@ -736,7 +736,9 @@ var nav_obj={}
 nav_obj.ol=[];nav_obj.open_notify=function(t,dt,dn){if(nav_obj.length){var tmp=nav_obj[nav_obj.length-1];if(tmp[0]==t&&tmp[1]==dt&&tmp[2]==dn)return;}
 var tmp=[];for(var i in nav_obj.ol)
 if(!(nav_obj.ol[i][0]==t&&nav_obj.ol[i][1]==dt&&nav_obj.ol[i][2]==dn))tmp.push(nav_obj.ol[i]);nav_obj.ol=tmp;nav_obj.ol.push([t,dt,dn])
-t=encodeURIComponent(t);dt=encodeURIComponent(dt);if(dn)dn=encodeURIComponent(dn);dhtmlHistory.add(t+'/'+dt+(dn?('/'+dn):''),'');}
+t=encodeURIComponent(t);dt=encodeURIComponent(dt);if(dn)dn=encodeURIComponent(dn);var id=t+'/'+dt+(dn?('/'+dn):'')
+if(nav_obj.on_open)
+nav_obj.on_open(id);dhtmlHistory.add(id,'');}
 nav_obj.rename_notify=function(dt,oldn,newn){for(var i=0;i<nav_obj.ol.length;i++){var o=nav_obj.ol[i];if(o[1]==dt&&o[2]==oldn)o[2]=newn;}}
 nav_obj.show_last_open=function(){var l=nav_obj.ol[nav_obj.ol.length-2];delete nav_obj.ol[nav_obj.ol.length-1];if(!l)loadpage('_home');else if(l[0]=='Page'){loadpage(l[1]);}else if(l[0]=='Report'){loadreport(l[1],l[2]);}else if(l[0]=='Form'){loaddoc(l[1],l[2]);}else if(l[0]=='Application'){loadapp(l[1]);}else if(l[0]=='DocBrowser'){loaddocbrowser(l[1]);}}
 var _history_current;function historyChange(newLocation,historyData){t=newLocation.split('/');for(var i=0;i<t.length;i++)
