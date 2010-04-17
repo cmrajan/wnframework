@@ -64,10 +64,6 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	if(cint(cur_frm.doc.docstatus)==2  && p[AMEND])
 		this.page_head.add_button('Amend', function() { cur_frm.amend_doc() }, 0, 'ui-icon-scissors');
 
-	// Trash	
-	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==0 && (!cur_frm.doc.__islocal))
-		this.page_head.add_button('Trash', function() { cur_frm.savetrash() }, 0, 'ui-icon-trash');
-	
 	// New
 	this.page_head.add_button('New', function() { new_doc() }, 0, 'ui-icon-document');
 	
@@ -85,7 +81,10 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	// Copy
 	if(!cur_frm.meta.allow_copy)
 		this.page_head.add_button('Copy', function() { cur_frm.copy_doc(); }, 0, 'ui-icon-copy');
-				
+
+	// Trash	
+	if(cur_frm.meta.allow_trash && cint(cur_frm.doc.docstatus) != 2 && (!cur_frm.doc.__islocal))
+		this.page_head.add_button('Trash', function() { cur_frm.savetrash() }, 0, 'ui-icon-trash');			
 }
 
 _f.FrmContainer.prototype.show_toolbar = function() {

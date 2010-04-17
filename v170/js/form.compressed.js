@@ -11,11 +11,11 @@ if(cur_frm.editable&&cint(cur_frm.doc.docstatus)==0&&p[WRITE])
 this.page_head.add_button('Save',function(){cur_frm.save('Save');},1,'ui-icon-disk');if(cur_frm.editable&&cint(cur_frm.doc.docstatus)==0&&p[SUBMIT]&&(!cur_frm.doc.__islocal))
 this.page_head.add_button('Submit',function(){cur_frm.savesubmit();},0,'ui-icon-locked');if(cur_frm.editable&&cint(cur_frm.doc.docstatus)==1&&p[CANCEL])
 this.page_head.add_button('Cancel',function(){cur_frm.savecancel()},0,'ui-icon-closethick');if(cint(cur_frm.doc.docstatus)==2&&p[AMEND])
-this.page_head.add_button('Amend',function(){cur_frm.amend_doc()},0,'ui-icon-scissors');if(cur_frm.editable&&cint(cur_frm.doc.docstatus)==0&&(!cur_frm.doc.__islocal))
-this.page_head.add_button('Trash',function(){cur_frm.savetrash()},0,'ui-icon-trash');this.page_head.add_button('New',function(){new_doc()},0,'ui-icon-document');this.page_head.add_button('Refresh',function(){cur_frm.reload_doc();},0,'ui-icon-refresh');if(!cur_frm.meta.allow_print)
+this.page_head.add_button('Amend',function(){cur_frm.amend_doc()},0,'ui-icon-scissors');this.page_head.add_button('New',function(){new_doc()},0,'ui-icon-document');this.page_head.add_button('Refresh',function(){cur_frm.reload_doc();},0,'ui-icon-refresh');if(!cur_frm.meta.allow_print)
 this.page_head.add_button('Print',function(){cur_frm.print_doc();},0,'ui-icon-print');if(!cur_frm.meta.allow_email)
 this.page_head.add_button('Email',function(){cur_frm.email_doc();},0,'ui-icon-mail-closed');if(!cur_frm.meta.allow_copy)
-this.page_head.add_button('Copy',function(){cur_frm.copy_doc();},0,'ui-icon-copy');}
+this.page_head.add_button('Copy',function(){cur_frm.copy_doc();},0,'ui-icon-copy');if(cur_frm.meta.allow_trash&&cint(cur_frm.doc.docstatus)!=2&&(!cur_frm.doc.__islocal))
+this.page_head.add_button('Trash',function(){cur_frm.savetrash()},0,'ui-icon-trash');}
 _f.FrmContainer.prototype.show_toolbar=function(){this.refresh_btns();}
 _f.FrmContainer.prototype.hide_toolbar=function(){}
 _f.FrmContainer.prototype.refresh_toolbar=function(){var m=cur_frm.meta;if(m.hide_heading){this.hide_head();}else{this.show_head();if(m.hide_toolbar){this.hide_toolbar();}else{this.show_toolbar();}}}
