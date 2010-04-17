@@ -345,7 +345,7 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	}
 	this.set_sort_options(new_sl);
 	if(sc && sc.sort_by) {
-		this.dt.sort_sel.inp.value = sc.sort_by;
+		this.dt.sort_sel.value = sc.sort_by;
 	}
 	if(sc && sc.sort_order) {
 		sc.sort_order=='ASC' ? this.dt.set_asc() : this.dt.set_desc();
@@ -378,10 +378,10 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 
 	// default filters
 	var fl = [
-		{'fieldtype':'Data', 'label':'ID', 'fieldname':'name', 'search_index':1, 'parent':dt},
-		{'fieldtype':'Data', 'label':'Owner', 'fieldname':'owner', 'search_index':1, 'parent':dt},
-		{'fieldtype':'Date', 'label':'Created on', 'fieldname':'creation', 'search_index':0, 'parent':dt},
-		{'fieldtype':'Date', 'label':'Last modified on', 'fieldname':'modified', 'search_index':0, 'parent':dt},
+		{'fieldtype':'Data', 'label':'ID', 'fieldname':'name', 'in_filter':1, 'parent':dt},
+		{'fieldtype':'Data', 'label':'Owner', 'fieldname':'owner', 'in_filter':1, 'parent':dt},
+		{'fieldtype':'Date', 'label':'Created on', 'fieldname':'creation', 'in_filter':0, 'parent':dt},
+		{'fieldtype':'Date', 'label':'Last modified on', 'fieldname':'modified', 'in_filter':0, 'parent':dt},
 	];
 
 	// can this be submitted?
@@ -457,7 +457,7 @@ _r.ReportBuilder.prototype.setup_doctype = function(fl, dt) {
 		var f=fl[i];
 		
 		// add to filter
-		if(f && (cint(f.search_index) || cint(f.in_filter))) {
+		if(f && cint(f.in_filter)) {
 			me.report_filters.add_field(f, dt, in_list(sf_list, f.fieldname));
 		}
 		
@@ -475,7 +475,7 @@ _r.ReportBuilder.prototype.set_sort_options = function(l) {
 	var sl = this.orig_sort_list;
 	
 	empty_select(this.dt.sort_sel);
-	
+		
 	if(l) sl = add_lists(l, this.orig_sort_list)
 	for(var i=0; i<sl.length; i++) {
 		this.dt.add_sort_option(sl[i][0], sl[i][1]);
@@ -542,7 +542,7 @@ _r.ReportBuilder.prototype.reset_report = function() {
 	this.column_picker.set_defaults();
 	this.dt.clear_all();
 	
-	this.dt.sort_sel.inp.value = 'ID';
+	this.dt.sort_sel.value = 'ID';
 	this.dt.page_len_sel.inp.value = '50';
 	this.dt.set_no_limit(0);
 	this.dt.set_desc();
@@ -1049,10 +1049,15 @@ _r.ReportColumnPicker.prototype.refresh = function() {
 	// separate
 	var ul = []; var sl=[];
 	for(var i=0; i<this.all_fields.length; i++) {
-		if(this.all_fields[i].selected) {
-			sl.push(this.all_fields[i]);
+		var o = this.all_fields[i];
+		if(o.selected) {
+			sl.push(o);
+			// enable sort option
+			if(this.rb.dt) this.rb.dt.set_sort_option_disabled(o.df.label, 0);
 		} else {
-			ul.push(this.all_fields[i]);
+			ul.push(o);
+			// disable sort option
+			if(this.rb.dt) this.rb.dt.set_sort_option_disabled(o.df.label, 1);
 		}
 	}
 	
@@ -1124,7 +1129,7 @@ _r.ReportColumnPicker.prototype.add_field = function(f) {
 	// column picker
 	if(!f.label) return;
 	
-	var by_default = (f.search_index || f.in_filter) ? 1 : 0;
+	var by_default = (f.in_filter) ? 1 : 0;
 	
 	this.all_fields.push({
 		selected:by_default

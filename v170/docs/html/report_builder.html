@@ -283,6 +283,20 @@ is usually used to customize filters as per the user requirments.</dd></dl>
 <dt id="_r.Datatable">
 <em class="property">class </em><tt class="descclassname">_r.</tt><tt class="descname">Datatable</tt><big>(</big><em>html_fieldname</em>, <em>dt</em>, <em>repname</em>, <em>hide_toolbar</em><big>)</big><a class="headerlink" href="#_r.Datatable" title="Permalink to this definition">¶</a></dt>
 <dd><p>The datatable class represents a grid object to show the results with paging etc</p>
+<dl class="function">
+<dt id="_r.Datatable.add_sort_option">
+<tt class="descname">add_sort_option</tt><big>(</big><em>label</em>, <em>value</em><big>)</big><a class="headerlink" href="#_r.Datatable.add_sort_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new field for sorting selection - value is the tablename.fieldname for the &#8220;ORDER BY&#8221; clause:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">report</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">add_sort_option</span><span class="p">(</span><span class="s">&#39;ID&#39;</span><span class="p">,</span><span class="s">&#39;`tabMyDT`.`name`&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="_r.Datatable.set_sort_option_disabled">
+<tt class="descname">set_sort_option_disabled</tt><big>(</big><em>label</em>, <em>disabled</em><big>)</big><a class="headerlink" href="#_r.Datatable.set_sort_option_disabled" title="Permalink to this definition">¶</a></dt>
+<dd>Will enable / disable sort option by label. To disable, pass disabled = 1 or to enable pass disabled = 0</dd></dl>
+
 <dl class="attribute">
 <dt id="_r.Datatable.query">
 <tt class="descname">query</tt><a class="headerlink" href="#_r.Datatable.query" title="Permalink to this definition">¶</a></dt>

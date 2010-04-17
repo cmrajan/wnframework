@@ -219,6 +219,16 @@ Datatable Class
 .. class:: _r.Datatable(html_fieldname, dt, repname, hide_toolbar)
 
    The datatable class represents a grid object to show the results with paging etc
+
+   .. function:: add_sort_option(label, value)
+   
+      Add a new field for sorting selection - value is the tablename.fieldname for the "ORDER BY" clause::
+      
+         report.dt.add_sort_option('ID','`tabMyDT`.`name`');
+
+   .. function:: set_sort_option_disabled(label, disabled)
+   
+      Will enable / disable sort option by label. To disable, pass disabled = 1 or to enable pass disabled = 0
    
    .. attribute:: query
    

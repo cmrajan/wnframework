@@ -57,7 +57,7 @@ Dialog.prototype.show = function() {
 	var d = get_screen_dims();
 	
 	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
-	this.wrapper.style.top = (get_scroll_top() + ((d.h - this.h)/2)) + 'px';
+	this.wrapper.style.top = '100px';
 
 	top_index++;
 	$y(this.wrapper,{zIndex:top_index});

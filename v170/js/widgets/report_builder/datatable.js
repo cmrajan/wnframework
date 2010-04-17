@@ -32,10 +32,10 @@ _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
   this.repname = repname;
   this.dt = dt;
   this.no_limit = false;
-  this.sort_labels = {};
   this.query = '';
   this.has_index = 1;
   this.has_headings = 1;  //this.sort_options = {};
+  this.disabled_options = {};
   
   this.levels = [];
   
@@ -124,9 +124,9 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
 
   $td(t,0,0).innerHTML = 'Sort By:'; $y($td(t,0,1),{textAlign:'right',paddingRight:'4px'});
   
-  this.sort_sel = new SelectWidget($td(t,0,2), [], '100px');
+  this.sort_sel = $a($td(t,0,2), 'select','',{width:'100px'});
 
-  this.sort_sel.inp.onchange = function() {
+  this.sort_sel.onchange = function() {
     me.start_rec = 1;
     me.run();
   }
@@ -192,17 +192,40 @@ _r.DataTable.prototype.set_asc = function(icon) {
 
 ////
 
-_r.DataTable.prototype.add_sort_option = function(label, val) {
-  if(!this.sort_labels[this.dt]) 
-  	this.sort_labels[this.dt] = {};
-  
-  this.sort_labels[this.dt][label] = val;
+_r.DataTable.prototype.set_sort_option_disabled = function(label, disabled) {
+  // has bugs due to sequencing
+  // may not set during load
 	
   var s = this.sort_sel;
-  s.append(label);
-  if(!s.inp.value) s.inp.value = label;
+  if(disabled) {
+  	// remove this option
+    for(var i=0; i<s.options.length; i++) {
+      if(s.options[i] && s.options[i].text==label) {
+        this.disabled_options[label] = s.options[i];
+        s.remove(i);
+      }
+    }
+  } else {
+  	// get it back
+    if(this.disabled_options[label]) {
+      try {
+        s.add(this.disabled_options[label], s.options[s.options.length-1]);
+      } catch(e) {
+      	s.add(this.disabled_options[label], s.options.length-1);
+      }
+      this.disabled_options[label] = null;
+    }
+  }
+  
   
 }
+
+_r.DataTable.prototype.add_sort_option = function(label, val) {
+  var s = this.sort_sel;
+  s.options[s.options.length] = 
+         new Option(label, val, false, s.options.length==0?true:false);
+}
+
 
 _r.DataTable.prototype.update_query = function(no_limit) { 
 
@@ -212,7 +235,7 @@ _r.DataTable.prototype.update_query = function(no_limit) {
   	// no sorting
   } else {
 	  this.query += NEWLINE 
-             + ' ORDER BY ' + this.sort_labels[this.dt][sel_val(this.sort_sel)]
+             + ' ORDER BY ' + sel_val(this.sort_sel)
              + ' ' + this.sort_order;
   }
   
