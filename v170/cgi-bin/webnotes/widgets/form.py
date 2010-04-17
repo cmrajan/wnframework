@@ -244,7 +244,7 @@ def savedocs():
 
 	# action
 	action = form.getvalue('action')
-
+	
 	# get docs	
 	doc, doclist = _get_doclist(webnotes.model.doclist.expand(form.getvalue('docs')))
 
@@ -321,7 +321,11 @@ def savedocs():
 		# on_cancel
 		if action == 'Cancel':
 			_do_action(doc, doclist, server_obj, 'on_cancel', 2)
-	
+		
+		# On Trash
+		if action == 'Trash':
+			_do_action(doc, doclist, server_obj, 'on_trash', 2)
+
 		# update recent documents
 		webnotes.user.update_recent(doc.doctype, doc.name)
 

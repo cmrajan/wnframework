@@ -884,6 +884,16 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		locals[this.doctype][this.docname].submitted_on = dateutil.full_str();
 		locals[this.doctype][this.docname].submitted_by = user;
 	}
+	if(save_action=='Trash') {
+		var reason = prompt('Reason for trash (mandatory)', '');
+		if(!strip(reason)) {
+			msgprint('Reason is mandatory, not trashed');
+			return;
+		}
+		locals[this.doctype][this.docname].trash_reason = reason;
+		locals[this.doctype][this.docname].trashed_on = dateutil.full_str();
+		locals[this.doctype][this.docname].trashed_by = user;
+	}
 	if(save_action=='Cancel') {
 		var reason = prompt('Reason for cancellation (mandatory)', '');
 		if(!strip(reason)) {
@@ -905,6 +915,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 			return 'Error';
 		}
 	}
+ 	
 	
 	var ret_fn = function(r) {
 		if(!cur_frm.not_in_container)
@@ -1102,6 +1113,11 @@ _f.Frm.prototype.savesubmit = function() {
 _f.Frm.prototype.savecancel = function() {
 	var answer = confirm("Permanently Cancel "+cur_frm.docname+"?");
 	if(answer) this.save('Cancel');
+}
+
+_f.Frm.prototype.savetrash = function() {
+	var answer = confirm("Permanently moved to Trash: "+cur_frm.docname+"?");
+	if(answer) this.save('Trash');
 }
 
 // ======================================================================================
