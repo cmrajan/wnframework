@@ -370,7 +370,7 @@ return'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/h
 +block.innerHTML.replace(/<td/g,'\n<td')
 +'</body></html>';}
 print_table=function(dt,dn,fieldname,tabletype,cols,head_labels,widths,condition,cssClass){var fl=fields_list[tabletype];var ds=getchildren(tabletype,dn,fieldname,dt);var tl=[];var cell_style={border:'1px solid #000',padding:'2px',verticalAlign:'top'};var make_table=function(fl){var w=document.createElement('div');var t=$a(w,'table','',{width:'100%',borderCollapse:'collapse',marginBottom:'10px'});t.wrapper=w;t.insertRow(0);var c_start=0;if(fl[0]=='SR'){var cell=t.rows[0].insertCell(0)
-cell.innerHTML=head_labels?head_labels[0]:' ';$y(cell,{width:'30px'});$y(cell,cell_style)
+cell.innerHTML=head_labels?head_labels[0]:'<b>Sr</b>';$y(cell,{width:'30px'});$y(cell,cell_style)
 c_start=1;}
 for(var c=c_start;c<fl.length;c++){var cell=t.rows[0].insertCell(c);$y(cell,cell_style)
 if(head_labels)

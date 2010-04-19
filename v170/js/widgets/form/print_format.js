@@ -269,7 +269,7 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 		var c_start = 0;
 	 	if(fl[0]=='SR') {
 			var cell = t.rows[0].insertCell(0)
-			cell.innerHTML = head_labels?head_labels[0]:' ';
+			cell.innerHTML = head_labels?head_labels[0]:'<b>Sr</b>';
 	 		$y(cell, {width:'30px'});
 	 		$y(cell, cell_style)
 
