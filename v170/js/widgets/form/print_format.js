@@ -135,7 +135,7 @@ _p.print_std = function(no_letterhead) {
 			if(cur_frm.pformat[f.fieldname]) {
 
 				var tmp = $a(layout.cur_cell, 'div');
-				tmp.innerHTML = cur_frm.pformat[f.fieldname](locals[dt][dt]);
+				tmp.innerHTML = cur_frm.pformat[f.fieldname](locals[dt][dn]);
 				
 			} else {
 				// do the normal thing
