@@ -17,8 +17,8 @@ _p.make_dialog = function() {
 		var c = d.widgets['Select'];
 		if(c.cur_sel && c.cur_sel.parentNode == c)
 			c.removeChild(c.cur_sel);
-		c.appendChild(cur_frm.print_sel.wrapper);
-		c.cur_sel = cur_frm.print_sel.wrapper;
+		c.appendChild(cur_frm.print_sel);
+		c.cur_sel = cur_frm.print_sel;
 	}
 }
 

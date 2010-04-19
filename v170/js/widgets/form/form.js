@@ -174,8 +174,9 @@ _f.Frm.prototype.setup_print = function() {
 		
 	}
 	l.push('Standard');
-	this.print_sel = new SelectWidget('160px',l);
-	this.print_sel.inp.value = this.default_format;
+	this.print_sel = $a(null, 'select', '', {width:'160px'});
+	add_sel_options(this.print_sel, l);
+	this.print_sel.value = this.default_format;
 }
 
 _f.Frm.prototype.print_doc = function() {

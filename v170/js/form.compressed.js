@@ -46,7 +46,7 @@ this.opendocs[old]=false;this.opendocs[name]=true;}
 _f.Frm.prototype.onhide=function(){if(_f.cur_grid_cell)_f.cur_grid_cell.grid.cell_deselect();}
 _f.Frm.prototype.setup_print=function(){var fl=getchildren('DocFormat',this.meta.name,'formats','DocType');var l=[];this.default_format='Standard';if(fl.length){this.default_format=fl[0].format;for(var i=0;i<fl.length;i++)
 l.push(fl[i].format);}
-l.push('Standard');this.print_sel=new SelectWidget('160px',l);this.print_sel.inp.value=this.default_format;}
+l.push('Standard');this.print_sel=$a(null,'select','',{width:'160px'});add_sel_options(this.print_sel,l);this.print_sel.value=this.default_format;}
 _f.Frm.prototype.print_doc=function(){if(this.doc.docstatus==2){msgprint("Cannot Print Cancelled Documents.");return;}
 if(this.print_sel.options.length>1){_p.show_dialog();}else{_p.build('Standard',_p.go);}}
 _f.Frm.prototype.email_doc=function(){if(!_e.dialog)_e.make();sel=this.print_sel;var c=$td(_e.dialog.rows['Format'].tab,0,1);if(c.cur_sel){c.removeChild(c.cur_sel.wrapper);c.cur_sel=null;}
@@ -332,7 +332,7 @@ if(swap_row){var cidx=_f.cur_grid_cell.cellIndex;this.cell_deselect();var aidx=l
 _p.show_dialog=function(){if(!_p.dialog){_p.make_dialog();}
 _p.dialog.show();}
 _p.make_dialog=function(){var d=new Dialog(360,140,"Print Formats");d.make_body([['HTML','Select'],['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats'],['Button','Go',function(){_p.build(sel_val(cur_frm.print_sel),_p.go,d.widgets['No Letterhead'].checked);}]]);_p.dialog=d;d.onshow=function(){var c=d.widgets['Select'];if(c.cur_sel&&c.cur_sel.parentNode==c)
-c.removeChild(c.cur_sel);c.appendChild(cur_frm.print_sel.wrapper);c.cur_sel=cur_frm.print_sel.wrapper;}}
+c.removeChild(c.cur_sel);c.appendChild(cur_frm.print_sel);c.cur_sel=cur_frm.print_sel;}}
 _p.field_tab=function(layout_cell){var t=$a(layout_cell,'table','',{width:'100%'});var r=t.insertRow(0);this.r=r;r.insertCell(0);r.insertCell(1);r.cells[0].className='datalabelcell';r.cells[1].className='datainputcell';return r}
 _p.print_std=function(){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];function add_layout(){var l=new Layout();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;pf_list[pf_list.length]=l;return l;}
 var layout=add_layout();var cp=locals['Control Panel']['Control Panel'];pf_list[pf_list.length-1].addrow();if(cp.letter_head){pf_list[pf_list.length-1].cur_row.header.innerHTML=cp.letter_head;}
