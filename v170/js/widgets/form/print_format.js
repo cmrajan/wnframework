@@ -81,10 +81,13 @@ _p.print_std = function() {
 			switch(f.fieldtype){
 			 case 'Section Break':
 				layout.addrow();
+				// if no column break after this field then add a column
 				if(fl[i+1]&&(fl[i+1].fieldtype!='Column Break')) {
 					layout.addcell(); }
-				if(f.label)
-					layout.cur_row.header.innerHTML = '<div class="sectionHeading">'+f.label+'</div>';
+					
+				// add label ---- no labels for section breaks!
+				//if(f.label)
+				//	layout.cur_row.header.innerHTML = '<div class="sectionHeading">'+f.label+'</div>';
 				// border at bottonm
 				if(!layout.with_border) {
 					$y(layout.cur_row.wrapper, {borderBottom: '1px solid #000' });	
@@ -92,8 +95,8 @@ _p.print_std = function() {
 				break;
 			 case 'Column Break': 
 				layout.addcell(f.width, f.label); 
-				if(f.label)
-					layout.cur_cell.header.innerHTML = '<div class="columnHeading">'+f.label+'</div>';
+				//if(f.label)
+				//	layout.cur_cell.header.innerHTML = '<div class="columnHeading">'+f.label+'</div>';
 				break;
 			 case 'Table': 
 				var t = print_table(dt, dn,f.fieldname,f.options,null,null,null,null);
@@ -132,16 +135,21 @@ _p.print_std = function() {
 			 	break;
 			 default:
 			 	// add cell data
-				if(f.fieldtype!="Button"){
-					r = _p.field_tab(layout.cur_cell)
-					// label
-					r.cells[0].innerHTML=f.label?f.label:f.fieldname;
-					
-					$s(r.cells[1], _f.get_value(dt,dn,f.fieldname), f.fieldtype);
-
-					// left align currency in normal display
-					if(f.fieldtype=='Currency')
-						$y(r.cells[1],{textAlign: 'left'});
+			 	var v = _f.get_value(dt,dn,f.fieldname);
+				if(f.fieldtype!="Button") {
+					if(!v && !in_list(['Float','Int','Currency'], f.fieldtype)) {
+						// no value and non-numberic - do nothing
+					} else {
+						r = _p.field_tab(layout.cur_cell)
+						// label
+						r.cells[0].innerHTML=f.label?f.label:f.fieldname;
+						
+						$s(r.cells[1], v, f.fieldtype);
+	
+						// left align currency in normal display
+						if(f.fieldtype=='Currency')
+							$y(r.cells[1],{textAlign: 'left'});
+					}
 				}
 			}
 		}
