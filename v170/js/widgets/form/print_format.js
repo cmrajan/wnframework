@@ -263,6 +263,7 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 	var ds = getchildren(tabletype, dn, fieldname, dt);
 	var tl = [];
 	var cell_style = {border:'1px solid #000', padding:'2px', verticalAlign:'top'};
+	var head_cell_style = {border:'1px solid #000', padding:'2px', verticalAlign:'top', backgroundColor:'#DDD'};
 	
 	var make_table = function(fl) {
 		var w = document.createElement('div');
@@ -276,14 +277,14 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 			var cell = t.rows[0].insertCell(0)
 			cell.innerHTML = head_labels?head_labels[0]:'<b>Sr</b>';
 	 		$y(cell, {width:'30px'});
-	 		$y(cell, cell_style)
+	 		$y(cell, head_cell_style)
 
 			c_start = 1;
 		}
 
 		for(var c=c_start;c<fl.length;c++) {
 			var cell = t.rows[0].insertCell(c);
-			$y(cell, cell_style)
+			$y(cell, head_cell_style)
 			if(head_labels)
 				cell.innerHTML = head_labels[c];
 			else
