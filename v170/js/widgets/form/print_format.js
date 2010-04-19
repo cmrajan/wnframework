@@ -167,6 +167,11 @@ _p.print_std = function(no_letterhead) {
 				 	var v= _f.get_value(dt,dn,f.fieldname);
 				 	tmp.innerHTML = '<div>'+ f.label + ': </div>' + '<pre style="font-family: Courier, Fixed;">'+(v?v:'')+'</pre>';
 				 	break;
+				 case 'Text Editor': 
+				 	var tmp = $a(layout.cur_cell, 'div');
+				 	var v= _f.get_value(dt,dn,f.fieldname);
+				 	tmp.innerHTML = v?v:'';
+				 	break;
 				 default:
 				 	// add cell data
 				 	_p.print_std_add_field(dt, dn, f, layout);
