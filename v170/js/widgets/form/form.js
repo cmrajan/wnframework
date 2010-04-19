@@ -105,6 +105,7 @@ _f.Frm = function(doctype, parent) {
 	this.sections_by_label = {};
 	this.grids = [];
 	this.cscript = {};
+	this.pformat = {};
 	this.parent = parent;
 	this.attachments = {};
 	this.tinymce_id_list = [];
@@ -185,11 +186,12 @@ _f.Frm.prototype.print_doc = function() {
 		return;
 	}
 
-	if(this.print_sel.options.length>1) {
-		_p.show_dialog(); // multiple options
-	} else {
-		_p.build('Standard', _p.go);
-	}
+	//if(this.print_sel.options.length>1) {
+	// always show dialog
+	_p.show_dialog(); // multiple options
+	//} else {
+	//	_p.build('Standard', _p.go);
+	//}
 }
 
 // ======================================================================================

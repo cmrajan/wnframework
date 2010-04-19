@@ -38,7 +38,7 @@ if(from_grid)
 d.dialog.set_title("Editing Row #"+(_f.cur_grid_ridx+1));else
 d.dialog.set_title(dt+': '+dn);d.dialog.show();_f.frm_dialog=d;}
 if(!frms[dt]){_f.add_frm(dt,show_dialog,null,d.dialog.body_wrapper);}else{show_dialog();}}
-_f.Frm=function(doctype,parent){this.docname='';this.doctype=doctype;this.dispnot_in_containerlay=0;this.not_in_container=false;var me=this;this.is_editable={};this.opendocs={};this.cur_section={};this.sections=[];this.sections_by_label={};this.grids=[];this.cscript={};this.parent=parent;this.attachments={};this.tinymce_id_list=[];this.last_comments={};this.n_comments={};frms[doctype]=this;this.setup_meta(doctype);rename_observers.push(this);}
+_f.Frm=function(doctype,parent){this.docname='';this.doctype=doctype;this.dispnot_in_containerlay=0;this.not_in_container=false;var me=this;this.is_editable={};this.opendocs={};this.cur_section={};this.sections=[];this.sections_by_label={};this.grids=[];this.cscript={};this.pformat={};this.parent=parent;this.attachments={};this.tinymce_id_list=[];this.last_comments={};this.n_comments={};frms[doctype]=this;this.setup_meta(doctype);rename_observers.push(this);}
 _f.Frm.prototype.rename_notify=function(dt,old,name){if(this.doctype!=dt)return;this.cur_section[name]=this.cur_section[old];delete this.cur_section[old];this.is_editable[name]=this.is_editable[old];delete this.is_editable[old];if(this.attachments[old]){this.attachments[name]=this.attachments[old];this.attachments[old]=null;for(var i in this.attachments[name]){this.attachments[name][i].docname=name;}}
 if(this.docname==old)
 this.docname=name;if(this&&this.opendocs[old]){local_dt[dt][name]=local_dt[dt][old];local_dt[dt][old]=null;}
@@ -48,7 +48,7 @@ _f.Frm.prototype.setup_print=function(){var fl=getchildren('DocFormat',this.meta
 l.push(fl[i].format);}
 l.push('Standard');this.print_sel=$a(null,'select','',{width:'160px'});add_sel_options(this.print_sel,l);this.print_sel.value=this.default_format;}
 _f.Frm.prototype.print_doc=function(){if(this.doc.docstatus==2){msgprint("Cannot Print Cancelled Documents.");return;}
-if(this.print_sel.options.length>1){_p.show_dialog();}else{_p.build('Standard',_p.go);}}
+_p.show_dialog();}
 _f.Frm.prototype.email_doc=function(){if(!_e.dialog)_e.make();sel=this.print_sel;var c=$td(_e.dialog.rows['Format'].tab,0,1);if(c.cur_sel){c.removeChild(c.cur_sel.wrapper);c.cur_sel=null;}
 c.appendChild(this.print_sel.wrapper);_e.dialog.widgets['Subject'].value=this.meta.name+': '+this.docname;_e.dialog.show();}
 _f.Frm.prototype.set_heading=function(){var me=this;_f.frm_con.page_head.main_head.innerHTML=this.doctype;_f.frm_con.page_head.sub_head.innerHTML='';if(!this.meta.issingle)
@@ -334,19 +334,19 @@ _p.dialog.show();}
 _p.make_dialog=function(){var d=new Dialog(360,140,"Print Formats");d.make_body([['HTML','Select'],['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats'],['Button','Go',function(){_p.build(sel_val(cur_frm.print_sel),_p.go,d.widgets['No Letterhead'].checked);}]]);_p.dialog=d;d.onshow=function(){var c=d.widgets['Select'];if(c.cur_sel&&c.cur_sel.parentNode==c)
 c.removeChild(c.cur_sel);c.appendChild(cur_frm.print_sel);c.cur_sel=cur_frm.print_sel;}}
 _p.field_tab=function(layout_cell){var t=$a(layout_cell,'table','',{width:'100%'});var r=t.insertRow(0);this.r=r;r.insertCell(0);r.insertCell(1);r.cells[0].className='datalabelcell';r.cells[1].className='datainputcell';return r}
-_p.print_std=function(){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];function add_layout(){var l=new Layout();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;pf_list[pf_list.length]=l;return l;}
-var layout=add_layout();var cp=locals['Control Panel']['Control Panel'];pf_list[pf_list.length-1].addrow();if(cp.letter_head){pf_list[pf_list.length-1].cur_row.header.innerHTML=cp.letter_head;}
+_p.print_std_add_table=function(t,layout,pf_list){if(t.appendChild){layout.cur_cell.appendChild(t);}else{for(var ti=0;ti<t.length-1;ti++){layout.cur_cell.appendChild(t[ti]);layout.close_borders();pf_list[pf_list.length]='<div style="page-break-after: always;"></div>';layout=add_layout();layout.addrow();layout.addcell();var div=$a(layout.cur_cell,'div');div.innerHTML='Continued from previous page...';div.style.padding='4px';}
+layout.cur_cell.appendChild(t[t.length-1]);}}
+_p.print_std_add_field=function(dt,dn,f,layout){var v=_f.get_value(dt,dn,f.fieldname);if(f.fieldtype!="Button"){if(!v&&!in_list(['Float','Int','Currency'],f.fieldtype)){}else{r=_p.field_tab(layout.cur_cell)
+r.cells[0].innerHTML=f.label?f.label:f.fieldname;$s(r.cells[1],v,f.fieldtype);if(f.fieldtype=='Currency')
+$y(r.cells[1],{textAlign:'left'});}}}
+_p.print_std=function(no_letterhead){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];function add_layout(){var l=new Layout();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;pf_list[pf_list.length]=l;return l;}
+var layout=add_layout();var cp=locals['Control Panel']['Control Panel'];pf_list[pf_list.length-1].addrow();if(cp.letter_head&&!no_letterhead){pf_list[pf_list.length-1].cur_row.header.innerHTML=cp.letter_head;}
 var h1=$a(layout.cur_row.header,'h1','',{fontSize:'22px',marginBottom:'8px'});h1.innerHTML=dt;var h2=$a(layout.cur_row.header,'div','',{fontSize:'16px',color:'#888',marginBottom:'8px',paddingBottom:'8px',borderBottom:(layout.with_border?'0px':'1px solid #000')});h2.innerHTML=dn;var fl=getchildren('DocField',dt,'fields','DocType');if(fl[0]&&fl[0].fieldtype!="Section Break"){layout.addrow();if(fl[0].fieldtype!="Column Break")
 layout.addcell();}
 for(var i=0;i<fl.length;i++){var fn=fl[i].fieldname?fl[i].fieldname:fl[i].label;if(fn)
 var f=get_field(dt,fn,dn);else
-var f=fl[i];if(!f.print_hide){switch(f.fieldtype){case'Section Break':layout.addrow();if(fl[i+1]&&(fl[i+1].fieldtype!='Column Break')){layout.addcell();}
-break;case'Column Break':layout.addcell(f.width,f.label);break;case'Table':var t=print_table(dt,dn,f.fieldname,f.options,null,null,null,null);if(t.appendChild){layout.cur_cell.appendChild(t);}else{for(var ti=0;ti<t.length-1;ti++){layout.cur_cell.appendChild(t[ti]);layout.close_borders();pf_list[pf_list.length]='<div style="page-break-after: always;"></div>';layout=add_layout();layout.addrow();layout.addcell();var div=$a(layout.cur_cell,'div');div.innerHTML='Continued from previous page...';div.style.padding='4px';}
-layout.cur_cell.appendChild(t[t.length-1]);}
-break;case'HTML':var tmp=$a(layout.cur_cell,'div');tmp.innerHTML=f.options;break;case'Code':var tmp=$a(layout.cur_cell,'div');var v=_f.get_value(dt,dn,f.fieldname);tmp.innerHTML='<div>'+f.label+': </div>'
-+'<pre style="font-family: Courier, Fixed;">'+(v?v:'')+'</pre>';break;default:var v=_f.get_value(dt,dn,f.fieldname);if(f.fieldtype!="Button"){if(!v&&!in_list(['Float','Int','Currency'],f.fieldtype)){}else{r=_p.field_tab(layout.cur_cell)
-r.cells[0].innerHTML=f.label?f.label:f.fieldname;$s(r.cells[1],v,f.fieldtype);if(f.fieldtype=='Currency')
-$y(r.cells[1],{textAlign:'left'});}}}}}
+var f=fl[i];if(!f.print_hide){if(cur_frm.pformat[f.fieldname]){var tmp=$a(layout.cur_cell,'div');tmp.innerHTML=cur_frm.pformat[f.fieldname](locals[dt][dt]);}else{switch(f.fieldtype){case'Section Break':layout.addrow();if(fl[i+1]&&(fl[i+1].fieldtype!='Column Break')){layout.addcell();}
+break;case'Column Break':layout.addcell(f.width,f.label);break;case'Table':var t=print_table(dt,dn,f.fieldname,f.options,null,null,null,null);_p.print_std_add_table(t,layout,pf_list);break;case'HTML':var tmp=$a(layout.cur_cell,'div');tmp.innerHTML=f.options;break;case'Code':var tmp=$a(layout.cur_cell,'div');var v=_f.get_value(dt,dn,f.fieldname);tmp.innerHTML='<div>'+f.label+': </div>'+'<pre style="font-family: Courier, Fixed;">'+(v?v:'')+'</pre>';break;default:_p.print_std_add_field(dt,dn,f,layout);}}}}
 layout.close_borders();var html='';for(var i=0;i<pf_list.length;i++){if(pf_list[i].wrapper){html+=pf_list[i].wrapper.innerHTML;}else if(pf_list[i].innerHTML){html+=pf_list[i].innerHTML;}else{html+=pf_list[i];}}
 pf_list=[];return html;}
 _p.print_style=".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:top; }"
@@ -355,7 +355,7 @@ _p.print_style=".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:top;
 +".columnHeading { font-size: 14px; font-weight: bold; margin: 8px 0px; }"
 _p.formats={}
 _p.build=function(fmtname,onload,no_letterhead){if(!cur_frm){alert('No Document Selected');return;}
-var doc=locals[cur_frm.doctype][cur_frm.docname];if(fmtname=='Standard'){onload(_p.render(_p.print_std(),_p.print_style,doc,doc.name,no_letterhead));}else{if(!_p.formats[fmtname])
+var doc=locals[cur_frm.doctype][cur_frm.docname];if(fmtname=='Standard'){onload(_p.render(_p.print_std(no_letterhead),_p.print_style,doc,doc.name,no_letterhead));}else{if(!_p.formats[fmtname])
 $c('webnotes.widgets.form.get_print_format',{'name':fmtname},function(r,t){_p.formats[fmtname]=r.message;onload(_p.render(_p.formats[fmtname],'',doc,doc.name,no_letterhead));});else
 onload(_p.render(_p.formats[fmtname],'',doc,doc.name,no_letterhead));}}
 _p.render=function(body,style,doc,title,no_letterhead){var block=document.createElement('div');var tmp_html='';block.innerHTML=body;if(doc&&cint(doc.docstatus)==0&&cur_frm.perm[0][SUBMIT]){var tmp_html='<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">DRAFT</div>This box will go away after the document is submitted.</div>';}

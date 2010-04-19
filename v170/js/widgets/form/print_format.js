@@ -32,9 +32,60 @@ _p.field_tab = function(layout_cell) {
 }
 
 
-// start a layout
+// standard layout
+// ==========================================================================
 
-_p.print_std = function() {
+_p.print_std_add_table = function(t, layout, pf_list) {
+	if(t.appendChild) { 
+		// one table only
+		layout.cur_cell.appendChild(t);
+	} else { 
+		// multiple tables
+		for(var ti=0;ti<t.length-1;ti++) {	
+			// add to current page
+			layout.cur_cell.appendChild(t[ti]);
+			layout.close_borders();
+			pf_list[pf_list.length] = '<div style="page-break-after: always;"></div>';
+							
+			// new page
+			layout = add_layout();
+			layout.addrow(); 
+			layout.addcell();
+		
+			var div = $a(layout.cur_cell, 'div');
+			div.innerHTML = 'Continued from previous page...';
+			div.style.padding = '4px';
+		}
+		// last table
+		layout.cur_cell.appendChild(t[t.length-1]);
+	}
+}
+
+// --------------------------------------------------------------------
+
+_p.print_std_add_field = function(dt, dn, f, layout) {
+
+	var v = _f.get_value(dt,dn,f.fieldname);
+	if(f.fieldtype!="Button") {
+		if(!v && !in_list(['Float','Int','Currency'], f.fieldtype)) {
+			// no value and non-numberic - do nothing
+		} else {
+			r = _p.field_tab(layout.cur_cell)
+			// label
+			r.cells[0].innerHTML=f.label?f.label:f.fieldname;
+							
+			$s(r.cells[1], v, f.fieldtype);
+		
+			// left align currency in normal display
+			if(f.fieldtype=='Currency')
+				$y(r.cells[1],{textAlign: 'left'});
+			}
+	}
+}
+
+// --------------------------------------------------------------------
+
+_p.print_std = function(no_letterhead) {
 	var dn = cur_frm.docname;
 	var dt = cur_frm.doctype;
 	var pf_list = [];
@@ -51,7 +102,7 @@ _p.print_std = function() {
 	// add letter head
 	var cp = locals['Control Panel']['Control Panel'];
 	pf_list[pf_list.length-1].addrow();
-	if(cp.letter_head) {
+	if(cp.letter_head && !no_letterhead) {
 		pf_list[pf_list.length-1].cur_row.header.innerHTML = cp.letter_head;
 	}
 
@@ -70,6 +121,7 @@ _p.print_std = function() {
 			layout.addcell(); 
 	}
 
+	// build each field
 	for(var i=0;i<fl.length;i++) {
 		var fn = fl[i].fieldname?fl[i].fieldname:fl[i].label;
 		if(fn)
@@ -78,84 +130,55 @@ _p.print_std = function() {
 			var f = fl[i];
 			
 		if(!f.print_hide){
-			switch(f.fieldtype){
-			 case 'Section Break':
-				layout.addrow();
-				// if no column break after this field then add a column
-				if(fl[i+1]&&(fl[i+1].fieldtype!='Column Break')) {
-					layout.addcell(); }
-					
-				// add label ---- no labels for section breaks!
-				//if(f.label)
-				//	layout.cur_row.header.innerHTML = '<div class="sectionHeading">'+f.label+'</div>';
-				// border at bottonm
-				//if(layout.with_border) {
-				//	$y(layout.cur_row.wrapper, {borderBottom: '1px solid #000' });	
-				//}
-				break;
-			 case 'Column Break': 
-				layout.addcell(f.width, f.label); 
-				//if(f.label)
-				//	layout.cur_cell.header.innerHTML = '<div class="columnHeading">'+f.label+'</div>';
-				break;
-			 case 'Table': 
-				var t = print_table(dt, dn,f.fieldname,f.options,null,null,null,null);
-				if(t.appendChild) { 
-					// one table only
-					layout.cur_cell.appendChild(t);
-				} else { 
-			 		// multiple tables
-					for(var ti=0;ti<t.length-1;ti++) {	
-						// add to current page
-						layout.cur_cell.appendChild(t[ti]);
-						layout.close_borders();
-						pf_list[pf_list.length] = '<div style="page-break-after: always;"></div>';
+
+			// if there is a custom method to generate the HTML then use it
+			if(cur_frm.pformat[f.fieldname]) {
+
+				var tmp = $a(layout.cur_cell, 'div');
+				tmp.innerHTML = cur_frm.pformat[f.fieldname](locals[dt][dt]);
+				
+			} else {
+				// do the normal thing
+			
+				switch(f.fieldtype){
+				 case 'Section Break':
+					layout.addrow();
+					// if no column break after this field then add a column
+					if(fl[i+1]&&(fl[i+1].fieldtype!='Column Break')) {
+						layout.addcell(); }
 						
-						// new page
-						layout = add_layout();
-						layout.addrow(); layout.addcell();
-	
-						var div = $a(layout.cur_cell, 'div');
-						div.innerHTML = 'Continued from previous page...';
-						div.style.padding = '4px';
-					}
-				 	// last table
-					layout.cur_cell.appendChild(t[t.length-1]);
-				}
-			 	break;
-			 case 'HTML': 
-			 	var tmp = $a(layout.cur_cell, 'div');
-			 	tmp.innerHTML = f.options;
-			 	break;
-			 case 'Code': 
-			 	var tmp = $a(layout.cur_cell, 'div');
-			 	var v= _f.get_value(dt,dn,f.fieldname);
-			 	tmp.innerHTML = '<div>'+ f.label + ': </div>'
-			 		+ '<pre style="font-family: Courier, Fixed;">'+(v?v:'')+'</pre>';
-			 	break;
-			 default:
-			 	// add cell data
-			 	var v = _f.get_value(dt,dn,f.fieldname);
-				if(f.fieldtype!="Button") {
-					if(!v && !in_list(['Float','Int','Currency'], f.fieldtype)) {
-						// no value and non-numberic - do nothing
-					} else {
-						r = _p.field_tab(layout.cur_cell)
-						// label
-						r.cells[0].innerHTML=f.label?f.label:f.fieldname;
-						
-						$s(r.cells[1], v, f.fieldtype);
-	
-						// left align currency in normal display
-						if(f.fieldtype=='Currency')
-							$y(r.cells[1],{textAlign: 'left'});
-					}
+					// add label ---- no labels for section breaks!
+					//if(f.label) layout.cur_row.header.innerHTML = '<div class="sectionHeading">'+f.label+'</div>';
+					break;
+				 case 'Column Break': 
+					layout.addcell(f.width, f.label); 
+					//if(f.label) layout.cur_cell.header.innerHTML = '<div class="columnHeading">'+f.label+'</div>';
+					break;
+				 case 'Table': 
+					var t = print_table(dt, dn,f.fieldname,f.options,null,null,null,null);
+					_p.print_std_add_table(t, layout, pf_list);
+				 	break;
+				 case 'HTML': 
+				 	var tmp = $a(layout.cur_cell, 'div');
+				 	tmp.innerHTML = f.options;
+				 	break;
+				 case 'Code': 
+				 	var tmp = $a(layout.cur_cell, 'div');
+				 	var v= _f.get_value(dt,dn,f.fieldname);
+				 	tmp.innerHTML = '<div>'+ f.label + ': </div>' + '<pre style="font-family: Courier, Fixed;">'+(v?v:'')+'</pre>';
+				 	break;
+				 default:
+				 	// add cell data
+				 	_p.print_std_add_field(dt, dn, f, layout);
+
 				}
 			}
 		}
 	}
 
 	layout.close_borders();
+	
+	// build html for each page
 	var html = '';
 	for(var i=0;i<pf_list.length;i++) {
 		if(pf_list[i].wrapper) {
@@ -182,17 +205,17 @@ _p.build = function(fmtname, onload, no_letterhead) {
 	if(!cur_frm) { alert('No Document Selected'); return; }
 	var doc = locals[cur_frm.doctype][cur_frm.docname];
 	if(fmtname=='Standard') {
-		onload(_p.render(_p.print_std(), _p.print_style, doc, doc.name,no_letterhead));
+		onload(_p.render(_p.print_std(no_letterhead), _p.print_style, doc, doc.name, no_letterhead));
 	} else {
 		if(!_p.formats[fmtname]) // not loaded, get data
 			$c('webnotes.widgets.form.get_print_format', {'name':fmtname }, 
 				function(r,t) { 
 					_p.formats[fmtname] = r.message;
-					onload(_p.render(_p.formats[fmtname], '', doc, doc.name,no_letterhead)); 
+					onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead)); 
 				}
 			);
 		else // loaded
-			onload(_p.render(_p.formats[fmtname], '', doc, doc.name,no_letterhead));	
+			onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead));	
 	}
 }
 
