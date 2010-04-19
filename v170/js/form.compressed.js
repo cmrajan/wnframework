@@ -341,7 +341,6 @@ layout.addcell();}
 for(var i=0;i<fl.length;i++){var fn=fl[i].fieldname?fl[i].fieldname:fl[i].label;if(fn)
 var f=get_field(dt,fn,dn);else
 var f=fl[i];if(!f.print_hide){switch(f.fieldtype){case'Section Break':layout.addrow();if(fl[i+1]&&(fl[i+1].fieldtype!='Column Break')){layout.addcell();}
-if(!layout.with_border){$y(layout.cur_row.wrapper,{borderBottom:'1px solid #000'});}
 break;case'Column Break':layout.addcell(f.width,f.label);break;case'Table':var t=print_table(dt,dn,f.fieldname,f.options,null,null,null,null);if(t.appendChild){layout.cur_cell.appendChild(t);}else{for(var ti=0;ti<t.length-1;ti++){layout.cur_cell.appendChild(t[ti]);layout.close_borders();pf_list[pf_list.length]='<div style="page-break-after: always;"></div>';layout=add_layout();layout.addrow();layout.addcell();var div=$a(layout.cur_cell,'div');div.innerHTML='Continued from previous page...';div.style.padding='4px';}
 layout.cur_cell.appendChild(t[t.length-1]);}
 break;case'HTML':var tmp=$a(layout.cur_cell,'div');tmp.innerHTML=f.options;break;case'Code':var tmp=$a(layout.cur_cell,'div');var v=_f.get_value(dt,dn,f.fieldname);tmp.innerHTML='<div>'+f.label+': </div>'

@@ -89,9 +89,9 @@ _p.print_std = function() {
 				//if(f.label)
 				//	layout.cur_row.header.innerHTML = '<div class="sectionHeading">'+f.label+'</div>';
 				// border at bottonm
-				if(!layout.with_border) {
-					$y(layout.cur_row.wrapper, {borderBottom: '1px solid #000' });	
-				}
+				//if(layout.with_border) {
+				//	$y(layout.cur_row.wrapper, {borderBottom: '1px solid #000' });	
+				//}
 				break;
 			 case 'Column Break': 
 				layout.addcell(f.width, f.label); 
