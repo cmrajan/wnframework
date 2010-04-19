@@ -325,6 +325,7 @@ def savedocs():
 		# On Trash
 		if action == 'Trash':
 			_do_action(doc, doclist, server_obj, 'on_trash', 2)
+			validate_trash_doc(doc, doclist)
 
 		# update recent documents
 		webnotes.user.update_recent(doc.doctype, doc.name)
@@ -339,6 +340,20 @@ def savedocs():
 		webnotes.msgprint('Did not save')
 		webnotes.errprint(webnotes.utils.getTraceback())
 		raise e
+
+
+def validate_trash_doc(doc, doclist):
+	import webnotes
+	conn = webnotes.app_conn or webnotes.conn
+	parent_mast = conn.sql('select t1.parent, t1.fieldname from tabDocField t1, tabDocType t2 where t1.fieldtype = "Link" and t1.options = %s and ifnull(t2.allow_trash, 0) = 1 and t1.parent = t2.name', doc.doctype)
+	#msgprint(parent_mast)
+	if parent_mast:
+		for d in parent_mast:
+			exists = [r[0] for r in conn.sql('select name from `tab%s` where docstatus != 2 and %s = "%s"' % (d[0], d[1], doc.name))]
+			if exists:
+				webnotes.msgprint("This record exists in %s : %s. Hence you cannot move %s : %s to trash." %(d[0], exists, doc.doctype, doc.name))
+				raise Exception
+
 
 # Print Format
 #===========================================================================================
