@@ -325,6 +325,7 @@ def savedocs():
 		# On Trash
 		if action == 'Trash':
 			_do_action(doc, doclist, server_obj, 'on_trash', 2)
+			# validate
 			validate_trash_doc(doc, doclist)
 
 		# update recent documents
@@ -341,18 +342,38 @@ def savedocs():
 		webnotes.errprint(webnotes.utils.getTraceback())
 		raise e
 
-
+# validate if linked to another document
+#========================================
 def validate_trash_doc(doc, doclist):
 	import webnotes
 	conn = webnotes.app_conn or webnotes.conn
-	parent_mast = conn.sql('select t1.parent, t1.fieldname from tabDocField t1, tabDocType t2 where t1.fieldtype = "Link" and t1.options = %s and ifnull(t2.allow_trash, 0) = 1 and t1.parent = t2.name', doc.doctype)
-	#msgprint(parent_mast)
-	if parent_mast:
-		for d in parent_mast:
-			exists = [r[0] for r in conn.sql('select name from `tab%s` where docstatus != 2 and %s = "%s"' % (d[0], d[1], doc.name))]
-			if exists:
-				webnotes.msgprint("This record exists in %s : %s. Hence you cannot move %s : %s to trash." %(d[0], exists, doc.doctype, doc.name))
-				raise Exception
+	# Fetch docs contains link of trash doc
+	parent_mast = conn.sql("select t1.parent, t1.fieldname from tabDocField t1, tabDocType t2 where ((t1.fieldtype = 'Link' and t1.options = '%s') or (t1.fieldtype = 'Select' and t1.options = 'link:%s')) and t1.parent not like 'old%%' and ifnull(t2.allow_trash, 0) = 1 and t1.parent = t2.name" % (doc.doctype, doc.doctype))
+	for d in parent_mast:
+		# check if records
+		check_if_rec_exist(doc, d[0], d[1])
+
+		#Child table contains link of trash doc
+		ch_table = conn.sql("select options from tabDocField where fieldtype = 'Table' and parent = '%s'" % d[0])
+		for c in ch_table:
+			# fieldname
+			fld = conn.sql("select fieldname from tabDocField where ((fieldtype = 'Link' and options = '%s') or (fieldtype = 'Select' and options = 'link:%s')) and parent not like 'old%%' and parent = '%s'" % (doc.doctype, doc.doctype, c[0]))
+			for f in fld:
+				# check if records
+				check_if_rec_exist(doc, c[0], f[0], d[0])
+				
+# Check whether record exists using trash doc
+#=============================================
+def check_if_rec_exist(doc, dtname, fname, par_dtname = ''):
+	import webnotes
+	conn = webnotes.app_conn or webnotes.conn
+
+	if not par_dtname: par_dtname = dtname
+	# exists?
+	exists = [r[0] for r in conn.sql('select parent from `tab%s` where docstatus != 2 and %s = "%s"' % (dtname, fname, doc.name))]
+	if exists:
+		webnotes.msgprint("This record exists in %s : %s. Hence you cannot move %s : %s to trash." %(dtname, exists, doc.doctype, doc.name))
+		raise Exception
 
 
 # Print Format
