@@ -507,7 +507,7 @@ _f.Frm.prototype.set_parent = function(parent) {
 _f.Frm.prototype.setup_print_layout = function() {
 	if(this.meta.read_only_onload) {
 		this.print_wrapper = $a(this.wrapper, 'div', '', {backgroundColor:'#46A',padding: '32px'});
-		this.print_body = $a(this.print_wrapper, 'div', '', {backgroundColor:'#FFF', border:'1px solid #444',padding: '32px' });
+		this.print_body = $a(this.print_wrapper, 'div', '', {backgroundColor:'#FFF', border:'1px solid #444',padding: '40px' });
 	}
 }
 
@@ -743,14 +743,6 @@ _f.Frm.prototype.cleanup_refresh = function() {
 			hide_field('amended_from'); hide_field('amendment_date');
 		}
 	}
-	if(me.fields_dict['trash_reason']) {
-		if(me.doc.trash_reason) {
-			unhide_field('trash_reason'); unhide_field('trashed_by');
-		} else {
-			hide_field('trash_reason'); hide_field('trashed_by');
-		}
-	}
-
 	if(me.meta.autoname && me.meta.autoname.substr(0,6)=='field:' && !me.doc.__islocal) {
 		var fn = me.meta.autoname.substr(6);
 		set_field_permlevel(fn,1); // make it readonly / hidden

@@ -111,7 +111,7 @@ _p.print_std = function(no_letterhead) {
 	h1.innerHTML = cur_frm.pformat.print_heading ? cur_frm.pformat.print_heading : dt;
 	
 	var h2 = $a(layout.cur_row.header, 'div', '', {fontSize:'16px', color:'#888', marginBottom:'8px', paddingBottom:'8px', borderBottom:(layout.with_border ? '0px' : '1px solid #000' )});
-	h2.innerHTML = dn;
+	h2.innerHTML = cur_frm.pformat.print_subheading ? cur_frm.pformat.print_subheading : dt;
 	
 	var fl = getchildren('DocField', dt, 'fields', 'DocType');
 

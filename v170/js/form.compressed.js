@@ -82,7 +82,7 @@ _f.Frm.prototype.setup_client_script=function(){if(this.meta.client_script_core|
 this.script_setup=1;}
 _f.Frm.prototype.set_parent=function(parent){if(parent){this.parent=parent;if(this.wrapper&&this.wrapper.parentNode!=parent)
 parent.appendChild(this.wrapper);}}
-_f.Frm.prototype.setup_print_layout=function(){if(this.meta.read_only_onload){this.print_wrapper=$a(this.wrapper,'div','',{backgroundColor:'#46A',padding:'32px'});this.print_body=$a(this.print_wrapper,'div','',{backgroundColor:'#FFF',border:'1px solid #444',padding:'32px'});}}
+_f.Frm.prototype.setup_print_layout=function(){if(this.meta.read_only_onload){this.print_wrapper=$a(this.wrapper,'div','',{backgroundColor:'#46A',padding:'32px'});this.print_body=$a(this.print_wrapper,'div','',{backgroundColor:'#FFF',border:'1px solid #444',padding:'40px'});}}
 _f.Frm.prototype.refresh_print_layout=function(){$ds(this.print_wrapper);$dh(this.form_wrapper);var me=this;var print_callback=function(print_html){me.print_body.innerHTML=print_html;}
 _p.build(this.default_format,print_callback);}
 _f.Frm.prototype.setup=function(){var me=this;this.fields=[];this.fields_dict={};this.wrapper=$a(this.parent,'div','frm_wrapper');this.setup_print_layout();this.form_wrapper=$a(this.wrapper,'div');if(this.meta.use_template){this.setup_template_layout();}else{this.setup_std_layout();}
@@ -114,7 +114,6 @@ me.set_section(me.cur_section[me.docname]);}}
 _f.Frm.prototype.refresh_fields=function(){var me=this;for(fkey in me.fields){var f=me.fields[fkey];f.perm=me.perm;f.docname=me.docname;if(f.refresh)f.refresh();}
 me.cleanup_refresh(me);}
 _f.Frm.prototype.cleanup_refresh=function(){var me=this;if(me.fields_dict['amended_from']){if(me.doc.amended_from){unhide_field('amended_from');unhide_field('amendment_date');}else{hide_field('amended_from');hide_field('amendment_date');}}
-if(me.fields_dict['trash_reason']){if(me.doc.trash_reason){unhide_field('trash_reason');unhide_field('trashed_by');}else{hide_field('trash_reason');hide_field('trashed_by');}}
 if(me.meta.autoname&&me.meta.autoname.substr(0,6)=='field:'&&!me.doc.__islocal){var fn=me.meta.autoname.substr(6);set_field_permlevel(fn,1);}}
 _f.Frm.prototype.refresh_dependency=function(){var me=this;var dep_dict={};var has_dep=false;for(fkey in me.fields){var f=me.fields[fkey];f.dependencies_clear=true;var guardian=f.df.depends_on;if(guardian){if(!dep_dict[guardian])
 dep_dict[guardian]=[];dep_dict[guardian][dep_dict[guardian].length]=f;has_dep=true;}}
@@ -342,7 +341,7 @@ r.cells[0].innerHTML=f.label?f.label:f.fieldname;$s(r.cells[1],v,f.fieldtype);if
 $y(r.cells[1],{textAlign:'left'});}}}
 _p.print_std=function(no_letterhead){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];function add_layout(){var l=new Layout();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;pf_list[pf_list.length]=l;return l;}
 var layout=add_layout();var cp=locals['Control Panel']['Control Panel'];pf_list[pf_list.length-1].addrow();if(cp.letter_head&&!no_letterhead){pf_list[pf_list.length-1].cur_row.header.innerHTML=cp.letter_head;}
-var h1=$a(layout.cur_row.header,'h1','',{fontSize:'22px',marginBottom:'8px'});h1.innerHTML=cur_frm.pformat.print_heading?cur_frm.pformat.print_heading:dt;var h2=$a(layout.cur_row.header,'div','',{fontSize:'16px',color:'#888',marginBottom:'8px',paddingBottom:'8px',borderBottom:(layout.with_border?'0px':'1px solid #000')});h2.innerHTML=dn;var fl=getchildren('DocField',dt,'fields','DocType');if(fl[0]&&fl[0].fieldtype!="Section Break"){layout.addrow();if(fl[0].fieldtype!="Column Break")
+var h1=$a(layout.cur_row.header,'h1','',{fontSize:'22px',marginBottom:'8px'});h1.innerHTML=cur_frm.pformat.print_heading?cur_frm.pformat.print_heading:dt;var h2=$a(layout.cur_row.header,'div','',{fontSize:'16px',color:'#888',marginBottom:'8px',paddingBottom:'8px',borderBottom:(layout.with_border?'0px':'1px solid #000')});h2.innerHTML=cur_frm.pformat.print_subheading?cur_frm.pformat.print_subheading:dt;var fl=getchildren('DocField',dt,'fields','DocType');if(fl[0]&&fl[0].fieldtype!="Section Break"){layout.addrow();if(fl[0].fieldtype!="Column Break")
 layout.addcell();}
 for(var i=0;i<fl.length;i++){var fn=fl[i].fieldname?fl[i].fieldname:fl[i].label;if(fn)
 var f=get_field(dt,fn,dn);else
