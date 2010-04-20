@@ -135,7 +135,7 @@ _f.Frm.prototype.show_doc=function(dn){this.show(dn);}
 _f.Frm.prototype.save=function(save_action,call_back){if(!save_action)save_action='Save';var me=this;if(this.savingflag){msgprint("Document is currently saving....");return;}
 if(save_action=='Submit'){locals[this.doctype][this.docname].submitted_on=dateutil.full_str();locals[this.doctype][this.docname].submitted_by=user;}
 if(save_action=='Trash'){var reason=prompt('Reason for trash (mandatory)','');if(!strip(reason)){msgprint('Reason is mandatory, not trashed');return;}
-locals[this.doctype][this.docname].trash_reason=reason;locals[this.doctype][this.docname].trashed_on=dateutil.full_str();}
+locals[this.doctype][this.docname].trash_reason=reason;}
 if(save_action=='Cancel'){var reason=prompt('Reason for cancellation (mandatory)','');if(!strip(reason)){msgprint('Reason is mandatory, not cancelled');return;}
 locals[this.doctype][this.docname].cancel_reason=reason;locals[this.doctype][this.docname].cancelled_on=dateutil.full_str();locals[this.doctype][this.docname].cancelled_by=user;}else{validated=true;validation_message='';this.runclientscript('validate',cur_frm.doctype,cur_frm.docname);if(!validated){if(validation_message)
 msgprint('Validation Error: '+validation_message);this.savingflag=false;return'Error';}}
