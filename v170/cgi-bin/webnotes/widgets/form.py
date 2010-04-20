@@ -370,7 +370,7 @@ def check_if_rec_exist(doc, dtname, fname, par_dtname = ''):
 
 	if not par_dtname: par_dtname = dtname
 	# exists?
-	exists = [r[0] for r in conn.sql('select parent from `tab%s` where docstatus != 2 and %s = "%s"' % (dtname, fname, doc.name))]
+	exists = [r[0] for r in conn.sql('select name from `tab%s` where docstatus != 2 and %s = "%s"' % (dtname, fname, doc.name))]
 	if exists:
 		webnotes.msgprint("This record exists in %s : %s. Hence you cannot move %s : %s to trash." %(dtname, exists, doc.doctype, doc.name))
 		raise Exception
