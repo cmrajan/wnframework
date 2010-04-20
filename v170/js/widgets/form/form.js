@@ -744,7 +744,7 @@ _f.Frm.prototype.cleanup_refresh = function() {
 		}
 	}
 
-	if(me.fields_dict.has_key('trash_reason') {
+	if(me.fields_dict.has_key('trash_reason')) {
 		if(me.doc.trash_reason) {
 			unhide_field('trash_reason');
 		} else {
