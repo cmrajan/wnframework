@@ -139,7 +139,7 @@ _f.add_frm = function(doctype, onload, opt_name, parent) {
 	
 	// check if record is new
 	var is_new = 0;
-	if(opt_name && locals[doctype][opt_name] && locals[doctype][opt_name].__islocal) {
+	if(opt_name && locals[doctype] && locals[doctype][opt_name] && locals[doctype][opt_name].__islocal) {
 		is_new = 1;
 	}
 	
