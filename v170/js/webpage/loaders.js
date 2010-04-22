@@ -58,6 +58,12 @@ function loaddoc(doctype, name, onload, menuitem) {
 		msgprint("Cannot open an instance of \"" + doctype + "\" when the DocType is open.");
 		return;
 	}
+	
+	// reverse validation - do not open DocType when an instance is open
+	if(doctype=='DocType' && frms[name]) {
+		msgprint("Cannot open DocType \"" + name + "\" when its instance is open.");
+		return;
+	}
 
 	var show_form = function(f) {
 		// load the frm container
@@ -78,7 +84,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user}, show_doc, null, null);	// onload
 		}
 	}
-	
+				
 	var show_doc = function(r,rt) {
 		if(locals[doctype] && locals[doctype][name]) {
 			var frm = frms[doctype];

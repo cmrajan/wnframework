@@ -122,6 +122,7 @@ _f.add_frm = function(doctype, onload, opt_name, parent) {
 		return;
 	}
 
+	// form already created, done
 	if(frms[doctype]) { 
 		return frms[doctype]; 
 	}
@@ -135,7 +136,14 @@ _f.add_frm = function(doctype, onload, opt_name, parent) {
 
 		if(onload)onload(r,rt);
 	}
-	if(opt_name) {
+	
+	// check if record is new
+	var is_new = 0;
+	if(opt_name && locals[doctype][opt_name] && locals[doctype][opt_name].__islocal) {
+		is_new = 1;
+	}
+	
+	if(opt_name && !is_new) {
 		// get both
 		$c('webnotes.widgets.form.getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, callback);
 	} else {

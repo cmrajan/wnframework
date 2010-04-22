@@ -816,6 +816,7 @@ rb.menuitems[rep_name].show_selected();}
 if(!rb.forbidden){page_body.change_to('Report Builder');nav_obj.open_notify('Report',dt,rep_name);}});}
 new_widget('_r.ReportContainer',show_report_builder,1);}
 var load_doc=loaddoc;function loaddoc(doctype,name,onload,menuitem){if(frms['DocType']&&frms['DocType'].opendocs[doctype]){msgprint("Cannot open an instance of \""+doctype+"\" when the DocType is open.");return;}
+if(doctype=='DocType'&&frms[name]){msgprint("Cannot open DocType \""+name+"\" when its instance is open.");return;}
 var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
 if(!frms[doctype]){_f.add_frm(doctype,show_doc,name);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user},show_doc,null,null);}}
 var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){var frm=frms[doctype];if(menuitem)frm.menuitem=menuitem;if(onload)onload(frm);if(r&&r.n_tweets)frm.n_tweets[name]=r.n_tweets;if(r&&r.last_comment)frm.last_comments[name]=r.last_comment;frm.show(name,null,_f.frm_con.body,0);nav_obj.open_notify('Form',doctype,name);if(frm.menuitem)frm.menuitem.show_selected();}else{msgprint('error:There were errors while loading '+doctype+','+name);}}
