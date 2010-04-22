@@ -79,6 +79,8 @@ Listing.prototype.make = function(parent) {
 	// results
 	this.results = $a($a(this.body_area, 'div','srs_results_area'),'div');
 	this.fetching_area = $a(this.body_area, 'div','',{height:'120px', background:'url("images/ui/square_loading.gif") center no-repeat', display:'none'});
+	this.show_no_records = $a(this.body_area,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
+	this.show_no_records.innerHTML = 'No Result';
 
 	if(this.opts.show_empty_tab)
 		this.make_result_tab();
@@ -477,11 +479,14 @@ Listing.prototype.run = function(from_page) {
 			if(!me.opts.append_records) {
 				me.n_records = 0;
 				me.set_rec_label(0);
-				if(!me.show_empty_tab) {
+				if(me.show_empty_tab) {
+					me.clear_tab();
+				} else {
 					me.remove_result_tab();
 					me.make_result_tab(0);
-				} else {
-					me.clear_tab();
+					if(me.opts.show_no_records_label) {
+						$ds(me.show_no_records);
+					}
 				}
 			}
 		}
@@ -490,6 +495,8 @@ Listing.prototype.run = function(from_page) {
 	}
 	
 	// run
+	$dh(me.show_no_records);
+	
 	this.set_rec_label(-1);
 	if(this.server_call) 
 		{ this.server_call(this, call_back); }

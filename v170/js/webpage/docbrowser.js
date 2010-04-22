@@ -5,6 +5,8 @@ DocBrowser = function() {
 
 	this.my_page = page_body.add_page('DocBrowser');
 	this.wrapper = $a(this.my_page,'div','',{margin:'8px'});
+	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
+	this.loading_div.innerHTML = 'Loading...';
 }
 
 DocBrowser.prototype.show = function(dt, label, field_list) {
@@ -32,15 +34,25 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 		w.head = $a(w,'div','',{marginBottom:'8px'});
 
 		me.page_head = new PageHeader(w.head, label);
+		// new button
+		if(in_list(profile.can_create,dt)) {
+			var d = $a($a(w,'div','',{marginBottom:'16px'}),'span');
+			d.dt = dt;
+			$(d).html('+ New ' + dt).css('background-color','#039').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').corners().click( function() { newdoc(this.dt); } );
+		}
+
+
 		// make the list
 		me.make_the_list(dt, w);
 		me.cur_list = w;
 		me.cur_list._label = label;
 
 	} else {
+		$ds(this.loading_div);
 		$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + field_list, 
 		function(r,rt) { 
 			me.dt_details[dt] = r.message; 
+			$dh(me.loading_div);
 			if(r.message) me.make(dt, label, field_list); });
 	}
 	
@@ -63,10 +75,11 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		hide_rec_label: 0,
 		show_calc: 0,
 		show_empty_tab : 0,
+		show_no_records_label: 1,
 		show_bottom_paging: 0,
 		round_corners: 0,
 		no_border: 1,
-		show_new: 1,
+		show_new: 0,
 		show_report: 1
 	}
 		

@@ -11,13 +11,9 @@ function WNToolbar(parent) {
 	
 	this.setup = function() {
 		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CDF' /*, paddingLeft: '24px', background:'url("images/logos/wnf24.gif") left no-repeat', backgroundPosition: '4px 2px'*/});
-		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['65%','0%','35%'],{padding:'2px'});
-		
-		// model tab
-		$y($td(this.body_tab, 0, 1),{paddingTop:'3px', paddingBottom:'0px'});
-		this.model_tab = make_table($td(this.body_tab,0,1), 1, 4, null, ['140px','140px','140px'], {padding:'2px'});
-		
-		this.menu = new MenuToolbar($td(this.body_tab,0,0));
+		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['5%','60%','35%'],{padding:'2px'});
+				
+		this.menu = new MenuToolbar($td(this.body_tab,0,1));
 		this.setup_home();
 		this.setup_new();
 		this.setup_recent();
@@ -57,7 +53,8 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_home = function() {
-		this.menu.add_top_menu('<b>Home</b>', function() { loadpage(home_page); });
+		var d = $a($td(this.body_tab,0,0),'div');
+		$(d).html('Home').css('background-color','#039').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').corners().click( function() { loadpage(home_page); } );
 	}
 
 	// Recent
@@ -198,7 +195,6 @@ function WNToolbar(parent) {
 		// select
 		this.search_sel = new SelectWidget($td(t, 0, 1), [], '120px');
 		this.search_sel.inp.value = 'Select...';
-		$y($td(this.model_tab, 0, 3),{paddingTop:'0px'});
 		
 		function open_quick_search() {
 			var v = sel_val(me.search_sel);

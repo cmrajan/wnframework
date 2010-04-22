@@ -14,7 +14,6 @@ function Dialog(w, h, title, content) {
 	$w(this.wrapper,w + 'px');
 	
 	this.head = $a(this.wrapper, 'div', 'dialog_head');
-
 	this.body = $a(this.wrapper, 'div', 'dialog_body');
 	
 	this.make_head(title);
@@ -57,7 +56,8 @@ Dialog.prototype.show = function() {
 	var d = get_screen_dims();
 	
 	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
-	this.wrapper.style.top = '100px';
+	var t = (get_scroll_top() + ((d.h - this.h)/2));
+	this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
 
 	top_index++;
 	$y(this.wrapper,{zIndex:top_index});
@@ -130,7 +130,7 @@ Dialog.prototype.make_row = function(d) {
 	} 
 	else if(d[0]=='Select') {
 		c1.innerHTML = d[1];
-		this.widgets[d[1]] = new SelectWidget(c2, [], '160px');
+		this.widgets[d[1]] = $a(c2, 'select', '', {width:'160px'})
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
 	} 
 	else if(d[0]=='Text') {

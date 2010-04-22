@@ -204,10 +204,10 @@ _f.Frm.prototype.email_doc = function() {
 	var c = $td(_e.dialog.rows['Format'].tab,0,1);
 	
 	if(c.cur_sel) {
-		c.removeChild(c.cur_sel.wrapper);
+		c.removeChild(c.cur_sel);
 		c.cur_sel = null;
 	}
-	c.appendChild(this.print_sel.wrapper);
+	c.appendChild(this.print_sel);
 
 	_e.dialog.widgets['Subject'].value = this.meta.name + ': ' + this.docname;
 	_e.dialog.show();

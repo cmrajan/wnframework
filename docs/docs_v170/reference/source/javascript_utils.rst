@@ -338,7 +338,7 @@ URL
 User Image
 ----------
 
-.. function:: set_user_img(username, img)
+.. function:: set_user_img(img, username)
 
    Sets the user image or No Image tag to the given `img`
 

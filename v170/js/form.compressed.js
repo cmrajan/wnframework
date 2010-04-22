@@ -49,8 +49,8 @@ l.push(fl[i].format);}
 l.push('Standard');this.print_sel=$a(null,'select','',{width:'160px'});add_sel_options(this.print_sel,l);this.print_sel.value=this.default_format;}
 _f.Frm.prototype.print_doc=function(){if(this.doc.docstatus==2){msgprint("Cannot Print Cancelled Documents.");return;}
 _p.show_dialog();}
-_f.Frm.prototype.email_doc=function(){if(!_e.dialog)_e.make();sel=this.print_sel;var c=$td(_e.dialog.rows['Format'].tab,0,1);if(c.cur_sel){c.removeChild(c.cur_sel.wrapper);c.cur_sel=null;}
-c.appendChild(this.print_sel.wrapper);_e.dialog.widgets['Subject'].value=this.meta.name+': '+this.docname;_e.dialog.show();}
+_f.Frm.prototype.email_doc=function(){if(!_e.dialog)_e.make();sel=this.print_sel;var c=$td(_e.dialog.rows['Format'].tab,0,1);if(c.cur_sel){c.removeChild(c.cur_sel);c.cur_sel=null;}
+c.appendChild(this.print_sel);_e.dialog.widgets['Subject'].value=this.meta.name+': '+this.docname;_e.dialog.show();}
 _f.Frm.prototype.set_heading=function(){var me=this;_f.frm_con.page_head.main_head.innerHTML=this.doctype;_f.frm_con.page_head.sub_head.innerHTML='';if(!this.meta.issingle)
 _f.frm_con.page_head.sub_head.innerHTML=this.docname;var doc=locals[this.doctype][this.docname];var tn=$i('rec_'+this.doctype+'-'+this.docname);var set_st=function(col){if(tn)$bg(tn,col);}
 var make_span=function(label,col){var s=$a(null,'span','',{padding:'2px',backgroundColor:col,color:'#FFF',fontWeight:'bold',marginLeft:(me.meta.issingle?'0px':'8px'),fontSize:'11px'});s.innerHTML=label;return s;}

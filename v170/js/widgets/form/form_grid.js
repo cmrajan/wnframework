@@ -139,7 +139,7 @@ _f.FormGrid.prototype.new_row_doc = function() {
 	// create row doc
 	var n = LocalDB.create(this.doctype);
 	var d = locals[this.doctype][n];
-	d.parent = this.field.frm.docname; 
+	d.parent = this.field.frm.docname;
 	d.parentfield = this.field.df.fieldname;
 	d.parenttype = this.field.frm.doctype;
 	return d;
