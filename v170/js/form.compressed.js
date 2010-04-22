@@ -23,7 +23,8 @@ _f.add_frm=function(doctype,onload,opt_name,parent){if(parent)parent=_f.frm_con.
 if(frms[doctype]){return frms[doctype];}
 var callback=function(r,rt){if(!locals['DocType'][doctype]){return;}
 new _f.Frm(doctype,parent);if(onload)onload(r,rt);}
-if(opt_name){$c('webnotes.widgets.form.getdoc',{'name':opt_name,'doctype':doctype,'getdoctype':1,'user':user},callback);}else{$c('webnotes.widgets.form.getdoctype',args={'doctype':doctype},callback);}}
+var is_new=0;if(opt_name&&locals[doctype][opt_name]&&locals[doctype][opt_name].__islocal){is_new=1;}
+if(opt_name&&!is_new){$c('webnotes.widgets.form.getdoc',{'name':opt_name,'doctype':doctype,'getdoctype':1,'user':user},callback);}else{$c('webnotes.widgets.form.getdoctype',args={'doctype':doctype},callback);}}
 _f.frm_dialog=null;_f.dialog_stack=[];_f.calling_doc_stack=[];_f.FrmDialog=function(){var me=this;var d=new Dialog(640,400,'Edit Row');d.body_wrapper=$a(d.body,'div','dialog_frm');d.done_btn=$a($a(d.body,'div','',{margin:'8px'}),'button');d.done_btn.innerHTML='Done';d.done_btn.onclick=function(){if(!me.from_grid){var callback=function(r,rt){if(me.on_save_callback)
 me.on_save_callback(me.cur_frm.docname);me.dialog.hide();}
 me.cur_frm.save('Save',callback);}else{me.dialog.hide();}}
