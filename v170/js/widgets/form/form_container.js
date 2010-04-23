@@ -53,11 +53,11 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 		this.page_head.add_button('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk');
 	
 	// Submit
-	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==0 && p[SUBMIT] && (!cur_frm.doc.__islocal))
+	if(cint(cur_frm.doc.docstatus)==0 && p[SUBMIT] && (!cur_frm.doc.__islocal))
 		this.page_head.add_button('Submit', function() { cur_frm.savesubmit(); }, 0, 'ui-icon-locked');
 	
 	// Cancel
-	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==1  && p[CANCEL])
+	if(cint(cur_frm.doc.docstatus)==1  && p[CANCEL])
 		this.page_head.add_button('Cancel', function() { cur_frm.savecancel() }, 0, 'ui-icon-closethick');
 
 	// Amend
