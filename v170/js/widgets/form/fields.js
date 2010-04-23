@@ -489,6 +489,8 @@ LinkField.prototype.make_input = function() {
 		return me.txt.value;
 	}
 	
+	
+	// add button
 	me.can_create = 0;
 	if((!me.not_in_form) && in_list(profile.can_create, me.df.options)) {
 		me.can_create = 1;
@@ -845,8 +847,10 @@ TimeField.prototype.make_input = function() { var me = this;
 	this.input_am = new SelectWidget($td(t,0,2), opt_am, '60px');
 
 	this.input_hr.inp.isactive = 1; this.input_mn.inp.isactive = 1; this.input_am.inp.isactive = 1;
-	this.input_hr.btn.isactive = 1; this.input_mn.btn.isactive = 1; this.input_am.btn.isactive = 1;
-
+	if(this.input_hr.btn) {
+		this.input_hr.btn.isactive = 1; this.input_mn.btn.isactive = 1; this.input_am.btn.isactive = 1;
+	}
+	
 	var onchange_fn = function() {
 		me.set(me.get_time()); 
 		me.run_trigger();
