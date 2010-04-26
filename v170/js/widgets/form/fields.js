@@ -375,7 +375,9 @@ DataField.prototype.validate = function(v) {
 			msgprint(this.df.label + ': ' + v + ' is not a valid email id');
 			return '';
 		}
-	}
+	} else {
+		return v;	
+	}	
 }
 
 DataField.prototype.onrefresh = function() {
