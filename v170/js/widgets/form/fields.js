@@ -358,6 +358,26 @@ DataField.prototype.make_input = function() {
 		if(me.format_input)me.format_input();
 	}
 }
+DataField.prototype.validate = function(v) {
+	if(this.df.options == 'Phone') {
+		if(v+''=='')return;
+		// phone may start with + and must only have numbers later, '-' and ' ' are stripped
+		v = v.replace(/ /g, '').replace(/-/g, '');
+		if(v && v.substr(0,1)=='+') {
+			var rest = cint(v.substr(1))
+			v = '+' + rest;
+		} else {
+			v = cint(v);
+		}
+		return v;
+	} else if(this.df.options == 'Email') {
+		if(!validate_email(v)) {
+			msgprint(this.df.label + ': ' + v + ' is not a valid email id');
+			return '';
+		}
+	}
+}
+
 DataField.prototype.onrefresh = function() {
 	if(this.input&&this.df.colour) {
 		var col = '#'+this.df.colour.split(':')[1];
