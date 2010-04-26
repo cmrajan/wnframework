@@ -138,6 +138,11 @@ function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
 				
 			if(onload)onload(d);
 			
+			// no-dialog for doctype of more than 8 fields
+			if(fields_list[doctype] && fields_list[doctype].length>8) {
+				in_dialog = 0;	
+			}
+			
 			if(in_dialog) {
 				_f.edit_record(doctype, d, 0, on_save_callback, cdt, cdn, cnic);
 			} else {
@@ -201,6 +206,9 @@ function loadpage(page_name, call_back, menuitem) {
 		// execute callback
 		cur_page=page_name;
 		if(call_back)call_back();
+		
+		// scroll to top
+		scroll(0,0);
 
 		// update "back"
 		nav_obj.open_notify('Page',page_name,'');

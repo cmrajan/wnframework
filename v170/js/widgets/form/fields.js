@@ -512,7 +512,7 @@ LinkField.prototype.make_input = function() {
 	}
 	
 	
-	// add button
+	// add button - for inline creation of records
 	me.can_create = 0;
 	if((!me.not_in_form) && in_list(profile.can_create, me.df.options)) {
 		me.can_create = 1;
@@ -523,10 +523,12 @@ LinkField.prototype.make_input = function() {
 					
 					locals[d[0]][d[1]][me.df.fieldname] = new_rec;
 					me.refresh();
+					
+					if(me.grid)me.grid.refresh();
 				}
 			}
-			_f.calling_doc_stack.push([me.frm.doctype, me.frm.docname]);
-			new_doc(me.df.options, null, 1, on_save_callback, me.frm.doctype, me.frm.docname, me.frm.not_in_container); 
+			_f.calling_doc_stack.push([me.doctype, me.docname]);
+			new_doc(me.df.options, null, 1, on_save_callback, me.doctype, me.docname, me.frm.not_in_container); 
 		}
 	}
 
