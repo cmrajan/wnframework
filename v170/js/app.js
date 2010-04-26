@@ -29,6 +29,7 @@ function startup() {
 		sys_defaults = r.sysdefaults;
 		// bc
 		session.rt = profile.can_read;
+		if(r.ipinfo) session.ipinfo = r.ipinfo;
 	}
 	
 	var setup_history = function(r) {

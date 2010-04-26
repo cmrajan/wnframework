@@ -51,7 +51,11 @@ def startup():
 	webnotes.response['docs'] = doclist
 	webnotes.response['home_page'] = home_page or ''
 	webnotes.response['start_items'] = webnotes.widgets.menus.get_menu_items()
+	if webnotes.session['data'].get('ipinfo'):
+		webnotes.response['ipinfo'] = webnotes.session['data']['ipinfo']
+		
 	webnotes.session['data']['profile'] = webnotes.response['profile']
+	
 
 def cleanup_docs():
 	if out.get('docs'):

@@ -301,6 +301,15 @@ class Authentication:
 			if not (self.remote_ip.startswith(ip[0]) or (remote_ip in ip)):
 				raise Exception, 'Not allowed from this IP Address'
 
+	# Get IP Info from ipinfodb.com
+	# =================================================================================
+	def get_ipinfo(self):
+		import os,httplib,urllib
+		conn=httplib.HTTPConnection("ipinfodb.com")  #open connention
+		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json'}
+		conn.request("GET", "/ip_query.php?"+urllib.urlencode(args))
+		self.session['data']['ipinfo'] = eval(conn.getresponse().read())
+
 	# Start Session
 	# =================================================================================
 	
@@ -310,6 +319,10 @@ class Authentication:
 		self.session['sid'] = webnotes.utils.generate_hash()
 		self.session['data'] = {}
 		self.session['data']['session_ip'] = self.remote_ip;
+
+		# get ipinfo
+		if self.conn.get_value('Control Panel',None,'get_ip_info'):
+			self.get_ipinfo()
 		
 		# insert session
 		self.conn.sql("insert into tabSessions (sessiondata, user, lastupdate, sid) values (%s , %s, NOW(), %s)", (str(self.session['data']), self.session['user'], self.session['sid']))
