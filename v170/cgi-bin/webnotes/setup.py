@@ -222,7 +222,7 @@ def create_account_doctype():
 	f.save()
 	
 	# udpate schema
-	webnotes.model.db_schema.update_db('Account')
+	webnotes.model.db_schema.updatedb('Account')
 	
 def create_account_record(ac_name, newdb, domain=''):
 	# update accounts
