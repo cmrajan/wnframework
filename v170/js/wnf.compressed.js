@@ -827,7 +827,7 @@ var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){var frm=f
 new_widget('_f.FrmContainer',show_form,1);}
 function new_doc(doctype,onload,in_dialog,on_save_callback,cdt,cdn,cnic){if(!doctype){if(cur_frm)doctype=cur_frm.doctype;else return;}
 var show_doc=function(){frm=frms[doctype];if(frm.perm[0][CREATE]==1){if(frm.meta.issingle){var d=doctype;LocalDB.set_default_values(locals[doctype][doctype]);}else
-var d=LocalDB.create(doctype);if(onload)onload(d);if(fields_list[doctype]&&fields_list[doctype].length>8){in_dialog=0;}
+var d=LocalDB.create(doctype);if(onload)onload(d);if(fields_list[doctype]&&fields_list[doctype].length>2){in_dialog=0;}
 if(in_dialog){_f.edit_record(doctype,d,0,on_save_callback,cdt,cdn,cnic);}else{nav_obj.open_notify('Form',doctype,d);frm.show(d,null,_f.frm_con.body,0);}}else{msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');}}
 var show_form=function(){if(!_f.frm_con){_f.frm_con=new _f.FrmContainer();}
 if(!frms[doctype])

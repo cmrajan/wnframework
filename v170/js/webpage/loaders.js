@@ -139,7 +139,7 @@ function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
 			if(onload)onload(d);
 			
 			// no-dialog for doctype of more than 8 fields
-			if(fields_list[doctype] && fields_list[doctype].length>8) {
+			if(fields_list[doctype] && fields_list[doctype].length>2) {
 				in_dialog = 0;	
 			}
 			
