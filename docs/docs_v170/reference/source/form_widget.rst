@@ -76,7 +76,7 @@ the `Field` object. Example::
    }
    
    // field in a grid
-   cur_frm.fields_dict['test_grid'].get_fields('my_link').get_query = function(doc,dt,dn) {
+   cur_frm.fields_dict['test_grid'].grid.get_field('my_link').get_query = function(doc,dt,dn) {
       return "SELECT tabDocType.name FROM tabDocType WHERE IFNULL(tabDocType.issingle,0)=0 AND tabDocType.name LIKE '%s'"
    }   
 
