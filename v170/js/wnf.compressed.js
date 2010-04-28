@@ -473,7 +473,7 @@ else
 {var me=this;var input=this.sInp;clearTimeout(this.ajID);this.ajID=setTimeout(function(){me.doAjaxRequest(input)},this.oP.delay);}
 return false;};AutoSuggest.prototype.doAjaxRequest=function(input)
 {if(input!=this.fld.value)
-return false;var me=this;var q='';this.oP.link_field.set_get_query();if(this.oP.link_field.get_query){if(cur_frm)var doc=locals[cur_frm.doctype][cur_frm.docname];q=this.oP.link_field.get_query(doc);}
+return false;var me=this;var q='';this.oP.link_field.set_get_query();if(this.oP.link_field.get_query){if(cur_frm)var doc=locals[cur_frm.doctype][cur_frm.docname];q=this.oP.link_field.get_query(doc,this.oP.link_field.doctype,this.oP.link_field.docname);}
 $c('webnotes.widgets.search.search_link',args={'txt':this.fld.value,'dt':this.oP.link_field.df.options,'query':q},function(r,rt){me.setSuggestions(r,rt,input);});return;};AutoSuggest.prototype.setSuggestions=function(r,rt,input)
 {if(input!=this.fld.value)
 return false;this.aSug=[];if(this.oP.json){var jsondata=eval('('+rt+')');for(var i=0;i<jsondata.results.length;i++){this.aSug.push({'id':jsondata.results[i].id,'value':jsondata.results[i].value,'info':jsondata.results[i].info});}}
@@ -761,7 +761,7 @@ if(d.input)d.input.set_get_query();var get_sf_list=function(dt){var l=[];var lf=
 $ds(d.rows['Search By']);if(search_fields[d.sel_type]){empty_select(field_sel);add_sel_options(field_sel,get_sf_list(d.sel_type),'ID');}else{empty_select(field_sel);add_sel_options(field_sel,['ID'],'ID');$c('webnotes.widgets.search.getsearchfields',{'doctype':d.sel_type},function(r,rt){search_fields[d.sel_type]=r.searchfields;empty_select(field_sel);add_sel_options(field_sel,get_sf_list(d.sel_type));field_sel.selectedIndex=0;});}}
 d.onhide=function(){if(page_body.wntoolbar)
 page_body.wntoolbar.search_sel.disabled=0;}
-btn.onclick=function(){btn.disabled=true;d.set_doctype=d.sel_type;var q='';if(d.input&&d.input.get_query){var doc={};if(cur_frm)doc=locals[cur_frm.doctype][cur_frm.docname];var q=d.input.get_query(doc);if(!q){return'';}}
+btn.onclick=function(){btn.disabled=true;d.set_doctype=d.sel_type;var q='';if(d.input&&d.input.get_query){var doc={};if(cur_frm)doc=locals[cur_frm.doctype][cur_frm.docname];var q=d.input.get_query(doc,d.input.doctype,d.input.docname);if(!q){return'';}}
 var get_sf_fieldname=function(v){var lf=search_fields[d.sel_type];if(!lf)
 return'name'
 for(var i=0;i<lf.length;i++)if(lf[i][1]==v)return lf[i][0];}

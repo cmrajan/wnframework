@@ -111,7 +111,7 @@ function makeselector() {
 		if(d.input && d.input.get_query) {
 			var doc = {};
 			if(cur_frm) doc = locals[cur_frm.doctype][cur_frm.docname];
-			var q = d.input.get_query(doc);
+			var q = d.input.get_query(doc, d.input.doctype, d.input.docname);
 			if(!q) { return ''; }
 		}
 

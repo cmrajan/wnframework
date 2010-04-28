@@ -235,7 +235,7 @@ AutoSuggest.prototype.doAjaxRequest = function (input)
 	this.oP.link_field.set_get_query();
 	if(this.oP.link_field.get_query) {
 		if(cur_frm)var doc = locals[cur_frm.doctype][cur_frm.docname];
-		q = this.oP.link_field.get_query(doc);
+		q = this.oP.link_field.get_query(doc, this.oP.link_field.doctype, this.oP.link_field.docname);
 	}
 	$c('webnotes.widgets.search.search_link', args={
 		'txt': this.fld.value, 
