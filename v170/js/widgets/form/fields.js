@@ -360,7 +360,7 @@ DataField.prototype.make_input = function() {
 }
 DataField.prototype.validate = function(v) {
 	if(this.df.options == 'Phone') {
-		if(v+''=='')return;
+		if(v+''=='')return '';
 		v1 = ''
 		// phone may start with + and must only have numbers later, '-' and ' ' are stripped
 		v = v.replace(/ /g, '').replace(/-/g, '').replace(/\(/g, '').replace(/\)/g, '');
