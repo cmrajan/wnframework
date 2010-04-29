@@ -79,8 +79,10 @@ class Database:
 			else:
 				self._cursor.execute(query)	
 		except Exception, e:
-			if ignore_no_table and e.args[0]==1146: # Table not found = no records
-				return ()
+			if webnotes.app_conn:
+			 	if e.args[0]==1146 and ignore_no_table: # Table not found = no records
+					return ()
+				#elif e.args[0]==1054: # field not found
 			else:
 				raise e
 

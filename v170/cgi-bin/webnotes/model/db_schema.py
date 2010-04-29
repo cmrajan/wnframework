@@ -129,11 +129,15 @@ def updatecolumns(doctype):
 # -----------
 
 def updateindex(doctype):
-	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE search_index=1 and parent='%s'" % doctype)
+	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=1 and parent='%s'" % doctype)
+	
+	# get keys
+	kl = [i[4] for i in webnotes.conn.sql("show keys from `tab%s`" % doctype)]
+
 	for f in addlist:
 		try:
-			# ???? check if index exists??
-			webnotes.conn.sql("alter table `tab%s` add index %s(%s)" % (doctype, f[0], f[0]))
+			if not f[0] in kl: # if not exists
+				webnotes.conn.sql("alter table `tab%s` add index %s(%s)" % (doctype, f[0], f[0]))
 		except:
 			pass
 
@@ -141,7 +145,8 @@ def updateindex(doctype):
 	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=0 and parent='%s'" % doctype)
 	for f in addlist:
 		try:
-			webnotes.conn.sql("alter table `tab%s` drop index %s" % (doctype, f[0]))
+			if f[0] in kl: # if exists
+				webnotes.conn.sql("alter table `tab%s` drop index %s" % (doctype, f[0]))
 		except:
 			pass
 
@@ -189,11 +194,41 @@ def updatedb(dt):
 # Synchronize tables from Application Database, if exists
 # -------------------------------------------------------
 
+def sync_all():
+	# check the last modified table, if this table is also modified in the current, then the system
+	# synched, if not then it must be synched
+	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType`" )
+	try:
+		t2 = webnotes.conn.sql("SELECT MAX(modified) from `tabDocType Update Register`", ignore_no_table = 0)
+	except Exception, e:
+		if e.args[0] == 1146:	
+			create_adt_update_table()
+			t2 = None
+		else:
+			raise e
+			
+	if t1 and t2 and t1[0][0] == t2[0][0]:
+		# all clear
+		pass
+	else:
+		# sync all tables (?)
+		tl = webnotes.app_conn.sql("select name from tabDocType where ifnull(issingle,0)=1")
+		for t in tl:
+			sync_dt(t[0])
+
+
+# create update register
+# ----------------------
+
 def create_adt_update_table():
+	webnotes.conn.sql('COMMIT')
+
 	webnotes.conn.sql("""
 		create table `tabDocType Update Register` (
 			name varchar(120) not null primary key, 
 			modified datetime) ENGINE=InnoDB""")
+
+	webnotes.conn.sql('START TRANSACTION')
 
 def sync_dt(dt):
 	if not webnotes.app_conn:
@@ -206,10 +241,8 @@ def sync_dt(dt):
 	except Exception, e:
 		if e.args[0] == 1146:
 			# No table created yet (?), create one
-			webnotes.conn.sql('COMMIT')
 			create_adt_update_table()
 			t2 = None
-			webnotes.conn.sql('START TRANSACTION')
 		else:
 			raise e
 	
