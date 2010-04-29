@@ -207,6 +207,7 @@ def sync_all():
 			
 	if t1 and t2 and t1[0][0] == t2[0][0]:
 		# all clear
+		webnotes.msgprint("Nothing to sync")
 		pass
 	else:
 		# sync all tables (?)
