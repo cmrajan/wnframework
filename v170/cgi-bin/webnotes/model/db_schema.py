@@ -78,12 +78,17 @@ def _change_column(f, dt, col_def):
 			else:
 				raise e
 		#webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
+
+def _get_dt_fields(doctype):
+	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
+		return sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+	else:
+		return sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+
 			
 def updatecolumns(doctype):
-	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
-		flist = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype FROM tabDocField WHERE parent = '%s'" % doctype)
-	else:
-		flist = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype FROM tabDocField WHERE parent = '%s'" % doctype)
+
+	flist = _get_dt_fields(doctype)
 
 	# list of existing columns - always from user db
 	cur_fields = webnotes.conn.sql("DESC `tab%s`" % (doctype))
@@ -159,8 +164,29 @@ def update_engine(doctype=None, engine='InnoDB'):
 			webnotes.conn.sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
 
 def create_table(dt):
-	webnotes.conn.sql("""
-		create table `tab%s` (
+	
+	# get fields specified from docfields
+	add_fields, add_index = [], []
+	
+	# build
+	flist = _get_dt_fields(dt)
+	for f in flist:
+		ft = getcoldef(f[2], f[3])
+		if f[1] and ft and (f[1] not in ['name','creation','modified','modified_by','owner','docstatus','parent','parenttype','parentfield','idx']):
+			add_fields.append('`' + f[1] + '` ' + ft)
+			
+			if f[5]:
+				add_index.append('index `' + f[1] + '`(`' + f[1] + '`)')
+
+	add_fields = add_fields and (', '.join(add_fields) + ', ') or ''
+	
+	# add indexes
+	add_fields += add_index and (', '.join(add_index) + ', ') or ''
+
+	# add indexes
+
+	# make the query
+	q = """create table `tab%s` (
 			name varchar(120) not null primary key, 
 			creation datetime, 
 			modified datetime, 
@@ -171,7 +197,11 @@ def create_table(dt):
 			parentfield varchar(120), 
 			parenttype varchar(120), 
 			idx int(8),
-			index parent(parent)) ENGINE=InnoDB""" % (dt))
+			%s
+			index parent(parent)) ENGINE=InnoDB""" % (dt, add_fields)
+	
+	# execute
+	webnotes.conn.sql(q)
 
 def updatedb(dt):
 	# if single type, nothing to do
@@ -183,11 +213,12 @@ def updatedb(dt):
 	if not (('tab'+dt).lower() in names):  
 		create_table(dt)
 
-	# update columns
-	updatecolumns(dt)
-
-	# update index
-	updateindex(dt)
+	else:
+		# update columns
+		updatecolumns(dt)
+	
+		# update index
+		updateindex(dt)
 
 # Synchronize tables from Application Database, if exists
 # -------------------------------------------------------
@@ -207,7 +238,7 @@ def sync_all():
 			
 	if t1 and t2 and t1[0][0] == t2[0][0]:
 		# all clear
-		webnotes.msgprint("Nothing to sync")
+		#webnotes.msgprint("Nothing to sync")
 		pass
 	else:
 		# sync all tables (?)
