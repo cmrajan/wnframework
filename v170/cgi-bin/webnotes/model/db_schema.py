@@ -87,9 +87,6 @@ def updatecolumns(doctype):
 
 	# list of existing columns - always from user db
 	cur_fields = webnotes.conn.sql("DESC `tab%s`" % (doctype))
-			
-
-	old_fields = [f[0] for f in flist]
 
 	for f in flist:
 		change = 0
@@ -97,11 +94,12 @@ def updatecolumns(doctype):
 		# not in current fields
 		if not (f[1] in [e[0] for e in cur_fields]):
 
-			# name changed
-			if f[0]: change = 1
+			# name changed --- will not work in add_conn
+			#if (not webnotes.app_conn) and f[0]: change = 1
 			
 			# new field
-			else: _add_column(f, doctype)
+			#else: 
+			_add_column(f, doctype)
 		
 		# type or length has changed
 		col_def = getcoldef(f[2], f[3])
