@@ -210,7 +210,7 @@ def sync_all():
 		pass
 	else:
 		# sync all tables (?)
-		tl = webnotes.app_conn.sql("select name from tabDocType where ifnull(issingle,0)=1")
+		tl = webnotes.app_conn.sql("select name from tabDocType where ifnull(issingle,0)=0")
 		for t in tl:
 			sync_dt(t[0])
 
