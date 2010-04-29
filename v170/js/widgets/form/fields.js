@@ -361,15 +361,22 @@ DataField.prototype.make_input = function() {
 DataField.prototype.validate = function(v) {
 	if(this.df.options == 'Phone') {
 		if(v+''=='')return;
+		v1 = ''
 		// phone may start with + and must only have numbers later, '-' and ' ' are stripped
-		v = v.replace(/ /g, '').replace(/-/g, '');
+		v = v.replace(/ /g, '').replace(/-/g, '').replace(/\(/g, '').replace(/\)/g, '');
+
+		// allow initial +,0,00
 		if(v && v.substr(0,1)=='+') {
-			var rest = cint(v.substr(1))
-			v = '+' + rest;
-		} else {
-			v = cint(v);
+			v1 = '+'; v = v.substr(1);
 		}
-		return v;
+		if(v && v.substr(0,2)=='00') {
+			v1 += '00'; v = v.substr(2);
+		} 
+		if(v && v.substr(0,1)=='0') {
+			v1 += '0'; v = v.substr(1);
+		}
+		v1 += cint(v) + '';
+		return v1;
 	} else if(this.df.options == 'Email') {
 		if(!validate_email(v)) {
 			msgprint(this.df.label + ': ' + v + ' is not a valid email id');
