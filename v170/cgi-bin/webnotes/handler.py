@@ -24,11 +24,13 @@ fw_folder = '/Users/rushabh/workbench/www/'
 def startup():
 	import webnotes.model.doc
 	import webnotes.model.doctype
+	import webnotes.model.db_schema
 	import webnotes.widgets.page
 	import webnotes.widgets.menus
 	import webnotes.profile
 	
 	webnotes.response['profile'] = webnotes.user.load_profile()
+	webnotes.model.db_schema.sync_all()
 
 	doclist = []
 	doclist += webnotes.model.doc.get('Control Panel')
