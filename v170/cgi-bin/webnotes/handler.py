@@ -30,7 +30,10 @@ def startup():
 	import webnotes.profile
 	
 	webnotes.response['profile'] = webnotes.user.load_profile()
-	webnotes.model.db_schema.sync_all()
+	try:
+		webnotes.model.db_schema.sync_all()
+	except:
+		pass
 
 	doclist = []
 	doclist += webnotes.model.doc.get('Control Panel')
