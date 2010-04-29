@@ -100,7 +100,7 @@ class EMail:
 		self.validate()
 		
 		import smtplib
-		sess = smtplib.SMTP(self.server, cint(self.port))
+		sess = smtplib.SMTP(self.server, self.port and cint(self.port) or None)
 		
 		if self.use_ssl: 
 			sess.ehlo()
