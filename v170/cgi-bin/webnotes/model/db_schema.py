@@ -227,7 +227,7 @@ def updatedb(dt):
 def sync_all(verbose=0):
 	# check the last modified table, if this table is also modified in the current, then the system
 	# synched, if not then it must be synched
-	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType`" )
+	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType` where ifnull(issingle,0)=0" )
 	try:
 		t2 = webnotes.conn.sql("SELECT MAX(modified) from `tabDocType Update Register`", ignore_no_table = 0)
 	except Exception, e:
@@ -240,7 +240,8 @@ def sync_all(verbose=0):
 			raise e
 	
 	if t2 and verbose:
-		webnotes.msgprint('Last updated on: ' + str(t2[0][0]))
+		webnotes.msgprint('Target last updated on: ' + str(t2[0][0]))
+		webnotes.msgprint('Source last updated on: ' + str(t2[0][0]))
 			
 	if t1 and t2 and t1[0][0] == t2[0][0]:
 		# all clear
