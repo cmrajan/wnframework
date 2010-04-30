@@ -365,6 +365,7 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 _r.ReportBuilder.prototype.setup_filters = function() {
 
 	function can_dt_be_submitted(dt) {
+		if(locals.DocType && locals.DocType[dt] && locals.DocType[dt].allow_trash) return 1;
 		var plist = getchildren('DocPerm', dt, 'permissions', 'DocType');
 		for(var pidx in plist) {
 			if(plist[pidx].submit) return 1;

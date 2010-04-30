@@ -63,7 +63,7 @@ this.set_sort_options(new_sl);if(sc&&sc.sort_by){this.dt.sort_sel.value=sc.sort_
 if(sc&&sc.sort_order){sc.sort_order=='ASC'?this.dt.set_asc():this.dt.set_desc();}
 if(sc&&sc.page_len){this.dt.page_len_sel.inp.value=sc.page_len;}
 this.current_loaded=criteria_name;this.set_main_title(criteria_name,sc.description);}
-_r.ReportBuilder.prototype.setup_filters=function(){function can_dt_be_submitted(dt){var plist=getchildren('DocPerm',dt,'permissions','DocType');for(var pidx in plist){if(plist[pidx].submit)return 1;}
+_r.ReportBuilder.prototype.setup_filters=function(){function can_dt_be_submitted(dt){if(locals.DocType&&locals.DocType[dt]&&locals.DocType[dt].allow_trash)return 1;var plist=getchildren('DocPerm',dt,'permissions','DocType');for(var pidx in plist){if(plist[pidx].submit)return 1;}
 return 0;}
 var me=this;var dt=me.parent_dt?me.parent_dt:me.doctype;var fl=[{'fieldtype':'Data','label':'ID','fieldname':'name','in_filter':1,'parent':dt},{'fieldtype':'Data','label':'Owner','fieldname':'owner','in_filter':1,'parent':dt},{'fieldtype':'Date','label':'Created on','fieldname':'creation','in_filter':0,'parent':dt},{'fieldtype':'Date','label':'Last modified on','fieldname':'modified','in_filter':0,'parent':dt},];if(can_dt_be_submitted(dt)){fl[fl.length]={'fieldtype':'Check','label':'Saved','fieldname':'docstatus','search_index':1,'def_filter':1,'parent':dt};fl[fl.length]={'fieldtype':'Check','label':'Submitted','fieldname':'docstatus','search_index':1,'def_filter':1,'parent':dt};fl[fl.length]={'fieldtype':'Check','label':'Cancelled','fieldname':'docstatus','search_index':1,'parent':dt};}
 me.make_datatable();me.orig_sort_list=[];if(me.parent_dt){me.setup_doctype(fl,me.parent_dt);var fl=[];}
