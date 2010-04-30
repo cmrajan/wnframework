@@ -387,9 +387,9 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 
 	// can this be submitted?
 	if(can_dt_be_submitted(dt)) {
-		fl[fl.length] = {'fieldtype':'Check', 'label':'Saved', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt};
-		fl[fl.length] = {'fieldtype':'Check', 'label':'Submitted', 'fieldname':'docstatus', 'search_index':1, 'def_filter':1, 'parent':dt};
-		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'parent':dt};
+		fl[fl.length] = {'fieldtype':'Check', 'label':'Saved', 'fieldname':'docstatus', 'search_index':1, 'in_filter':1, 'def_filter':1, 'parent':dt};
+		fl[fl.length] = {'fieldtype':'Check', 'label':'Submitted', 'fieldname':'docstatus', 'search_index':1, 'in_filter':1, 'def_filter':1, 'parent':dt};
+		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'in_filter':1, 'parent':dt};
 	}
 	
 	me.make_datatable();
