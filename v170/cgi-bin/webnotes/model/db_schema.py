@@ -176,7 +176,8 @@ def create_table(dt):
 			add_fields.append('`' + f[1] + '` ' + ft)
 			
 			if f[5]:
-				add_index.append('index `' + f[1] + '`(`' + f[1] + '`)')
+				if not ft.startswith('text'):
+					add_index.append('index `' + f[1] + '`(`' + f[1] + '`)')
 
 	add_fields = add_fields and (', '.join(add_fields) + ', ') or ''
 	
