@@ -237,6 +237,9 @@ def sync_all(verbose=0):
 			t2 = None
 		else:
 			raise e
+	
+	if t2 and verbose:
+		webnotes.msgprint('Last updated on: ' + str(t2[0][0]))
 			
 	if t1 and t2 and t1[0][0] == t2[0][0]:
 		# all clear
