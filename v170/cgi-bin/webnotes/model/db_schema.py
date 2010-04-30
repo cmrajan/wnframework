@@ -223,29 +223,33 @@ def updatedb(dt):
 # Synchronize tables from Application Database, if exists
 # -------------------------------------------------------
 
-def sync_all():
+def sync_all(verbose=0):
 	# check the last modified table, if this table is also modified in the current, then the system
 	# synched, if not then it must be synched
 	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType`" )
 	try:
 		t2 = webnotes.conn.sql("SELECT MAX(modified) from `tabDocType Update Register`", ignore_no_table = 0)
 	except Exception, e:
-		if e.args[0] == 1146:	
+		if e.args[0] == 1146:
 			create_adt_update_table()
+			if verbose:
+				webnotes.msgprint("Created `tabDocType Update Register`")
 			t2 = None
 		else:
 			raise e
 			
 	if t1 and t2 and t1[0][0] == t2[0][0]:
 		# all clear
-		#webnotes.msgprint("Nothing to sync")
+		if verbose:
+			webnotes.msgprint("Nothing to sync")
 		pass
 	else:
 		# sync all tables (?)
 		tl = webnotes.app_conn.sql("select name from tabDocType where ifnull(issingle,0)=0")
 		for t in tl:
 			sync_dt(t[0])
-
+			if verbose:
+				webnotes.msgprint("Synched %s" % t[0])
 
 # create update register
 # ----------------------
