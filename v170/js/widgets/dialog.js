@@ -56,9 +56,14 @@ Dialog.prototype.show = function() {
 	var d = get_screen_dims();
 	
 	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
-	var t = (get_scroll_top() + ((d.h - this.h)/2));
-	this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
-
+	
+	if(!cint(this.h)) {
+		this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
+	} else {
+		var t = (get_scroll_top() + ((d.h - this.h)/2));
+		this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
+	}
+	
 	top_index++;
 	$y(this.wrapper,{zIndex:top_index});
 
