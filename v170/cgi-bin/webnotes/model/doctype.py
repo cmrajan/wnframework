@@ -15,7 +15,7 @@ class _DocType:
 	def is_modified(self):
 		is_modified = 0
 		modified = sql("SELECT modified from tabDocType where name='%s'" % self.name, allow_testing=0)
-		cache_modified = sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
+		cache_modified = webnotes.conn.sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
 		if not (cache_modified and modified[0][0]==cache_modified[0][0]):
 			is_modified = 1
 		return modified, is_modified, cache_modified
@@ -37,13 +37,13 @@ class _DocType:
 		import zlib
 
 		if not cache_modified:
-			sql("INSERT INTO `__DocTypeCache` (`name`) VALUES ('%s')" % self.name)
-		sql("UPDATE `__DocTypeCache` SET `modified`=%s, `content`=%s WHERE name=%s", (modified[0][0], zlib.compress(str([d.fields for d in doclist]),2), self.name))
+			webnotes.conn.sql("INSERT INTO `__DocTypeCache` (`name`) VALUES ('%s')" % self.name)
+		webnotes.conn.sql("UPDATE `__DocTypeCache` SET `modified`=%s, `content`=%s WHERE name=%s", (modified[0][0], zlib.compress(str([d.fields for d in doclist]),2), self.name))
 
 	def _load_from_cache(self):
 		import zlib
 	
-		doclist = eval(zlib.decompress(sql("SELECT content from `__DocTypeCache` where name='%s'" % self.name)[0][0]))
+		doclist = eval(zlib.decompress(webnotes.conn.sql("SELECT content from `__DocTypeCache` where name='%s'" % self.name)[0][0]))
 		return [webnotes.model.doc.Document(fielddata = d) for d in doclist]
 
 	def _build_client_script(self, doclist):
@@ -133,7 +133,7 @@ def compile_code(doc):
 			conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
 
 def clear_cache():
-	sql("delete from __DocTypeCache")
+	webnotes.conn.sql("delete from __DocTypeCache")
 
 def update_doctype(doclist):
 	doc = doclist[0]

@@ -307,8 +307,11 @@ class Authentication:
 		import os,httplib,urllib
 		conn=httplib.HTTPConnection("ipinfodb.com")  #open connention
 		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json'}
-		conn.request("GET", "/ip_query.php?"+urllib.urlencode(args))
-		self.session['data']['ipinfo'] = eval(conn.getresponse().read())
+		try:
+			conn.request("GET", "/ip_query.php?"+urllib.urlencode(args))
+			self.session['data']['ipinfo'] = eval(conn.getresponse().read())
+		except:
+			pass
 
 	# Start Session
 	# =================================================================================

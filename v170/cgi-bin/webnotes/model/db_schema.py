@@ -81,9 +81,19 @@ def _change_column(f, dt, col_def):
 
 def _get_dt_fields(doctype):
 	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
-		return sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
 	else:
-		return sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+
+	fl2 = _get_custom_fields(doctype)
+	if fl2:
+		return fl + fl2
+	else:
+		return fl
+
+def _get_custom_fields(doctype):
+	if 'tabCustom Field' in  [t[0] for t in sql("show tables")]:
+		return sql(" SELECT '', fieldname, fieldtype, '', '', search_index FROM tabDocField WHERE parent = '%s'" % doctype)
 
 			
 def updatecolumns(doctype):

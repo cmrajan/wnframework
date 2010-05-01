@@ -47,6 +47,9 @@ class Document:
 	def __nonzero__(self):
 		return True
 
+	def __str__(self):
+		return str(self.fields)
+
 	# Load Document
 	# -------------
 
@@ -80,12 +83,12 @@ class Document:
 	# Load Fields from dataset
 	# ------------------------
 
-	def loadfields(self, dataset, rid, description):
+	def loadfields(self, dataset, ridx, description):
 		try: import decimal # for decimal Python 2.5 (?)
 		except: pass
 		import datetime
 		for i in range(len(description)):
-			v = dataset[rid][i]
+			v = dataset[ridx][i]
 			if type(v)==datetime.date:
 				v = str(v)
 			elif type(v)==datetime.timedelta:
@@ -410,27 +413,52 @@ def getseries(key, digits, doctype=''):
 		n = 1
 	return ('%0'+str(digits)+'d') % n
 
+# Merge Custom Fields - for custom fields
+# -------------------
+
+def merge_custom_fields(l, name):
+	fl = conn.sql("select * from `tabCustom Field` where dt='%s' order by idx" % (name))
+	desc = conn.get_description()
+	
+	for i in range(len(fl)):
+		d = Document()
+		d.loadfields(fl, i, desc)
+		d.doctype = 'DocField'
+		d.parent = name
+		d.parenttype = 'DocType'
+		d.parentfield = 'fields'
+		del d.fields['dt']
+		l.append(d)
+
 
 # Get Children
 # ------------
 
 def getchildren(name, childtype, field='', parenttype=''):
+	import webnotes
 	
 	tmp = ''
+	
 	if field: 
 		tmp = ' and parentfield="%s" ' % field
 	if parenttype: 
 		tmp = ' and parenttype="%s" ' % parenttype
 
 	dataset = conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
+	desc = conn.get_description()
 
 	l = []
 	
 	for i in range(len(dataset)):
-		d = webnotes.model.doc.Document()
+		d = Document()
 		d.doctype = childtype
-		d.loadfields(dataset, i, conn.get_description())
+		d.loadfields(dataset, i, desc)
 		l.append(d)
+
+	if childtype=='DocField':
+		merge_custom_fields(l, name)
+		#webnotes.msgprint([i.fields for i in l])
+	
 	return l
 
 # check if the DocType is application doctype
