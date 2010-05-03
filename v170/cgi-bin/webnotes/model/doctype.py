@@ -118,7 +118,7 @@ class _DocType:
 
 def get_custom_script(dt, script_type):
 	if 'tabCustom Script' in  [t[0] for t in webnotes.conn.sql("show tables")]:
-		script = sql("select script from `tabCustom Script` where dt=%s and script_type=%s", (dt, script_type))
+		script = sql("select script from `tabCustom Script` where dt=%s and script_type=%s and ifnull(docstatus,0)<2", (dt, script_type))
 		return script and script[0][0] or ''
 	return ''
 
