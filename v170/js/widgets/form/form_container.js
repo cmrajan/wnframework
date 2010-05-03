@@ -82,14 +82,13 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	if(!cur_frm.meta.allow_copy)
 		this.page_head.add_button('Copy', function() { cur_frm.copy_doc(); }, 0, 'ui-icon-copy');
 
-	// Trash	
+	// Trash
 	if(cur_frm.meta.allow_trash && cint(cur_frm.doc.docstatus) != 2 && (!cur_frm.doc.__islocal) && p[CANCEL])
 		this.page_head.add_button('Trash', function() { cur_frm.savetrash() }, 0, 'ui-icon-trash');			
 }
 
 _f.FrmContainer.prototype.show_toolbar = function() {
 	//for(var i=0; i<this.head_elements.length; i++) this.head_elements[i].is_inline ? $di(this.head_elements[i]) : $ds(this.head_elements[i]);
-
 	this.refresh_btns();
 }
 
