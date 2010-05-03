@@ -417,8 +417,8 @@ def getseries(key, digits, doctype=''):
 # -------------------
 
 def merge_custom_fields(l, name):
-	fl = conn.sql("select * from `tabCustom Field` where dt='%s' order by idx" % (name))
-	desc = conn.get_description()
+	fl = webnotes.conn.sql("select * from `tabCustom Field` where dt='%s' order by idx" % (name))
+	desc = webnotes.conn.get_description()
 	
 	for i in range(len(fl)):
 		d = Document()

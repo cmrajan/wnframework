@@ -93,7 +93,7 @@ def _get_dt_fields(doctype):
 
 def _get_custom_fields(doctype):
 	if 'tabCustom Field' in  [t[0] for t in sql("show tables")]:
-		return sql(" SELECT '', fieldname, fieldtype, '', '', 0 FROM `tabCustom Field` WHERE dt = '%s'" % doctype)
+		return webnotes.conn.sql(" SELECT '', fieldname, fieldtype, '', '', 0 FROM `tabCustom Field` WHERE dt = '%s'" % doctype)
 
 			
 def updatecolumns(doctype):
