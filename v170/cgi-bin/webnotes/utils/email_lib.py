@@ -100,7 +100,7 @@ class EMail:
 		self.validate()
 		
 		import smtplib
-		sess = smtplib.SMTP(self.server, self.port and cint(self.port) or 21)
+		sess = smtplib.SMTP(self.server, self.port or None)
 		
 		if self.use_ssl: 
 			sess.ehlo()
@@ -120,8 +120,6 @@ class EMail:
 		self.msg['Reply-To'] = self.reply_to
 		if self.cc:
 			self.msg['CC'] = ', '.join([r.strip() for r in self.cc])
-		
-		#msgprint('<pre><code>'+self.msg.as_string()+'</code></pre>')
 				
 		sess.sendmail(self.sender, self.recipients, self.msg.as_string())
 		
