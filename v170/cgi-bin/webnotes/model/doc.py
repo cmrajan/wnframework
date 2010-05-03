@@ -417,18 +417,21 @@ def getseries(key, digits, doctype=''):
 # -------------------
 
 def merge_custom_fields(l, name):
-	fl = webnotes.conn.sql("select * from `tabCustom Field` where dt='%s' and ifnull(docstatus,0)<2 order by idx" % (name))
-	desc = webnotes.conn.get_description()
-	
-	for i in range(len(fl)):
-		d = Document()
-		d.loadfields(fl, i, desc)
-		d.doctype = 'DocField'
-		d.parent = name
-		d.parenttype = 'DocType'
-		d.parentfield = 'fields'
-		del d.fields['dt']
-		l.append(d)
+	try:
+		fl = webnotes.conn.sql("select * from `tabCustom Field` where dt='%s' and ifnull(docstatus,0)<2 order by idx" % (name))
+		desc = webnotes.conn.get_description()
+		
+		for i in range(len(fl)):
+			d = Document()
+			d.loadfields(fl, i, desc)
+			d.doctype = 'DocField'
+			d.parent = name
+			d.parenttype = 'DocType'
+			d.parentfield = 'fields'
+			del d.fields['dt']
+			l.append(d)
+	except:
+		pass
 
 
 # Get Children
