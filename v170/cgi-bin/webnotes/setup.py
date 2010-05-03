@@ -146,7 +146,7 @@ def import_db(source, target='', is_accounts=0):
 
 	sql("use %s;" % target)
 	sql("DROP TABLE IF EXISTS `__DocTypeCache`")
-	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT)")
+	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
 	sql("update tabProfile set password = password('admin') where name='Administrator'")
 	sql("update tabDocType set server_code_compiled = NULL")
 

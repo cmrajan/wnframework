@@ -14,7 +14,9 @@ convert_to_lists = webnotes.conn.convert_to_lists
 version = 'v170'
 NEWLINE = '\n'
 BACKSLASH = '\\'
-	
+
+#=================================================================================
+
 def execute(code, doc=None, doclist=[]):
 	# execute it
 	exec code in globals()
@@ -23,32 +25,31 @@ def execute(code, doc=None, doclist=[]):
 	if doc:
 		d = DocType(doc, doclist)
 		return d
-	
+
+#=================================================================================
+
 def get_server_obj(doc, doclist = [], basedoctype = ''):
 	import marshal
 	dt = basedoctype and basedoctype or doc.doctype
 
-	# default code (if none is present
-	ex_code = '''
-class DocType:
-	def __init__(self, d, dl):
-		self.doc, self.doclist = d, dl'''
-
 	# load from application or main
-	conn = webnotes.app_conn or webnotes.conn
-
-	sc_compiled = conn.get_value('DocType', dt, 'server_code_compiled')
-	if sc_compiled:
-		ex_code = marshal.loads(sc_compiled)
-	if not sc_compiled:
-		sc_core = cstr(conn.get_value('DocType', dt, 'server_code_core'))
-		sc = cstr(conn.get_value('DocType', dt, 'server_code'))
-		
-		if sc_core or sc:
-			ex_code = sc_core + sc
-		ex_code = ex_code.strip()
+	sc_compiled = None
 	
-	return execute(ex_code, doc, doclist)
+	try:
+		# get compiled code
+		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)[0][0]
+		return execute(marshal.loads(sc_compiled), doc, doclist)
+	except:
+		# compile
+		import webnotes.model.doctype
+		webnotes.model.doctype.compile_code(Document('DocType', doc.doctype))
+
+		# load
+		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)
+		if sc_compiled:
+			return execute(marshal.loads(sc_compiled[0][0]), doc, doclist)
+		
+#=================================================================================
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:
@@ -61,7 +62,9 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 		return get_server_obj(doclist[0], doclist)
 	else:
 		return get_server_obj(doc, doclist)
-		
+
+#=================================================================================
+
 def run_server_obj(server_obj, method_name, arg=None):
 	if server_obj and hasattr(server_obj, method_name):
 		if arg:
@@ -69,7 +72,9 @@ def run_server_obj(server_obj, method_name, arg=None):
 		else:
 			return getattr(server_obj, method_name)()
 			
-# deprecated methods for ensuring smooth transfer from v160 apps
+# deprecated methods to keep v160 apps happy
+#=================================================================================
+
 def updatedb(doctype, userfields = [], args = {}):
 	pass
 

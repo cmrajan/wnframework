@@ -93,12 +93,13 @@ def _get_dt_fields(doctype):
 
 def _get_custom_fields(doctype):
 	if 'tabCustom Field' in  [t[0] for t in sql("show tables")]:
-		return sql(" SELECT '', fieldname, fieldtype, '', '', search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+		return sql(" SELECT '', fieldname, fieldtype, '', '', 0 FROM `tabCustom Field` WHERE dt = '%s'" % doctype)
 
 			
 def updatecolumns(doctype):
 
 	flist = _get_dt_fields(doctype)
+
 
 	# list of existing columns - always from user db
 	cur_fields = webnotes.conn.sql("DESC `tab%s`" % (doctype))
@@ -210,7 +211,7 @@ def create_table(dt):
 			idx int(8),
 			%s
 			index parent(parent)) ENGINE=InnoDB""" % (dt, add_fields)
-	
+		
 	# execute
 	webnotes.conn.sql(q)
 

@@ -43,13 +43,20 @@ class _DocType:
 	def _load_from_cache(self):
 		import zlib
 	
-		doclist = eval(zlib.decompress(webnotes.conn.sql("SELECT content from `__DocTypeCache` where name='%s'" % self.name)[0][0]))
+		doclist = eval(zlib.decompress(webnotes.conn.sql("SELECT content from `__DocTypeCache` where name=%s", self.name)[0][0]))
 		return [webnotes.model.doc.Document(fielddata = d) for d in doclist]
 
 	def _build_client_script(self, doclist):
-		client_script = str(doclist[0].client_script_core or '') + '\n' + str(doclist[0].client_script or '')
+		# get custom (if present)
+		custom = get_custom_script(self.name, 'Client')
+
+		client_script = [str(doclist[0].client_script_core or ''), str(doclist[0].client_script or ''), (custom or '')]
+
+		# make into a single script
+		client_script = '\n'.join(client_script)
 		
-		if client_script:
+		# compile for import
+		if client_script.strip():
 			import re
 			p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
 	
@@ -109,6 +116,14 @@ class _DocType:
 
 #=================================================================================
 
+def get_custom_script(dt, script_type):
+	if 'tabCustom Script' in  [t[0] for t in webnotes.conn.sql("show tables")]:
+		script = sql("select script from `tabCustom Script` where dt=%s and script_type=%s", (dt, script_type))
+		return script and script[0][0] or ''
+	return ''
+
+#=================================================================================
+		
 def scrub_field_names(doclist):
 	restricted = ('name','parent','idx','owner','creation','modified','modified_by','parentfield','parenttype')
 	conn = webnotes.app_conn or webnotes.conn
@@ -121,19 +136,61 @@ def scrub_field_names(doclist):
 					d.fieldname = d.fieldname + '1'
 				conn.set(d, 'fieldname', d.fieldname)
 
+#=================================================================================
+
+def _add_compiled_code_to_cache(code, dt):
+	import marshal
+	if webnotes.conn.sql("select name from __DocTypeCache where name=%s", dt):
+		webnotes.conn.sql("UPDATE __DocTypeCache set server_code_compiled = %s WHERE name=%s", (marshal.dumps(code), dt))
+	else:
+		webnotes.conn.sql("INSERT INTO __DocTypeCache (name, server_code_compiled) VALUES (%s, %s)", (dt, marshal.dumps(code)))
+
+#=================================================================================
+
 def compile_code(doc):
 	conn = webnotes.app_conn or webnotes.conn
-	if doc.server_code or doc.server_code_core:
-		import marshal
+
+	custom = get_custom_script(doc.name, 'Server') or ''
+	c = [doc.server_code_core or '', doc.server_code or '', custom or '']
+	
+	# add default code if no code
+	# ---------------------------
+	if not (c[0] or c[1] or c[2]):
+		c[0] = 	'''class DocType:
+	def __init__(self, d, dl):
+		self.doc, self.doclist = d, dl'''
+	
+	code = None
+		
+	# compile code
+	# ------------
+	try:
+		code = compile('\n'.join(c), '<string>', 'exec')
+		conn.set(doc, 'server_code_error', ' ')
+	except:
+		conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
+				
+	# add to cache
+	# ------------
+	if code:
 		try:
-			code = compile(cstr(doc.server_code_core) + '\n' + cstr(doc.server_code), '<string>', 'exec')
-			conn.set(doc, 'server_code_compiled', marshal.dumps(code))
-			conn.set(doc, 'server_code_error', ' ')
-		except:
-			conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
+			_add_compiled_code_to_cache(code, doc.name)
+		except Exception, e:
+			if e.args[0]==1054:
+				# column not yet made - remove after some time
+				sql("commit")
+				webnotes.conn.sql("alter table __DocTypeCache add `server_code_compiled` text")
+				sql("start transaction")
+				
+				# retry
+				_add_compiled_code_to_cache(code, doc.name)
+			else:
+				raise e
+
+#=================================================================================
 
 def clear_cache():
-	webnotes.conn.sql("delete from __DocTypeCache")
+	webnotes.conn.sql("update __DocTypeCache set modified=NULL")
 
 def update_doctype(doclist):
 	doc = doclist[0]
@@ -147,7 +204,10 @@ def update_doctype(doclist):
 	
 	# reload record
 	for d in doclist:
-		d.loadfromdb()
+		try:
+			d.loadfromdb()
+		except:
+			pass
 	
 	# compile server code
 	compile_code(doc)
@@ -156,7 +216,6 @@ def update_doctype(doclist):
 	clear_cache()
 	
 #=================================================================================
-
 
 def get(dt):
 	doclist = _DocType(dt).make_doclist()
