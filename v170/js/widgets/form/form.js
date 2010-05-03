@@ -428,6 +428,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 _f.Frm.prototype.setup_fields_std = function() {
 	var fl = fields_list[this.doctype]; 
 
+	fl.sort(function(a,b) { return a.idx - b.idx});
+
 	if(fl[0]&&fl[0].fieldtype!="Section Break") {
 		this.layout.addrow(); // default section break
 		if(fl[0].fieldtype!="Column Break") {// without column too
@@ -471,6 +473,8 @@ _f.Frm.prototype.setup_template_layout = function() {
 	
 	// fields
 	var fl = fields_list[this.doctype];
+
+	fl.sort(function(a,b) { return a.idx - b.idx});
 
 	for(var i=0;i<fl.length;i++) {
 		var f=fl[i];
