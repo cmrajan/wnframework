@@ -837,7 +837,7 @@ if(!frms[doctype])
 _f.add_frm(doctype,show_doc);else
 show_doc(frms[doctype]);}
 new_widget('_f.FrmContainer',show_form,1);}
-var newdoc=new_doc;var pscript={};var cur_page;function loadpage(page_name,call_back,menuitem){if(page_name=='_home')
+var newdoc=new_doc;var pscript={};var cur_page;function loadpage(page_name,call_back,menuitem){if(page_name=='_home'||page_name=='Home')
 page_name=home_page;var fn=function(r,rt){if(page_body.pages[page_name]){var p=page_body.pages[page_name]
 page_body.change_to(page_name);try{if(pscript['refresh_'+page_name])pscript['refresh_'+page_name](menuitem);}catch(e){submit_error(e);}}else{var p=render_page(page_name,menuitem);if(menuitem)p.menuitem=menuitem;if(!p)return;}
 if(p.menuitem)p.menuitem.show_selected();cur_page=page_name;if(call_back)call_back();scroll(0,0);nav_obj.open_notify('Page',page_name,'');}
