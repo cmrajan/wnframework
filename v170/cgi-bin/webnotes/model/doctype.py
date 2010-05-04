@@ -33,10 +33,10 @@ class _DocType:
 		cs = conn.get_value('DocType',name,'client_script')
 		return str(csc or '') + '\n' + str(cs or '')
 
-	def _update_cache(self, cache_modified, modified, doclist):
+	def _update_cache(self, is_cache_modified, modified, doclist):
 		import zlib
 
-		if not cache_modified:
+		if not is_cache_modified:
 			webnotes.conn.sql("INSERT INTO `__DocTypeCache` (`name`) VALUES ('%s')" % self.name)
 		webnotes.conn.sql("UPDATE `__DocTypeCache` SET `modified`=%s, `content`=%s WHERE name=%s", (modified[0][0], zlib.compress(str([d.fields for d in doclist]),2), self.name))
 
@@ -93,7 +93,7 @@ class _DocType:
 		
 	def make_doclist(self):
 		tablefields = webnotes.model.get_table_fields(self.name)
-		modified, is_modified, cache_modified = self.is_modified()
+		modified, is_modified, is_cache_modified = self.is_modified()
 
 		if is_modified:
 			# yes
@@ -104,7 +104,7 @@ class _DocType:
 			# don't save compiled server code
 			doclist[0].server_code_compiled = None
 			
-			self._update_cache(cache_modified, modified, doclist)
+			self._update_cache(is_cache_modified, modified, doclist)
 		else:
 			doclist = self._load_from_cache()
 	

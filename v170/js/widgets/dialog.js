@@ -58,7 +58,7 @@ Dialog.prototype.show = function() {
 	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
 	
 	if(!cint(this.h)) {
-		this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
+		this.wrapper.style.top = '60px';
 	} else {
 		var t = (get_scroll_top() + ((d.h - this.h)/2));
 		this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
