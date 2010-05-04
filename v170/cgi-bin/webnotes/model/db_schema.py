@@ -181,14 +181,19 @@ def create_table(dt):
 	
 	# build
 	flist = _get_dt_fields(dt)
+	fname_list = []
 	for f in flist:
 		ft = getcoldef(f[2], f[3])
 		if f[1] and ft and (f[1] not in ['name','creation','modified','modified_by','owner','docstatus','parent','parenttype','parentfield','idx']):
-			add_fields.append('`' + f[1] + '` ' + ft)
 			
-			if f[5]:
-				if not ft.startswith('text'):
-					add_index.append('index `' + f[1] + '`(`' + f[1] + '`)')
+			if not f[1] in fname_list: # check for duplicate
+				add_fields.append('`' + f[1] + '` ' + ft)
+				
+				fname_list.append(f[1])
+				
+				if f[5]:
+					if not ft.startswith('text'):
+						add_index.append('index `' + f[1] + '`(`' + f[1] + '`)')
 
 	add_fields = add_fields and (', '.join(add_fields) + ', ') or ''
 	

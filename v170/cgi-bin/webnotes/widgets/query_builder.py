@@ -11,26 +11,10 @@ def get_search_criteria_list(dt):
 
 def load_report_list():
 	webnotes.response['rep_list'] = get_search_criteria_list(form.getvalue('dt'))
-	
-# GET MATCH CONDITION
-# -------------------
 
-def getmatchcondition(dt, ud, ur):
-	res = sql("SELECT `role`, `match` FROM tabDocPerm WHERE parent = '%s' AND (`read`=1) AND permlevel = 0" % dt)
-	cond = []
-	for r in res:
-		if r[0] in ur: # role applicable to user
-			if r[1]:
-				defvalues = ud.get(r[1],['_NA'])
-				for d in defvalues:
-					cond.append('`tab%s`.`%s`="%s"' % (dt, r[1], d))
-			else: # nomatch i.e. full read rights
-				return ''
-
-	return ' OR '.join(cond)
 	
-# Run Query
-# ---------
+# Get, scrub metadata
+# ====================================================================
 
 def get_sql_tables(q):
 	if q.find('WHERE') != -1:
@@ -78,6 +62,23 @@ def get_sql_meta(tl):
 			
 	return meta
 
+# Additional conditions to fulfill match permission rules
+# ====================================================================
+
+def getmatchcondition(dt, ud, ur):
+	res = sql("SELECT `role`, `match` FROM tabDocPerm WHERE parent = '%s' AND (`read`=1) AND permlevel = 0" % dt)
+	cond = []
+	for r in res:
+		if r[0] in ur: # role applicable to user
+			if r[1]:
+				defvalues = ud.get(r[1],['_NA'])
+				for d in defvalues:
+					cond.append('`tab%s`.`%s`="%s"' % (dt, r[1], d))
+			else: # nomatch i.e. full read rights
+				return ''
+
+	return ' OR '.join(cond)
+	
 def add_match_conditions(q, tl, ur, ud):
 	sl = []
 	for dt in tl:
@@ -100,6 +101,9 @@ def add_match_conditions(q, tl, ur, ud):
 			
 	return q
 
+# execute server-side script from Search Criteria
+# ====================================================================
+
 def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[], filter_values={}, query='', from_export=0):
 	col_idx, i, out, style, header_html, footer_html, page_template = {}, 0, None, [], '', '', ''
 	for c in colnames:
@@ -112,6 +116,7 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 	from webnotes.model.doc import *
 	from webnotes.model.doclist import getlist
 	from webnotes.model.db_schema import updatedb
+	from webnotes.model.code import get_obj
 
 	set = webnotes.conn.set
 	sql = webnotes.conn.sql
@@ -126,7 +131,9 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 
 	return res, style, header_html, footer_html, page_template
 
-#####
+# Entry Point - Run the query
+# ====================================================================
+
 def runquery(q='', ret=0, from_export=0):
 	import webnotes.utils
 	
@@ -204,6 +211,9 @@ def runquery(q='', ret=0, from_export=0):
 			qm = add_match_conditions(qm, tl, webnotes.user.roles, webnotes.user.defaults)
 
 		out['n_values'] = webnotes.utils.cint(sql(qm)[0][0])
+
+# Export to CSV
+# ====================================================================
 
 def runquery_csv():
 	from webnotes.utils import getCSVelement

@@ -1,3 +1,8 @@
+// ReportContainer Contains ReportBuilder objects for all DocTypes
+//  - Only one ReportContainer exists
+//  - Page header is als a part
+//  - New ReportBuilder is made here
+
 _r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
 	
@@ -67,6 +72,13 @@ _r.ReportContainer = function() {
 }
 
 // ===================================================================================
+// + ReportBuilder
+//      + Datatable (grid)
+//      + ColumnPicker
+//      + ReportFilter
+//
+// - Contains all methods relating to saving, loading and executing Search Criteria
+// - Contains ui objects of the report including tabs
 
 _r.ReportBuilder = function(parent, doctype, onload) {
 	this.menuitems = {};
@@ -85,7 +97,7 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 
 	this.make_tabs();
 	this.current_loaded = null;
-	this.make_filters(onload);
+	this.setup_doctype(onload);
 	
 	this.hide = function() {
 		$dh(me.wrapper);
@@ -126,8 +138,9 @@ _r.ReportBuilder.prototype.make_body = function() {
 }
 
 //
-// Saving of criteria
+// Make list of all Criterias relating to this DocType
 // -------------------------------------------------------------------------------------
+// Search Criterias are loaded with the DocType - put them in a list and dict
 
 _r.ReportBuilder.prototype.make_save_criteria = function() {
 	var me = this;
@@ -208,7 +221,7 @@ _r.ReportBuilder.prototype.save_criteria = function(save_as) {
 		msgprint('Filters and Columns Synchronized. You must also "Save" the Search Criteria to update');
 		loaddoc('Search Criteria', this.sc_dict[this.current_loaded]);
 	} else {
-		save_doclist(doc.doctype, doc.name, 'Save', fn);
+		save_doclist(doc.doctype, doc.name, 'Save', fn); // server-side save
 	}
 }
 
@@ -223,6 +236,7 @@ _r.ReportBuilder.prototype.hide_all_filters = function() {
 // -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.run = function() {
+	// Note: all client code is executed in datatable
 	this.dt.run();
 }
 
@@ -291,11 +305,13 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	}
 	this.sc = locals['Search Criteria'][this.sc_dict[criteria_name]];
 
+	// eval the custom script
 	var report = this;
 	if(this.sc && this.sc.report_script) eval(this.sc.report_script);
 	
 	this.large_report = 0;
 
+	// execute the customize_filters method from Search Criteria
 	if(report.customize_filters) {
 		report.customize_filters(this);
 	}
@@ -326,16 +342,20 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 }
 
 // -------------------------------------------------------------------------------------
+// this method must be called after resetting the Search Criteria (or clearing)
+// to set Data table properties
 
 _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 
-	
+	// add additional columns
 	var sc = locals['Search Criteria'][this.sc_dict[criteria_name]];
 	if(sc && sc.add_col)
 		var acl = sc.add_col.split('\n');
 	else
 		var acl = [];
 	var new_sl = [];
+	
+	// update the label in datatable where the column name is specified in the query using AS
 	for(var i=0; i<acl.length; i++) {
 		var tmp = acl[i].split(' AS ');
 		if(tmp[1]) {
@@ -343,6 +363,8 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 			new_sl[new_sl.length] = [t, "`"+t+"`"];
 		}
 	}
+	
+	// set sort
 	this.set_sort_options(new_sl);
 	if(sc && sc.sort_by) {
 		this.dt.sort_sel.value = sc.sort_by;
@@ -353,6 +375,7 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 	if(sc && sc.page_len) {
 		this.dt.page_len_sel.inp.value = sc.page_len;
 	}
+	
 	this.current_loaded = criteria_name;
 	// load additional fields sort option
 	this.set_main_title(criteria_name, sc.description);
@@ -362,8 +385,10 @@ _r.ReportBuilder.prototype.set_criteria_sel = function(criteria_name) {
 // Create the filter UI and column selection UI
 // -------------------------------------------------------------------------------------
 
-_r.ReportBuilder.prototype.setup_filters = function() {
+_r.ReportBuilder.prototype.setup_filters_and_cols = function() {
 
+	// function checks where there is submit permission on the DocType or if the DocType 
+	// can be trashed
 	function can_dt_be_submitted(dt) {
 		if(locals.DocType && locals.DocType[dt] && locals.DocType[dt].allow_trash) return 1;
 		var plist = getchildren('DocPerm', dt, 'permissions', 'DocType');
@@ -374,7 +399,6 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 	}
 
 	var me = this;
-
 	var dt = me.parent_dt?me.parent_dt:me.doctype;
 
 	// default filters
@@ -392,19 +416,20 @@ _r.ReportBuilder.prototype.setup_filters = function() {
 		fl[fl.length] = {'fieldtype':'Check', 'label':'Cancelled', 'fieldname':'docstatus', 'search_index':1, 'in_filter':1, 'parent':dt};
 	}
 	
+	// make the datatable
 	me.make_datatable();
 
-	// Add columns of parent doctype
+	// Add columns and filters of parent doctype
 	me.orig_sort_list = [];
 	if(me.parent_dt) {
-		me.setup_doctype(fl, me.parent_dt); 
+		me.setup_dt_filters_and_cols(fl, me.parent_dt); 
 		var fl = [];
 	}
 
-	// Add columns of selected doctype
-	me.setup_doctype(fl, me.doctype); 
+	// Add columns and filters of selected doctype
+	me.setup_dt_filters_and_cols(fl, me.doctype); 
 
-	// hide primary filters if not fields
+	// hide primary filters blue box if there are no primary filters
 	if(!this.has_primary_filters) 
 		$dh(this.report_filters.first_page_filter);
 
@@ -427,15 +452,12 @@ _r.ReportBuilder.prototype.add_filter = function(f) {
 }
 
 // -------------------------------------------------------------------------------------
+// this is where the filters and columns are created for a particular doctype
 
-_r.ReportBuilder.prototype.setup_doctype = function(fl, dt) {
+_r.ReportBuilder.prototype.setup_dt_filters_and_cols = function(fl, dt) {
 	var me = this; 
-	
-	// set value in Toolbar
-	if(page_body.wntoolbar && page_body.wntoolbar.rb_sel)
-		page_body.wntoolbar.rb_sel.value = dt;
 
-	// set labels
+	// set section headings
 	var lab = $a(me.filter_area,'div','filter_dt_head');
 	lab.innerHTML = 'Filters for ' + dt;
 
@@ -449,6 +471,8 @@ _r.ReportBuilder.prototype.setup_doctype = function(fl, dt) {
 	}
 	
 	// get "high priority" search fields
+	// if the field is in search_field then it should be primary filter (i.e. on first page)
+	
 	var sf_list = locals.DocType[dt].search_fields ? locals.DocType[dt].search_fields.split(',') : [];
 	for(var i in sf_list) sf_list[i] = strip(sf_list[i]);
 	
@@ -502,7 +526,7 @@ _r.ReportBuilder.prototype.validate_permissions = function(onload) {
 
 // -------------------------------------------------------------------------------------
 
-_r.ReportBuilder.prototype.make_filters = function(onload) {
+_r.ReportBuilder.prototype.setup_doctype = function(onload) {
 	// load doctype
 	var me = this;
 	
@@ -513,7 +537,7 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 				if(!me.validate_permissions()) 
 					return;
 				me.make_body();
-				me.setup_filters();
+				me.setup_filters_and_cols();
 				if(onload)onload(me);
 			} );
 	} else {
@@ -527,7 +551,7 @@ _r.ReportBuilder.prototype.make_filters = function(onload) {
 			return;
 		me.validate_permissions();
 		me.make_body();
-		me.setup_filters();
+		me.setup_filters_and_cols();
 		if(onload)onload(me);
 	}
 }
@@ -593,7 +617,10 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		if(sc && sc.server_script) me.dt.server_script = sc.server_script;
 		else me.dt.server_script = null;
 	
-		//load client scripts
+		// load client scripts - attach all functions from ReportBuilder to Datatable
+		// this is a bad way of doing things but since DataTable is a stable object
+		// currently this is okay.... to change in future
+
 		for(var i=0;i<me.fn_list.length;i++) {
 			if(me[me.fn_list[i]]) me.dt[me.fn_list[i]] = me[me.fn_list[i]];
 			else me.dt[me.fn_list[i]] = null;
@@ -602,14 +629,16 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		var fl = []; // field list
 		var docstatus_cl = [];
 		var cl = []; // cond list
+		
+		// format table name
 		var table_name = function(t) { return '`tab' + t + '`'; }
 
-		// advanced - diabled filters
+		// advanced - make list of diabled filters
 		var dis_filters_list = [];
 		if(sc && sc.dis_filters)
 			var dis_filters_list = sc.dis_filters.split('\n');
 		
-		// select columns
+		// make a list of selected columns from ColumnPicker in tableName.fieldName format
 		var t = me.column_picker.get_selected();
 		for(var i=0;i<t.length;i++) {
 			fl.push(table_name(t[i].parent) + '.`'+t[i].fieldname+'`');
@@ -624,7 +653,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			}
 		}
 
-		// filter values for server side
+		// build dictionary for filter values for server side
 		me.dt.filter_vals = {} 
 		add_to_filter = function(k,v,is_select) {
 			if(v==null)v='';
@@ -639,6 +668,8 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			}
 		}
 
+		// loop over the fields and construct the SQL query
+		// ------------------------------------------------
 		for(var i=0;i<me.filter_fields.length;i++) {
 			var t = me.filter_fields[i];
 			
@@ -672,19 +703,26 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 						if(t.get_value()) docstatus_cl[docstatus_cl.length] = table_name(t.df.parent)+'.docstatus=2';
 						else cl[cl.length] = table_name(t.df.parent)+'.docstatus!=2';
 					}
-				} else { // normal
+				} else { 
+					
+					// normal
+					// -------
 					var fn = '`' + t.df.fieldname + '`';
 					var v = t.get_value?t.get_value():'';
 					if(v) {
 						if(in_list(['Data','Link','Small Text','Text'],t.df.fieldtype)) {
 							cl[cl.length] = table_name(t.df.parent) + '.' + fn + ' LIKE "' + v + '%"';
+
 						} else if(t.df.fieldtype=='Select') {
+							// loop for multiple select
 							var tmp_cl = [];
 							for(var sel_i=0;sel_i < v.length; sel_i++) {
 								if(v[sel_i]) {
 									tmp_cl[tmp_cl.length] = table_name(t.df.parent) + '.' + fn + ' = "' + v[sel_i] + '"';
 								}
 							}
+							
+							// join multiple select conditions by OR
 							if(tmp_cl.length)cl[cl.length] = '(' + tmp_cl.join(' OR ') + ')';
 						} else {
 							var condition = '=';
@@ -757,7 +795,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 				this.query += ' GROUP BY ' + sc.group_by;
 			}
 	
-			// replace
+			// replace - in custom query if %(key)s is specified, then replace it by filter values
 			this.query = repl(this.query, me.dt.filter_vals)
 		}
 		
@@ -765,7 +803,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			this.show_query = 1;
 		}
 		
-		// report name
+		// report name - used as filename in export
 		if(me.current_loaded) this.rep_name = me.current_loaded;
 		else this.rep_name = me.doctype;
 	}
