@@ -422,7 +422,7 @@ def merge_custom_fields(l, name):
 		fl = webnotes.conn.sql("select * from `tabCustom Field` where dt='%s' and ifnull(docstatus,0)<2 order by idx" % (name))
 		desc = webnotes.conn.get_description()
 	except Exception, e:
-		if e.arg[0]==1146:
+		if e.args[0]==1146:
 			pass
 		else:
 			raise e
