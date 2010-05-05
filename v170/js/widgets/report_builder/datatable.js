@@ -230,9 +230,9 @@ _r.DataTable.prototype.add_sort_option = function(label, val) {
 _r.DataTable.prototype.update_query = function(no_limit) { 
 
   // add sorting
-  if(this.search_criteria && this.search_criteria.custom_query) {
+  if((_r.rb_con.cur_rb && _r.rb_con.cur_rb.get_query) || (this.search_criteria && this.search_criteria.custom_query)) {
   	
-  	// no sorting
+  	// no sorting if custom_query or get_query
   } else {
 	  this.query += NEWLINE 
              + ' ORDER BY ' + sel_val(this.sort_sel)

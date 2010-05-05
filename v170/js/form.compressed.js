@@ -14,7 +14,7 @@ this.page_head.add_button('Cancel',function(){cur_frm.savecancel()},0,'ui-icon-c
 this.page_head.add_button('Amend',function(){cur_frm.amend_doc()},0,'ui-icon-scissors');this.page_head.add_button('New',function(){new_doc()},0,'ui-icon-document');this.page_head.add_button('Refresh',function(){cur_frm.reload_doc();},0,'ui-icon-refresh');if(!cur_frm.meta.allow_print)
 this.page_head.add_button('Print',function(){cur_frm.print_doc();},0,'ui-icon-print');if(!cur_frm.meta.allow_email)
 this.page_head.add_button('Email',function(){cur_frm.email_doc();},0,'ui-icon-mail-closed');if(!cur_frm.meta.allow_copy)
-this.page_head.add_button('Copy',function(){cur_frm.copy_doc();},0,'ui-icon-copy');if(cur_frm.meta.allow_trash&&cint(cur_frm.doc.docstatus)!=2&&(!cur_frm.doc.__islocal)&&(p[WRITE]||p[CREATE]))
+this.page_head.add_button('Copy',function(){cur_frm.copy_doc();},0,'ui-icon-copy');if(cur_frm.meta.allow_trash&&cint(cur_frm.doc.docstatus)!=2&&(!cur_frm.doc.__islocal)&&p[CANCEL])
 this.page_head.add_button('Trash',function(){cur_frm.savetrash()},0,'ui-icon-trash');}
 _f.FrmContainer.prototype.show_toolbar=function(){this.refresh_btns();}
 _f.FrmContainer.prototype.hide_toolbar=function(){}
