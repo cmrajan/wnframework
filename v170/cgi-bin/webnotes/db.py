@@ -201,4 +201,5 @@ class Database:
 			return None
 
 	def close(self):
-		self._conn.close()
+		if self._conn:
+			self._conn.close()

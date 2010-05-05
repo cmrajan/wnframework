@@ -76,11 +76,12 @@ LocalDB.sync = function(list) {
 			if(!fields_list[d.parent])fields_list[d.parent] = [];
 			fields_list[d.parent][fields_list[d.parent].length] = d;
 
+			if(!fields[d.parent])
+				fields[d.parent] = {};
+			
 			if(d.fieldname) {
-				if(!fields[d.parent])fields[d.parent] = {};	
 				fields[d.parent][d.fieldname] = d;
 			} else if(d.label) {
-				if(!fields[d.parent])fields[d.parent] = {};	
 				fields[d.parent][d.label] = d;
 			}
 		} else if(d.doctype=='Event') {
