@@ -69,6 +69,10 @@ LocalDB.sync = function(list) {
 		if(d.doctype=='DocType') {
 			fields_list[d.name] = [];
 		} else if(d.doctype=='DocField') { // field dictionary / list 
+			if(!d.parent) {
+				alert('Error: No parent specified for field "' + d.label + '"');
+			}
+		
 			if(!fields_list[d.parent])fields_list[d.parent] = [];
 			fields_list[d.parent][fields_list[d.parent].length] = d;
 

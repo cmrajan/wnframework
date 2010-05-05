@@ -869,7 +869,8 @@ LocalDB.delete_doc=function(dt,dn){var doc=get_local(dt,dn);for(var ndt in local
 delete locals[dt][dn];}
 function get_local(dt,dn){return locals[dt]?locals[dt][dn]:null;}
 LocalDB.sync=function(list){if(list._kl)list=expand_doclist(list);for(var i=0;i<list.length;i++){var d=list[i];if(!d.name)
-d.name=LocalDB.get_localname(d.doctype);LocalDB.add(d.doctype,d.name);locals[d.doctype][d.name]=d;if(d.doctype=='DocType'){fields_list[d.name]=[];}else if(d.doctype=='DocField'){if(!fields_list[d.parent])fields_list[d.parent]=[];fields_list[d.parent][fields_list[d.parent].length]=d;if(d.fieldname){if(!fields[d.parent])fields[d.parent]={};fields[d.parent][d.fieldname]=d;}else if(d.label){if(!fields[d.parent])fields[d.parent]={};fields[d.parent][d.label]=d;}}else if(d.doctype=='Event'){if((!d.localname)&&_c.calendar&&(!_c.calendar.has_event[d.name]))
+d.name=LocalDB.get_localname(d.doctype);LocalDB.add(d.doctype,d.name);locals[d.doctype][d.name]=d;if(d.doctype=='DocType'){fields_list[d.name]=[];}else if(d.doctype=='DocField'){if(!d.parent){alert('Error: No parent specified for field "'+d.label+'"');}
+if(!fields_list[d.parent])fields_list[d.parent]=[];fields_list[d.parent][fields_list[d.parent].length]=d;if(d.fieldname){if(!fields[d.parent])fields[d.parent]={};fields[d.parent][d.fieldname]=d;}else if(d.label){if(!fields[d.parent])fields[d.parent]={};fields[d.parent][d.label]=d;}}else if(d.doctype=='Event'){if((!d.localname)&&_c.calendar&&(!_c.calendar.has_event[d.name]))
 _c.calendar.set_event(d);}
 if(d.localname)
 notify_rename_observers(d.doctype,d.localname,d.name);}}
