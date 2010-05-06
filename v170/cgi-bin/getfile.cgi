@@ -19,12 +19,23 @@ try:
 	import webnotes
 	import webnotes.auth
 	import webnotes.utils
+	import webnotes.db
 	
 	form = cgi.FieldStorage()
 	n = form.getvalue('name')
 
 	# authenticate
 	auth_obj = webnotes.auth.Authentication(form, {}, [])
+	
+	# login to a particular account (if specified)
+	if form.getvalue('acx'):
+		# resolve database name from account id
+		c = webnotes.db.Database(use_default=1)
+		res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
+
+		# connect
+		webnotes.conn = webnotes.db.Database(user=res[0][1])
+		webnotes.conn.use(res[0][0])
 	
 	# get file
 	res = webnotes.utils.get_file(n)
