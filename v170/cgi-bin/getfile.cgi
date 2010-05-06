@@ -31,7 +31,7 @@ try:
 	if form.getvalue('acx'):
 		# resolve database name from account id
 		c = webnotes.db.Database(use_default=1)
-		res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
+		res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % form.getvalue('acx'))
 
 		# connect
 		webnotes.conn = webnotes.db.Database(user=res[0][1])
