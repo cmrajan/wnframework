@@ -34,7 +34,7 @@ try:
 		res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % form.getvalue('acx'))
 
 		# connect
-		webnotes.conn = webnotes.db.Database(user=res[0][1])
+		webnotes.conn = webnotes.db.Database(user=res[0][1] or res[0][0])
 		webnotes.conn.use(res[0][0])
 	
 	# get file
