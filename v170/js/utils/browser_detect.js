@@ -1,6 +1,5 @@
 /* Version Detect */
 
-var agt=navigator.userAgent.toLowerCase();
 var appVer = navigator.appVersion.toLowerCase();
 var is_minor = parseFloat(appVer);
 var is_major = parseInt(is_minor);
@@ -19,3 +18,5 @@ if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){ //test for Firefox/x.x
 	else if (ffversion>=2) var isFF2 = 1;
 	else if (ffversion>=1) var isFF1 = 1;
 }
+var isSafari = navigator.userAgent.indexOf('Safari')!=-1 ? 1 : 0;
+var isChrome = navigator.userAgent.indexOf('Chrome')!=-1 ? 1 : 0;
