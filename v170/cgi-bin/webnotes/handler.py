@@ -469,7 +469,7 @@ def compressBuf(buf):
 
 if out.get('type')=='csv':
 	print "Content-Type: text/csv"
-	print "Content-Disposition: filename="+out['doctype'].replace(' ', '_')+".csv"
+	print "Content-Disposition: attachment; filename="+out['doctype'].replace(' ', '_')+".csv"
 	print
 	print out['result']
 elif out.get('type')=='iframe':
