@@ -603,7 +603,7 @@ DataField.prototype.validate=function(v){if(this.df.options=='Phone'){if(v+''=='
 v=v.replace(/ /g,'').replace(/-/g,'').replace(/\(/g,'').replace(/\)/g,'');if(v&&v.substr(0,1)=='+'){v1='+';v=v.substr(1);}
 if(v&&v.substr(0,2)=='00'){v1+='00';v=v.substr(2);}
 if(v&&v.substr(0,1)=='0'){v1+='0';v=v.substr(1);}
-v1+=cint(v)+'';return v1;}else if(this.df.options=='Email'){if(!validate_email(v)){msgprint(this.df.label+': '+v+' is not a valid email id');return'';}else
+v1+=cint(v)+'';return v1;}else if(this.df.options=='Email'){if(v+''=='')return'';if(!validate_email(v)){msgprint(this.df.label+': '+v+' is not a valid email id');return'';}else
 return v;}else{return v;}}
 DataField.prototype.onrefresh=function(){if(this.input&&this.df.colour){var col='#'+this.df.colour.split(':')[1];$bg(this.input,col);}}
 function ReadOnlyField(){}ReadOnlyField.prototype=new Field();ReadOnlyField.prototype.with_label=1;function HTMLField(){}HTMLField.prototype=new Field();HTMLField.prototype.set_disp=function(val){this.disp_area.innerHTML=val;}

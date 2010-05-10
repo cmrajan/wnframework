@@ -378,6 +378,7 @@ DataField.prototype.validate = function(v) {
 		v1 += cint(v) + '';
 		return v1;
 	} else if(this.df.options == 'Email') {
+		if(v+''=='')return '';
 		if(!validate_email(v)) {
 			msgprint(this.df.label + ': ' + v + ' is not a valid email id');
 			return '';
