@@ -530,8 +530,11 @@ else:
 	print "Content-Type: text/html; Charset: ISO-8859-1"
 	
 	if cookies:
-		if webnotes.add_cookies: cookies.update(webnotes.add_cookies)
-		print cookies
+		try:
+			if webnotes.add_cookies: cookies.update(webnotes.add_cookies)
+			print cookies
+		except:
+			pass
 	print # Headers end
 	
 if out_buf:
