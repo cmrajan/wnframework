@@ -69,6 +69,7 @@ class Authentication:
 			
 			self.login()
 			self.login_flag = 1
+			webnotes.add_cookies['uid'] = form.getvalue('usr')
 		
 		else:
 			# authenticated user
