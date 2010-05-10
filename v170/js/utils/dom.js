@@ -280,3 +280,14 @@ function get_url_arg(name) {
 	else
 		return results[1];
 }
+
+function get_cookie(c) {
+	var t=""+document.cookie;
+	var ind=t.indexOf(c);
+	if (ind==-1 || c=="") return ""; 
+	var ind1=t.indexOf(';',ind);
+	if (ind1==-1) ind1=t.length; 
+	return unescape(t.substring(ind+c.length+1,ind1));
+}
+
+
