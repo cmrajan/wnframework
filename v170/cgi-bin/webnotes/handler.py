@@ -529,8 +529,7 @@ else:
 		
 	print "Content-Type: text/html; Charset: ISO-8859-1"
 	
-	if cookies:
-		if webnotes.add_cookies: 
+	if cookies or webnotes.add_cookies: 
 			for c in webnotes.add_cookies.keys():
 				cookies[c] = webnotes.add_cookies[c]
 		print cookies
