@@ -9,7 +9,7 @@ var def_ph_style = {
 	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#CDF', display:'none'}
 	,separator: { border:'1px solid #000' } // show this when there is no toolbar
 	,tag_area: { color:'#888', marginBottom:'4px', textAlign:'right', fontSize:'10px' }
-	,close_btn: { cursor:'pointer', width:'44px', cssFloat:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat" }
+	,close_btn: { cursor:'pointer', width:'44px', cssFloat:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat", lineHeight:'1.1em' }
 }
 
 function PageHeader(parent, main_text, sub_text) {
