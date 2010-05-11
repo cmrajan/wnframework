@@ -532,6 +532,7 @@ else:
 	if cookies or webnotes.add_cookies: 
 		for c in webnotes.add_cookies.keys():
 			cookies[c] = webnotes.add_cookies[c]
+			
 		print cookies
 		
 	print # Headers end
