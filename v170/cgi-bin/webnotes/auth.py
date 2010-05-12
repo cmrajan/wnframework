@@ -305,6 +305,8 @@ class Authentication:
 	# Get IP Info from ipinfodb.com
 	# =================================================================================
 	def get_ipinfo(self):
+		return
+		
 		import os,httplib,urllib
 		conn=httplib.HTTPConnection("ipinfodb.com", timeout=3)  #open connention
 		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json'}
