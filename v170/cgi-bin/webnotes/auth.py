@@ -306,7 +306,7 @@ class Authentication:
 	# =================================================================================
 	def get_ipinfo(self):
 		import os,httplib,urllib
-		conn=httplib.HTTPConnection("ipinfodb.com")  #open connention
+		conn=httplib.HTTPConnection("ipinfodb.com", timeout=3)  #open connention
 		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json'}
 		try:
 			conn.request("GET", "/ip_query.php?"+urllib.urlencode(args))
