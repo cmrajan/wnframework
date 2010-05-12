@@ -242,7 +242,8 @@ class Document:
 		return err_list
 
 	def make_link_list(self):
-		res = sql("""
+		c = webnotes.app_conn or webnotes.conn
+		res = c.sql("""
 			SELECT fieldname, options
 			FROM tabDocField
 			WHERE parent='%s' and (fieldtype='Link' or (fieldtype='Select' and `options` like 'link:%%'))""" % (self.doctype))
