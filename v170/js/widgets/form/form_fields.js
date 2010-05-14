@@ -445,7 +445,11 @@ _f.CodeField.prototype.make_input = function() {
 }
 _f.CodeField.prototype.set_disp = function(val) {
 	$y(this.disp_area, {width:'90%'})
-	this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>';
+	if(this.df.fieldtype=='Text Editor') {
+		this.disp_area.innerHTML = val;
+	} else {
+		this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>';
+	}
 }
 _f.CodeField.prototype.setup_editor = function() {
 	var me = this;
