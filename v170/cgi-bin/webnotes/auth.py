@@ -332,8 +332,7 @@ class Authentication:
 		self.conn.sql("insert into tabSessions (sessiondata, user, lastupdate, sid) values (%s , %s, NOW(), %s)", (str(self.session['data']), self.session['user'], self.session['sid']))
 
 		# update profile
-		try: self.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (server.now(), self.remote_ip, session['user']))
-		except: pass
+		self.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (webnotes.utils.now(), self.remote_ip, self.session['user']))
 
 	# Update session, at the end of the request
 	# =================================================================================
