@@ -30,7 +30,7 @@ function onLoginReply(r, rtext) {
 
 function doLogin() {
  var args = {};
- if(in_list(['frappe','michiganeng','indobakels','ecoreco','tastel','ncsci','sun advertising','janak2009'], $i("inpAccount").value)) {
+ if(in_list(['frappe','michiganeng','indobakels','ecoreco','tastel','ncsci','sun advertising'], $i("inpAccount").value)) {
    alert('This account has been migrated to iWebNotes. You will now be redirected to www.iwebnotes.com. Please update your bookmarks');	
    window.location.href = 'http://iwebnotes.com';
    return;
