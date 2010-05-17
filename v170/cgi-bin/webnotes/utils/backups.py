@@ -1,6 +1,7 @@
 import webnotes
 
 backup_folder = '/backups'
+mysql_path = ''
 
 def mysqldump(db, folder=''):
 	global mysql_path
@@ -37,7 +38,8 @@ def backup_all():
 	import os
 	global backup_folder
 	
-	dblist = sql_accounts('select db_name from tabAccount')
+	conn = webnotes.db.Database(use_default=1)
+	dblist = conn.sql('select db_name from tabAccount')
 
 	# backup -all in /backups folder
 	for d in (('accounts'),) + dblist:
