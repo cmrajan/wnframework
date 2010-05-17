@@ -36,6 +36,7 @@ def backup_db(db, from_all=0):
 def backup_all():
 	# backups folder
 	import os
+	import webnotes.db
 	global backup_folder
 	
 	conn = webnotes.db.Database(use_default=1)
