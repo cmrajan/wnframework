@@ -46,6 +46,8 @@ def backup_all():
 	for d in (('accounts'),) + dblist:
 		backup_db(d[0], conn, 1)
 	
+	conn.close()
+	
 	# dump all in /daily folder
 	import time, datetime
 	fname = 'daily-' + time.strftime('%Y-%m-%d') + '.tar.gz'
