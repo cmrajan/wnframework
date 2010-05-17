@@ -27,7 +27,7 @@ def backup_db(db, from_all=0):
 			os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
 			os.system('rm %s/%s.sql' % (p, db))
 		else:
-			msgprint("Another process is running in database. Please try again")
+			print("Another process is running in database. Please try again")
 	except Exception, e:
 		#sql('unlock tables')
 		raise e
