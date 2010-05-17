@@ -1,6 +1,6 @@
 import webnotes
 
-backup_folder = '../../backups'
+backup_folder = '/backups'
 
 def mysqldump(db, folder=''):
 	global mysql_path
@@ -14,8 +14,8 @@ def backup_db(db, from_all=0):
 	try:
 	# Check processlist
 		if len(sql("show processlist")) == 1:
-			p = '../backups'
-			if from_all: p = '../backups/dumps'	
+			p = backup_folder
+			if from_all: p = backup_folder + '/dumps'	
 
 			# clear old file
 			os.system('rm %s/%s.tar.gz' % (p,db))
@@ -35,6 +35,8 @@ def backup_db(db, from_all=0):
 def backup_all():
 	# backups folder
 	import os
+	global backup_folder
+	
 	dblist = sql_accounts('select db_name from tabAccount')
 
 	# backup -all in /backups folder
@@ -46,19 +48,19 @@ def backup_all():
 	fname = 'daily-' + time.strftime('%Y-%m-%d') + '.tar.gz'
 	
 	# daily dump
-	os.system('tar czf ../backups/daily/%s ../backups/dumps' % fname) 
+	os.system('tar czf %s/daily/%s %s/dumps' % (backup_folder, fname, backup_folder))
 
 	# keep only three files
-	if len(os.listdir('../backups/daily')) > 3:
-		delete_oldest_file('../backups/daily')
+	if len(os.listdir(backup_folder + '/daily')) > 3:
+		delete_oldest_file(backup_folder + '/daily')
 
 	# if sunday, then copy to weekly
 	if datetime.datetime.now().weekday()==6:
-		os.system('cp ../backups/daily/'+fname+' ../backups/weekly/'+fname)
+		os.system('cp '+backup_folder+'/daily/'+fname+' '+backup_folder+'/weekly/'+fname)
 	
 		# keep only three files
-		if len(os.listdir('../backups/weekly')) > 3:
-			delete_oldest_file('../backups/weekly')
+		if len(os.listdir(backup_folder + '/weekly')) > 3:
+			delete_oldest_file(backup_folder + '/weekly')
 	
 def delete_oldest_file(folder):
 	import os
