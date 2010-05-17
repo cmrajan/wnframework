@@ -2110,9 +2110,9 @@ def backup_db(db, from_all=0):
 		if len(sql("show processlist")) == 1:
 			p = '../backups'
 			if from_all: p = '../backups/dumps'	
-	
+
 			os.system('rm %s/%s.tar.gz' % (p,db))
-		
+
 			# dump
 			mysqldump(db, p+'/')
 			
@@ -2121,12 +2121,11 @@ def backup_db(db, from_all=0):
 			os.system('rm %s/%s.sql' % (p, db))
 			#sql('unlock tables')
 		else:
-			msgprint("Another process is running in database. Please try after 1 minute.")
+			msgprint("Another process is running in database. Please try again")
 	except Exception, e:
 		#sql('unlock tables')
 		raise e
-	
-  	
+
 def copy_db(source, target=''):
 	# Check processlist
 	if len(sql("show processlist")) == 1:
