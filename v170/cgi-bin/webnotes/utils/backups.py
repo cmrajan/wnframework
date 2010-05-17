@@ -6,7 +6,9 @@ mysql_path = ''
 def mysqldump(db, folder=''):
 	global mysql_path
 	import os
-	os.system('%(path)smysqldump %(db)s > %(folder)s%(db)s.sql -u %(db)s -p%(pwd)s --ignore-table=%(db)s.__DocTypeCache' % {'path':mysql_path, 'db':db, 'pwd':db_password, 'folder':folder})
+	import defs
+	
+	os.system('%(path)smysqldump %(db)s > %(folder)s%(db)s.sql -u %(db)s -p%(pwd)s --ignore-table=%(db)s.__DocTypeCache' % {'path':mysql_path, 'db':db, 'pwd':defs.db_password, 'folder':folder})
 
 def backup_db(db, conn, from_all=0):
 	import os
