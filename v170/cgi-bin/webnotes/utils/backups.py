@@ -8,13 +8,13 @@ def mysqldump(db, folder=''):
 	import os
 	os.system('%(path)smysqldump %(db)s > %(folder)s%(db)s.sql -u %(db)s -p%(pwd)s --ignore-table=%(db)s.__DocTypeCache' % {'path':mysql_path, 'db':db, 'pwd':db_password, 'folder':folder})
 
-def backup_db(db, from_all=0):
+def backup_db(db, conn, from_all=0):
 	import os
 	global backup_folder
 
 	try:
 	# Check processlist
-		if len(sql("show processlist")) == 1:
+		if len(conn.sql("show processlist")) == 1:
 			p = backup_folder
 			if from_all: p = backup_folder + '/dumps'	
 
@@ -44,7 +44,7 @@ def backup_all():
 
 	# backup -all in /backups folder
 	for d in (('accounts'),) + dblist:
-		backup_db(d[0], 1)
+		backup_db(d[0], conn, 1)
 	
 	# dump all in /daily folder
 	import time, datetime
