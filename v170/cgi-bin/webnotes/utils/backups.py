@@ -84,16 +84,14 @@ def get_backup():
 	# get the last nightly backup file from the backups folder
 	if webnotes.conn.cur_db_name:
 		fname = webnotes.conn.cur_db_name + '.tar.gz'
-		webnotes.msgprint('cp '+backup_folder+'/dumps/' + fname + ' ' + os.getcwd() + '/' + download_folder + '/' + fname)
-		webnotes.msgprint(os.system('cp '+backup_folder+'/dumps/' + fname + ' ' + os.getcwd() + '/' + download_folder + '/' + fname))
 
 		# rename it
 		from random import choice
 		lnd='0123456789'
 		new_name = ''.join(map(lambda x,y=lnd: choice(y), range(8))) + '.tar.gz'
 
-		os.chdir(backup_folder)
-		os.system('rename ' + fname + ' ' + new_name + '.tar.gz ' + fname)
+		os.chdir(download_folder)
+		os.system('rename ' + fname + ' ' + new_name + ' ' + fname)
 
 		webnotes.msgprint('Your nightly backup is available for download by <a href="'+download_folder+'/' + new_name + '">clicking here</a> (only for the next few hours)')
 	
