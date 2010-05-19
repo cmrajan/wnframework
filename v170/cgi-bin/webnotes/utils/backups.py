@@ -75,7 +75,7 @@ def delete_oldest_file(folder):
 	a = sorted(os.listdir(folder), key=lambda fn: os.stat(folder+'/'+fn).st_mtime, reverse=False)
 	if a:
 		os.system('rm %s/%s' % (folder, a[0]))
-		
+
 def get_backup():
 	import webnotes		
 	import os, time
@@ -86,12 +86,12 @@ def get_backup():
 		fname = webnotes.cur_db_name + '.tar.gz'
 		webnotes.msgprint(fname)
 		os.system('cp '+backup_folder+'/dumps/' + fname + ' ' + download_folder + '/' + fname)
-	
+
 		# rename it
 		from random import choice
 		lnd='0123456789'
 		new_name = ''.join(map(lambda x,y=lnd: choice(y), range(8))) + '.tar.gz'
-		
+
 		os.chdir(backup_folder)
 		os.system('rename ' + fname + ' ' + new_name + '.tar.gz ' + fname)
 
@@ -103,5 +103,4 @@ def get_backup():
 		if os.stat(f).st_mtime < now - 86400:
 			if os.path.isfile(f):
 				os.remove(os.path.join(path, f))
-				
 				
