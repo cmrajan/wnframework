@@ -32,7 +32,7 @@ class Database:
 	
 	def use(self, db_name):
 		self._conn.select_db(db_name)
-		self.cur_db_name = self.db_name
+		self.cur_db_name = db_name
 	
 	def check_transaction_status(self, query):
 		if query and query.strip().lower()=='start transaction':
