@@ -16,7 +16,7 @@ def backup_db(db, conn, from_all=0):
 
 	try:
 	# Check processlist
-		if len(conn.sql("show processlist")) == 1:
+		if from_all or len(conn.sql("show processlist")) == 1:
 			p = backup_folder
 			if from_all: p = backup_folder + '/dumps'	
 
