@@ -2,6 +2,7 @@ import webnotes
 
 backup_folder = '/backups'
 mysql_path = ''
+download_folder = 'backups'
 
 def mysqldump(db, folder=''):
 	global mysql_path
@@ -45,7 +46,7 @@ def backup_all():
 	dblist = conn.sql('select db_name from tabAccount')
 
 	# backup -all in /backups folder
-	for d in (('accounts'),) + dblist:
+	for d in (('accounts',),) + dblist:
 		backup_db(d[0], conn, 1)
 	
 	conn.close()
@@ -74,3 +75,33 @@ def delete_oldest_file(folder):
 	a = sorted(os.listdir(folder), key=lambda fn: os.stat(folder+'/'+fn).st_mtime, reverse=False)
 	if a:
 		os.system('rm %s/%s' % (folder, a[0]))
+		
+def get_backup():
+	import webnotes		
+	import os, time
+	global backup_folder
+
+	# get the last nightly backup file from the backups folder
+	if webnotes.cur_db_name:
+		fname = webnotes.cur_db_name + '.tar.gz'
+		webnotes.msgprint(fname)
+		os.system('cp '+backup_folder+'/dumps/' + fname + ' ' + download_folder + '/' + fname)
+	
+		# rename it
+		from random import choice
+		lnd='0123456789'
+		new_name = ''.join(map(lambda x,y=lnd: choice(y), range(8))) + '.tar.gz'
+		
+		os.chdir(backup_folder)
+		os.system('rename ' + fname + ' ' + new_name + '.tar.gz ' + fname)
+
+		webnotes.msgprint('Your file is available for download by <a href="'+download_folder+'/' + new_name +'.tar.gz">clicking here</a> (only for the next few hours)')
+	
+	# delete any files older than a day
+	now = time.time()
+	for f in os.listdir(download_folder):
+		if os.stat(f).st_mtime < now - 86400:
+			if os.path.isfile(f):
+				os.remove(os.path.join(path, f))
+				
+				
