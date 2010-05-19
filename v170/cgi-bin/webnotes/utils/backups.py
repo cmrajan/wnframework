@@ -84,7 +84,7 @@ def get_backup():
 	# get the last nightly backup file from the backups folder
 	if webnotes.conn.cur_db_name:
 		fname = webnotes.conn.cur_db_name + '.tar.gz'
-		os.system('cp '+backup_folder+'/dumps/' + fname + ' ' + download_folder + '/' + fname)
+		os.system('cp '+backup_folder+'/dumps/' + fname + ' ' + os.getcwd() + '/' + download_folder + '/' + fname)
 
 		# rename it
 		from random import choice
