@@ -82,8 +82,8 @@ def get_backup():
 	global backup_folder
 
 	# get the last nightly backup file from the backups folder
-	if webnotes.cur_db_name:
-		fname = webnotes.cur_db_name + '.tar.gz'
+	if webnotes.conn.cur_db_name:
+		fname = webnotes.conn.cur_db_name + '.tar.gz'
 		webnotes.msgprint(fname)
 		os.system('cp '+backup_folder+'/dumps/' + fname + ' ' + download_folder + '/' + fname)
 
@@ -95,7 +95,7 @@ def get_backup():
 		os.chdir(backup_folder)
 		os.system('rename ' + fname + ' ' + new_name + '.tar.gz ' + fname)
 
-		webnotes.msgprint('Your file is available for download by <a href="'+download_folder+'/' + new_name +'.tar.gz">clicking here</a> (only for the next few hours)')
+		webnotes.msgprint('Your nightly backup is available for download by <a href="'+download_folder+'/' + new_name +'.tar.gz">clicking here</a> (only for the next few hours)')
 	
 	# delete any files older than a day
 	now = time.time()
@@ -103,4 +103,3 @@ def get_backup():
 		if os.stat(f).st_mtime < now - 86400:
 			if os.path.isfile(f):
 				os.remove(os.path.join(path, f))
-				
