@@ -78,13 +78,13 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 		$c('runserverobj',{
 			'doctype':doclist,
 			'method':method, 
-			'arg':arg}, call_back);	
+			'arg':arg}, call_back, null, no_spinner, freeze_msg);	
 	} else {
 	// doclist
 		$c('runserverobj',{
 			'docs':compress_doclist(doclist), 
 			'method':method, 
-			'arg':arg}, call_back, no_spinner, freeze_msg);
+			'arg':arg}, call_back, null, no_spinner, freeze_msg);
 	}
 }
 

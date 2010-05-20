@@ -126,10 +126,9 @@ function WNToolbar(parent) {
 	this.setup_help = function() {
 		me.menu.add_top_menu('Tools', function() {  }, "images/ui/down-arrow1.gif");
 		this.menu.add_item('Tools','Error Console', function() { err_console.show(); });
-		this.menu.add_item('Tools','Start / Finish Testing Mode', function() { me.enter_testing(); });
+		//this.menu.add_item('Tools','Start / Finish Testing Mode', function() { me.enter_testing(); });
 		if(has_common(user_roles,['Administrator','System Manager'])) {
-			this.menu.add_item('Tools','Download Backup', function() { me.start_testing(); });
-			this.menu.add_item('Tools','Reset Testing', function() { me.download_backup(); });			
+			this.menu.add_item('Tools','Download Backup', function() { me.download_backup(); });
 		}
 		this.menu.add_item('Tools','About <b>Web Notes</b>', function() { show_about(); });
 	}	
@@ -230,9 +229,7 @@ function WNToolbar(parent) {
 	}
 
 	this.download_backup = function() {
-	  window.location = outUrl + "?cmd=backupdb&read_only=1&__account="+account_id
-	    + (__sid150 ? ("&sid150="+__sid150) : '')
-		+ "&db_name="+account_id;
+		$c('webnotes.utils.backups.get_backup',{},function(r,rt) {});
 	}
 	
 	this.enter_testing = function() {

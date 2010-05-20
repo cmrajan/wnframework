@@ -161,7 +161,7 @@ if(r.exc&&r.__redirect_login){msgprint(r.exc,0,function(){document.location=logi
 if(freeze_msg)unfreeze();if(r.exc){errprint(r.exc);};if(r.server_messages){msgprint(r.server_messages);};if(r.docs){LocalDB.sync(r.docs);}
 saveAllowed=true;if(fn)fn(r,rtxt);}}
 req.onreadystatechange=ret_fn;req.open("POST",outUrl,true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");args['cmd']=command;req.send(makeArgString(args));if(!no_spinner)set_loading();if(freeze_msg)freeze(freeze_msg,1);}
-function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){if(doclist.substr){$c('runserverobj',{'doctype':doclist,'method':method,'arg':arg},call_back);}else{$c('runserverobj',{'docs':compress_doclist(doclist),'method':method,'arg':arg},call_back,no_spinner,freeze_msg);}}
+function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){if(doclist.substr){$c('runserverobj',{'doctype':doclist,'method':method,'arg':arg},call_back,null,no_spinner,freeze_msg);}else{$c('runserverobj',{'docs':compress_doclist(doclist),'method':method,'arg':arg},call_back,null,no_spinner,freeze_msg);}}
 function $c_obj_csv(doclist,method,arg){var args={}
 args.cmd='runserverobj';args.as_csv=1;args.method=method;args.arg=arg;if(doclist.substr)
 args.doctype=doclist;else
@@ -717,7 +717,7 @@ this.rdocs.remove=function(dt,dn){var it=me.rdocs.items[dt+'-'+dn];if(it)$dh(it)
 var rlist=profile.recent.split('\n');var m=rlist.length;if(m>15)m=15;for(var i=0;i<m;i++){var t=rlist[i].split('~~~');if(t[1]){var dt=t[0];var dn=t[1];this.rdocs.add(dt,dn,0);}}
 this.rename_notify=function(dt,old,name){me.rdocs.remove(dt,old);me.rdocs.add(dt,name,1);}
 rename_observers.push(this);}
-this.setup_help=function(){me.menu.add_top_menu('Tools',function(){},"images/ui/down-arrow1.gif");this.menu.add_item('Tools','Error Console',function(){err_console.show();});this.menu.add_item('Tools','Start / Finish Testing Mode',function(){me.enter_testing();});if(has_common(user_roles,['Administrator','System Manager'])){this.menu.add_item('Tools','Download Backup',function(){me.start_testing();});this.menu.add_item('Tools','Reset Testing',function(){me.download_backup();});}
+this.setup_help=function(){me.menu.add_top_menu('Tools',function(){},"images/ui/down-arrow1.gif");this.menu.add_item('Tools','Error Console',function(){err_console.show();});if(has_common(user_roles,['Administrator','System Manager'])){this.menu.add_item('Tools','Download Backup',function(){me.download_backup();});}
 this.menu.add_item('Tools','About <b>Web Notes</b>',function(){show_about();});}
 this.setup_new=function(){me.menu.add_top_menu('Create New...',function(){me.show_new();});me.show_new=function(){if(!me.new_dialog){var d=new Dialog(240,140,"Create a new record");d.make_body([['HTML','Select'],['Button','Go',function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}]]);d.onshow=function(){me.new_sel.inp.focus();}
 me.new_dialog=d;me.new_sel=new SelectWidget(d.widgets['Select'],profile.can_create.sort(),'200px');me.new_sel.onchange=function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}}
@@ -731,9 +731,7 @@ me.search_btn=$a($td(t,0,2),'button')
 $(me.search_btn).html('Search');me.search_btn.onclick=function(){open_quick_search();}
 startup_list.push(makeselector);}
 this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px'});var t=make_table(w,1,5,null,[],{padding:'2px 4px',borderLeft:'1px solid #CCC',fontSize:'13px'});$y(t,{cssFloat:'right'});$y($td(t,0,0),{border:'0px'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span class="link_type" style="font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span class="link_type" style="font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';$td(t,0,4).innerHTML='<span class="link_type" onclick="logout()">Logout</span>';}
-this.download_backup=function(){window.location=outUrl+"?cmd=backupdb&read_only=1&__account="+account_id
-+(__sid150?("&sid150="+__sid150):'')
-+"&db_name="+account_id;}
+this.download_backup=function(){$c('webnotes.utils.backups.get_backup',{},function(r,rt){});}
 this.enter_testing=function(){about_dialog.hide();if(is_testing){end_testing();return;}
 var a=prompt('Type in the password','');if(a=='start testing'){$c('start_test',args={},function(){$ds('testing_div');is_testing=true;$i('testing_mode_link').innerHTML='End Testing';});}else{msgprint('Sorry, only administrators are allowed use the testing mode.');}}
 this.setup_testing=function(){about_dialog.hide();$c('setup_test',args={},function(){});}

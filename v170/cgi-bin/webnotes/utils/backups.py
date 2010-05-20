@@ -98,6 +98,6 @@ def get_backup():
 	# delete any files older than a day
 	now = time.time()
 	for f in os.listdir(download_folder):
-		if os.stat(f).st_mtime < now - 86400:
+		if os.stat(f).st_mtime < (now - 86400):
 			if os.path.isfile(f):
 				os.remove(os.path.join(path, f))
