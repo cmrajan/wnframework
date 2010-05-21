@@ -435,6 +435,7 @@ def merge_custom_fields(l, name):
 		d.parent = name
 		d.parenttype = 'DocType'
 		d.parentfield = 'fields'
+		d.idx = d.index
 		del d.fields['dt']
 		l.append(d)
 

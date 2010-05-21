@@ -75,6 +75,8 @@ def _change_column(f, dt, col_def):
 		except Exception, e:
 			if e.args[0] == 1054:
 				_add_column(f, dt)
+			if e.args[0] == 1060:
+				pass # duplicate column (already exists by another name)
 			else:
 				raise e
 		#webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))

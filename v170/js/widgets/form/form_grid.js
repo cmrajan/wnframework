@@ -74,6 +74,8 @@ _f.FormGrid.prototype.make_columns = function() {
 		alert('Table details not found "'+this.field.df.options+'"');
 	}
 
+	gl.sort(function(a,b) { return a.idx - b.idx});
+
 	var p = this.field.perm;
 	for(var i=0;i<gl.length;i++) {
 		if(p[this.field.df.permlevel] && p[this.field.df.permlevel][READ] && (!gl[i].hidden)) { // if read
