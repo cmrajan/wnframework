@@ -226,6 +226,7 @@ function WNToolbar(parent) {
 		$td(t,0,2).innerHTML = '<span class="link_type" style="font-weight: bold" onclick="get_feedback()">Feedback</span>';
 		$td(t,0,3).innerHTML = '<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';
 		$td(t,0,4).innerHTML = '<span class="link_type" onclick="logout()">Logout</span>';
+		this.menu_table_right = t;
 	}
 
 	this.download_backup = function() {
