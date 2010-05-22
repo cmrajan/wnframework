@@ -11,7 +11,7 @@ function WNToolbar(parent) {
 	
 	this.setup = function() {
 		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CDF' /*, paddingLeft: '24px', background:'url("images/logos/wnf24.gif") left no-repeat', backgroundPosition: '4px 2px'*/});
-		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['5%','60%','35%'],{padding:'2px'});
+		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['5%','55%','40%'],{padding:'2px'});
 				
 		this.menu = new MenuToolbar($td(this.body_tab,0,1));
 		this.setup_home();
