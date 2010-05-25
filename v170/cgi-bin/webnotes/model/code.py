@@ -41,6 +41,10 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		# get compiled code
 		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)[0][0]
 	except:
+		# no code yet
+		pass
+
+	if not sc_compiled:
 		# compile
 		import webnotes.model.doctype
 		webnotes.model.doctype.compile_code(Document('DocType', doc.doctype))
@@ -49,8 +53,7 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)
 		sc_compiled = sc_compiled and sc_compiled[0][0]
 
-	if sc_compiled:
-		return execute(marshal.loads(sc_compiled), doc, doclist)
+	return execute(marshal.loads(sc_compiled), doc, doclist)
 
 		
 #=================================================================================
