@@ -30,6 +30,8 @@ def execute(code, doc=None, doclist=[]):
 
 def get_server_obj(doc, doclist = [], basedoctype = ''):
 	import marshal
+	import webnotes
+	
 	dt = basedoctype and basedoctype or doc.doctype
 
 	# load from application or main
