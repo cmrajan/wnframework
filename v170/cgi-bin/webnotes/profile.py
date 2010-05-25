@@ -102,6 +102,12 @@ class Profile:
 
 		return self.defaults
 		
+	def get_hide_tips(self):
+		try:
+			return webnotes.conn.sql("select hide_tips from tabProfile where name=%s", self.name)[0][0] or 0
+		except:
+			return 0
+		
 	def get_random_password(self):
 		import string
 		from random import choice
@@ -157,6 +163,8 @@ class Profile:
 		d['first_name'] = t[1] or ''
 		d['last_name'] = t[2] or ''
 		d['recent'] = t[3] or ''
+		
+		d['hide_tips'] = self.get_hide_tips()
 		
 		d['roles'] = self.get_roles()
 		d['defaults'] = self.get_defaults()

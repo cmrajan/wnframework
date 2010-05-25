@@ -2,6 +2,7 @@
 //
 // + this.parent (can change)
 // 		+ this.wrapper
+//			+ this.tip_wrapper
 //			+ this.form_wrapper
 //			|	+ this.body
 //			+ this.print_wrapper
@@ -393,7 +394,6 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// headings
 	this.header = $a(this.form_wrapper, 'div', 'frm_header');
 	this.heading = $a(this.header, 'div', 'frm_heading');
-	this.tip_wrapper = $a(this.header, 'div');
 	this.tab_wrapper = $a(this.header, 'div'); $dh(this.tab_wrapper);
 
 	if(this.meta.section_style=='Tray') {
@@ -537,6 +537,9 @@ _f.Frm.prototype.setup = function() {
 	this.fields_dict = {};
 
 	this.wrapper = $a(this.parent, 'div', 'frm_wrapper');
+
+	// tips
+	this.tip_wrapper = $a(this.wrapper, 'div');
 	
 	// create area for print fomrat
 	this.setup_print_layout();
