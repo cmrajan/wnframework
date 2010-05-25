@@ -152,14 +152,14 @@ def compile_code(doc):
 
 	custom = get_custom_script(doc.name, 'Server') or ''
 	c = [doc.server_code_core or '', doc.server_code or '', custom or '']
-	
+
 	# add default code if no code
 	# ---------------------------
 	if not (c[0] or c[1] or c[2]):
 		c[0] = 	'''class DocType:
 	def __init__(self, d, dl):
 		self.doc, self.doclist = d, dl'''
-	
+
 	code = None
 		
 	# compile code
@@ -211,7 +211,7 @@ def update_doctype(doclist):
 	
 	# compile server code
 	compile_code(doc)
-		
+
 	# change modifed of parent doctype (to clear the cache)
 	clear_cache()
 	
