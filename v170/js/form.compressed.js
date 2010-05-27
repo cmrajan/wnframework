@@ -5,7 +5,7 @@ _f.FrmContainer.prototype.show_head=function(){$ds(this.head);}
 _f.FrmContainer.prototype.hide_head=function(){$dh(this.head);}
 _f.FrmContainer.prototype.make_toolbar=function(){}
 _f.FrmContainer.prototype.refresh_btns=function(){var me=this;var p=cur_frm.get_doc_perms();this.page_head.clear_toolbar();if(cur_frm.meta.read_only_onload&&!cur_frm.doc.__islocal){if(!cur_frm.editable)
-this.page_head.add_button('Edit',function(){cur_frm.edit_doc()},1,'ui-icon-document');else
+this.page_head.add_button('Edit',function(){cur_frm.edit_doc();},1,'ui-icon-document');else
 this.page_head.add_button('Done Editing',function(){cur_frm.is_editable[cur_frm.docname]=0;cur_frm.refresh();},1,'ui-icon-document');}
 if(cur_frm.editable&&cint(cur_frm.doc.docstatus)==0&&p[WRITE])
 this.page_head.add_button('Save',function(){cur_frm.save('Save');},1,'ui-icon-disk');if(cint(cur_frm.doc.docstatus)==0&&p[SUBMIT]&&(!cur_frm.doc.__islocal))
@@ -108,7 +108,8 @@ this.setup_client_script();this.runclientscript('set_perm',dt,dn);this.doc=get_l
 if(this.doc.__islocal)
 this.is_editable[this.docname]=1;this.editable=this.is_editable[this.docname];if(this.editable||(!this.editable&&this.not_in_container)){if(this.print_wrapper){$dh(this.print_wrapper);$ds(this.form_wrapper);}
 if(!no_script)this.runclientscript('refresh');if(!this.not_in_container){this.refresh_container();}
-this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();if(this.layout)this.layout.show();}else{this.refresh_container();if(this.print_wrapper){this.refresh_print_layout();}}
+this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();if(this.layout)this.layout.show();}else{this.refresh_container();if(this.print_wrapper){this.refresh_print_layout();}
+this.runclientscript('edit_status_changed');}
 if(!this.display)this.show(this.docname,1,null,this.not_in_container);page_body.change_to('Forms');}}
 _f.Frm.prototype.refresh_tabs=function(){var me=this;if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed'){for(var i in me.sections){me.sections[i].hide();}
 me.set_section(me.cur_section[me.docname]);}}

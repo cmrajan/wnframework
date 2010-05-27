@@ -40,10 +40,13 @@ _f.FrmContainer.prototype.refresh_btns= function() {
 	// Edit
 	if(cur_frm.meta.read_only_onload && !cur_frm.doc.__islocal) {
 		if(!cur_frm.editable)
-			this.page_head.add_button('Edit', function() { cur_frm.edit_doc() }, 1, 'ui-icon-document' );
+				this.page_head.add_button('Edit', function() { 
+					cur_frm.edit_doc();
+				}, 1, 'ui-icon-document' 
+			);
 		else
 			this.page_head.add_button('Done Editing', function() { 
-				cur_frm.is_editable[cur_frm.docname] = 0;
+				cur_frm.is_editable[cur_frm.docname] = 0;				
 				cur_frm.refresh(); }, 1, 'ui-icon-document' );	
 	}
 

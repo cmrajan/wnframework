@@ -706,6 +706,7 @@ _f.Frm.prototype.refresh = function(no_script) {
 			if(this.print_wrapper) {
 				this.refresh_print_layout();
 			}
+			this.runclientscript('edit_status_changed');
 		}
 		
 		// show the record
