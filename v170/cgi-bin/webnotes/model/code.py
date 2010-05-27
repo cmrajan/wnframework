@@ -60,7 +60,7 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 			
 	except:
 		# no code yet
-		pass
+		sc_compiled = None
 
 	if not sc_compiled:
 		# compile

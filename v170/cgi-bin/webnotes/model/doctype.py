@@ -152,16 +152,17 @@ def _add_compiled_code_to_cache(code, dt, modified):
 
 def compile_code(doc):
 	conn = webnotes.app_conn or webnotes.conn
+	std_code = '''class DocType:
+	def __init__(self, d, dl):
+		self.doc, self.doclist = d, dl'''
 
 	custom = get_custom_script(doc.name, 'Server') or ''
 	c = [doc.server_code_core or '', doc.server_code or '', custom or '']
 
 	# add default code if no code
 	# ---------------------------
-	if not (c[0] or c[1] or c[2]):
-		c[0] = 	'''class DocType:
-	def __init__(self, d, dl):
-		self.doc, self.doclist = d, dl'''
+	if not (c[0].strip() or c[1].strip() or c[2].strip()):
+		c[0] = std_code
 
 	code = None
 		
@@ -172,6 +173,7 @@ def compile_code(doc):
 		conn.set(doc, 'server_code_error', ' ')
 	except:
 		conn.set(doc, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
+		code = compile(std_code, '<string>', 'exec')
 				
 	# add to cache
 	# ------------
