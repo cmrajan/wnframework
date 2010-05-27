@@ -40,6 +40,9 @@ class _DocType:
 			webnotes.conn.sql("INSERT INTO `__DocTypeCache` (`name`) VALUES ('%s')" % self.name)
 		webnotes.conn.sql("UPDATE `__DocTypeCache` SET `modified`=%s, `content`=%s WHERE name=%s", (modified[0][0], zlib.compress(str([d.fields for d in doclist]),2), self.name))
 
+		# cache the code
+		compile_code(doclist[0])
+
 	def _load_from_cache(self):
 		import zlib
 	
@@ -138,12 +141,12 @@ def scrub_field_names(doclist):
 
 #=================================================================================
 
-def _add_compiled_code_to_cache(code, dt):
+def _add_compiled_code_to_cache(code, dt, modified):
 	import marshal
 	if webnotes.conn.sql("select name from __DocTypeCache where name=%s", dt):
-		webnotes.conn.sql("UPDATE __DocTypeCache set server_code_compiled = %s WHERE name=%s", (marshal.dumps(code), dt))
+		webnotes.conn.sql("UPDATE __DocTypeCache set server_code_compiled = %s, modified=%s WHERE name=%s", (marshal.dumps(code), modified, dt))
 	else:
-		webnotes.conn.sql("INSERT INTO __DocTypeCache (name, server_code_compiled) VALUES (%s, %s)", (dt, marshal.dumps(code)))
+		webnotes.conn.sql("INSERT INTO __DocTypeCache (name, modified, server_code_compiled) VALUES (%s, %s, %s)", (dt, modified, marshal.dumps(code)))
 
 #=================================================================================
 
@@ -174,7 +177,7 @@ def compile_code(doc):
 	# ------------
 	if code:
 		try:
-			_add_compiled_code_to_cache(code, doc.name)
+			_add_compiled_code_to_cache(code, doc.name, doc.modified)
 		except Exception, e:
 			if e.args[0]==1054:
 				# column not yet made - remove after some time
