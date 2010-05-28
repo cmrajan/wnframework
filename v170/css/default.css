@@ -716,6 +716,14 @@ div.finder_filter_area {
 	padding-top: 6px;
 	background-color: #DDF;
 	margin:16px;
+	
+	background: -webkit-gradient(linear, left top, left bottom, from(#EEF), to(#CCF));
+	background: -moz-linear-gradient(top, #EEF, #CCF);
+	
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;	
+	
+	border: 1px solid #DDF;
 }
 
 div.filter_head {
@@ -741,6 +749,15 @@ div.finder_picker_area {
 	padding: 16px;
 	padding-top: 6px;
 	background-color: #FFD;
+	
+	background: -webkit-gradient(linear, left top, left bottom, from(#FFD), to(#FFB));
+	background: -moz-linear-gradient(top, #FFD, #FFB);
+	
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;	
+	
+	border: 1px solid #FFB;	
+	
 }
 div.builder_field {
 	margin: 0px;
