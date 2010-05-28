@@ -272,7 +272,7 @@ div.frm_body {
 }
 
 div.frm_tip_box {
-	margin: 8px;
+	margin: 8px 0px;
 	padding: 8px;
 	background-color: #FFC;
 	display: none;
