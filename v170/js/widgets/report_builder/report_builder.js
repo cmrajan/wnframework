@@ -14,10 +14,8 @@ _r.ReportContainer = function() {
 
 	// tool bar
 
-	var div = $a(this.wrapper, 'div');
-	var inner = $a(div, 'div', '', {padding:'6px 8px 4px 8px'});
-	
-	this.page_head = new PageHeader(inner);
+	var div = $a(this.wrapper, 'div');	
+	this.page_head = new PageHeader(div);
 
 	// buttons
 

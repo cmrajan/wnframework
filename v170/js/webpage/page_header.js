@@ -9,7 +9,10 @@ var def_ph_style = {
 	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#CDF', display:'none'}
 	,separator: { border:'1px solid #000' } // show this when there is no toolbar
 	,tag_area: { color:'#888', marginBottom:'4px', textAlign:'right', fontSize:'10px' }
-	,close_btn: { cursor:'pointer', width:'44px', cssFloat:'right', padding:'1px', paddingRight: '20px', background:"url('images/icons/close.gif') right top no-repeat", lineHeight:'1.1em' }
+	,close_btn: { cursor:'pointer', width:'36px', cssFloat:'right', padding:'3px', paddingRight: '24px', 
+		background:"url('images/icons/close.gif') no-repeat 44px 2px", 
+		lineHeight:'1.2em',backgroundColor:'#EEE',border:'1px solid #AAA' 
+	}
 }
 
 function PageHeader(parent, main_text, sub_text) {
@@ -32,6 +35,11 @@ function PageHeader(parent, main_text, sub_text) {
 	this.close_btn.innerHTML = 'Close';
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
+	if(!isIE) {
+		$(this.close_btn).css('-moz-border-radius','4px').css('-webkit-border-radius','4px')
+			
+	}
+
 	if(main_text) this.main_head.innerHTML = main_text;
 	if(sub_text) this.sub_head.innerHTML = sub_text;
 }
@@ -48,6 +56,14 @@ PageHeader.prototype.add_button = function(label, fn, bold, icon) {
 PageHeader.prototype.show_toolbar = function() {
 	$dh(this.separator);
 	$ds(this.toolbar_area);
+	
+	if(!isIE) {
+		$(this.toolbar_area).css('background','-webkit-gradient(linear, left top, left bottom, from(#EEF), to(#DDF))')
+			.css('background','-moz-linear-gradient(top, #EEF, #DDF)')
+			.css('border','1px solid #BBF')
+			.css('-moz-border-radius','5px')
+			.css('-webkit-border-radius','5px');
+	}
 }
 PageHeader.prototype.clear_toolbar = function() {
 	this.toolbar_area.innerHTML = '';
