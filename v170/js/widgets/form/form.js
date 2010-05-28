@@ -511,7 +511,7 @@ _f.Frm.prototype.set_parent = function(parent) {
 _f.Frm.prototype.setup_print_layout = function() {
 	if(this.meta.read_only_onload) {
 		this.print_wrapper = $a(this.wrapper, 'div', '', {backgroundColor:'#46A',padding: '32px'});
-		this.print_body = $a(this.print_wrapper, 'div', '', {backgroundColor:'#FFF', border:'1px solid #444',padding: '40px' });
+		this.print_body = $a(this.print_wrapper, 'div', 'frm_print_wrapper');
 	}
 }
 

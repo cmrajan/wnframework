@@ -235,6 +235,16 @@ div.frm_wrapper {
 	margin-bottom: 32px;
 }
 
+div.frm_print_wrapper {
+	background-color:#FFF;
+	border:1px solid #444;
+	padding: 40px;
+
+	box-shadow:1px 1px 8px #229;
+	-moz-box-shadow: 1px 1px 8px #229;
+	-webkit-box-shadow: 1px 1px 8px #229;
+}
+
 div.grid_tbarlinks {
 	border-bottom: 0px;
 	background-color: #EEE;
@@ -906,8 +916,6 @@ div.todo_links div {
 	border: 1px solid #AAA;
 }
 
-/* Drop Shadow */
-
 div.dialog_row {
 	padding: 8px 8px 0px 8px;
 }
@@ -1282,14 +1290,10 @@ div.dialog_wrapper {
 	z-index: 90;
 	padding: 4px;
 	background-color: #FFF;
-	border: 2px solid #444;
-}
-
-div.dialog_wrapper .sb-inner {
-	background-color: #FFF;
-}
-div.dialog_wrapper .sb-border {
-	background-color: #444;
+	border: 1px solid #888;
+	box-shadow:1px 1px 5px #777;
+	-moz-box-shadow: 1px 1px 5px #777;
+	-webkit-box-shadow: 1px 1px 5px #777;
 }
 
 div.dialog_head {
@@ -1297,6 +1301,8 @@ div.dialog_head {
 	padding: 4px;
 	margin-bottom: 4px;
 	background-color: #DDF;
+	background: -webkit-gradient(linear, left top, left bottom, from(#CCF), to(#AAF));
+	background: -moz-linear-gradient(top, #CCF, #AAF);
 }
 
 div.dialog_body {

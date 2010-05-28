@@ -188,7 +188,7 @@ def compile_code(doc):
 				sql("start transaction")
 				
 				# retry
-				_add_compiled_code_to_cache(code, doc.name)
+				_add_compiled_code_to_cache(code, doc.name, doc.modified)
 			else:
 				raise e
 
