@@ -365,13 +365,12 @@ _f.Frm.prototype.setup_tips = function() {
 	c0.style.width = '24px';
 	
 	this.set_tip = function(t, icon) {
-		me.c1.innerHTML = t; 
+		me.c1.innerHTML = '<div style="margin-bottom: 8px;">'+t+'</div>'; 
 		$ds(me.tip_box);
 		if(icon) this.img.setAttribute('src','images/icons/'+icon);
 	}
 	this.append_tip = function(t) {
-		if(me.c1.innerHTML) me.c1.innerHTML += '<br><br>';
-		me.c1.innerHTML += t;  $ds(me.tip_box);
+		me.c1.innerHTML += '<div style="margin-bottom: 8px;">' + t + '</div>';  $ds(me.tip_box);
 	}
 	this.clear_tip = function() { me.c1.innerHTML = ''; $dh(me.tip_box); }
 	$dh(this.tip_box);
