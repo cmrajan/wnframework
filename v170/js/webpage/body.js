@@ -51,6 +51,7 @@ function Body() {
 				c++;
 			}			
 		}
+		this.center.header = $a(this.center, 'div');
 	}
 
 	this.setup_sidebar_menu = function() {
