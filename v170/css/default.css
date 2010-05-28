@@ -276,6 +276,12 @@ div.frm_tip_box {
 	padding: 8px;
 	background-color: #FFC;
 	display: none;
+	font-size: 11px;
+
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+
+	border: 1px solid #FFB;
 }
 
 div.frm_tip_box table {
