@@ -6,6 +6,9 @@ function fmt_money(v){
 	if(isNaN(v)) {
 		return ''; // not a number
 	} else {
+		var cp = locals['Control Panel']['Control Panel'];
+		var val = 2; // variable used to differentiate other values from Millions
+		if(cp.currency_format == 'Millions')	val = 3;
 		v = v.toFixed(2);
 		var delimiter = ","; // replace comma if desired
 		amount = v+'';
@@ -18,11 +21,17 @@ function fmt_money(v){
 		i = Math.abs(i);
 		var n = new String(i);
 		var a = [];
-		while(n.length > 3)
+		if(n.length > 3)
 		{
 			var nn = n.substr(n.length-3);
 			a.unshift(nn);
-			n = n.substr(0,n.length-3);
+			n = n.substr(0,n.length-3);			
+			while(n.length > val)
+			{
+				var nn = n.substr(n.length-val);
+				a.unshift(nn);
+				n = n.substr(0,n.length-val);
+			}
 		}
 		if(n.length > 0) { a.unshift(n); }
 		n = a.join(delimiter);
