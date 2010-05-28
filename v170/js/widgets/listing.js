@@ -265,7 +265,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 
 	// create new table (or new line)
 	if((!this.inp_tab) || (this.cell_idx==this.filters_per_line)) {
-		this.inp_tab = $a(this.filter_area.div, 'table','',{width:'100%'});
+		this.inp_tab = $a(this.filter_area.div, 'table','',{width:'100%', tableLayout:'fixed'});
 		this.inp_tab.insertRow(0);
 		for(var i=0;i<this.filters_per_line;i++) {
 			this.inp_tab.rows[0].insertCell(i);

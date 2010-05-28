@@ -531,12 +531,16 @@ div.srs_results_area {
 }
 
 div.srs_filter_wrapper {
+	background: -webkit-gradient(linear, left top, left bottom, from(#EEEEEE), to(#E0E0E0));
+	background: -moz-linear-gradient(top, #EEEEEE, #E0E0E0);
+	
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+
+	border: 1px solid #CCC;
+	
 	background-color: #EEEEF2;
 	margin:0px 0px 16px 0px;
-}
-
-div.srs_filter_wrapper .sb-inner {
-	background-color: #DDD;
 }
 
 div.srs_filter_area {
