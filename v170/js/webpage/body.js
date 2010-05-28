@@ -52,6 +52,7 @@ function Body() {
 			}			
 		}
 		this.center.header = $a(this.center, 'div');
+		this.center.body = $a(this.center, 'div');
 	}
 
 	this.setup_sidebar_menu = function() {
@@ -133,7 +134,7 @@ function Body() {
 	this.pages = {};
 	this.cur_page = null;
 	this.add_page = function(label, onshow, onhide) {
-		var c = $a(this.center, 'div');
+		var c = $a(this.center.body, 'div');
 		if(onshow) 
 			c.onshow = onshow;
 		if(onhide)
