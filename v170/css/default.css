@@ -1301,8 +1301,8 @@ div.dialog_head {
 	padding: 4px;
 	margin-bottom: 4px;
 	background-color: #DDF;
-	background: -webkit-gradient(linear, left top, left bottom, from(#CCF), to(#AAF));
-	background: -moz-linear-gradient(top, #CCF, #AAF);
+	background: -webkit-gradient(linear, left top, left bottom, from(#DDF), to(#CCF));
+	background: -moz-linear-gradient(top, #DDF, #CCF);
 }
 
 div.dialog_body {
