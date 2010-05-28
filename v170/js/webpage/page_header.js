@@ -36,7 +36,7 @@ function PageHeader(parent, main_text, sub_text) {
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	if(!isIE) {
-		$(this.close_btn).css('-moz-border-radius','4px').css('-webkit-border-radius','4px')
+		$(this.close_btn).css('-moz-border-radius','4px').css('-webkit-border-radius','4px');
 			
 	}
 
@@ -60,7 +60,7 @@ PageHeader.prototype.show_toolbar = function() {
 	if(!isIE) {
 		$(this.toolbar_area).css('background','-webkit-gradient(linear, left top, left bottom, from(#EEF), to(#DDF))')
 			.css('background','-moz-linear-gradient(top, #EEF, #DDF)')
-			.css('border','1px solid #BBF')
+			.css('border','1px solid #CCCCFF')
 			.css('-moz-border-radius','5px')
 			.css('-webkit-border-radius','5px');
 	}
