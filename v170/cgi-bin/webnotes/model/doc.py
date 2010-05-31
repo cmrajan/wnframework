@@ -443,7 +443,7 @@ def merge_custom_fields(l, name):
 # Get Children
 # ------------
 
-def getchildren(name, childtype, field='', parenttype=''):
+def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 	import webnotes
 	
 	tmp = ''
@@ -464,7 +464,7 @@ def getchildren(name, childtype, field='', parenttype=''):
 		d.loadfields(dataset, i, desc)
 		l.append(d)
 
-	if childtype=='DocField':
+	if from_doctype and childtype=='DocField':
 		merge_custom_fields(l, name)
 		#webnotes.msgprint([i.fields for i in l])
 	
@@ -490,9 +490,10 @@ def get_is_adt(dt):
 
 # called from everywhere
 # load a record and its child records and bundle it in a list - doclist
+# if it is called from_doctype, it will also merge custom fields (post processing)
 # ---------------------------------------------------------------------
 
-def get(dt, dn='', with_children = 1):
+def get(dt, dn='', with_children = 1, from_doctype=0):
 	global conn
 
 	import webnotes.model
@@ -512,6 +513,6 @@ def get(dt, dn='', with_children = 1):
 	# load chilren
 	doclist = [doc,]
 	for t in tablefields:
-		doclist += getchildren(doc.name, t[0], t[1], dt)
+		doclist += getchildren(doc.name, t[0], t[1], dt, from_doctype)
 
 	return doclist

@@ -100,9 +100,9 @@ class _DocType:
 
 		if is_modified:
 			# yes
-			doclist = webnotes.model.doc.get('DocType', self.name)
+			doclist = webnotes.model.doc.get('DocType', self.name, 1, 1)
 			for t in tablefields: 
-				doclist += webnotes.model.doc.get('DocType', t[0])
+				doclist += webnotes.model.doc.get('DocType', t[0], 1, 1)
 
 			# don't save compiled server code
 			doclist[0].server_code_compiled = None
