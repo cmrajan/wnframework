@@ -237,7 +237,7 @@ _f.Frm.prototype.set_heading = function() {
 		return s;
 	}
 
-	var sp1 = null;
+	var sp1 = null; var sp2 = null;
 	if(doc.__islocal) {
 		sp1 = make_span('Unsaved Draft', '#F81');
 		set_st('#f81');
@@ -247,6 +247,11 @@ _f.Frm.prototype.set_heading = function() {
 	} else if(cint(doc.docstatus)==0) {
 		sp1 = make_span('Saved', '#0A1');
 		set_st('#0A1');
+		
+		// if submittable, show it
+		if(cur_frm.get_doc_perms()[SUBMIT]) {
+			sp2 = make_span('To Be Submitted', '#888');
+		}
 	} else if(cint(doc.docstatus)==1) {
 		sp1 = make_span('Submitted', '#44F');
 		set_st('#44F');
@@ -255,11 +260,10 @@ _f.Frm.prototype.set_heading = function() {
 		set_st('#F44');
 	}
 	
-	var sp2 = null;
-	if(is_testing && this.meta.setup_test) {
-		sp2 = $a(null, 'span', '', {marginLeft:'4px',padding:'4px',color:'#FFF',backgroundColor:'#F88'})
-		sp2.innerHTML = 'Test Record';
-	}
+	//if(is_testing && this.meta.setup_test) {
+	//	sp2 = $a(null, 'span', '', {marginLeft:'4px',padding:'4px',color:'#FFF',backgroundColor:'#F88'})
+	//	sp2.innerHTML = 'Test Record';
+	//}
 	
 	// created & modified
 	var scrub_date = function(d) {
@@ -279,7 +283,7 @@ _f.Frm.prototype.set_heading = function() {
 	var t = _f.frm_con.page_head.tag_area;
 	t.innerHTML = '';
 	_f.frm_con.page_head.sub_head.appendChild(sp1);
-	if(sp2)t.appendChild(sp2);
+	if(sp2)_f.frm_con.page_head.sub_head.appendChild(sp2);
 	t.appendChild(sp3);
 	
 	// tweets
