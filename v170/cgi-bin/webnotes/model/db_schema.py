@@ -245,7 +245,7 @@ def updatedb(dt):
 def sync_all(verbose=0):
 	# check the last modified table, if this table is also modified in the current, then the system
 	# synched, if not then it must be synched
-	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType` where ifnull(issingle,0)=0" )
+	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType`" )
 	try:
 		t2 = webnotes.conn.sql("SELECT MAX(modified) from `tabDocType Update Register`", ignore_no_table = 0)
 	except Exception, e:
@@ -268,7 +268,7 @@ def sync_all(verbose=0):
 		pass
 	else:
 		# sync all tables (?)
-		tl = webnotes.app_conn.sql("select name from tabDocType where ifnull(issingle,0)=0")
+		tl = webnotes.app_conn.sql("select name from tabDocType")
 		for t in tl:
 			sync_dt(t[0])
 			if verbose:
@@ -287,12 +287,22 @@ def create_adt_update_table():
 
 	webnotes.conn.sql('START TRANSACTION')
 
+def _sync_dt(dt, issingle):
+	if issingle:
+		# compile the code
+		import webnotes.model.doctype
+		webnotes.model.doctype.get(dt)
+	else:
+		updatedb(dt)
+
+# sync metadata / code from master
+# --------------------------------
 def sync_dt(dt):
 	if not webnotes.app_conn:
 		return
 
 	# check modified date
-	t1 = webnotes.app_conn.sql("SELECT modified from `tabDocType` where name='%s'" % dt)
+	t1 = webnotes.app_conn.sql("SELECT modified, issingle from `tabDocType` where name='%s'" % dt)
 	try:
 		t2 = webnotes.conn.sql("SELECT modified from `tabDocType Update Register` where name='%s'" % dt, ignore_no_table = 0)
 	except Exception, e:
@@ -306,14 +316,14 @@ def sync_dt(dt):
 	# new
 	if not t2:
 		# first time creation
-		updatedb(dt)
+		_sync_dt(dt, t1[0][1])
 		
 		webnotes.conn.sql("INSERT INTO `tabDocType Update Register`(name, modified) VALUES (%s, %s)", (dt, t1[0][0]))
 	
 	# exists
 	elif t1[0][0] != t2[0][0]:
 		# if different, sync the databases
-		updatedb(dt)
+		_sync_dt(dt, t1[0][1])
 
 		# update the register
 		webnotes.conn.sql("UPDATE `tabDocType Update Register` set modified = %s where name=%s", (t1[0][0], dt))
