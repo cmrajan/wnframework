@@ -10,7 +10,7 @@ function Finder(parent, doctype, onload) {
 	this.doctype = doctype;
 	var me = this;
 
-	this.fn_list = ['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];
+	this.fn_list = ['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters', 'get_query'];
 
 	this.wrapper = $a(parent, 'div', 'finder_wrapper');
 
@@ -871,52 +871,56 @@ Finder.prototype.make_datatable = function() {
 			this.is_simple = 1;
 			return
 		}
+		
+		if(me.get_query) {
+			// custom query method
+			this.query = me.get_query();
+		}else {
+			// add docstatus conditions
+			if(docstatus_cl.length)
+				cl[cl.length] = '('+docstatus_cl.join(' OR ')+')';
 
-		// add docstatus conditions
-		if(docstatus_cl.length)
-			cl[cl.length] = '('+docstatus_cl.join(' OR ')+')';
-
-		// advanced - additional conditions
-		if(sc && sc.add_cond) {
-			var adv_cl = sc.add_cond.split('\n');
-			for(var i=0;i< adv_cl.length;i++) {
-				cl[cl.length] = adv_cl[i];
+			// advanced - additional conditions
+			if(sc && sc.add_cond) {
+				var adv_cl = sc.add_cond.split('\n');
+				for(var i=0;i< adv_cl.length;i++) {
+					cl[cl.length] = adv_cl[i];
+				}
 			}
-		}
 
-		if(!fl.length) {
-			alert('You must select atleast one column to view');
-			this.query = '';
-			return;
-		}
+			if(!fl.length) {
+				alert('You must select atleast one column to view');
+				this.query = '';
+				return;
+			}
 
-		// join with parent in case of child
-		var tn = table_name(me.doctype);
-		if(me.parent_dt) {
-			tn = tn + ',' + table_name(me.parent_dt);
-			cl[cl.length] = table_name(me.doctype) + '.`parent` = ' + table_name(me.parent_dt) + '.`name`';
-		}
+			// join with parent in case of child
+			var tn = table_name(me.doctype);
+			if(me.parent_dt) {
+				tn = tn + ',' + table_name(me.parent_dt);
+				cl[cl.length] = table_name(me.doctype) + '.`parent` = ' + table_name(me.parent_dt) + '.`name`';
+			}
 		
-		// advanced - additional tables
-		if(sc && sc.add_tab) {
-			var adv_tl = sc.add_tab.split('\n');
-			tn = tn + ',' + adv_tl.join(',');
-		}
+			// advanced - additional tables
+			if(sc && sc.add_tab) {
+				var adv_tl = sc.add_tab.split('\n');
+				tn = tn + ',' + adv_tl.join(',');
+			}
 		
-		// make the query
-		if(!cl.length)
-			this.query = 'SELECT ' + fl.join(',\n') + ' FROM ' + tn
-		else
-			this.query = 'SELECT ' + fl.join(',') + ' FROM ' + tn + ' WHERE ' + cl.join('\n AND ');
+			// make the query
+			if(!cl.length)
+				this.query = 'SELECT ' + fl.join(',\n') + ' FROM ' + tn
+			else
+				this.query = 'SELECT ' + fl.join(',') + ' FROM ' + tn + ' WHERE ' + cl.join('\n AND ');
 
-		// advanced - group by
-		if(sc && sc.group_by) {
-			this.query += ' GROUP BY ' + sc.group_by;
+			// advanced - group by
+			if(sc && sc.group_by) {
+				this.query += ' GROUP BY ' + sc.group_by;
+			}
+
+			// replace
+			this.query = repl(this.query, me.dt.filter_vals)
 		}
-
-		// replace
-		this.query = repl(this.query, me.dt.filter_vals)
-
 		if(me.show_query.checked) {
 			this.show_query = 1;
 		}
@@ -1117,7 +1121,7 @@ DataTable.prototype.add_sort_option = function(label, val) {
 DataTable.prototype.update_query = function(no_limit) { 
 
   // add sorting
-  if(this.search_criteria && this.search_criteria.custom_query) {
+  if(this.get_query || this.search_criteria && this.search_criteria.custom_query) {
   	
   	// no sorting
   } else {
