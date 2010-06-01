@@ -98,7 +98,7 @@ def get_backup():
 		webnotes.msgprint('Your nightly backup is available for download by <a href="'+download_folder+'/' + new_name + '">clicking here</a> (only for the next few hours)')
 	
 	# delete any files older than a day
-	now = time.time()
+	now = time.time() 
 	for f in os.listdir('.'):
 		if os.stat(f).st_mtime < (now - 86400):
 			if os.path.isfile(f):
