@@ -65,9 +65,8 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	if not sc_compiled:
 		# compile
 		import webnotes.model.doctype
-		
-		# reload
 		webnotes.model.doctype.get(doc.doctype)
+		#webnotes.model.doctype.compile_code(Document('DocType', doc.doctype))
 
 		# load
 		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)
