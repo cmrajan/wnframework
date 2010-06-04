@@ -1,7 +1,7 @@
 //------------------
 // FINDER 2.0
 //------------------
-  
+
 var FILTER_SEP = '\1';
 
 function Finder(parent, doctype, onload) {
