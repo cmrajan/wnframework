@@ -29,6 +29,8 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 	var me = this;
 	label = label ? label : dt;
 	if(me.dt_details[dt]) {
+		label = get_doctype_label(label);
+				
 		// make a new wrapper
 		var w = $a(this.wrapper, 'div');
 		w.head = $a(w,'div','',{marginBottom:'8px'});

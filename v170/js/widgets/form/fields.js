@@ -12,58 +12,73 @@ var codeid=0; var code_editors={};
 function Field() {	}
 
 Field.prototype.make_body = function() { 
+	var ischk = (this.df.fieldtype=='Check' ? 1 : 0);
+		
 	if(this.parent)
 		this.wrapper = $a(this.parent, 'div');
 	else
 		this.wrapper = document.createElement('div');
-		
-	if(!this.with_label) {
 
-		// simple field with label on top
-		this.label_area = $a(this.wrapper, 'div');
-		if(this.in_grid) {
-			$dh(this.label_area);
-		}
-		this.input_area = $a(this.wrapper, 'div');
-		this.disp_area = $a(this.wrapper, 'div');
-		this.help_icon = null;
-	} else {
+	this.label_area = $a(this.wrapper, 'div');
 		
-		// 2 column layout with label on LHS	
-		var t = $a(this.wrapper, 'table', 'frm_field_table');
-		var r = t.insertRow(0); this.r = r;
-		var lc = r.insertCell(0); this.input_cell = r.insertCell(1);
-		lc.className='datalabelcell'; this.input_cell.className = 'datainputcell';
-		
-		var lt = make_table($a(lc,'div'),1,3,'100%',[null,'20px','20px']);
-		this.label_icon = $a($td(lt,0,2),'img'); $dh(this.label_icon);
+	// label
+	if(this.with_label) {
+		var t = make_table(this.label_area, 1, 3+ischk, null, [], {verticalAlign: 'middle', height: '18px', padding: '2px'});
+	
+		this.label_span = $a($td(t,0,0+ischk), 'span', '', {marginRight:'4px', fontSize:'11px'})
+	
+		// help icon
+		this.help_icon = $a($td(t,0,1+ischk),'img','',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
+		this.help_icon.src = 'images/icons/help.gif';
+	
+		// error icon
+		this.label_icon = $a($td(t,0,2+ischk),'img','',{marginRight:'4px'}); $dh(this.label_icon);
 		this.label_icon.src = 'images/icons/error.gif';
 
-		this.help_icon = $a($td(lt,0,1),'img','',{cursor:'pointer'}); $dh(this.help_icon);
-		this.help_icon.src = 'images/icons/help.gif';
-
-		this.label_cell= $td(lt,0,0);
-		this.input_area = $a(this.input_cell, 'div', 'input_area');
-		this.disp_area = $a(this.input_cell, 'div');
+	} else {
+		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px'})
 	}
+
+	// make the input areas
+	if(ischk && !this.in_grid) {
+		this.input_area = $a($td(t,0,0), 'div');
+		this.disp_area = $a($td(t,0,0), 'div');
+	} else {
+		this.input_area = $a(this.wrapper, 'div');
+		this.disp_area = $a(this.wrapper, 'div');
+	}
+
+	// apply style
+	if(this.in_grid) { 
+		if(this.label_area) $dh(this.label_area);
+	} else {
+		this.input_area.className = 'input_area';
+		$y(this.wrapper,{marginBottom:'8px'})
+	}
+
 	if(this.onmake)this.onmake();
 }
 
 Field.prototype.set_label = function() {
-	if(this.label_cell&&this.label!=this.df.label) { 
-		this.label_cell.innerHTML = this.df.label;this.label = this.df.label; 
+	if(this.with_label && this.label_area && this.label!=this.df.label) { 
+		this.label_span.innerHTML = this.df.label;this.label = this.df.label; 
 	}
 
 }
 
 Field.prototype.set_comment = function() {
 	var me = this;
-	if(!this.help_icon) return;
 	if(this.df.description) {
-		$ds(this.help_icon);
-		this.help_icon.onclick = function() { msgprint(me.df.description) };
+		this.label_span.title = me.df.description;
+		$(this.label_span).tooltip();
+
+		if(this.help_icon) {
+			$di(this.help_icon);
+			this.help_icon.title = me.df.description;
+			$(this.help_icon).tooltip();
+		} 
 	} else {
-		$dh(this.help_icon);
+		if(this.help_icon) 	$dh(this.help_icon);
 	}
 }
 
@@ -124,13 +139,13 @@ Field.prototype.refresh_mandatory = function() {
 	if(this.not_in_form)return;
 
 	// mandatory changes
-	if(this.label_cell) {
+	if(this.label_area) {
 		if(this.df.reqd) {
-			this.label_cell.style.color= "#d22";
+			this.label_area.style.color= "#d22";
 			if(this.txt)$bg(this.txt,"#FFFED7");
 			else if(this.input)$bg(this.input,"#FFFED7");
 		} else {
-			this.label_cell.style.color= "#222";
+			this.label_area.style.color= "#222";
 			if(this.txt)$bg(this.txt,"#FFF");
 			else if(this.input)$bg(this.input,"#FFF");
 		}

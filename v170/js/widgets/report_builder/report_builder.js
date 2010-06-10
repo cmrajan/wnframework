@@ -104,7 +104,7 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 		$ds(me.wrapper);
 		
 		// reset main title
-		this.set_main_title('Report: ' + me.doctype);
+		this.set_main_title('Report: ' + get_doctype_label(me.doctype));
 		
 		if(my_onload)my_onload(me);
 	}
@@ -127,7 +127,7 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 
 _r.ReportBuilder.prototype.make_body = function() {
 
-	this.set_main_title('Report: ' + this.doctype);
+	this.set_main_title('Report: ' + get_doctype_label(this.doctype));
 	var me = this;
 
 	this.make_save_criteria();	
@@ -260,7 +260,7 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 	
 	this.set_sort_options();
 	
-	this.set_main_title('Report: ' + this.doctype);
+	this.set_main_title('Report: ' + get_doctype_label(this.doctype));
 
 	this.current_loaded = null;
 	this.customized_filters = null;
@@ -457,10 +457,10 @@ _r.ReportBuilder.prototype.setup_dt_filters_and_cols = function(fl, dt) {
 
 	// set section headings
 	var lab = $a(me.filter_area,'div','filter_dt_head');
-	lab.innerHTML = 'Filters for ' + dt;
+	lab.innerHTML = 'Filters for ' + get_doctype_label(dt);
 
 	var lab = $a(me.picker_area,'div','builder_dt_head');
-	lab.innerHTML = 'Select columns for ' + dt;
+	lab.innerHTML = 'Select columns for ' + get_doctype_label(dt);
 		
 	// get fields
 	var dt_fields = fields_list[dt];
@@ -1120,7 +1120,9 @@ _r.ReportColumnPicker.prototype.set_options = function(s, l) {
 
 	for(var i=0; i<l.length; i++) {
 		var v = l[i].df.parent + '.' + l[i].df.label;
-		var o = new Option (v, v, false, false);
+		var v_label = get_doctype_label(l[i].df.parent) + '.' + l[i].df.label;
+		
+		var o = new Option (v_label, v, false, false);
 		o.field = l[i];
 		if(o.field.is_selected) o.selected = 1;
 		s.options[s.options.length] = o;

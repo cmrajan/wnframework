@@ -219,8 +219,8 @@ _f.Frm.prototype.email_doc = function() {
 _f.Frm.prototype.set_heading = function() {
 	var me = this;
 
-	// main title	
-	_f.frm_con.page_head.main_head.innerHTML = this.doctype;
+	// main title
+	_f.frm_con.page_head.main_head.innerHTML = get_doctype_label(this.doctype);
 	
 	// sub title
 	_f.frm_con.page_head.sub_head.innerHTML = '';
@@ -348,7 +348,7 @@ _f.Frm.prototype.set_section = function(sec_id) {
 _f.Frm.prototype.setup_tabs = function() {
 	var me = this;
 	$ds(this.tab_wrapper);
-	$y(this.tab_wrapper, {marginTop:'8px'});
+	$y(this.tab_wrapper, {marginTop:'4px'});
 	this.tabs = new TabbedPage(this.tab_wrapper, 1);
 }
 
@@ -396,7 +396,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 	// headings
 	this.header = $a(this.form_wrapper, 'div', 'frm_header');
-	this.heading = $a(this.header, 'div', 'frm_heading');
+	//this.heading = $a(this.header, 'div', 'frm_heading');
 	this.tab_wrapper = $a(this.header, 'div'); $dh(this.tab_wrapper);
 
 	if(this.meta.section_style=='Tray') {

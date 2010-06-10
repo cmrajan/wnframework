@@ -156,6 +156,12 @@ class Authentication:
 			if res:
 				self.account = res[0][2]
 				
+			# see if the first part of the domain name matches the account id
+			if not self.account:
+				fp = self.domain.split('.')[0]
+				if c.sql("select name from tabAccount where ac_name = %s", fp):
+					self.account = fp
+				
 		# get details of app login - not required everytime, use the cookies
 		# ------------------------------------------------------------------
 		

@@ -12,7 +12,7 @@ sendmail = function(emailto, emailfrom, cc, subject, message, fmt, with_attachme
 			'sendfrom': emailfrom?emailfrom:'',
 			'cc':cc?cc:'',
 			'subject':subject,
-			'message':message,
+			'message':replace_newlines(message),
 			'body':html,
 			'with_attachments':with_attachments ? 1 : 0,
 			'dt':cur_frm.doctype,

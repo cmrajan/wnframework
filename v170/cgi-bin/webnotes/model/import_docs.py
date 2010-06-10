@@ -393,7 +393,7 @@ class CSVImport:
 						cur_doc.save(1)
 					self.msg.append('<div style="color: GREEN">Created: %s</div>' % (cur_doc.name))
 				except Exception, e:
-					self.msg.append('<div style="color: RED">ERROR: %sData:%s</div>' % (str(webnotes.utils.getTraceback()) + '\n', str(cur_doc.fields)))
+					self.msg.append('<div style="color: RED">ERROR: %s<br>Data:%s</div>' % (str(webnotes.utils.getTraceback()), str(cur_doc.fields)))
 
 				# make in groups
 				docs.append(cur_doc)

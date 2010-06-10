@@ -87,7 +87,7 @@ function WNToolbar(parent) {
 				var rec_label = '<table style="width: 100%" cellspacing=0><tr>'
 					+'<td style="width: 10%; vertical-align: middle;"><div class="status_flag" id="rec_'+dt+'-'+dn+'"></div></td>'
 					+'<td style="width: 50%; text-decoration: underline; color: #22B; padding: 2px;">'+tdn+'</td>'
-					+'<td style="font-size: 11px;">'+dt+'</td></tr></table>';
+					+'<td style="font-size: 11px;">'+get_doctype_label(dt)+'</td></tr></table>';
 			
 				var mi = me.menu.add_item('Recent',rec_label,fn, on_top);
 				mi.dt = dt; mi.dn = dn;	
@@ -147,7 +147,13 @@ function WNToolbar(parent) {
 					me.new_sel.inp.focus();	
 				}
 				me.new_dialog = d;
-				me.new_sel = new SelectWidget(d.widgets['Select'], profile.can_create.sort(), '200px');
+				
+				// replace by labels
+				var nl = profile.can_create;
+				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
+				
+				// labels
+				me.new_sel = new SelectWidget(d.widgets['Select'], nl.sort(), '200px');
 				me.new_sel.onchange = function() { me.new_dialog.hide(); new_doc(me.new_sel.inp.value); }
 			}
 			me.new_dialog.show();
@@ -170,7 +176,12 @@ function WNToolbar(parent) {
 					me.rb_sel.inp.focus();	
 				}
 				me.rb_dialog = d;			
-				me.rb_sel = new SelectWidget(d.widgets['Select'], profile.can_get_report.sort(), '200px');
+
+				// replace by labels
+				var nl = profile.can_get_report;
+				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
+				
+				me.rb_sel = new SelectWidget(d.widgets['Select'], nl.sort(), '200px');
 				me.rb_sel.onchange = function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); };
 			}
 			me.rb_dialog.show();
@@ -202,7 +213,11 @@ function WNToolbar(parent) {
 			selector.show();
 		}
 
-		me.search_sel.set_options(profile.can_read.sort());
+		// replace by labels
+		var nl = profile.can_read;
+		for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
+				
+		me.search_sel.set_options(nl.sort());
 		me.search_sel.onchange = function() { open_quick_search(); }
 
 		// button

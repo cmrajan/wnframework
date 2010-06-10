@@ -6,14 +6,12 @@ _f.FrmContainer = function() {
 	$y(this.wrapper,{margin:'4px'});
 	
 	this.make_head();
-	this.make_toolbar();
 }
-
 
 _f.FrmContainer.prototype.make_head = function() {
 	var me = this;
 	this.bg_color = '#FFF';
-	this.head = $a(this.wrapper, 'div', '', {margin:'0px 0px 4px 0px'});
+	this.head = $a(this.wrapper, 'div');
 	this.body = $a(this.wrapper,'div');
 
 	this.page_head = new PageHeader(this.head);
@@ -25,9 +23,6 @@ _f.FrmContainer.prototype.show_head = function() {
 
 _f.FrmContainer.prototype.hide_head = function() { 
 	$dh(this.head); 
-}
-
-_f.FrmContainer.prototype.make_toolbar = function() {
 }
 
 _f.FrmContainer.prototype.refresh_btns= function() {

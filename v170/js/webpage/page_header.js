@@ -3,8 +3,8 @@
 // -----------------------------
 
 var def_ph_style = {
-	wrapper: {marginBottom:'32px'}
-	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px' }
+	wrapper: {marginBottom:'16px'}
+	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555' }
 	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#CDF', display:'none'}
 	,separator: { border:'1px solid #000' } // show this when there is no toolbar

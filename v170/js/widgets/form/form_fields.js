@@ -93,7 +93,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 
 
 _f.SectionBreak.prototype.make_simple_section = function(static) {
-	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '16px'});
+	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '8px'});
 	var me = this;
 
 	// colour
@@ -122,6 +122,7 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 	// description
 	if(this.df.description) {
 		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor: (static ? '#EEE' : '')});
+		if(static)$y(d,{paddingTop:'0px'});
 		if(this.df.description.length > 240) {
 			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
 			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
@@ -395,7 +396,7 @@ _f.CodeField.prototype.make_input = function() {
 	var me = this;
 	$ds(this.label_area);
 	this.label_area.innerHTML = this.df.label;
-	this.input = $a(this.input_area, 'textarea','code_text');
+	this.input = $a(this.input_area, 'textarea','code_text',{fontSize:'12px'});
 	this.myid = 'code-'+codeid;
 	this.input.setAttribute('id',this.myid);
 	codeid++;

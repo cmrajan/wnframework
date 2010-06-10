@@ -28,9 +28,9 @@ this.rb_area=$a(this.wrapper,'div');this.set_dt=function(dt,onload){my_onload=fu
 if(me.cur_rb)
 me.cur_rb.hide();if(me.rb_dict[dt]){me.rb_dict[dt].show(my_onload);}else{me.rb_dict[dt]=new _r.ReportBuilder(me.rb_area,dt,my_onload);}}}
 _r.ReportBuilder=function(parent,doctype,onload){this.menuitems={};this.has_primary_filters=false;this.doctype=doctype;this.forbidden=0;this.filter_fields=[];this.filter_fields_dict={};var me=this;this.fn_list=['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];this.wrapper=$a(parent,'div','finder_wrapper');this.make_tabs();this.current_loaded=null;this.setup_doctype(onload);this.hide=function(){$dh(me.wrapper);}
-this.show=function(my_onload){$ds(me.wrapper);this.set_main_title('Report: '+me.doctype);if(my_onload)my_onload(me);}}
+this.show=function(my_onload){$ds(me.wrapper);this.set_main_title('Report: '+get_doctype_label(me.doctype));if(my_onload)my_onload(me);}}
 _r.ReportBuilder.prototype.make_tabs=function(){this.tab_wrapper=$a(this.wrapper,'div','finder_tab_area');this.mytabs=new TabbedPage(this.tab_wrapper);this.mytabs.add_tab('Result');this.mytabs.add_tab('More Filters');this.mytabs.add_tab('Select Columns');}
-_r.ReportBuilder.prototype.make_body=function(){this.set_main_title('Report: '+this.doctype);var me=this;this.make_save_criteria();this.column_picker=new _r.ReportColumnPicker(this);this.report_filters=new _r.ReportFilters(this);}
+_r.ReportBuilder.prototype.make_body=function(){this.set_main_title('Report: '+get_doctype_label(this.doctype));var me=this;this.make_save_criteria();this.column_picker=new _r.ReportColumnPicker(this);this.report_filters=new _r.ReportFilters(this);}
 _r.ReportBuilder.prototype.make_save_criteria=function(){var me=this;this.sc_list=[];this.sc_dict={};for(var n in locals['Search Criteria']){var d=locals['Search Criteria'][n];if(d.doc_type==this.doctype){this.sc_list[this.sc_list.length]=d.criteria_name;this.sc_dict[d.criteria_name]=n;}}}
 _r.ReportBuilder.prototype.save_criteria=function(save_as){var overwrite=0;if(this.current_loaded&&(!save_as)){var overwrite=confirm('Do you want to overwrite the saved criteria "'+this.current_loaded+'"');if(overwrite){var doc=locals['Search Criteria'][this.sc_dict[this.current_loaded]];var criteria_name=this.current_loaded;}}
 if(!overwrite){var criteria_name=prompt('Select a name for the criteria:','');if(!criteria_name)
@@ -45,7 +45,7 @@ _r.ReportBuilder.prototype.hide_all_filters=function(){for(var i=0;i<this.filter
 _r.ReportBuilder.prototype.run=function(){this.dt.run();}
 _r.ReportBuilder.prototype.clear_criteria=function(){this.column_picker.clear();this.column_picker.set_defaults();for(var i=0;i<this.filter_fields.length;i++){this.filter_fields[i].df.filter_hide=0;this.filter_fields[i].df.ignore=0;if(this.filter_fields[i].df.custom)
 this.filter_fields[i].df.filter_hide=1;this.filter_fields[i].set_input(null);}
-this.set_sort_options();this.set_main_title('Report: '+this.doctype);this.current_loaded=null;this.customized_filters=null;this.sc=null;this.has_index=1;this.has_headings=1;for(var i in this.fn_list)this[this.fn_list[i]]=null;this.report_filters.refresh();this.column_picker.refresh();}
+this.set_sort_options();this.set_main_title('Report: '+get_doctype_label(this.doctype));this.current_loaded=null;this.customized_filters=null;this.sc=null;this.has_index=1;this.has_headings=1;for(var i in this.fn_list)this[this.fn_list[i]]=null;this.report_filters.refresh();this.column_picker.refresh();}
 _r.ReportBuilder.prototype.set_main_title=function(t,t1){_r.rb_con.page_head.main_head.innerHTML=t;_r.rb_con.page_head.sub_head.innerHTML=(t1?t1:'');set_title(t);}
 _r.ReportBuilder.prototype.select_column=function(dt,label,value){if(value==null)value=1;this.column_picker.set(dt,label,value);}
 _r.ReportBuilder.prototype.set_filter=function(dt,label,value){if(this.filter_fields_dict[dt+'\1'+label])
@@ -70,7 +70,7 @@ me.make_datatable();me.orig_sort_list=[];if(me.parent_dt){me.setup_dt_filters_an
 me.setup_dt_filters_and_cols(fl,me.doctype);if(!this.has_primary_filters)
 $dh(this.report_filters.first_page_filter);this.column_picker.refresh();$ds(me.body);}
 _r.ReportBuilder.prototype.add_filter=function(f){if(this.filter_fields_dict[f.parent+'\1'+f.label]){this.filter_fields_dict[f.parent+'\1'+f.label].df=f;}else{f.custom=1;this.report_filters.add_field(f,f.parent);}}
-_r.ReportBuilder.prototype.setup_dt_filters_and_cols=function(fl,dt){var me=this;var lab=$a(me.filter_area,'div','filter_dt_head');lab.innerHTML='Filters for '+dt;var lab=$a(me.picker_area,'div','builder_dt_head');lab.innerHTML='Select columns for '+dt;var dt_fields=fields_list[dt];for(var i=0;i<dt_fields.length;i++){fl[fl.length]=dt_fields[i];}
+_r.ReportBuilder.prototype.setup_dt_filters_and_cols=function(fl,dt){var me=this;var lab=$a(me.filter_area,'div','filter_dt_head');lab.innerHTML='Filters for '+get_doctype_label(dt);var lab=$a(me.picker_area,'div','builder_dt_head');lab.innerHTML='Select columns for '+get_doctype_label(dt);var dt_fields=fields_list[dt];for(var i=0;i<dt_fields.length;i++){fl[fl.length]=dt_fields[i];}
 var sf_list=locals.DocType[dt].search_fields?locals.DocType[dt].search_fields.split(','):[];for(var i in sf_list)sf_list[i]=strip(sf_list[i]);for(var i=0;i<fl.length;i++){var f=fl[i];if(f&&cint(f.in_filter)){me.report_filters.add_field(f,dt,in_list(sf_list,f.fieldname));}
 if(f&&!in_list(no_value_fields,f.fieldtype)&&f.fieldname!='docstatus'&&(!f.report_hide)){me.column_picker.add_field(f);}}
 me.set_sort_options();}
@@ -153,7 +153,7 @@ _r.ReportColumnPicker.prototype.refresh=function(){var ul=[];var sl=[];for(var i
 ul.sort(function(a,b){return(cint(a.df.idx)-cint(b.df.idx))});sl.sort(function(a,b){return(cint(a.sel_idx)-cint(b.sel_idx))})
 for(var i=0;i<sl.length;i++){sl[i].sel_idx=i;}
 this.set_options(this.unsel_fields,ul);this.set_options(this.sel_fields,sl);}
-_r.ReportColumnPicker.prototype.set_options=function(s,l){empty_select(s);for(var i=0;i<l.length;i++){var v=l[i].df.parent+'.'+l[i].df.label;var o=new Option(v,v,false,false);o.field=l[i];if(o.field.is_selected)o.selected=1;s.options[s.options.length]=o;}}
+_r.ReportColumnPicker.prototype.set_options=function(s,l){empty_select(s);for(var i=0;i<l.length;i++){var v=l[i].df.parent+'.'+l[i].df.label;var v_label=get_doctype_label(l[i].df.parent)+'.'+l[i].df.label;var o=new Option(v_label,v,false,false);o.field=l[i];if(o.field.is_selected)o.selected=1;s.options[s.options.length]=o;}}
 _r.ReportColumnPicker.prototype.clear=function(){this.sel_idx=0;for(var i=0;i<this.all_fields.length;i++){this.all_fields[i].selected=0;}
 this.refresh();}
 _r.ReportColumnPicker.prototype.get_selected=function(){var sl=[];for(var i=0;i<this.all_fields.length;i++){var o=this.all_fields[i];if(o.selected){sl[sl.length]=o.df;o.df.sel_idx=o.sel_idx;}}

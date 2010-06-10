@@ -60,7 +60,21 @@ def startup():
 		webnotes.response['ipinfo'] = webnotes.session['data']['ipinfo']
 		
 	webnotes.session['data']['profile'] = webnotes.response['profile']
+	webnotes.response['dt_labels'] = get_dt_labels()
+
+# new feature added 9-Jun-10 to allow doctypes to have labels 
+def get_dt_labels():
+	c = webnotes.app_conn or webnotes.conn
+	d = {}
+	try:
+		res = c.sql("select name, dt_label from `tabDocType Label`")
+	except:
+		return {}
+		
+	for r in res:
+		d[r[0]] = r[1]
 	
+	return d
 
 def cleanup_docs():
 	if out.get('docs'):
@@ -130,7 +144,7 @@ def import_csv():
 	from webnotes.utils import cint
 
 	i = webnotes.model.import_docs.CSVImport()
-	r = i.import_csv(form.getvalue('csv_file'), form.getvalue('dateformat'), cint(form.has_key('overwrite')))
+	r = i.import_csv(form.getvalue('csv_file'), form.getvalue('dateformat'), cint(form.getvalue('overwrite')))
 		
 	webnotes.response['type']='iframe'
 	rhead = '''<style>body, html {font-family: Arial; font-size: 12px;}</style>'''

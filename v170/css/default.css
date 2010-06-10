@@ -32,6 +32,10 @@ table { padding: 0px; }
 
 td { padding:0px; margin: 0px; vertical-align: top; }
 
+a:active { outline:none; }
+
+:focus { -moz-outline-style:none; }
+
 table.simpletable { border-collapse: collapse; margin-bottom: 10px;}
 table.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }
 
@@ -128,6 +132,25 @@ div.dd_item_mo { background-color: #FE8; }
 	margin: 0px;
 	padding: 0px;
 }
+
+/* Tooltip */
+
+/* tooltip styling. by default the element to be styled is .tooltip  */
+.tooltip {
+	display:none;
+	background-color:#FFD;
+	border: 2px solid #FFA;
+	
+	font-size:12px;
+	width:160px;
+	padding:8px;
+	margin-bottom: 16px;
+
+	-moz-box-shadow: 1px 1px 8px #229;
+	-webkit-box-shadow: 1px 1px 8px #229;
+}
+
+
 
 /* FLOATING MESSAGE */
 
@@ -263,9 +286,7 @@ div.frm_tbarmain div {
 	padding: 2px;
 }
 
-div.frm_heading {
-	width: 100%;
-}
+div.frm_heading { }
 
 div.frm_body {
 	/*background-color: #FFF;*/
@@ -926,13 +947,13 @@ div.todo_links div {
 .datalabelcell { padding: 4px 0px; width: 160px; vertical-align: top; }
 .datainputcell { padding: 4px 0px; }
 
-.input_area input { width: 80%; font-size: 12px; margin: 0px; border: 1px solid #888; padding: 1px;  }
-.input_area select { width: 80%; }
-.input_area textarea { width: 80%; font-size: 12px; }
+.input_area input { width: 80%; font-size: 14px; margin: 0px; border: 1px solid #888; padding: 1px;  }
+.input_area select { width: 80%; font-size: 14px; }
+.input_area textarea { width: 80%; font-size: 14px; }
 .input_area button { width: 40%; }
 
-.disp_area { width: 80%; background-color: #F2F2F2; padding: 2px;}
-.disp_area_no_val { width: 80%; background-color: #F2F2F2; padding: 2px; height: 12px; }
+.disp_area { width: 80%; border: 1px solid #CCC; padding: 2px; font-size: 14px; background-color: #EEE; }
+.disp_area_no_val { width: 80%; border: 1px solid #CCC; padding: 2px; height: 14px; background-color: #EEE; }
 
 .no_img {
 	padding: 40px;
@@ -1262,7 +1283,7 @@ div.autosuggest ul em
 /******* TABS ********/
 
 div.box_label_wrapper {
-	border-bottom: 4px solid #ABABAB;
+	border-bottom: 4px solid #777;
 }
 
 div.box_label_body {
@@ -1278,8 +1299,18 @@ ul.box_tabs {
 ul.box_tabs li {
 	height: 28px;
 	float:left;
-	background:url("../images/ui/rc/tab-left-EEE.gif") no-repeat left top;
+	font-size: 14px;
+	/*background:url("../images/ui/rc/tab-left-EEE.gif") no-repeat left top;*/
 	/*background:url("left.gif") no-repeat left top;*/
+
+	background-color: #DDD;
+
+	background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(#DDD));
+	background: -moz-linear-gradient(top, #EEE, #DDD);
+
+	-moz-border-radius-topright: 5px; -moz-border-radius-topleft: 5px;
+	-webkit-border-top-right-radius: 5px; -webkit-border-top-left-radius: 5px;
+	
 	margin:0;
 	margin-left: 4px;
 	padding:0 0 0 9px;
@@ -1289,7 +1320,7 @@ ul.box_tabs li {
 
 ul.box_tabs a {
 	display:block;
-	background:url("../images/ui/rc/tab-right-EEE.gif") no-repeat right top;
+/*	background:url("../images/ui/rc/tab-right-EEE.gif") no-repeat right top;*/
 	padding:6px 15px 6px 6px;
 	text-decoration:none;
 	font-weight:bold;
@@ -1301,12 +1332,18 @@ ul.box_tabs li.box_tab_mouseover {
 
 
 ul.box_tabs li.box_tab_selected {
-	background:url("../images/ui/rc/tab-left-CCC.gif") no-repeat left top;
-	background-color: #ABABAB;
+/*	background:url("../images/ui/rc/tab-left-CCC.gif") no-repeat left top;
+	background-color: #ABABAB; */
+	
+	background-color: #777;
+	
+	background: -webkit-gradient(linear, left top, left bottom, from(#999), to(#777));
+	background: -moz-linear-gradient(top, #999, #777);
+		
 	color: #FFF;
 }
 ul.box_tabs li.box_tab_selected a {
-	background:url("../images/ui/rc/tab-right-CCC.gif") no-repeat right top;
+/*	background:url("../images/ui/rc/tab-right-CCC.gif") no-repeat right top; */
 }
 
 /***** Dialogs *******/

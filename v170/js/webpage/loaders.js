@@ -2,6 +2,8 @@
 // -------------------------------------------------------------------------------
 
 function loadreport(dt, rep_name, onload, menuitem, reset_report) {
+	dt = get_label_doctype(dt);
+	
 	var show_report_builder = function(rb_con) {
 		if(!_r.rb_con) {
 			// first load
@@ -52,6 +54,7 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 var load_doc = loaddoc;
 
 function loaddoc(doctype, name, onload, menuitem) {
+	doctype = get_label_doctype(doctype);
 
 	// validate
 	if(frms['DocType'] && frms['DocType'].opendocs[doctype]) {
@@ -121,7 +124,9 @@ function loaddoc(doctype, name, onload, menuitem) {
 // -------------------------------------------------------------------------------
 
 
-function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {	
+function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
+	doctype = get_label_doctype(doctype);
+	
 	if(!doctype) {
 		if(cur_frm)doctype = cur_frm.doctype; else return;
 	}
@@ -244,6 +249,8 @@ function loadscript(src, call_back) {
 // -------------------------------------------------------------------------------
 
 function loaddocbrowser(dt, label, fields) {
+	dt = get_label_doctype(dt);
+	
 	var show = function() {
 		doc_browser.show(dt, label, fields);
 		nav_obj.open_notify('DocBrowser',dt,'');

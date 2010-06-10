@@ -30,6 +30,11 @@ function startup() {
 		// bc
 		session.rt = profile.can_read;
 		if(r.ipinfo) session.ipinfo = r.ipinfo;
+		session.dt_labels = r.dt_labels;
+		session.rev_dt_labels = {} // reverse lookup - get doctype by label
+		if(r.dt_labels) {
+			for(key in r.dt_labels)session.rev_dt_labels[r.dt_labels[key]] = key;
+		}
 	}
 	
 	var setup_history = function(r) {
