@@ -99,7 +99,7 @@ LocalDB.sync = function(list) {
 local_name_idx = {};
 LocalDB.get_localname=function(doctype) {
 	if(!local_name_idx[doctype]) local_name_idx[doctype] = 1;
-	var n = 'New '+ doctype + ' ' + local_name_idx[doctype];
+	var n = 'New '+ get_doctype_label(doctype) + ' ' + local_name_idx[doctype];
 	local_name_idx[doctype]++;
 	return n;
 }
