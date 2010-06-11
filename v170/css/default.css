@@ -949,7 +949,7 @@ div.todo_links div {
 
 .input_area input { width: 80%; font-size: 14px; margin: 0px; border: 1px solid #888; padding: 1px;  }
 .input_area select { width: 80%; font-size: 14px; }
-.input_area textarea { width: 80%; font-size: 14px; }
+.input_area textarea { width: 90%; font-size: 14px; }
 
 .disp_area { width: 80%; border: 1px solid #CCC; padding: 2px; font-size: 14px; background-color: #EEE; }
 .disp_area_no_val { width: 80%; border: 1px solid #CCC; padding: 2px; height: 14px; background-color: #EEE; }

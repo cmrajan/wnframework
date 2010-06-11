@@ -37,6 +37,7 @@ Field.prototype.make_body = function() {
 
 	} else {
 		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px'})
+		$dh(this.label_area);
 	}
 
 	// make the input areas

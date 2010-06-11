@@ -553,7 +553,8 @@ var no_value_fields=['Section Break','Column Break','HTML','Table','FlexTable','
 Field.prototype.make_body=function(){var ischk=(this.df.fieldtype=='Check'?1:0);if(this.parent)
 this.wrapper=$a(this.parent,'div');else
 this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div');if(this.with_label){var t=make_table(this.label_area,1,3+ischk,null,[],{verticalAlign:'middle',height:'18px',padding:'2px'});this.label_span=$a($td(t,0,0+ischk),'span','',{marginRight:'4px',fontSize:'11px'})
-this.help_icon=$a($td(t,0,1+ischk),'img','',{cursor:'pointer',marginRight:'4px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a($td(t,0,2+ischk),'img','',{marginRight:'4px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})}
+this.help_icon=$a($td(t,0,1+ischk),'img','',{cursor:'pointer',marginRight:'4px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a($td(t,0,2+ischk),'img','',{marginRight:'4px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})
+$dh(this.label_area);}
 if(ischk&&!this.in_grid){this.input_area=$a($td(t,0,0),'div');this.disp_area=$a($td(t,0,0),'div');}else{this.input_area=$a(this.wrapper,'div');this.disp_area=$a(this.wrapper,'div');}
 if(this.in_grid){if(this.label_area)$dh(this.label_area);}else{this.input_area.className='input_area';$y(this.wrapper,{marginBottom:'8px'})}
 if(this.onmake)this.onmake();}
