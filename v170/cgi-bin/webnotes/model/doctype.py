@@ -14,7 +14,7 @@ class _DocType:
 		
 	def is_modified(self):
 		is_modified = 0
-		modified = sql("SELECT modified from tabDocType where name='%s'" % self.name, allow_testing=0)
+		modified = sql("SELECT modified from tabDocType where name='%s'" % self.name)
 		cache_modified = webnotes.conn.sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
 		if not (cache_modified and modified[0][0]==cache_modified[0][0]):
 			is_modified = 1
