@@ -30,8 +30,8 @@ def execute(code, doc=None, doclist=[]):
 		d = DocType(doc, doclist)
 		return d
 		
-	if out:
-		return out
+	if page_html:
+		return page_html
 
 #=================================================================================
 
