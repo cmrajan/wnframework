@@ -93,10 +93,10 @@ def get_doc_content(dt, dn):
 		# generate HTML
 		do = webnotes.model.code.get_obj(dt, dn, with_children = 1)
 		if hasattr(do, 'to_html'):
-			return (dt + '-' + dn), do.to_html()
+			return dn, do.to_html()
 		else:
 			import webnotes.model.doclist
-			return (dt + '-' + dn), webnotes.model.doclist.to_html(do.doclist)
+			return dn, webnotes.model.doclist.to_html(do.doclist)
 	else:
 		return 'Forbidden - 404', '<h1>Forbidden - 404</h1>'
 

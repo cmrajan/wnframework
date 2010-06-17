@@ -18,6 +18,8 @@ BACKSLASH = '\\'
 #=================================================================================
 
 def execute(code, doc=None, doclist=[]):
+	out = None
+
 	# execute it
 	exec code in globals()
 	
@@ -25,6 +27,9 @@ def execute(code, doc=None, doclist=[]):
 	if doc:
 		d = DocType(doc, doclist)
 		return d
+		
+	if out:
+		return out
 
 #=================================================================================
 
