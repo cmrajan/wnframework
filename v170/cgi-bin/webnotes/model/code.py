@@ -11,6 +11,9 @@ in_transaction = webnotes.conn.in_transaction
 get_value = webnotes.conn.get_value
 convert_to_lists = webnotes.conn.convert_to_lists
 
+page_html = None
+
+
 version = 'v170'
 NEWLINE = '\n'
 BACKSLASH = '\\'
@@ -18,7 +21,6 @@ BACKSLASH = '\\'
 #=================================================================================
 
 def execute(code, doc=None, doclist=[]):
-	out = None
 
 	# execute it
 	exec code in globals()
