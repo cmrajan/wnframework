@@ -398,6 +398,7 @@ Listing.prototype.do_export = function() {
 	else {
 		for(var i=1;i<this.colnames.length;i++) cn.push(this.colnames[i]); // Ignore the SR label
 	}
+        alert(cn);
 	var q = export_query(this.query, function(query) { export_csv(query, this.head_text, null, 1, null, cn); });
 }
 
