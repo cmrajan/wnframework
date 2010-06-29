@@ -121,9 +121,11 @@ class App:
 	# sync a particular record
 	# ----------------------------------
 	def sync_doc(self, dt, dn):
-		# get from master
+		import webnotes
 		webnotes.conn = self.master_conn
 		import webnotes.model.doc
+
+		# get from master
 		doclist = webnotes.model.doc.get(dt, dn)
 		
 		# put
