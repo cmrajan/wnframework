@@ -95,7 +95,7 @@ class App:
 		self.sync_records('DocType',0,1)
 		self.sync_records('Search Criteria',1,1)
 		self.sync_records('Page',1,1)
-		self.sync_records('Module Def',0,1)
+		self.sync_records('Module Def',0,0)
 		self.sync_records('Print Format',1,1)
 		self.sync_records('DocType Mapper',0,1)
 		self.sync_records('DocType Label',0,1)
