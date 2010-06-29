@@ -71,8 +71,8 @@ class _DocType:
 	def _get_client_script(self, match):		
 		name = match.group('name')
 
-		csc = str(webnotes.model.meta.get_dt_values(name, 'client_script_core') or '')
-		cs = str(webnotes.model.meta.get_dt_values(name, 'client_script') or '')
+		csc = str(webnotes.model.meta.get_dt_values(name, 'client_script_core')[0][0] or '')
+		cs = str(webnotes.model.meta.get_dt_values(name, 'client_script')[0][0] or '')
 
 		return csc + '\n' + cs
 		
