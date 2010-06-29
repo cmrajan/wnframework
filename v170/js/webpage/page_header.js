@@ -9,9 +9,8 @@ var def_ph_style = {
 	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#CDF', display:'none'}
 	,separator: { border:'1px solid #000' } // show this when there is no toolbar
 	,tag_area: { color:'#888', marginBottom:'4px', textAlign:'right', fontSize:'10px' }
-	,close_btn: { cursor:'pointer', width:'36px', cssFloat:'right', padding:'3px', paddingRight: '24px', 
-		background:"url('images/icons/close.gif') no-repeat 44px 2px", 
-		lineHeight:'1.2em',backgroundColor:'#EEE',border:'1px solid #AAA' 
+	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 
+		background:"url('images/ui/close_btn.gif') center no-repeat"
 	}
 }
 
@@ -31,8 +30,6 @@ function PageHeader(parent, main_text, sub_text) {
 	
 	this.close_btn.onmouseover = function() { $y(this,{color:'#00B', textDecoration:'underline'}) }
 	this.close_btn.onmouseout = function() { $y(this,{color:'#000', textDecoration:'none'}) }
-	
-	this.close_btn.innerHTML = 'Close';
 	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	if(!isIE) {
