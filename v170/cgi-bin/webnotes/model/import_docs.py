@@ -113,7 +113,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 	from webnotes.model.doc import Document
 	from webnotes.model.code import get_obj
 	from webnotes.model.code import get_server_obj
-	from webnotes.model import get_table_fields
+	from webnotes.model.meta import get_table_fields
 	
 	sql = webnotes.conn.sql
 	override = 0
@@ -145,7 +145,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 			# ------------------------
 			ts = sql("select modified from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]
 			if str(ts)==doc.modified:
-				return doc.name + ": <span style='color: #888'>No update</span>"
+				return doc.name + ": No update"
 
 			# Replace the record
 			# ------------------
@@ -192,7 +192,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 	if webnotes.conn.in_transaction: 
 		sql("COMMIT")
 
-	return doc.name + ' <span style="color:GREEN; font-weight:bold">Completed</span>'
+	return doc.name + ': Completed'
 
 #=============================================================================================
 	

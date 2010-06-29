@@ -1,7 +1,6 @@
 import webnotes
 import webnotes.model.meta
 
-conn = webnotes.conn
 sql = webnotes.conn.sql
 
 from webnotes.utils import *
@@ -61,11 +60,11 @@ class Document:
 		if issingle:
 			self.loadsingle()
 		else:
-			dataset = conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
+			dataset = webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
 			if not dataset:
 				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name))
 				raise Exception
-			self.load_values(dataset[0], conn.get_description())
+			self.load_values(dataset[0], webnotes.conn.get_description())
 
 	# Load Fields from dataset
 	# ------------------------
@@ -368,7 +367,7 @@ def make_autoname(key, doctype=''):
 # -----------------------
 
 def getseries(key, digits, doctype=''):
-	ttl = conn.get_testing_tables()
+	ttl = webnotes.conn.get_testing_tables()
 
 	# series created ?
 	if webnotes.conn.sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
@@ -400,8 +399,8 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 	if parenttype: 
 		tmp = ' and parenttype="%s" ' % parenttype
 
-	dataset = conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
-	desc = conn.get_description()
+	dataset = webnotes.conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
+	desc = webnotes.conn.get_description()
 
 	l = []
 	
@@ -420,8 +419,6 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 # ---------------------------------------------------------------------
 
 def get(dt, dn='', with_children = 1, from_doctype=0):
-	global conn
-
 	import webnotes.model
 
 	dn = dn or dt

@@ -1,25 +1,24 @@
 # model __init__.py
 import webnotes
 
-sql = webnotes.conn.sql
-
 no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image', 'Graph']
 default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
 
 #=================================================================================
 
 def delete_doc(doctype, name):
-	tablefields = get_table_fields(doctype)
-	sql("delete from `tab%s` where name='%s' limit 1" % (doctype, name))
+	import webnotes.model.meta
+	tablefields = webnotes.model.meta.get_table_fields(doctype)
+	webnotes.conn.sql("delete from `tab%s` where name='%s' limit 1" % (doctype, name))
 	for t in tablefields:
-		sql("delete from `tab%s` where parent = '%s' and parentfield='%s'" % (t[0], name, t[1]))
+		webnotes.conn.sql("delete from `tab%s` where parent = '%s' and parentfield='%s'" % (t[0], name, t[1]))
 
 #=================================================================================
 # new feature added 9-Jun-10 to allow doctypes to have labels 
 def get_dt_labels():
 	d = {}
 	try:
-		res = webnotes.app_conn.sql("select name, dt_label from `tabDocType Label`")
+		res = webnotes.conn.sql("select name, dt_label from `tabDocType Label`")
 	except:
 		return {}
 		
@@ -30,12 +29,13 @@ def get_dt_labels():
 #=================================================================================
 
 def get_search_criteria(dt):
+	import webnotes.model.doc
 	# load search criteria for reports (all)
 	dl = []
 	try: # bc
-		sc_list = sql("select name from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s' and (disabled!=1 OR disabled IS NULL)" % (dt, dt))
+		sc_list = webnotes.conn.sql("select name from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s' and (disabled!=1 OR disabled IS NULL)" % (dt, dt))
 		for sc in sc_list:
-			dl += server.getdoc('Search Criteria', sc[0])
+			dl += webnotes.model.doc.get('Search Criteria', sc[0])
 	except Exception, e:
 		pass # no search criteria
 	return dl
@@ -45,6 +45,8 @@ def get_search_criteria(dt):
 #=================================================================================
 
 def rename(dt, old, new, is_doctype = 0):
+	sql = webnotes.conn.sql
+
 	# rename doc
 	sql("update `tab%s` set name='%s' where name='%s'" % (dt, new, old))
 
@@ -75,6 +77,8 @@ def rename(dt, old, new, is_doctype = 0):
 #=================================================================================
 
 def clear_recycle_bin():
+	sql = webnotes.conn.sql
+
 	tl = sql('show tables')
 	total_deleted = 0
 	for t in tl:
