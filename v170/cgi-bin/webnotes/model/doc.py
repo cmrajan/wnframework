@@ -1,5 +1,5 @@
 import webnotes
-import webnotes.model.db_schema
+import webnotes.model.meta
 
 conn = webnotes.conn
 sql = webnotes.conn.sql
@@ -38,9 +38,6 @@ class Document:
 			self.fields['name'] = name
 		self.__initialized = 1
 
-		if doctype:
-			self.set_connection()
-
 		if (doctype and name):
 			self.loadfromdb(doctype, name)
 
@@ -53,22 +50,12 @@ class Document:
 	# Load Document
 	# -------------
 
-	def set_connection(self):
-		global conn, sql
-		# check if ADT and set conn accordingly
-		is_adt = get_is_adt(self.doctype)
-		if is_adt:
-			conn = webnotes.app_conn
-		else:
-			conn = webnotes.conn	
-			sql = conn.sql
-
 	def loadfromdb(self, doctype = None, name = None):
 
 		if name: self.name = name
 		if doctype: self.doctype = doctype
 
-		r = sql("select issingle from tabDocType where name='%s'" % self.doctype)
+		r = webnotes.model.meta.is_single(self.doctype)
 		issingle = r and r[0][0] or 0
 				
 		if issingle:
@@ -78,30 +65,22 @@ class Document:
 			if not dataset:
 				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name))
 				raise Exception
-			self.loadfields(dataset, 0, conn.get_description())
+			self.load_values(dataset[0], conn.get_description())
 
 	# Load Fields from dataset
 	# ------------------------
 
-	def loadfields(self, dataset, ridx, description):
-		try: import decimal # for decimal Python 2.5 (?)
-		except: pass
-		import datetime
+	def load_values(self, data, description):
 		for i in range(len(description)):
-			v = dataset[ridx][i]
-			if type(v)==datetime.date:
-				v = str(v)
-			elif type(v)==datetime.timedelta:
-				v = ':'.join(str(v).split(':')[:2])
-			elif type(v)==datetime.datetime:
-				v = str(v)
-			elif type(v)==long: v=int(v)
-			try:
-				if type(v)==decimal.Decimal: v=float(v)
-			except: pass
-			
-			self.fields[description[i][0]] = v
+			v = data[i]
+			self.fields[description[i][0]] = webnotes.conn.convert_to_simple_type(v)
 
+	def merge_values(self, data, description):
+		for i in range(len(description)):
+			v = data[i]
+			if v: # only if value, over-write
+				self.fields[description[i][0]] = webnotes.conn.convert_to_simple_type(v)
+			
 	# Load Single Type
 	# ----------------
 
@@ -234,22 +213,19 @@ class Document:
 			# validate links
 			old_val = self.fields[f]
 			if link_list and link_list.get(f):
-				self.fields[f] = self._validate_link(link_list[f], self.fields[f])
+				self.fields[f] = self._validate_link(link_list[f][0], self.fields[f])
 
 			if old_val and not self.fields[f]:
-				err_list.append(old_val)
+				s = link_list[f][1] + ': ' + old_val
+				err_list.append(s)
 				
 		return err_list
 
 	def make_link_list(self):
-		c = webnotes.app_conn or webnotes.conn
-		res = c.sql("""
-			SELECT fieldname, options
-			FROM tabDocField
-			WHERE parent='%s' and (fieldtype='Link' or (fieldtype='Select' and `options` like 'link:%%'))""" % (self.doctype))
-			
+		res = webnotes.model.meta.get_link_fields(self.doctype)
+
 		link_list = {}
-		for i in res: link_list[i[0]] = i[1]
+		for i in res: link_list[i[0]] = (i[1], i[2]) # options, label
 		return link_list
 	
 	def _validate_link(self, dt, dn):
@@ -275,7 +251,7 @@ class Document:
 					
 					# validate links
 					if link_list and link_list.get(f):
-						self.fields[f] = self._validate_link(link_list[f], self.fields[f])
+						self.fields[f] = self._validate_link(link_list[f][0], self.fields[f])
 
 					if self.fields[f]==None:
 						update_str.append("`%s`=NULL" % f)
@@ -296,12 +272,8 @@ class Document:
 	# Save values
 	# -----------
 	def save(self, new=0, check_links=1, ignore_fields=0):	
-		res = sql('select autoname, issingle, istable, name_case from tabDocType where name="%s"' % self.doctype, as_dict=1)
+		res = webnotes.model.meta.get_dt_values(self.doctype, 'autoname, issingle, istable, name_case', as_dict=1)
 		res = res and res[0] or {}
-
-		# sync tables by latest metadata from app db -- for non singles
-		if not res.get('issingle'):
-			webnotes.model.db_schema.sync_dt(self.doctype)
 
 		# if required, make new
 		if new or (not new and self.fields.get('__islocal')) and (not res.get('issingle')):
@@ -414,31 +386,6 @@ def getseries(key, digits, doctype=''):
 		n = 1
 	return ('%0'+str(digits)+'d') % n
 
-# Merge Custom Fields - for custom fields
-# -------------------
-
-def merge_custom_fields(l, name):
-	fl = []
-	try:
-		fl = webnotes.conn.sql("select * from `tabCustom Field` where dt='%s' and ifnull(docstatus,0)<2 order by idx" % (name))
-		desc = webnotes.conn.get_description()
-	except Exception, e:
-		if e.args[0]==1146:
-			pass
-		else:
-			raise e
-
-	for i in range(len(fl)):
-		d = Document()
-		d.loadfields(fl, i, desc)
-		d.doctype = 'DocField'
-		d.parent = name
-		d.parenttype = 'DocType'
-		d.parentfield = 'fields'
-		d.idx = d.index
-		del d.fields['dt']
-		l.append(d)
-
 
 # Get Children
 # ------------
@@ -458,35 +405,14 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 
 	l = []
 	
-	for i in range(len(dataset)):
+	for i in dataset:
 		d = Document()
 		d.doctype = childtype
-		d.loadfields(dataset, i, desc)
+		d.load_values(i, desc)
 		l.append(d)
-
-	if from_doctype and childtype=='DocField':
-		merge_custom_fields(l, name)
-		#webnotes.msgprint([i.fields for i in l])
 	
 	return l
 
-# check if the DocType is application doctype
-# -------------------------------------------
-
-def get_is_adt(dt):
-	# has connection ?
-	if not webnotes.app_conn:
-		return 0
-	
-	# has list ?
-	if not webnotes.adt_list:
-		return 0
-
-	# return
-	if dt in webnotes.adt_list:
-		return 1
-	else:
-		return 0
 
 # called from everywhere
 # load a record and its child records and bundle it in a list - doclist
@@ -508,7 +434,7 @@ def get(dt, dn='', with_children = 1, from_doctype=0):
 		return [doc,]
 	
 	# get all children types
-	tablefields = webnotes.model.get_table_fields(dt)
+	tablefields = webnotes.model.meta.get_table_fields(dt)
 
 	# load chilren
 	doclist = [doc,]

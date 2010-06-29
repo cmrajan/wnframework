@@ -6,15 +6,28 @@ sql = webnotes.conn.sql
 no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image', 'Graph']
 default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
 
-def get_table_fields(doctype):
-	conn = webnotes.app_conn or webnotes.conn
-	return conn.sql("select options, fieldname from tabDocField where parent='%s' and fieldtype='Table'" % doctype)
+#=================================================================================
 
 def delete_doc(doctype, name):
 	tablefields = get_table_fields(doctype)
 	sql("delete from `tab%s` where name='%s' limit 1" % (doctype, name))
 	for t in tablefields:
 		sql("delete from `tab%s` where parent = '%s' and parentfield='%s'" % (t[0], name, t[1]))
+
+#=================================================================================
+# new feature added 9-Jun-10 to allow doctypes to have labels 
+def get_dt_labels():
+	d = {}
+	try:
+		res = webnotes.app_conn.sql("select name, dt_label from `tabDocType Label`")
+	except:
+		return {}
+		
+	for r in res:
+		d[r[0]] = r[1]
+	
+	return d
+#=================================================================================
 
 def get_search_criteria(dt):
 	# load search criteria for reports (all)
@@ -27,8 +40,9 @@ def get_search_criteria(dt):
 		pass # no search criteria
 	return dl
 
+
 # Rename Doc
-# ----------
+#=================================================================================
 
 def rename(dt, old, new, is_doctype = 0):
 	# rename doc
@@ -58,6 +72,8 @@ def rename(dt, old, new, is_doctype = 0):
 		for c in ct:
 			sql("update `tab%s` set parenttype='%s' where parenttype='%s'" % (c[0], new, old))
 
+#=================================================================================
+
 def clear_recycle_bin():
 	tl = sql('show tables')
 	total_deleted = 0
@@ -82,7 +98,7 @@ def clear_recycle_bin():
 	
 	
 # Make Table Copy
-# ---------------
+#=================================================================================
 
 def copytables(srctype, src, srcfield, tartype, tar, tarfield, srcfields, tarfields=[]):
 	if not tarfields: 

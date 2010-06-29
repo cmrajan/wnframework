@@ -143,12 +143,12 @@ Field.prototype.refresh_mandatory = function() {
 	if(this.label_area) {
 		if(this.df.reqd) {
 			this.label_area.style.color= "#d22";
-			if(this.txt)$bg(this.txt,"#FFFED7");
-			else if(this.input)$bg(this.input,"#FFFED7");
+			if(this.txt)$y(this.txt,{backgroundColor:"#FFFED7"});
+			else if(this.input)$y(this.input,{backgroundColor:"#FFFED7"});
 		} else {
 			this.label_area.style.color= "#222";
-			if(this.txt)$bg(this.txt,"#FFF");
-			else if(this.input)$bg(this.input,"#FFF");
+			if(this.txt)$y(this.txt,{backgroundColor:"#FFF"});
+			else if(this.input)$y(this.input,{backgroundColor:"#FFF"});
 		}
 	}
 	this.set_reqd = this.df.reqd;
@@ -458,7 +458,7 @@ DateField.prototype.make_input = function() {
 		// input as dd-mm-yyyy
 		if(this.value==null)this.value='';
 
-		me.set(dateutil.str_to_user(me.input.value));
+		me.set(dateutil.user_to_str(me.input.value));
 		me.run_trigger();
 	}
 	me.input.set_input = function(val) {

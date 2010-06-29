@@ -271,7 +271,7 @@ def create_account(ac_name, ac_type='Framework'):
 	# create entry in Account table in 'accounts' (default) database
 	create_account_record(ac_name, newdb)
 	
-	return "Created %s (%s)" % (ac_name, newdb)
+	return "%s,%s" % (ac_name, newdb)
 
 # Installation
 # -------------------------------------------------------------

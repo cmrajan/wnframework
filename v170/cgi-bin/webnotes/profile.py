@@ -29,13 +29,13 @@ class Profile:
 		return self._load_roles()
 	
 	def get_allow_list(self, key):
-		conn = webnotes.app_conn or webnotes.conn
+		conn = webnotes.conn
 		role_options = ["role = '"+r+"'" for r in self.get_roles()]
 		return [r[0] for r in conn.sql('SELECT DISTINCT t1.parent FROM `tabDocPerm` t1, tabDocType t2 WHERE t1.`%s`=1 AND t1.parent not like "old_parent:%%" AND t1.parent = t2.name AND IFNULL(t2.istable,0) = 0 AND (%s) order by t1.parent' % (key, ' OR '.join(role_options)))]
 	
 	def get_create_list(self):
 		cl = self.get_allow_list('create')
-		conn = webnotes.app_conn or webnotes.conn
+		conn = webnotes.conn
 		no_create_list = [r[0] for r in conn.sql('select name from tabDocType where in_create = 1 or istable=1')]
 		self.can_create = filter(lambda x: x not in no_create_list, cl)
 		return self.can_create
@@ -46,7 +46,7 @@ class Profile:
 	
 	def get_report_list(self):
 
-		conn = webnotes.app_conn or webnotes.conn
+		conn = webnotes.conn
 	
 		# get all tables list
 		res = conn.sql('SELECT parent, options from tabDocField where fieldtype="Table"')
@@ -137,7 +137,7 @@ class Profile:
 	
 	# update recent documents
 	def update_recent(self, dt, dn):
-		conn = webnotes.app_conn or webnotes.conn
+		conn = webnotes.conn
 	
 		# get list of child tables, so we know what not to add in the recent list
 		child_tables = [t[0] for t in conn.sql('select name from tabDocType where istable = 1')]

@@ -21,7 +21,7 @@ function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
 	this.page_len = 20;
 	this.paging_len = 5;
-	this.filters_per_line = 3;
+	this.filters_per_line = 5;
 	this.cell_idx = 0;
 	this.head_text = head_text ? head_text : 'Result';
 	this.keyword = 'records';
@@ -279,7 +279,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	
 	$y(c,{width:cint(100/this.filters_per_line) + '%',textAlign:'left',verticalAlign:'top'});
 	
-	var d1= $a(c,'div'); d1.innerHTML = label; $y(d1,{marginBottom:'2px'});
+	var d1= $a(c,'div','',{fontSize:'11px', marginBottom:'2px'}); d1.innerHTML = label;
 	var d2= $a(c,'div');
 	
 	// create the filter
@@ -392,14 +392,18 @@ Listing.prototype.set_sort = function(cell, ci, fname) {
 }
 Listing.prototype.do_export = function() {
 	this.build_query();
-	var cn = [];
+	var me = this;
+	me.cn = [];
 	if(this.no_index)
-		cn = this.colnames; // No index
+		me.cn = this.colnames; // No index
 	else {
-		for(var i=1;i<this.colnames.length;i++) cn.push(this.colnames[i]); // Ignore the SR label
+		for(var i=1;i<this.colnames.length;i++) 
+			me.cn.push(this.colnames[i]); // Ignore the SR label
 	}
-        alert(cn);
-	var q = export_query(this.query, function(query) { export_csv(query, this.head_text, null, 1, null, cn); });
+	var q = export_query(this.query, 
+		function(query) { 
+			export_csv(query, me.head_text, null, 1, null, me.cn); 
+		});
 }
 
 Listing.prototype.build_query = function() {

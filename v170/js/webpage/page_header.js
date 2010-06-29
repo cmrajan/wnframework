@@ -51,6 +51,7 @@ PageHeader.prototype.add_button = function(label, fn, bold, icon) {
 	if(bold)$y(btn, {fontWeight: 'bold'});
 	$(btn).button({icons:{ primary: icon }});
 	this.show_toolbar();
+	return btn;
 }
 
 PageHeader.prototype.show_toolbar = function() {

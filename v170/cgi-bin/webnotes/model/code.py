@@ -35,21 +35,6 @@ def execute(code, doc=None, doclist=[]):
 
 #=================================================================================
 
-def _check_if_code_is_latest(dt):
-	import webnotes
-	m = webnotes.conn.sql("select modified from __DocTypeCache where name=%s", dt)
-	if not m: return 0
-	
-	if webnotes.app_conn:
-		m1 = webnotes.conn.sql("select modified from `tabDocType Update Register` where name=%s", dt)
-	else:
-		m1 = webnotes.conn.sql("select modified from `tabDocType` where name=%s", dt)
-
-	if m1 and m1[0][0] == m[0][0]: 
-		return 1
-	else: 
-		return 0
-
 def get_server_obj(doc, doclist = [], basedoctype = ''):
 	import marshal
 	import webnotes
@@ -62,7 +47,6 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	try:
 		# get compiled code
 		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)[0][0]
-		#if not (sc_compiled and _check_if_code_is_latest(dt)):
 		#	sc_compiled = None
 			
 	except:
@@ -73,7 +57,6 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		# compile
 		import webnotes.model.doctype
 		webnotes.model.doctype.get(doc.doctype)
-		#webnotes.model.doctype.compile_code(Document('DocType', doc.doctype))
 
 		# load
 		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)

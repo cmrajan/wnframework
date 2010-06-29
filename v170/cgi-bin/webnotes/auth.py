@@ -50,12 +50,8 @@ class Authentication:
 		self.user_id = None
 		self.cp = None
 		
-		self.app_login = None
-		self.app_password = None
-		
 		self.get_env()
 		self.set_db()
-		self.set_app_db()
 		
 		# make the connections global
 		webnotes.conn = self.conn
@@ -64,7 +60,6 @@ class Authentication:
 		if form.getvalue('cmd')=='login':
 			if form.getvalue('acx'):
 				self.set_db(form.getvalue('acx'))
-				self.set_app_db()
 				webnotes.conn = self.conn
 			
 			self.login()
@@ -164,16 +159,6 @@ class Authentication:
 						self.account = fp
 				except:
 					pass
-				
-		# get details of app login - not required everytime, use the cookies
-		# ------------------------------------------------------------------
-		
-		try:
-			res_app = c.sql("select app_login from tabAccount where ac_name = %s", self.account)
-			if res_app: 
-				self.app_login = res_app[0][0]
-		except Exception, e:
-			pass
 		
 		# connect
 		# -------
@@ -187,40 +172,6 @@ class Authentication:
 			
 		self.conn = c
 		
-
-	# setup Application Database
-	# Appication Database is from where Application DocTypes are accesssed
-	# =================================================================================
-	
-	def set_app_db(self):
-		
-		# find app_login from defs.py
-		if not self.app_login:
-			if hasattr(defs, 'app_login'):
-				self.app_login = defs.app_login
-	
-			if hasattr(defs, 'app_password'):
-				self.app_password = defs.app_password
-		
-			a = self.cookies.get('app_id') or self.form.getvalue('app_id')
-			if a:
-				self.app_login = a
-
-		if not self.app_login:
-			return
-
-		if self.app_login == self.conn.user:
-			# i am the app_db, do nothing
-			return
-		
-		webnotes.app_conn = webnotes.db.Database(user = self.app_login, password = self.app_password)
-		webnotes.app_conn.use(self.app_login)
-		webnotes.app_conn.is_app_conn = 1
-		
-		# setup list of application doctypes
-		webnotes.adt_list = webnotes.app_conn.get_value("Control Panel", None, 'adt_list')
-		webnotes.adt_list = webnotes.adt_list and webnotes.adt_list.split('\n') or ['DocType', 'DocField', 'DocPerm', 'Role', 'Page', 'Page Role', 'Module Def', 'Print Format', 'Search Criteria']
-	
 	def check_ip(self):
 		if self.session:
 			if self.session['data']['session_ip'] != self.remote_ip:
@@ -369,11 +320,6 @@ class Authentication:
 			
 		elif self.account:
 			self.out_cookies['ac_name'] = self.account
-			
-		if self.app_login:
-			self.out_cookies['app_id'] = self.app_login
-		else:
-			self.out_cookies['app_id'] = ''
 			
 		self.out_cookies['sid'] = self.session['sid']
 

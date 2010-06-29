@@ -123,7 +123,6 @@ def getvaluelist(doclist, fieldname):
 		l.append(d.fields[fieldname])
 	return l
 
-
 def _make_html(doc, link_list):
 
 	from webnotes.utils import cstr

@@ -2,9 +2,7 @@
 # ----------------
 
 import webnotes
-
-# prefer Application Database for the schema (if exists)
-sql = webnotes.app_conn and webnotes.app_conn.sql or webnotes.conn.sql
+import webnotes.model.meta
 
 def getcoldef(ftype, length=''):
 	t=ftype.lower()
@@ -81,26 +79,10 @@ def _change_column(f, dt, col_def):
 				raise e
 		#webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
 
-def _get_dt_fields(doctype):
-	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
-		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
-	else:
-		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
 
-	fl2 = _get_custom_fields(doctype)
-	if fl2:
-		return fl + fl2
-	else:
-		return fl
-
-def _get_custom_fields(doctype):
-	if 'tabCustom Field' in  [t[0] for t in sql("show tables")]:
-		return webnotes.conn.sql(" SELECT '', fieldname, fieldtype, '', '', 0 FROM `tabCustom Field` WHERE dt = '%s' and ifnull(docstatus, 0) < 2" % doctype)
-
-			
 def updatecolumns(doctype):
 
-	flist = _get_dt_fields(doctype)
+	flist = webnotes.model.meta.get_dt_fields(doctype)
 
 
 	# list of existing columns - always from user db
@@ -111,12 +93,6 @@ def updatecolumns(doctype):
 
 		# not in current fields
 		if not (f[1] in [e[0] for e in cur_fields]):
-
-			# name changed --- will not work in add_conn
-			#if (not webnotes.app_conn) and f[0]: change = 1
-			
-			# new field
-			#else: 
 			_add_column(f, doctype)
 		
 		# type or length has changed
@@ -137,15 +113,15 @@ def updatecolumns(doctype):
 				_change_column(f, doctype, col_def)
 	
 	# update the "old" columns
-	sql("start transaction")
-	sql("UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent= '%s'" % doctype)
+	webnotes.conn.sql("start transaction")
+	webnotes.model.meta.update_oldfield_values()
 
 
 # Add Indices
 # -----------
 
 def updateindex(doctype):
-	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=1 and parent='%s'" % doctype)
+	addlist = webnotes.model.meta.get_index_fields(doctype, 1)
 	
 	# get keys
 	kl = [i[4] for i in webnotes.conn.sql("show keys from `tab%s`" % doctype)]
@@ -158,8 +134,8 @@ def updateindex(doctype):
 			pass
 
 	# remove
-	addlist = sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=0 and parent='%s'" % doctype)
-	for f in addlist:
+	droplist = webnotes.model.meta.get_index_fields(doctype, 0)
+	for f in droplist:
 		try:
 			if f[0] in kl: # if exists
 				webnotes.conn.sql("alter table `tab%s` drop index %s" % (doctype, f[0]))
@@ -173,7 +149,7 @@ def update_engine(doctype=None, engine='InnoDB'):
 	if doctype:
 		webnotes.conn.sql("ALTER TABLE `tab%s` ENGINE = '%s'" % (doctype, engine))
 	else:
-		for t in sql("show tables"):
+		for t in webnotes.conn.sql("show tables"):
 			webnotes.conn.sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
 
 def create_table(dt):
@@ -182,7 +158,7 @@ def create_table(dt):
 	add_fields, add_index = [], []
 	
 	# build
-	flist = _get_dt_fields(dt)
+	flist = webnotes.model.meta.get_dt_fields(dt)
 	fname_list = []
 	for f in flist:
 		ft = getcoldef(f[2], f[3])
@@ -224,7 +200,7 @@ def create_table(dt):
 
 def updatedb(dt):
 	# if single type, nothing to do
-	if sql("select issingle from tabDocType where name=%s", dt)[0][0]:
+	if webnotes.model.meta.is_single(dt):
 		return
 
 	# create table
@@ -238,93 +214,4 @@ def updatedb(dt):
 	
 		# update index
 		updateindex(dt)
-
-# Synchronize tables from Application Database, if exists
-# -------------------------------------------------------
-
-def sync_all(verbose=0):
-	# check the last modified table, if this table is also modified in the current, then the system
-	# synched, if not then it must be synched
-	t1 = webnotes.app_conn.sql("SELECT MAX(modified) from `tabDocType`" )
-	try:
-		t2 = webnotes.conn.sql("SELECT MAX(modified) from `tabDocType Update Register`", ignore_no_table = 0)
-	except Exception, e:
-		if e.args[0] == 1146:
-			create_adt_update_table()
-			if verbose:
-				webnotes.msgprint("Created `tabDocType Update Register`")
-			t2 = None
-		else:
-			raise e
-	
-	if t2 and verbose:
-		webnotes.msgprint('Target last updated on: ' + str(t2[0][0]))
-		webnotes.msgprint('Source last updated on: ' + str(t2[0][0]))
-			
-	if t1 and t2 and t1[0][0] == t2[0][0]:
-		# all clear
-		if verbose:
-			webnotes.msgprint("Nothing to sync")
-		pass
-	else:
-		# sync all tables (?)
-		tl = webnotes.app_conn.sql("select name from tabDocType")
-		for t in tl:
-			sync_dt(t[0])
-			if verbose:
-				webnotes.msgprint("Synched %s" % t[0])
-
-# create update register
-# ----------------------
-
-def create_adt_update_table():
-	webnotes.conn.sql('COMMIT')
-
-	webnotes.conn.sql("""
-		create table `tabDocType Update Register` (
-			name varchar(120) not null primary key, 
-			modified datetime) ENGINE=InnoDB""")
-
-	webnotes.conn.sql('START TRANSACTION')
-
-def _sync_dt(dt, issingle):
-	if issingle:
-		# compile the code
-		import webnotes.model.doctype
-		webnotes.model.doctype.get(dt)
-	else:
-		updatedb(dt)
-
-# sync metadata / code from master
-# --------------------------------
-def sync_dt(dt):
-	if not webnotes.app_conn:
-		return
-
-	# check modified date
-	t1 = webnotes.app_conn.sql("SELECT modified, issingle from `tabDocType` where name='%s'" % dt)
-	try:
-		t2 = webnotes.conn.sql("SELECT modified from `tabDocType Update Register` where name='%s'" % dt, ignore_no_table = 0)
-	except Exception, e:
-		if e.args[0] == 1146:
-			# No table created yet (?), create one
-			create_adt_update_table()
-			t2 = None
-		else:
-			raise e
-	
-	# new
-	if not t2:
-		# first time creation
-		_sync_dt(dt, t1[0][1])
-		
-		webnotes.conn.sql("INSERT INTO `tabDocType Update Register`(name, modified) VALUES (%s, %s)", (dt, t1[0][0]))
-	
-	# exists
-	elif t1[0][0] != t2[0][0]:
-		# if different, sync the databases
-		_sync_dt(dt, t1[0][1])
-
-		# update the register
-		webnotes.conn.sql("UPDATE `tabDocType Update Register` set modified = %s where name=%s", (t1[0][0], dt))
 

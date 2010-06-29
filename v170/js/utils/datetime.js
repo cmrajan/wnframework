@@ -81,6 +81,27 @@ function DateFn() {
 		return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() + ' '
 		+ d.getHours()  + ':' + d.getMinutes()   + ':' + d.getSeconds();
 	}
+	this.user_to_str = function(d) {
+		if(user_fmt=='dd-mm-yyyy') {
+			var d = d.split('-');
+			return  d[2]+'-'+d[1]+'-'+d[0];
+		}
+		else if(user_fmt=='dd/mm/yyyy') {
+			var d = d.split('/');
+			return  d[2]+'-'+d[1]+'-'+d[0];
+		}
+		else if(user_fmt=='yyyy-mm-dd') {
+			return d;
+		}
+		else if(user_fmt=='mm/dd/yyyy') {
+			var d = d.split('/');
+			return  d[2]+'-'+d[0]+'-'+d[1];
+		}
+		else if(user_fmt=='mm-dd-yyyy') {
+			var d = d.split('-');
+			return  d[2]+'-'+d[0]+'-'+d[1];
+		}
+	}
 }
 
 var dateutil = new DateFn();

@@ -178,8 +178,8 @@ $td(t,0,4).innerHTML='Per Page:';$y($td(t,0,4),{textAlign:'right',paddingRight:'
 this.page_len_sel=s;var c1=$td(ht,0,2);c1.style.textAlign='right';var ic=this.add_icon(c1,'resultset_first');ic.onclick=function(){me.start_rec=1;me.run();}
 var ic=this.add_icon(c1,'resultset_previous');ic.onclick=function(){if(me.start_rec-me.page_len<=0)return;me.start_rec=me.start_rec-me.page_len;me.run();}
 this.has_next=false;var ic=this.add_icon(c1,'resultset_next');ic.onclick=function(){if(!me.has_next)return;me.start_rec=me.start_rec+me.page_len;me.run();}}
-_r.DataTable.prototype.set_desc=function(){this.sort_icon.src='images/icons/arrow_down.png';this.sort_order='DESC';}
-_r.DataTable.prototype.set_asc=function(icon){this.sort_icon.src='images/icons/arrow_up.png';this.sort_order='ASC';}
+_r.DataTable.prototype.set_desc=function(){this.sort_icon.src='images/icons/arrow_down.gif';this.sort_order='DESC';}
+_r.DataTable.prototype.set_asc=function(icon){this.sort_icon.src='images/icons/arrow_up.gif';this.sort_order='ASC';}
 _r.DataTable.prototype.set_sort_option_disabled=function(label,disabled){var s=this.sort_sel;if(disabled){for(var i=0;i<s.options.length;i++){if(s.options[i]&&s.options[i].text==label){this.disabled_options[label]=s.options[i];s.remove(i);}}}else{if(this.disabled_options[label]){try{s.add(this.disabled_options[label],s.options[s.options.length-1]);}catch(e){s.add(this.disabled_options[label],s.options.length-1);}
 this.disabled_options[label]=null;}}}
 _r.DataTable.prototype.add_sort_option=function(label,val){var s=this.sort_sel;s.options[s.options.length]=new Option(label,val,false,s.options.length==0?true:false);}

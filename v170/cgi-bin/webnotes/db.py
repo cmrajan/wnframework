@@ -17,7 +17,6 @@ class Database:
 		self.is_testing = 0
 		self.in_transaction = 0
 		self.testing_tables = []
-		self.is_app_conn = 0
 		
 		self.connect()
 	
@@ -56,6 +55,8 @@ class Database:
 		if cmd in ['alter', 'drop', 'truncate'] and webnotes.user.name != 'Administrator':
 			webnotes.msgprint('Not allowed to execute query')
 			raise Execption
+
+	# ======================================================================================
 	
 	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1, ignore_no_table = 1):
 		# check security
@@ -65,27 +66,16 @@ class Database:
 		if self.is_testing and allow_testing:
 			query = self.replace_tab_by_test(query)
 
-		# metadata separation
-		if not self.is_app_conn and webnotes.app_conn and webnotes.adt_list:
-			if self.parse_for_metadata(query, webnotes.adt_list):
-				return webnotes.app_conn.sql(query, values, as_dict, as_list, allow_testing, ignore_no_table)
-
 		# in transaction validations
 		self.check_transaction_status(query)
 		
 		# execute
-		try:
-			if values!=():
-				self._cursor.execute(query, values)
-			else:
-				self._cursor.execute(query)	
-		except Exception, e:
-			if webnotes.app_conn and e.args[0]==1146 and ignore_no_table: # Table not found = no records
-				return ()
-			else:
-				raise e
+		if values!=():
+			self._cursor.execute(query, values)
+		else:
+			self._cursor.execute(query)	
 
-		# scrub out put if required
+		# scrub output if required
 		if as_dict:
 			return self.fetch_as_dict()
 		elif as_list:
@@ -140,28 +130,41 @@ class Database:
 	def get_description(self):
 		return self._cursor.description
 
-	def convert_to_lists(self, res):
-		try: import decimal # for decimal Python 2.5 (?)
+	# ======================================================================================
+
+	def convert_to_simple_type(self, v):
+		try: import decimal # for decimal Python 2.5 onwards
 		except: pass
+		import datetime
+
+		if type(v)==datetime.date:
+			v = str(v)
+		elif type(v)==datetime.timedelta:
+			v = ':'.join(str(v).split(':')[:2])
+		elif type(v)==datetime.datetime:
+			v = str(v)
+		elif type(v)==long: 
+			v=int(v)
+
+		try:
+			if type(v)==decimal.Decimal: 
+				v=float(v)
+		except: pass
+		
+		return v
+
+	# ======================================================================================
+
+	def convert_to_lists(self, res):
 		nres = []
 		for r in res:
 			nr = []
 			for c in r:
-				try:
-					if type(c)==decimal.Decimal: c=float(c)
-				except: pass
-	
-				if c == None: c=''
-				elif hasattr(c, 'seconds'): c = ':'.join(str(c).split(':')[:2])
-				elif hasattr(c, 'strftime'): 
-					try:
-						c = c.strftime('%Y-%m-%d')
-					except ValueError, e:
-						c = 'ERR'
-				elif type(c) == long: c = int(c)
-				nr.append(c)
+				nr.append(self.convert_to_simple_type(c))
 			nres.append(nr)
 		return nres
+
+	# ======================================================================================
 
 	def replace_tab_by_test(self, query):
 		if self.is_testing:
@@ -176,7 +179,9 @@ class Database:
 			testing_tables+=['tabSeries','tabSingles'] # tabSessions is not included here
 		return self.testing_tables
 
+	# ======================================================================================
 	# get a single value from a record
+
 	def get_value(self, doctype, docname, fieldname):
 		if docname:
 			try:
@@ -188,9 +193,17 @@ class Database:
 			r = self.sql("select value from tabSingles where field=%s and doctype=%s", (fieldname, doctype))
 			return r and r[0][0] or None
 
+	def set_value(self, dt, dn, field, val):
+		if dn:
+			self.sql("update `tab"+dt+"` set `"+field+"`=%s where name=%s", (val, dn))
+		else:
+			self.sql("update tabSingles set value=%s where field=%s and doctype=%s", (val, field, dt))
+		
 	def set(self, doc, field, val):
-		self.sql("update `tab"+doc.doctype+"` set `"+field+"`=%s where name=%s", (val, doc.name))
+		self.set_value(doc.doctype, doc.name, field, val)
 		doc.fields[field] = val
+
+	# ======================================================================================
 
 	def field_exists(self, dt, fn):
 		return self.sql("select name from tabDocField where fieldname=%s and parent=%s", (dt, fn))
@@ -201,6 +214,7 @@ class Database:
 		except:
 			return None
 
+	# ======================================================================================
 	def close(self):
 		if self._conn:
 			self._conn.close()

@@ -184,10 +184,10 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
 }
 
 _r.DataTable.prototype.set_desc = function() {
-	this.sort_icon.src = 'images/icons/arrow_down.png'; this.sort_order='DESC';
+	this.sort_icon.src = 'images/icons/arrow_down.gif'; this.sort_order='DESC';
 }
 _r.DataTable.prototype.set_asc = function(icon) {
-	this.sort_icon.src = 'images/icons/arrow_up.png'; this.sort_order='ASC'; 
+	this.sort_icon.src = 'images/icons/arrow_up.gif'; this.sort_order='ASC'; 
 }
 
 ////

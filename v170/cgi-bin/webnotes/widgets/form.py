@@ -1,5 +1,6 @@
 import webnotes
 import webnotes.model.doc
+import webnotes.model.meta
 
 def getdoc():
 	import webnotes
@@ -18,10 +19,6 @@ def getdoc():
 
 #===========================================================================================
 
-def get_parent_dt(dt):
-	parent_dt = webnotes.conn.sql('select parent from tabDocField where fieldtype="Table" and options="%s" and (parent not like "old_parent:%%") limit 1' % dt)
-	return parent_dt and parent_dt[0][0] or ''
-
 def getdoctype():
 	# load parent doctype too
 	import webnotes.model.doctype
@@ -33,7 +30,7 @@ def getdoctype():
 
 	# with parent (called from report builder)
 	if with_parent:
-		parent_dt = get_parent_dt(dt)
+		parent_dt = webnotes.model.meta.get_parent_dt(dt)
 		if parent_dt:
 			doclist = webnotes.model.doctype.get(parent_dt)
 			webnotes.response['parent_dt'] = parent_dt
@@ -46,7 +43,7 @@ def getdoctype():
 		doclist += webnotes.model.doc.get(dt)
 
 	# load search criteria for reports (all)
-	doclist += get_search_criteria(dt)
+	doclist += webnotes.model.meta.get_search_criteria(dt)
 
 	webnotes.response['docs'] = doclist
 
@@ -75,18 +72,8 @@ def load_single_doc(dt, dn, user):
 
 	# load search criteria ---- if doctype
 	if dt=='DocType':
-		dl += get_search_criteria(dt)
+		dl += webnotes.model.meta.get_search_criteria(dt)
 
-	return dl
-
-#===========================================================================================
-
-def get_search_criteria(dt):
-	# load search criteria for reports (all)
-	dl = []
-	sc_list = webnotes.conn.sql("select name from `tabSearch Criteria` where doc_type = '%s' or parent_doc_type = '%s' and (disabled!=1 OR disabled IS NULL)" % (dt, dt))
-	for sc in sc_list:
-		dl += webnotes.model.doc.get('Search Criteria', sc[0])
 	return dl
 
 # Runserverobj - run server calls from form
@@ -211,18 +198,8 @@ def _do_action(doc, doclist, so, method_name, docstatus):
 
 def check_integrity(doc):
 	import webnotes
-
-	conn = webnotes.app_conn or webnotes.conn
-
-	# check for integrity / transaction safety
-	res = conn.sql('SELECT issingle FROM tabDocType WHERE name="%s"' % doc.doctype)
-	if res:
-		is_single = res[0][0]
-	else:
-		webnotes.errprint('DocType not found "%s"' % doc.doctype)
-		return
 		
-	if (not is_single) and (not doc.fields.get('__islocal')):
+	if (not webnotes.model.meta.is_single(doc.doctype)) and (not doc.fields.get('__islocal')):
 		tmp = webnotes.conn.sql('SELECT modified FROM `tab%s` WHERE name="%s"' % (doc.doctype, doc.name))
 		if tmp and str(tmp[0][0]) != str(doc.modified):
 			webnotes.msgprint('Document has been modified after you have opened it. To maintain the integrity of the data, you will not be able to save your changes. Please refresh this document. [%s/%s]' % (tmp[0][0], doc.modified))
@@ -346,7 +323,7 @@ def savedocs():
 #========================================
 def validate_trash_doc(doc, doclist):
 	import webnotes
-	conn = webnotes.app_conn or webnotes.conn
+	conn = webnotes.conn
 	# Fetch docs contains link of trash doc
 	parent_mast = conn.sql("select t1.parent, t1.fieldname from tabDocField t1, tabDocType t2 where ((t1.fieldtype = 'Link' and t1.options = '%s') or (t1.fieldtype = 'Select' and t1.options = 'link:%s')) and t1.parent not like 'old%%' and ifnull(t2.allow_trash, 0) = 1 and t1.parent = t2.name" % (doc.doctype, doc.doctype))
 	for d in parent_mast:
@@ -354,7 +331,7 @@ def validate_trash_doc(doc, doclist):
 		check_if_rec_exist(doc, d[0], d[1])
 
 		#Child table contains link of trash doc
-		ch_table = conn.sql("select options from tabDocField where fieldtype = 'Table' and parent = '%s'" % d[0])
+		ch_table = webnotes.model.meta.get_table_fields(d[0])
 		for c in ch_table:
 			# fieldname
 			fld = conn.sql("select fieldname from tabDocField where ((fieldtype = 'Link' and options = '%s') or (fieldtype = 'Select' and options = 'link:%s')) and parent not like 'old%%' and parent = '%s'" % (doc.doctype, doc.doctype, c[0]))
@@ -366,11 +343,10 @@ def validate_trash_doc(doc, doclist):
 #=============================================
 def check_if_rec_exist(doc, dtname, fname, par_dtname = ''):
 	import webnotes
-	conn = webnotes.app_conn or webnotes.conn
 
 	if not par_dtname: par_dtname = dtname
 	# exists?
-	exists = [r[0] for r in conn.sql('select name from `tab%s` where docstatus != 2 and %s = "%s"' % (dtname, fname, doc.name))]
+	exists = [r[0] for r in webnotes.conn.sql('select name from `tab%s` where docstatus != 2 and %s = "%s"' % (dtname, fname, doc.name))]
 	if exists:
 		webnotes.msgprint("This record exists in %s : %s. Hence you cannot move %s : %s to trash." %(dtname, exists, doc.doctype, doc.name))
 		raise Exception
@@ -380,24 +356,17 @@ def check_if_rec_exist(doc, dtname, fname, par_dtname = ''):
 #===========================================================================================
 def _get_print_format(match):
 	name = match.group('name')
-	conn = webnotes.app_conn or webnotes.conn
-
-	content = conn.sql('select html from `tabPrint Format` where name="%s"' % name)
-	return content and content[0][0] or ''
+	return webnotes.model.meta.get_print_format_html(name)
 
 def get_print_format():
 	import re
 	import webnotes
 
-	conn = webnotes.app_conn or webnotes.conn
-
-	html = conn.sql('select html from `tabPrint Format` where name="%s"' % webnotes.form.getvalue('name'))
-	html = html and html[0][0] or ''
+	html = webnotes.model.meta.get_print_format_html(webnotes.form.getvalue('name'))
 
 	p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
-	if html:
-		out_html = p.sub(_get_print_format, html)
-		
+	if html: out_html = p.sub(_get_print_format, html)
+
 	webnotes.response['message'] = out_html
 	
 # remove attachment

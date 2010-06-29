@@ -22,26 +22,19 @@ fw_folder = '/Users/rushabh/workbench/www/'
 # ------------------------------------------------------------------------------------
 
 def startup():
+	import webnotes.model
 	import webnotes.model.doc
 	import webnotes.model.doctype
-	import webnotes.model.db_schema
 	import webnotes.widgets.page
 	import webnotes.widgets.menus
 	import webnotes.profile
 	
 	webnotes.response['profile'] = webnotes.user.load_profile()
-	try:
-		webnotes.model.db_schema.sync_all()
-	except:
-		pass
 
 	doclist = []
 	doclist += webnotes.model.doc.get('Control Panel')
 	cp = doclist[0]
 	
-	# get startup_code from app_conn
-	if webnotes.app_conn:
-		cp.startup_code = webnotes.app_conn.get_value("Control Panel", None, "startup_code")
 	
 	doclist += webnotes.model.doctype.get('Event')
 	doclist += webnotes.model.doctype.get('Search Criteria')
@@ -60,21 +53,7 @@ def startup():
 		webnotes.response['ipinfo'] = webnotes.session['data']['ipinfo']
 		
 	webnotes.session['data']['profile'] = webnotes.response['profile']
-	webnotes.response['dt_labels'] = get_dt_labels()
-
-# new feature added 9-Jun-10 to allow doctypes to have labels 
-def get_dt_labels():
-	c = webnotes.app_conn or webnotes.conn
-	d = {}
-	try:
-		res = c.sql("select name, dt_label from `tabDocType Label`")
-	except:
-		return {}
-		
-	for r in res:
-		d[r[0]] = r[1]
-	
-	return d
+	webnotes.response['dt_labels'] = webnotes.model.get_dt_labels()
 
 def cleanup_docs():
 	if out.get('docs'):
