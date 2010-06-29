@@ -249,7 +249,7 @@ def scrub_field_names(doclist):
 				webnotes.model.meta.set_fieldname(d.name, d.fieldname)
 
 def clear_cache():
-	webnotes.conn.sql("update __DocTypeCache set modified=NULL")
+	webnotes.conn.sql("delete from __DocTypeCache")
 	
 # Load "DocType" - called by form builder, report buider and from code.py (when there is no cache)
 #=================================================================================================
