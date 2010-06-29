@@ -185,7 +185,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 		so = get_server_obj(doc, dl)
 		if hasattr(so, 'on_update'):
 			so.on_update()
-
+		
 	# reset modified
 	webnotes.conn.set(doc, 'modified', orig_modified)
 
