@@ -115,8 +115,8 @@ class App:
 	def sync_records(self, dt, has_standard_field, has_module):
 		ml = self.get_master_list(dt, has_standard_field, has_module)
 		for m in ml:
-			if self.is_modified(self, dt, m[0], m[1]):
-				self.sync_doc(self, dt, m[0])
+			if self.is_modified(dt, m[0], m[1]):
+				self.sync_doc(dt, m[0])
 	
 	# sync a particular record
 	# ----------------------------------
