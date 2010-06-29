@@ -146,9 +146,9 @@ class App:
 	def is_modified(self, dt, dn, modified):
 		ret = self.conn.sql("select modified from `tab%s` where name=%s" % (dt, '%s'), dn)
 		if ret and ret[0][0]==modified:
-			return 1
-		else:
 			return 0
+		else:
+			return 1
 	
 	# run script remotely
 	# ----------------------------------
