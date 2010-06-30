@@ -110,6 +110,7 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 # --------------------------------------------------------------------
 
 def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
+	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model.code import get_obj
 	from webnotes.model.code import get_server_obj
@@ -184,9 +185,14 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 			pass # ignore tables
 	
 	if onupdate:
-		so = get_server_obj(doc, dl)
-		if hasattr(so, 'on_update'):
-			so.on_update()
+		if doc.doctype=='DocType':
+			import webnotes.model.doctype
+			webnotes.model.doctype.update_doctype(dl)
+		else:
+			so = get_server_obj(doc, dl)
+			if hasattr(so, 'on_update'):
+				so.on_update()
+			
 		
 	# reset modified
 	webnotes.conn.set(doc, 'modified', orig_modified)

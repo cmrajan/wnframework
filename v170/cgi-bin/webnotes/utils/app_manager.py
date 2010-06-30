@@ -73,7 +73,7 @@ class AppManager:
 # Application Instance
 # =====================================================================================
 class App:
-	def __init__(self, db_login, master):
+	def __init__(self, master, db_login):
 		self.ignore_modules = ['Development', 'Recycle Bin', 'System']
 		self.db_login = db_login
 		self.master = master
@@ -96,15 +96,17 @@ class App:
 			
 		self.verbose = verbose
 		self.connect()
-		self.sync_records('Role',0,1)
-		self.sync_records('DocType',0,1)
-		self.sync_records('Search Criteria',1,1)
-		self.sync_records('Page',1,1)
-		self.sync_records('Module Def',0,0)
-		self.sync_records('Print Format',1,1)
-		self.sync_records('DocType Mapper',0,1)
-		self.sync_records('DocType Label',0,1)
+		self.sync_records('Role')
+		self.sync_records('DocType')
+		self.sync_records('Search Criteria')
+		self.sync_records('Page')
+		self.sync_records('Module Def')
+		self.sync_records('Print Format')
+		self.sync_records('DocType Mapper')
+		self.sync_records('DocType Label')
 		self.sync_control_panel()
+		self.conn.close()
+		self.master_conn.close()
 		
 	# sync control panel
 	# ----------------------------------
@@ -117,10 +119,10 @@ class App:
 
 	# sync records of a particular type
 	# ----------------------------------
-	def sync_records(self, dt, has_standard_field, has_module):
+	def sync_records(self, dt):
 		if self.verbose:
 			print "Sync: " + dt
-		ml = self.get_master_list(dt, has_standard_field, has_module)
+		ml = self.get_master_list(dt)
 		for m in ml:
 			if self.is_modified(dt, m[0], m[1]):
 				self.sync_doc(dt, m[0])
@@ -145,11 +147,14 @@ class App:
 	
 	# get the list from master
 	# ----------------------------------
-	def get_master_list(self, dt, has_standard_field, has_module):
+	def get_master_list(self, dt):
 		c = ''
-		if has_standard_field:
+		
+		cl = [i[0] for i in self.master_conn.sql("desc `tab%s`" % dt)]
+		
+		if 'standard' in cl:
 			c += ' and standard="Yes"'
-		if has_module:
+		if 'module' in cl and self.ignore_modules:
 			c += ' and (' + ' and '.join(['module!="%s"' % i for i in self.ignore_modules]) + ')'
 		return self.master_conn.sql("select name, modified from `tab%s` where docstatus != 2 %s" % (dt, c))
 	
