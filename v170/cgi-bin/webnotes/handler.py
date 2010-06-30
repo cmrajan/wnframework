@@ -56,6 +56,7 @@ def startup():
 	webnotes.response['dt_labels'] = webnotes.model.get_dt_labels()
 
 def cleanup_docs():
+	import webnotes.model.doclist
 	if out.get('docs'):
 		out['docs'] = webnotes.model.doclist.compress(out['docs'])
 		
