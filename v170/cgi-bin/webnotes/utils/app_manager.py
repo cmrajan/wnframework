@@ -77,6 +77,7 @@ class App:
 		self.ignore_modules = ['Development', 'Recycle Bin', 'System']
 		self.db_login = db_login
 		self.master = master
+		self.verbose = 0
 	
 	# make connections to master and app
 	# ----------------------------------
@@ -89,7 +90,11 @@ class App:
 	
 	# sync application doctypes
 	# ----------------------------------
-	def sync(self):
+	def sync(self, verbose = 0):
+		if not webnotes.session:
+			webnotes.session = {'user': 'Administrator'}
+			
+		self.verbose = verbose
 		self.connect()
 		self.sync_records('Role',0,1)
 		self.sync_records('DocType',0,1)
@@ -113,10 +118,16 @@ class App:
 	# sync records of a particular type
 	# ----------------------------------
 	def sync_records(self, dt, has_standard_field, has_module):
+		if self.verbose:
+			print "Sync: " + dt
 		ml = self.get_master_list(dt, has_standard_field, has_module)
 		for m in ml:
 			if self.is_modified(dt, m[0], m[1]):
 				self.sync_doc(dt, m[0])
+			else:
+				if self.verbose:
+					print "No update in " + m[0]
+
 	
 	# sync a particular record
 	# ----------------------------------
@@ -130,7 +141,7 @@ class App:
 		
 		# put
 		webnotes.conn = self.conn
-		webnotes.model.import_docs.set_doc([d.fields for d in doclist], ovr = 1)
+		print webnotes.model.import_docs.set_doc([d.fields for d in doclist], ovr = 1)
 	
 	# get the list from master
 	# ----------------------------------

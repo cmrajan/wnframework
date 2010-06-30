@@ -125,6 +125,8 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 
 	exists = webnotes.conn.exists(doc.doctype, doc.name)
 
+	print doc.name
+
 	if not webnotes.conn.in_transaction: 
 		sql("START TRANSACTION")
 	

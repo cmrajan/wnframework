@@ -1,8 +1,6 @@
 import webnotes
 import webnotes.model.meta
 
-sql = webnotes.conn.sql
-
 from webnotes.utils import *
 
 class BaseDocType:
@@ -85,7 +83,7 @@ class Document:
 
 	def loadsingle(self):
 		self.name = self.doctype
-		dataset = sql("select field, value from tabSingles where doctype='%s'" % self.doctype)
+		dataset = webnotes.conn.sql("select field, value from tabSingles where doctype='%s'" % self.doctype)
 		for d in dataset: self.fields[d[0]] = d[1]
 
 	# Setter
@@ -128,7 +126,7 @@ class Document:
 		if self.amended_from:
 			am_id = 1
 			am_prefix = self.amended_from
-			if sql('select amended_from from `tab%s` where name = "%s"' % (self.doctype, self.amended_from))[0][0] or '':
+			if webnotes.conn.sql('select amended_from from `tab%s` where name = "%s"' % (self.doctype, self.amended_from))[0][0] or '':
 				am_id = cint(self.amended_from.split('-')[-1]) + 1
 				am_prefix = '-'.join(self.amended_from.split('-')[:-1]) # except the last hyphen
 			
@@ -157,7 +155,7 @@ class Document:
 		if not self.owner:
 			self.owner = webnotes.session['user']
 
-		if sql('select name from `tab%s` where name=%s' % (self.doctype,'%s'), self.name):
+		if webnotes.conn.sql('select name from `tab%s` where name=%s' % (self.doctype,'%s'), self.name):
 			raise NameError, 'Name %s already exists' % self.name
 		
 		if not self.name:
@@ -173,7 +171,7 @@ class Document:
 			if f in self.name:
 				raise NameError, '%s not allowed in ID (name)' % f
 		
-		sql("""insert into `tab%s` (name, owner, creation, modified, modified_by) values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
+		webnotes.conn.sql("""insert into `tab%s` (name, owner, creation, modified, modified_by) values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
 
 
 	# Update Values
@@ -183,7 +181,7 @@ class Document:
 		update_str = ["(%s, 'modified', %s)",]
 		values = [self.doctype, now()]
 		
-		sql("delete from tabSingles where doctype='%s'" % self.doctype)
+		webnotes.conn.sql("delete from tabSingles where doctype='%s'" % self.doctype)
 		for f in self.fields.keys():
 			if not (f in ('modified', 'doctype', 'name', 'perm', 'localname', 'creation'))\
 				and (not f.startswith('__')): # fields not saved
@@ -201,7 +199,7 @@ class Document:
 					values.append(self.doctype)
 					values.append(f)
 					values.append(self.fields[f])
-		sql("insert into tabSingles(doctype, field, value) values %s" % (', '.join(update_str)), values)
+		webnotes.conn.sql("insert into tabSingles(doctype, field, value) values %s" % (', '.join(update_str)), values)
 
 	# Validate Links
 	# --------------
@@ -233,7 +231,7 @@ class Document:
 			dt = dt[5:]
 		if '\n' in dt:
 			dt = dt.split('\n')[0]
-		tmp = sql("""SELECT name FROM `tab%s` WHERE name = '%s' """ % (dt, dn))
+		tmp = webnotes.conn.sql("""SELECT name FROM `tab%s` WHERE name = '%s' """ % (dt, dn))
 		return tmp and tmp[0][0] or ''# match case
 	
 	def update_values(self, issingle, link_list, ignore_fields=0):
@@ -255,18 +253,18 @@ class Document:
 					if self.fields[f]==None:
 						update_str.append("`%s`=NULL" % f)
 						if ignore_fields:
-							try: r = sql("update `tab%s` set `%s`=NULL where name=%s" % (self.doctype, f, '%s'), self.name)
+							try: r = webnotes.conn.sql("update `tab%s` set `%s`=NULL where name=%s" % (self.doctype, f, '%s'), self.name)
 							except: pass
 					else:
 						values.append(self.fields[f])
 						update_str.append("`%s`=%s" % (f, '%s'))
 						if ignore_fields:
-							try: r = sql("update `tab%s` set `%s`=%s where name=%s" % (self.doctype, f, '%s', '%s'), (self.fields[f], self.name))
+							try: r = webnotes.conn.sql("update `tab%s` set `%s`=%s where name=%s" % (self.doctype, f, '%s', '%s'), (self.fields[f], self.name))
 							except: pass
 			if values:
 				if not ignore_fields:
 					# update all in one query
-					r = sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
+					r = webnotes.conn.sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
 
 	# Save values
 	# -----------

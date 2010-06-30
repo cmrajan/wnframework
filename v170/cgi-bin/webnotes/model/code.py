@@ -1,37 +1,47 @@
-import webnotes
-
-from webnotes import *
-from webnotes.utils import *
-from webnotes.model.doc import *
-from webnotes.model.doclist import getlist
-
-set = webnotes.conn.set
-sql = webnotes.conn.sql
-in_transaction = webnotes.conn.in_transaction
-get_value = webnotes.conn.get_value
-convert_to_lists = webnotes.conn.convert_to_lists
-
-page_html = None
-
-
-version = 'v170'
-NEWLINE = '\n'
-BACKSLASH = '\\'
 
 #=================================================================================
 
 def execute(code, doc=None, doclist=[]):
 
-	# execute it
-	exec code in globals()
+	import webnotes
+
+	# functions used in server script of DocTypes
+	# --------------------------------------------------	
+	from webnotes.utils import add_days, add_months, add_years, cint, cstr, date_diff, default_fields, flt, fmt_money, formatdate, generate_hash, getTraceback, get_defaults, get_file, get_first_day, get_last_day, getdate, has_common, month_name, now, nowdate, replace_newlines, sendmail, set_default, str_esc_quote, user_format, validate_email_add
+	from webnotes.model.doc import Document, addchild, removechild, getchildren
+	from webnotes.model.doclist import getlist
+
+	set = webnotes.conn.set
+	sql = webnotes.conn.sql
+	get_value = webnotes.conn.get_value
+	in_transaction = webnotes.conn.in_transaction
+	convert_to_lists = webnotes.conn.convert_to_lists
+	if webnotes.user:
+		get_roles = webnotes.user.get_roles
 	
+	# page output
+	# -----------------
+	page_html, out = None, None
+	
+	version = 'v170'
+	NEWLINE = '\n'
+	BACKSLASH = '\\'
+
+	# execute it
+	# -----------------
+	exec code in locals()
+		
 	# if doc
+	# -----------------
 	if doc:
 		d = DocType(doc, doclist)
 		return d
 		
 	if page_html:
 		return page_html
+
+	if out:
+		return out
 
 #=================================================================================
 
@@ -69,12 +79,14 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:
+		import webnotes.model.doc
+	
 		if not dn:
 			dn = dt
 		if with_children:
-			doclist = get(dt, dn)
+			doclist = webnotes.model.doc.get(dt, dn)
 		else:
-			doclist = get(dt, dn, with_children = 0)
+			doclist = webnotes.model.doc.get(dt, dn, with_children = 0)
 		return get_server_obj(doclist[0], doclist)
 	else:
 		return get_server_obj(doc, doclist)
