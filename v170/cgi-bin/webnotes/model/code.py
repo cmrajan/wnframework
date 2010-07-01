@@ -6,7 +6,7 @@ def execute(code, doc=None, doclist=[]):
 	# functions used in server script of DocTypes
 	# --------------------------------------------------	
 	from webnotes.utils import add_days, add_months, add_years, cint, cstr, date_diff, default_fields, flt, fmt_money, formatdate, generate_hash, getTraceback, get_defaults, get_file, get_first_day, get_last_day, getdate, has_common, month_name, now, nowdate, replace_newlines, sendmail, set_default, str_esc_quote, user_format, validate_email_add
-	from webnotes.model.doc import Document, addchild, removechild, getchildren
+	from webnotes.model.doc import Document, addchild, removechild, getchildren, make_autoname
 	from webnotes.model.doclist import getlist
 	from webnotes import session, form, is_testing, msgprint, errprint
 
