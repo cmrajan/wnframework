@@ -122,14 +122,20 @@ class App:
 	def sync_records(self, dt):
 		if self.verbose:
 			print "Sync: " + dt
-		ml = self.get_master_list(dt)
-		for m in ml:
-			if self.is_modified(dt, m[0], m[1]):
-				self.sync_doc(dt, m[0])
+			
+		try:
+			ml = self.get_master_list(dt)
+			for m in ml:
+				if self.is_modified(dt, m[0], m[1]):
+					self.sync_doc(dt, m[0])
+				else:
+					if self.verbose:
+						print "No update in " + m[0]
+		except Exception, e:
+			if e.args[0]==1146:
+				print "No table %s in master" % dt
 			else:
-				if self.verbose:
-					print "No update in " + m[0]
-
+				raise e
 	
 	# sync a particular record
 	# ----------------------------------
