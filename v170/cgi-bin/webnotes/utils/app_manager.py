@@ -111,11 +111,13 @@ class App:
 	# sync control panel
 	# ----------------------------------
 	def sync_control_panel(self):
+		self.conn.sql("start transaction")
 		startup_code = self.master_conn.get_value('Control Panel', None, 'startup_code')
 		self.conn.set_value('Control Panel', None, 'startup_code', startup_code)
 
 		startup_css = self.master_conn.get_value('Control Panel', None, 'startup_css')
 		self.conn.set_value('Control Panel', None, 'startup_css', startup_css)
+		self.conn.sql("commit")
 
 	# sync records of a particular type
 	# ----------------------------------
