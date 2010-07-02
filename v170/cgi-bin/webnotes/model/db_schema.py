@@ -114,7 +114,7 @@ def updatecolumns(doctype):
 	
 	# update the "old" columns
 	webnotes.conn.sql("start transaction")
-	webnotes.model.meta.update_oldfield_values()
+	webnotes.model.meta.update_oldfield_values(doctype)
 
 
 # Add Indices
