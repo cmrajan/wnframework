@@ -15,18 +15,25 @@ class AppManager:
 	
 	# load list of applications
 	# ----------------------------------
-	def load_app_list(self):
-		self.acc_conn = webnotes.db.Database(use_default=1)
-		al = self.acc_conn.sql('select * from tabAccount', as_dict = 1)
+	def load_app_list(self, al=[]):
+		if not al:
+			self.acc_conn = webnotes.db.Database(use_default=1)
+			al = [a[0] for a in self.acc_conn.sql('select db_name from tabAccount')]
 		for a in al:
 			self.app_list.append(App(a['db_name'], self.master))
 
 	# sync all the apps
 	# ----------------------------------
-	def sync_apps(self):
-		self.load_app_list()
-		for app in self.app_list():
-			app.sync()
+	def sync_apps(self, dt='', dn='', app_list=[]):
+		''' app_list is list of db_names '''
+		self.load_app_list(app_list)
+		for app in self.app_list:
+			if dt and dn:
+				app.connect()
+				app.sync_doc(dt, dn)
+				app.close()
+			else:
+				app.sync()
 	
 	# execute a script in all apps
 	# ----------------------------------
@@ -46,8 +53,9 @@ class AppManager:
 		print app_id + ' created'
 		
 		# sync
-		app = App(db_name, self.master)
-		app.sync()
+		app = App(self.master, db_name)
+		app.delete_doc('DocType', 'Ticket') # clear Ticket as it is very different from the new ticket
+		app.sync(1)
 		print app_id + ' synced'
 		
 		# run setup script
@@ -82,18 +90,24 @@ class App:
 	# make connections to master and app
 	# ----------------------------------
 	def connect(self):
+		if not webnotes.session:
+			webnotes.session = {'user': 'Administrator'}
+			
 		self.master_conn = webnotes.db.Database(user = self.master)
 		self.master_conn.use(self.master)
 
 		self.conn = webnotes.db.Database(user = self.db_login)
 		self.conn.use(self.db_login)
 	
+	# close
+	# ----------------------------------
+	def close(self):
+		self.conn.close()
+		self.master_conn.close()
+	
 	# sync application doctypes
 	# ----------------------------------
-	def sync(self, verbose = 0):
-		if not webnotes.session:
-			webnotes.session = {'user': 'Administrator'}
-			
+	def sync(self, verbose = 0):			
 		self.verbose = verbose
 		self.connect()
 		self.sync_records('Role')
@@ -105,8 +119,7 @@ class App:
 		self.sync_records('DocType Mapper')
 		self.sync_records('DocType Label')
 		self.sync_control_panel()
-		self.conn.close()
-		self.master_conn.close()
+		self.close()
 		
 	# sync control panel
 	# ----------------------------------
@@ -143,6 +156,7 @@ class App:
 	# ----------------------------------
 	def sync_doc(self, dt, dn):
 		import webnotes
+		
 		webnotes.conn = self.master_conn
 		import webnotes.model.doc
 
@@ -188,3 +202,13 @@ class App:
 		webnotes.conn = self.conn
 		from webnotes.model.code import get_obj
 		sc = get_obj('Setup Control').do_setup()
+		
+	# delete a record
+	# ----------------------------------
+	def delete_doc(self, dt, dn):
+		webnotes.conn = self.conn
+		import webnotes.model
+		
+		webnotes.model.delete_doc(dt, dn)
+		
+		

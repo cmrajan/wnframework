@@ -43,430 +43,297 @@ def import_docs(docs = []):
 
 	return out
 
-#  When a DocType is imported, upgrade it (instead of re-creating it)
-#
-#  1. custom added fieds are not overwritten
-#  2. server_code_core and client_script_core are not over-written
-#  --------------------------------------------------------------------
-
-def ovr_doctype(doclist, ovr, ignore, onupdate):
-	from webnotes.model.doc import Document
-	from webnotes.model.doclist import getlist
-	import webnotes.model.code
-	from webnotes.utils import cstr
-	
-	sql = webnotes.conn.sql
-	
-	doclist = [Document(fielddata = d) for d in doclist]
-	doc = doclist[0]
-	cur_doc = Document('DocType',doc.name)
-	added = 0
-	
-	# fields
-	# ------
-	for d in getlist(doclist, 'fields'):
-		# if exists
-		if d.fieldname:
-			fld = sql("select name from tabDocField where fieldname=%s and parent=%s", (d.fieldname, d.parent))
-		else:
-			fld = sql("select name from tabDocField where label=%s and parent=%s", (d.label, d.parent))
-
-		if (not fld) and d.label: # must have label
-			# re number - following fields
-			
-			sql("update tabDocField set idx = idx + 1 where parent=%s and idx > %s", (d.parent, d.idx))
-			
-			# add field
-			nd = Document(fielddata = d.fields)
-			nd.oldfieldname, nd.oldfieldtype = '', ''
-			nd.save(new = 1, ignore_fields = ignore)
-			added += 1
-
-	# code
-	# ----
-	
-	cur_doc.server_code_core = cstr(doc.server_code_core)
-	cur_doc.client_script_core = cstr(doc.client_script_core)
-	
-	cur_doc.save(ignore_fields = ignore)
-	
-	if onupdate:
-		so = webnotes.model.code.get_obj('DocType', doc.name, with_children = 1)
-
-		# update database (in case of DocType)
-		if so.doc.doctype=='DocType':
-			import webnotes.model.doctype
-			try: 
-				webnotes.model.doctype.update_doctype(so.doclist)
-			except: 
-				pass
-
-	if webnotes.conn.in_transaction: sql("COMMIT")
-
-	return doc.name + (' Upgraded: %s fields added' % added)
-
-# Import a record (with its chilren)
-# Used by transfer
-# --------------------------------------------------------------------
-
-def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
-	import webnotes
-	from webnotes.model.doc import Document
-	from webnotes.model.code import get_obj
-	from webnotes.model.code import get_server_obj
-	from webnotes.model.meta import get_table_fields
-	
-	sql = webnotes.conn.sql
-	override = 0
-	
-	if not doclist:
-		return 'No Doclist'
-	doc = Document(fielddata = doclist[0])
-	orig_modified = doc.modified
-
-	exists = webnotes.conn.exists(doc.doctype, doc.name)
-
-	print doc.name
-
-	if not webnotes.conn.in_transaction: 
-		sql("START TRANSACTION")
-	
-	if exists: 
-		if ovr:
-			# Special Treatement
-			# ------------------
-			if allow_transfer_control:
-				if webnotes.conn.exists('DocType', 'Transfer Control'):
-					tc = get_obj('Transfer Control')
-					if tc.override_transfer.has_key(doc.doctype):
-						return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate) # done
-			
-				if doc.doctype == 'DocType':
-					return ovr_doctype(doclist, ovr, ignore, onupdate) # done
-
-			# check modified timestamp
-			# ------------------------
-			ts = sql("select modified from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]
-			if str(ts)==doc.modified:
-				return doc.name + ": No update"
-
-			# Replace the record
-			# ------------------
-
-			# remove main doc
-			newname = '__overwritten:'+doc.name
-			n_records = sql("SELECT COUNT(*) from `tab%s` WHERE name like '%s%%'" % (doc.doctype, newname))
-			if n_records[0][0]:
-				newname = newname + '-' + str(n_records[0][0])
-				
-			sql("UPDATE `tab%s` SET name='%s', docstatus=2 WHERE name = '%s' limit 1" % (doc.doctype, newname, doc.name))
-			
-			# remove child elements
-			tf_list = get_table_fields(doc.doctype)
-			for t in tf_list:
-				sql("UPDATE `tab%s` SET parent='%s', docstatus=2 WHERE parent='%s' AND parentfield='%s'" % (t[0], 'oldparent:'+doc.name, doc.name, t[1]))
-				
-		else:
-			if webnotes.conn.in_transaction: 
-				sql("ROLLBACK")
-			return doc.name + ": Exists / No change"
-
-	# save main
-	doc.save(new = 1, ignore_fields = ignore, check_links=0)
-	
-	# save others
-	dl = [doc]
-	for df in doclist[1:]:
-		try:
-			d = Document(fielddata = df)
-			d.save(new = 1, ignore_fields = ignore, check_links=0)
-			dl.append(d)
-		except:
-			pass # ignore tables
-	
-	if onupdate:
-		if doc.doctype=='DocType':
-			import webnotes.model.doctype
-			webnotes.model.doctype.update_doctype(dl)
-		else:
-			so = get_server_obj(doc, dl)
-			if hasattr(so, 'on_update'):
-				so.on_update()
-			
-		
-	# reset modified
-	webnotes.conn.set(doc, 'modified', orig_modified)
-
-	if webnotes.conn.in_transaction: 
-		sql("COMMIT")
-
-	return doc.name + ': Completed'
-
 #=============================================================================================
 	
+import webnotes
+import webnotes.utils
+
+sql = webnotes.conn.sql
+flt = webnotes.utils.flt
+cint = webnotes.utils.cint
+cstr = webnotes.utils.cstr
+
 class CSVImport:
 	def __init__(self):
 		self.msg = []
 		self.csv_data = None
 		self.import_date_format = None
 
-	# Parse data
-	# --------------------------------------------------------------------
-	def parse_data(self):
-		# parse csv
+	def validate_doctype(self, dt_list):
+		cl, tables, self.dt_list, self.prompt_autoname_flag = 0, [t[0] for t in sql("show tables")], [], 0
+		self.msg.append('<p><b>Identifying Documents</b></p>')
+	 
+		dtd = sql("select name, istable, autoname from `tabDocType` where name = '%s' " % dt_list[0])
+		if dtd and dtd[0][0]:
+			self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[0] + '</div>')
+			self.dt_list.append(dt_list[0])
+			if dtd[0][2] and 'Prompt' in dtd[0][2]: self.prompt_autoname_flag = 1
+			if flt(dtd[0][1]):
+				res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % self.dt_list[0])
+				if res1 and res1[0][0] == dt_list[1]:
+					self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[1] + '</div>')
+					self.dt_list.append(dt_list[1])
+				else : 
+					self.msg.append('<div style="color:RED"> Error: At Row 1, Column 3 => %s is not a valid Document </div>' % dt_list[1])
+					self.valiadte_success = 0
 
-		import csv
-		l = csv.reader(self.csv_data.splitlines())
+				if res1 and res1[0][1] == dt_list[2]:
+					self.msg.append('<div style="color: GREEN" >Identified Document Fieldname: ' + dt_list[2] + '</div>')
+					self.dt_list.append(dt_list[2])
+				else :
+					self.msg.append('<div style="color:RED"> Error: At Row 1, Column 4 => %s is not a valid Fieldname </div>' % dt_lsit[2])
+					self.valiadte_success = 0
+			elif dt_list[1] or dt_list[2]:
+				self.msg.append('<div style="color:RED"> Error: At Row 1, Column %s => %s is not a valid Document </div>' % ((dt_list[1] and 2) or (dt_list[2] and 3)))
+		else:
+			self.msg.append('<div style="color:RED"> Error: At Row 1, Column 2 => %s is not a valid Document </div>' % dt_list[0])
+			self.validate_success = 0
 
-		self.dt_list, self.msg = [], []
 
-		# MAKE THE LIST OF ALL DIFFERENT TABLES
-		# EACH SEPARATED BY '#'
+	def validate_fields(self, lb_list):
+
+		self.msg.append('<p><b>Checking fieldnames for %s</b></p>' % self.dt_list[0])
+		if len(self.dt_list) > 1 and self.overwrite:
+			self.msg.append('<div style="color:RED"> Error: Overwrite is not possible for Document %s </div>' % self.dt_list[0])
+			self.validate_success = 0
 		
-		self.msg.append('<p><b>Identifying DocTypes</b></p>')
-		for r in l:
-			if len(r)>0 and r[0]: # first cell must not be blank!
-				if r[0].strip() == '#': # new type
-					data = []
-					# format : data, doctype, parenttype, parentfield
-					self.dt_list.append([data, r[1], len(r)>2 and r[2] or '', len(r)>3 and r[3] or ''])
-					self.msg.append('<div>Identified DocType: ' +r[1] + '</div>')
-				else:
-					try:
-						data.append(r)
-					except:
-						self.msg.append('<div style="color:RED">Error: No Doctypes Identified using "#"</div>')
-						return
-		if not len(self.dt_list):
-			self.msg.append('<div style="color:RED">Error: No Doctypes Identified using "#"</div>')
-
-	# Check CSV
-	# --------------------------------------------------------------------
-	def check_csv(self):
-		self.parse_data()
+		elif self.overwrite and 'Name' != lb_list[0]:
+			self.msg.append('<div style="color:RED"> Error: At Row 5 and Column 1: To Overwrite fieldname should be Name" </div>' % self.dt_list[0])
+			self.validate_success = 0
 		
-		for typedata in self.dt_list:
-			ischild = 0
-			data = typedata[0]
-			
-			# identify fields
-			fields = data[0] 
-			data = data[1:]
-			
-			dt = typedata[1]
-			
-			# 1. check if doctype exists
-			is_doctype = 1
+		# labelnames
+		res = [d[0] for d in sql("select label from tabDocField where parent='%s' and docstatus!=2 and (ifnull(hidden,'') = '' or ifnull(hidden,0) = 0)" % self.dt_list[0])] or []
+
+		if len(self.dt_list) > 1 and self.dt_list[1]:
+			self.fields.append('parent')
+			lb_list.pop(lb_list.index(self.dt_list[1]))
+
+		dtd = sql("select autoname from `tabDocType` where name = '%s' " % self.dt_list[0])[0][0]
+		if self.prompt_autoname_flag:
+			self.fields.append('name')
+			lb_list.pop(lb_list.index('Name'))
+		
+		cl = 1
+		for l in lb_list:
 			try:
-				webnotes.conn.sql("select * from `tab%s` limit 0" % dt)
-			except:
-				is_doctype = 0
-				self.msg.append('<div style="color: RED">Error: No DocType: %s</div>' % dt)
-			
-			if is_doctype:
-				# 1. check field names
-				fl = [f[0] for f in webnotes.conn.get_description()]
-			
-				self.msg.append('<p><b>Checking fieldnames for %s</b></p>' % dt)
-				has_field_err = 0
-				for f in fields:
-					if not f.strip() in fl:
-						self.msg.append('<div style="color: RED">Error: Field %s is not present in %s</div>' % (f, dt))
-						has_field_err = 1
-						
-				if not has_field_err:
-					self.msg.append('<div style="color: GREEN">Fields OK for %s</div>' % dt)
-					
-				# 2. check whether new or exists
-				# load data
-				for d in data:
-					fd = {}
-					tmp = len(fields)
-					if len(d)<len(fields): 
-						tmp = len(d)
+				if l:
+					if not (l in res):
+						self.msg.append('<div style="color: RED">Error: At Row 5 and Column %s Field %s is not present in %s</div>' % (cl, l, self.dt_list[0]))
+						self.validate_success = 0
+						# this condition is for child doctype
+				
+					else:	self.fields.append(sql("select fieldname from tabDocField where parent ='%s' and label = '%s' " % (self.dt_list[0], l))[0][0] or '')
+			except Exception, e:
+				self.msg.append('<div style="color: RED"> At Row 5 and Column %s : =>ERROR: %s </div>' % ( c, e))
+				self.validate_success = 0
+			cl = cl + 1
 	
-					for i in range(tmp):
-						if fields[i].strip():
-							fd[fields[i].strip()] = d[i]
+		if not self.overwrite:
+			# get_reqd_fields
+			reqd_list = [d[0] for d in sql("select label from `tabDocField` where parent = '%s' and ifnull(reqd,'') != ''" % self.dt_list[0])	if d[0] not in lb_list] or []
+		
+			# Check if Reqd field not present in self.fields
+			if reqd_list:
+				self.msg.append('<div style="color: RED"> Error: At Row 5 Mandatory Fields %s of Document %s are Required.</div>' % (reqd_list , self.dt_list[0]))
+				self.validate_success = 0
+		if self.validate_success:
+			self.msg.append('<div style="color: GREEN">Fields OK for %s</div>' % self.dt_list[0])
 					
-					if fd.has_key('name'):
-						if sql('select name from `tab%s` where name = "%s"' % (dt, fd['name'])):
-							self.msg.append('<div style="color: ORANGE">WARNING %s, %s: Document exists, will be over-written</div>' % (dt, fd['name']))
+	def validate_headers(self):
+		self.validate_doctype(self.doctype_data)
+		if self.validate_success:
+			self.validate_fields(self.labels)
 
-		return '\n'.join(self.msg)			
-	
 	# Date parsing
 	# --------------------------------------------------------------------
-	def parse_date(self, d):
+	def parse_date(self, r, c, d):
 		out = ''
-		if self.import_date_format=='yyyy-mm-dd':
-			out = d
-		elif d and self.import_date_format=='dd-mm-yyyy':
-			tmpd = d.split('-')
-						
-			if len(tmpd)==3:
-				out = tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
+		try:
+			if self.import_date_format=='yyyy-mm-dd':
+				tmpd = d.split('-')
 			
-		elif d and self.import_date_format=='mm/dd/yyyy':
-			tmpd = d.split('/')
+				if len(tmpd)==3:
+					out = tmpd[0] + '-'+tmpd[1] + '-' + tmpd[2]
+		
+			elif d and self.import_date_format=='dd-mm-yyyy':
+				tmpd = d.split('-')
+					
+				if len(tmpd)==3:
+					out = tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
 			
-			if len(tmpd)==3:
-				out = tmpd[2]+'-'+tmpd[0]+'-'+tmpd[1]
+			elif d and self.import_date_format=='mm/dd/yyyy':
+				tmpd = d.split('/')
+			
+				if len(tmpd)==3:
+					out = tmpd[2]+'-'+tmpd[0]+'-'+tmpd[1]
 				
-		elif d and self.import_date_format=='mm/dd/yy':
-			tmpd = d.split('/')
+			elif d and self.import_date_format=='mm/dd/yy':
+				tmpd = d.split('/')
 			
-			if len(tmpd)==3:
-				out = '20'+tmpd[2]+'-'+tmpd[0]+'-'+tmpd[1]
+				if len(tmpd)==3:
+					out = '20'+tmpd[2]+'-'+tmpd[0]+'-'+tmpd[1]
 		
-		elif d and self.import_date_format=='dd/mm/yyyy':
-			tmpd = d.split('/')
-			if len(tmpd)==3:
-				out = tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
+			elif d and self.import_date_format=='dd/mm/yyyy':
+				tmpd = d.split('/')
+				if len(tmpd)==3:
+					out = tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
 
-		elif d and self.import_date_format=='dd/mm/yy':
-			tmpd = d.split('/')
-			if len(tmpd)==3:
-				out = '20'+tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
+			elif d and self.import_date_format=='dd/mm/yy':
+				tmpd = d.split('/')
+				if len(tmpd)==3:
+					out = '20'+tmpd[2]+'-'+tmpd[1]+'-'+tmpd[0]
 
-		
+			if len(tmpd) != 3:
+				self.msg.append('<div style="color: RED"> At Row %s and Column %s : => Date Format selected as %s does not match with Date Format in File</div>' % (r, c, str(self.import_date_format)))
+				self.validate_success = 0
+			else:
+			
+				import datetime
+				dt = out.split('-')
+				datetime.date(int(dt[0]),int(dt[1]), int(dt[2]))
+		except Exception, e:
+			self.msg.append('<div style="color: RED"> At Row %s and Column %s : =>ERROR: %s </div>' % (r, c, e))
+			self.validate_success = 0
+		self.msg.append(out)
 		return out
+
+	def check_select_link_data(self, r, c, f, d, s = '', l = ''):
+		options = ''
+		try:
+			if d and f:
+				dt = sql("select options, label from `tabDocField` where fieldname ='%s' and parent = '%s' " % (f, self.dt_list[0]))
+				dt, lbl = dt[0][0].strip(), dt[0][1].strip()
+				options = l and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n')
+				if options and d not in options :
+					self.msg.append('<div style="color: RED">At Row %s and Column %s : => Data "%s" in field [%s] Not Found in options %s</div>\n' % (r, c, d, lbl, options))
+					self.validate_success = 0
+		except Exception, e:
+			self.msg.append('<div style="color: RED"> ERROR: %s </div>' % (str(webnotes.utils.getTraceback())))
+			self.validate_success = 0
+		return d
+
+	def get_field_type_list(self):
+		# get_date_fields
+		date_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Date' and docstatus !=2" % self.dt_list[0])]
+
+		# get_link_fields
+		link_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and (fieldtype='Link' and ifnull(options,'') != '') or (fieldtype='Select' and ifnull(options,'') like '%%link:%%') and docstatus !=2 " % self.dt_list[0])]
+
+		# get_select_fileds
+		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and docstatus !=2" % self.dt_list[0])]
 		
+		# get_reqd_fields
+		reqd_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and ifnull(reqd,'') not in ('', 0)  and docstatus !=2" % self.dt_list[0])]
+
+		if len(self.dt_list)> 1 and 'parent' not in reqd_list: reqd_list.append('parent')
+
+		if self.prompt_autoname_flag and 'name' not in reqd_list: reqd_list.append('name')
+			 
+		return date_list, link_list, select_list, reqd_list
+
+
+	def validate_data(self):
+		self.msg.append('<p><b>Checking Data for %s</b></p>' % self.dt_list[0])
+		date_list, link_list, select_list, reqd_list = self.get_field_type_list()
+
+		
+		# load data
+		row = 6
+		for d in self.data:
+			self.validate_success, fd, col = 1, {}, 1
+			self.msg.append('<p><b>Checking Row %s </b></p>' % (row))
+			for i in range(len(d)):
+				if i < len(self.fields):
+					f = self.fields[i]
+					try:
+						# Check Reqd Fields
+						if (f in reqd_list) and not d[i]:
+							self.msg.append('<div style="color: RED">Error: At Row %s and Column %s, Field %s is Mandatory.</div>' % (row, col, f))
+							self.validate_success = 0
+					
+						# Check Date Fields
+						if d[i] and f and f in date_list : fd[f] = self.parse_date(row, col, d[i])
+	
+						# Check Link Fields
+						elif d[i] and f in link_list: fd[f] = self.check_select_link_data(row, col, f, d[i], l='Link')
+						
+						# Check Select Fields
+						elif d[i] and f in select_list: fd[f] = self.check_select_link_data(row, col, f, d[i], s= 'Select')
+												
+						# Need To Perform Check For Other Data Type Too	
+						else:	fd[f] = d[i]
+
+					except Exception:
+						self.msg.append('<div style="color: RED"> ERROR: %sData:%s and %s and %s and %s</div>' % (str(webnotes.utils.getTraceback()) + '\n', str(d), str(f), str(date_list), str(link_list)))
+						self.validate_success = 0
+				elif d[i]:
+					self.validate_success = 0
+					self.msg.append('<div style="color: RED">At Row %s and Column %s</div>' % (row,col))
+					self.msg.append('<div style="color: ORANGE">Ingored</div>')
+				col = col + 1 
+			if self.validate_success:
+				self.msg.append('<div style="color: GREEN">At Row %s and Column %s, Data Verification Completed </div>' % (row,col))
+				self.update_data(fd,row)
+			row = row + 1
+
+	def update_data(self, fd, row):
+		# load metadata
+		from webnotes.model.doc import Document
+		cur_doc = Document(fielddata = fd)
+		self.msg.append(str(cur_doc.parent))
+		cur_doc.doctype, cur_doc.parenttype, cur_doc.parentfield = self.dt_list[0], len(self.dt_list) > 1 and self.dt_list[1] or '', len(self.dt_list) > 1 and self.dt_list[2] or ''
+		obj = ''
+		# save the document
+		try:
+			if cur_doc.name and webnotes.conn.exists(self.dt_list[0], cur_doc.name):
+				if self.overwrite:
+					cur_doc.save()
+					obj = webnotes.model.code.get_obj(cur_doc.parent and cur_doc.parent_type or cur_doc.doctype, cur_doc.parent or cur_doc.name, with_children = 1)
+					self.msg.append('<div style="color: ORANGE">Row %s => Over-written: %s</div>' % (row, cur_doc.name))
+				else:
+					self.msg.append('<div style="color: ORANGE">Row %s => Ingored: %s</div>' % (row, cur_doc.name))
+			else:
+				if cur_doc.parent and webnotes.conn.exists(cur_doc.parenttype, cur_doc.parent) or not cur_doc.parent:
+					self.msg.append(str(fd))
+					cur_doc.save(1)
+					obj = webnotes.model.code.get_obj(cur_doc.parent and cur_doc.parenttype or cur_doc.doctype, cur_doc.parent or cur_doc.name, with_children = 1)
+					self.msg.append('<div style="color: GREEN">Row %s => Created: %s</div>' % (row, cur_doc.name))
+				else: 
+					self.msg.append('<div style="color: RED">Row %s => Invalid %s : %s</div>' % (row, cur_doc.parenttype, cur_doc.parent))
+			if obj:
+				obj.validate()
+				obj.on_update()
+		except Exception:
+			self.msg.append('<div style="color: RED"> ERROR: %s</div>' % (str(webnotes.utils.getTraceback())))
+			self.msg.append('<div style="color: ORANGE">Ingored: %s</div>' % (cur_doc.name))
+
+
 	# do import
 	# --------------------------------------------------------------------
 	def import_csv(self, csv_data, import_date_format = 'yyyy-mm-dd', overwrite = 0):
-		self.csv_data = csv_data
-		self.import_date_format = import_date_format
-	
-		import webnotes.model.code
-		from webnotes.model.doc import Document
-		sql = webnotes.conn.sql
-	
-		self.parse_data()
-
-		docs, doc_groups = [], {}
-		for typedata in self.dt_list:
-			ischild = 0
-			data, dt = typedata[0], typedata[1]
+		import csv
+		self.validate_success, self.csv_data = 1, self.convert_csv_data_into_list(csv.reader(csv_data.splitlines()))
+		self.import_date_format, self.overwrite = import_date_format, overwrite
+		if len(self.csv_data) > 4:
 			
-			# identify fields
-			fields = []
-			for f in data[0]:
-				if not f: 
-					break # only add upto blank field
-				fields.append(f)
-			data = data[1:]
-
-			self.msg.append('<p>Fields Identified: %s</p>' % fields)
-			
-			# find if child type
-			for f in fields:
-				if f=='parent':
-					ischild = 1
-
-			# find date strings
-			date_list = [d[0] for d in sql('SELECT fieldname from `tabDocField` where parent = "%s" and fieldtype="Date"' % dt)]
-			
-			# load data
-			for d in data:
-				self.msg.append('<p><b>Importing From: %s</b></p>' % dt)
-				fd = {}
-				tmp = len(fields)
-				if len(d)<len(fields): 
-					tmp = len(d)
-					
-				for i in range(tmp):
-					f = fields[i].strip()
-					if f in date_list:
-						# date formats
-						fd[f] = self.parse_date(d[i])
-					else:
-						fd[f] = d[i]
-				
-				# load metadata
-				cur_doc = Document(fielddata = fd)
-				cur_doc.doctype = dt
-				cur_doc.parenttype = typedata[2]
-				cur_doc.parentfield = typedata[3]
-				
-				# save the document
-				try:
-					if cur_doc.name and webnotes.conn.exists(dt, cur_doc.name):
-						if overwrite:
-							cur_doc.save()
-							self.msg.append('<div style="color: ORANGE">Over-written: %s</div>' % (cur_doc.name))
-						else:
-							self.msg.append('<div style="color: ORANGE">Ingored: %s</div>' % (cur_doc.name))
-					else:
-						cur_doc.save(1)
-					self.msg.append('<div style="color: GREEN">Created: %s</div>' % (cur_doc.name))
-				except Exception, e:
-					self.msg.append('<div style="color: RED">ERROR: %s<br>Data:%s</div>' % (str(webnotes.utils.getTraceback()), str(cur_doc.fields)))
-
-				# make in groups
-				docs.append(cur_doc)
-				if cur_doc.parent:
-
-					if not doc_groups.has_key(cur_doc.parent):
-						doc_groups[cur_doc.parent] = []
-						doc_groups[cur_doc.parent].append(cur_doc)
-
-			for m in docs:
-				try:
-					obj = webnotes.model.code.get_server_obj(m, doc_groups.get(m.name, []))
-					out = webnotes.model.code.run_server_obj(obj, 'validate')
-					if not out:
-						out1 = webnotes.model.code.run_server_obj(obj, 'on_update')
-						self.msg.append('<div style="color: GREEN">On Update: %s - %s</div>' % (m.name, out1))
-					else:
-						self.msg.append('<div style="color: Red">Validation Failed: %s - %s</div>' % (m.name, out))
-				except Exception, e:
-					self.msg.append('<div style="color: RED">On Update ERROR: %s - %s</div>' % (cur_doc.name, str(webnotes.utils.getTraceback())))
-			
+			self.doctype_data, self.labels, self.data = self.csv_data[0][:4], self.csv_data[3], self.csv_data[4:]
+			self.fields = []
+		
+			import webnotes.model.code
+			from webnotes.model.doc import Document
+			sql = webnotes.conn.sql
+	        
+			self.validate_headers()
+			if self.validate_success:
+				self.validate_data()
+		else:
+			self.msg.append('<p><b>No data entered in file.</b></p>')
 		return '\n'.join(self.msg)
 
-#=============================================================================================
+	def convert_csv_data_into_list(self,csv_data):
+		st_list = []
+		for s in csv_data:
+			st_list.append([d.strip() for d in s])
+		return st_list
 
-def get_template():
-	import webnotes.model
 
-	from webnotes.utils import getCSVelement
-	
-	form = webnotes.form
-	sql = webnotes.conn.sql
-
-	dt = form.getvalue('dt')
-	pt, pf = '', ''
-	
-	# is table?
-	dtd = sql("select istable, autoname from tabDocType where name='%s'" % dt)
-	if dtd and dtd[0][0]:
-		res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % dt)
-		if res1:
-			pt, pf = res1[0][0], res1[0][1]
-
-	# line 1
-	dset = []
-	if pt and pf:
-		fl = ['parent']
-		line1 = '#,%s,%s,%s' % (getCSVelement(dt), getCSVelement(pt), getCSVelement(pf))
-	else:
-		if dtd[0][1]=='Prompt':
-			fl = ['name']
-		else:
-			fl = []
-		line1 = '#,%s' % getCSVelement(dt)
-		
-	# fieldnames
-	res = sql("select fieldname, fieldtype from tabDocField where parent='%s' and docstatus!=2" % dt)
-	for r in res:
-		if not r[1] in webnotes.model.no_value_fields:
-			fl.append(getCSVelement(r[0]))
-	
-	dset.append(line1)
-	dset.append(','.join(fl))
-	
-	txt = '\n'.join(dset)
-	webnotes.response['result'] = txt
-	webnotes.response['type'] = 'csv'
-	webnotes.response['doctype'] = dt
