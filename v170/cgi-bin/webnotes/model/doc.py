@@ -51,11 +51,8 @@ class Document:
 
 		if name: self.name = name
 		if doctype: self.doctype = doctype
-
-		r = webnotes.model.meta.is_single(self.doctype)
-		issingle = r and r[0][0] or 0
 				
-		if issingle:
+		if webnotes.model.meta.is_single(self.doctype):
 			self.loadsingle()
 		else:
 			dataset = webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
