@@ -15,16 +15,8 @@ def get_dt_fields(doctype):
 	else:
 		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
 
-	fl2 = _get_custom_fields(doctype)
-	if fl2:
-		return fl + fl2
-	else:
-		return fl
-
-def _get_custom_fields(doctype):
-	if 'tabCustom Field' in  [t[0] for t in sql("show tables")]:
-		return webnotes.conn.sql(" SELECT '', fieldname, fieldtype, '', '', 0 FROM `tabCustom Field` WHERE dt = '%s' and ifnull(docstatus, 0) < 2" % doctype)
-
+	return fl
+	
 #=================================================================================
 
 def update_oldfield_values(doctype):
@@ -39,7 +31,7 @@ def set_dt_value(doctype, field, value):
 	return webnotes.conn.set_value('DocType', doctype, field, value)
 
 def is_single(doctype):
-	return get_dt_values(doctype, 'issingle')
+	return get_dt_values(doctype, 'issingle')[0][0]
 #=================================================================================
 
 def get_parent_dt(dt):
