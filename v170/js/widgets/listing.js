@@ -15,7 +15,8 @@ list_opts = {
 	show_bottom_paging: 1,
 	round_corners: 1,
 	no_border: 0,
-	append_records: 0
+	append_records: 0,
+	table_width: null
 };
 function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
@@ -531,11 +532,17 @@ Listing.prototype.make_result_tab = function(nr) {
 	if(nr==null)nr = this.page_len;
 	nr += has_headrow;
 	var nc = this.colwidths.length;
-		
-	var t=make_table(this.results, nr, nc, '100%', this.colwidths,{padding:'0px'});
+	
+	
+	var t=make_table(this.results, nr, nc, (this.opts.table_width ? this.opts.table_width : '100%'), this.colwidths,{padding:'0px'});
 	t.className = 'srs_result_tab'; this.result_tab = t;
 	$y(t,{borderCollapse:'collapse'});
-	
+
+	if(this.opts.table_width) {
+		$y(this.results, {overflowX:'auto'});
+		$y(t,{tableLayout:'fixed'});
+	}
+
 	// display headings
 	if(has_headrow) {
 		this.make_headings(t,nr,nc);

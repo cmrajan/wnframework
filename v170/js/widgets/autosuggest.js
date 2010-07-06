@@ -17,7 +17,7 @@ function AutoSuggest(id, param) {
 	var k, def = {
 		minchars:1, meth:"get", varname:"input", className:"autosuggest", timeout:2000
 		,delay:1000, offsety:-5, shownoresults: true, noresults: "No results!", maxheight: 250
-		,cache: true, maxentries: 25, fixed_options: false, xdelta: 0, ydelta: 5
+		,cache: false, maxentries: 25, fixed_options: false, xdelta: 0, ydelta: 5
 	}
 	
 	for (k in def)
@@ -511,17 +511,16 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 		} catch(e) { 
 			return; // pass
 		}
+
+		this.fld.value = this.sInp;
+
 		this.clearSuggestions();
 		this.killTimeout();
 		
 		// pass selected object to callback function, if exists
 		//
 		if (typeof(this.oP.callback) == "function")
-			this.oP.callback( this.aSug[this.iHigh-1] );
-			
-		this.fld.value = this.sInp;
-		if (this.fld.onchange)
-			this.fld.onchange();
+			this.oP.callback( this.aSug[this.iHigh-1] );			
 	}
 };
 
@@ -556,10 +555,17 @@ AutoSuggest.prototype.clearSuggestions = function () {
 				this.fld.value = d[this.fld.fieldname]; // refresh the value
 			}
 		} else {
-			// accept the value
+
 		}
 	}
-};
+	
+	// accept the value
+	if(this.fld.field_object && !this.oP.fixed_options) {
+		// call onchange
+		// we do not call onchange from the link field if autosuggest options are open
+		this.fld.onchange();
+	}
+}
 
 
 /* create element */

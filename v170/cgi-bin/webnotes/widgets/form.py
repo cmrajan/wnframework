@@ -392,3 +392,11 @@ def get_fields():
 		for f in fl:
 			r[f], i = ret[0][i], i+1
 	webnotes.response['message']=r
+
+# validate link
+#===========================================================================================
+def validate_link():
+	import webnotes
+	value, options = webnotes.form.getvalue('value'), webnotes.form.getvalue('options')
+	if webnotes.conn.sql("select name from `tab%s` where name=%s" % (options, '%s'), value):
+		webnotes.response['message'] = 'Ok'

@@ -65,7 +65,7 @@ function startup() {
 		if(r.exc) msgprint(r.ext);
 		
 		setup_globals(r);
-		setup_history(r);
+		setup_history();
 		setup_events();
 
 		var a = new Body();
@@ -86,8 +86,12 @@ function startup() {
 			loadpage(home_page);
 		}
 	}
-	if($i('startup_div'))
-		$c('startup',{},callback,null,1);
+	if(_startup_data) {
+		callback(_startup_data, '');
+	} else {
+		if($i('startup_div'))
+			$c('startup',{},callback,null,1);
+	}
 }
 
 function to_open() {

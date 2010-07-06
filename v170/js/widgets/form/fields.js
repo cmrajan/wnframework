@@ -513,19 +513,44 @@ LinkField.prototype.make_input = function() {
 		if(me.txt.value && me.df.options) { loaddoc(me.df.options, me.txt.value); }
 	}
 
+	me.txt.field_object = this;
 	me.txt.onchange = function() { 
-		// check values are not set in quick succession due to un intentional event call
+		// check values are not set in quick succession due to un-intentional event call
 		if(_last_link_value)
 			return
 			
+		// not in form, do nothing
+		if(me.not_in_form) return;
+		
+		// same value, do nothing
+		if(cur_frm) {
+			if(me.txt.value == locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname])
+				return;
+		}
+		
 		if(me.as && me.as.ul) {
 			// still setting value
 		} else {
 			me.set(me.txt.value);
-			_last_link_value = me.txt.value
+			_last_link_value = me.txt.value;
 			setTimeout('_last_link_value=null', 100);
 			
-			me.run_trigger();
+			// run trigger if value is cleared
+			if(!me.txt.value) {
+				me.run_trigger();
+				return;
+			}
+
+			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options}, function(r,rt) { 
+				if(r.message=='Ok') {
+					me.run_trigger();
+				} else {
+					msgprint('No ' + me.df.options + ' "' + me.txt.value + '" found for ' + me.df.label); 
+					me.txt.value = ''; 
+					me.set('');
+				}
+			});
+			
 		}
 	}
 	me.input.set_input = function(val) {

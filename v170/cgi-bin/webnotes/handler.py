@@ -22,6 +22,12 @@ fw_folder = '/Users/rushabh/workbench/www/'
 # ------------------------------------------------------------------------------------
 
 def startup():
+	import webnotes
+	import webnotes.session_cache
+
+	webnotes.response.update(webnotes.session_cache.get())
+
+def build_session():
 	import webnotes.model
 	import webnotes.model.doc
 	import webnotes.model.doctype
@@ -55,9 +61,11 @@ def startup():
 	webnotes.session['data']['profile'] = webnotes.response['profile']
 	webnotes.response['dt_labels'] = webnotes.model.get_dt_labels()
 
+	# push to session
+
 def cleanup_docs():
 	import webnotes.model.doclist
-	if out.get('docs'):
+	if out.get('docs') and type(out['docs'])!=dict:
 		out['docs'] = webnotes.model.doclist.compress(out['docs'])
 		
 def set_timezone():

@@ -21,6 +21,7 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   <script language="JavaScript" src="js/jquery/jquery.corners.min.js"></script>
   <script language="JavaScript" src="js/wnf.compressed.js"></script>
   <script language="JavaScript" src="js/form.compressed.js"></script>
+  <script language="JavaScript">var _startup_data = %(startup_data)s;</script>
   <!--[if IE]><script language="javascript" type="text/javascript" src="js/jquery/excanvas.min.js"></script><![endif]-->
   %(add_in_head)s
   
@@ -32,7 +33,7 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 
 <div id="dialog_back"></div>
 
-<div id="startup_div" style="padding: 8px; font-size: 14px;">Loading...</div>
+<div id="startup_div" style="padding: 8px; font-size: 14px;"></div>
 
 <!-- Main Starts -->
 <div id="body_div"> 
@@ -132,7 +133,12 @@ def get_static_content():
 def get():
 	global index_template
 	import webnotes.model.code
-	
+	import webnotes.session_cache
+	try:
+		import json
+	except: # python 2.4
+		import simplejson as json
+		
 	template, add_in_head, add_in_body = index_template, '', ''
 	cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
 	if hasattr(cp, 'get_index_template'):
@@ -157,6 +163,7 @@ def get():
 			,'site_description':site_description
 			,'add_in_head':add_in_head
 			,'add_in_body':add_in_body
+			,'startup_data':json.dumps(webnotes.session_cache.get())
 		}
 		
 	return template

@@ -43,7 +43,7 @@ class AppManager:
 	
 	# create a new app
 	# ----------------------------------
-	def new_app(self):
+	def new_app(self, ac_name):
 		import webnotes.setup
 
 		# setup
@@ -73,7 +73,7 @@ class AppManager:
 		ret = self.acc_conn.sql("select ac_name from tabAccount where ifnull(registered,0)=0 order by ac_name limit 1")
 		if not ret:
 			raise Exception, "No more apps to register"
-				
+
 		self.acc_conn.sql("update tabAccount set registered=1 where ac_name=%s", ret[0][0])
 		return ret[0][0]
 		
