@@ -126,6 +126,7 @@ function WNToolbar(parent) {
 	this.setup_help = function() {
 		me.menu.add_top_menu('Tools', function() {  }, "images/ui/down-arrow1.gif");
 		this.menu.add_item('Tools','Error Console', function() { err_console.show(); });
+		this.menu.add_item('Tools','Clear Cache', function() { $c('webnotes.session_cache.clear',{},function(r,rt){}) });
 		//this.menu.add_item('Tools','Start / Finish Testing Mode', function() { me.enter_testing(); });
 		if(has_common(user_roles,['Administrator','System Manager'])) {
 			this.menu.add_item('Tools','Download Backup', function() { me.download_backup(); });

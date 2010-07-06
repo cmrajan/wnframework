@@ -162,7 +162,7 @@ unfreeze();return false;}}
 var pending_req=0;function newHttpReq(){if(!isIE)
 var r=new XMLHttpRequest();else if(window.ActiveXObject)
 var r=new ActiveXObject("Microsoft.XMLHTTP");return r;}
-function $c(command,args,fn,on_timeout,no_spinner,freeze_msg){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,on_timeout,no_spinner,freeze_msg)){if(!no_spinner)hide_loading();var rtxt=req.responseText;try{var r=eval("var a="+rtxt+";a");}catch(e){msgprint('Handler Exception:'+rtxt);return;}
+function $c(command,args,fn,on_timeout,no_spinner,freeze_msg){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,on_timeout,no_spinner,freeze_msg)){if(!no_spinner)hide_loading();var rtxt=req.responseText;try{var r=eval("var a="+rtxt+";a");}catch(e){alert('Handler Exception:'+rtxt);return;}
 if(r.exc&&r.__redirect_login){msgprint(r.exc,0,function(){document.location=login_file});return;}
 if(freeze_msg)unfreeze();if(r.exc){errprint(r.exc);};if(r.server_messages){msgprint(r.server_messages);};if(r.docs){LocalDB.sync(r.docs);}
 saveAllowed=true;if(fn)fn(r,rtxt);}}
@@ -735,7 +735,7 @@ this.rdocs.remove=function(dt,dn){var it=me.rdocs.items[dt+'-'+dn];if(it)$dh(it)
 var rlist=profile.recent.split('\n');var m=rlist.length;if(m>15)m=15;for(var i=0;i<m;i++){var t=rlist[i].split('~~~');if(t[1]){var dt=t[0];var dn=t[1];this.rdocs.add(dt,dn,0);}}
 this.rename_notify=function(dt,old,name){me.rdocs.remove(dt,old);me.rdocs.add(dt,name,1);}
 rename_observers.push(this);}
-this.setup_help=function(){me.menu.add_top_menu('Tools',function(){},"images/ui/down-arrow1.gif");this.menu.add_item('Tools','Error Console',function(){err_console.show();});if(has_common(user_roles,['Administrator','System Manager'])){this.menu.add_item('Tools','Download Backup',function(){me.download_backup();});}
+this.setup_help=function(){me.menu.add_top_menu('Tools',function(){},"images/ui/down-arrow1.gif");this.menu.add_item('Tools','Error Console',function(){err_console.show();});this.menu.add_item('Tools','Clear Cache',function(){$c('webnotes.session_cache.clear',{},function(r,rt){})});if(has_common(user_roles,['Administrator','System Manager'])){this.menu.add_item('Tools','Download Backup',function(){me.download_backup();});}
 this.menu.add_item('Tools','About <b>Web Notes</b>',function(){show_about();});}
 this.setup_new=function(){me.menu.add_top_menu('Create New...',function(){me.show_new();});me.show_new=function(){if(!me.new_dialog){var d=new Dialog(240,140,"Create a new record");d.make_body([['HTML','Select'],['Button','Go',function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}]]);d.onshow=function(){me.new_sel.inp.focus();}
 me.new_dialog=d;var nl=profile.can_create;for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.new_sel=new SelectWidget(d.widgets['Select'],nl.sort(),'200px');me.new_sel.onchange=function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}}
@@ -987,10 +987,10 @@ var setup_history=function(r){rename_observers.push(nav_obj);}
 var setup_events=function(){addEvent('keyup',function(ev,target){for(var i in keypress_observers){if(keypress_observers[i])
 keypress_observers[i].notify_keypress(ev,ev.keyCode);}});addEvent('click',function(ev,target){for(var i=0;i<click_observers.length;i++){if(click_observers[i])
 click_observers[i].notify_click(ev,target);}});if(isIE){$op($i('dialog_back'),60);}}
-var callback=function(r,rt){if(r.exc)msgprint(r.ext);setup_globals(r);setup_history(r);setup_events();var a=new Body();page_body.run_startup_code();page_body.setup_sidebar_menu();for(var i=0;i<startup_list.length;i++){startup_list[i]();}
+var callback=function(r,rt){if(r.exc)msgprint(r.ext);setup_globals(r);setup_history();setup_events();var a=new Body();page_body.run_startup_code();page_body.setup_sidebar_menu();for(var i=0;i<startup_list.length;i++){startup_list[i]();}
 $dh('startup_div');$ds('body_div');var t=to_open();if(t){historyChange(t);}else if(home_page){loadpage(home_page);}}
-if($i('startup_div'))
-$c('startup',{},callback,null,1);}
+if(_startup_data){LocalDB.sync(_startup_data.docs);callback(_startup_data,'');}else{if($i('startup_div'))
+$c('startup',{},callback,null,1);}}
 function to_open(){if(get_url_arg('page'))
 return get_url_arg('page');}
 function logout(){$c('logout',args={},function(r,rt){if(r.exc){msgprint(r.exc);return;}

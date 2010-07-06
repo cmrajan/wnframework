@@ -44,7 +44,7 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 			try { 
 				var r = eval("var a="+rtxt+";a"); 
 			} catch(e) { 
-				msgprint('Handler Exception:' + rtxt);
+				alert('Handler Exception:' + rtxt);
 				return; 
 			}
 			if(r.exc && r.__redirect_login) {

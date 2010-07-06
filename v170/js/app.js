@@ -87,6 +87,7 @@ function startup() {
 		}
 	}
 	if(_startup_data) {
+		LocalDB.sync(_startup_data.docs);
 		callback(_startup_data, '');
 	} else {
 		if($i('startup_div'))

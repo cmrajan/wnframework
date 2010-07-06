@@ -1,5 +1,17 @@
 # session_cache.py
 
+# clear cache
+# ==================================================
+
+def clear():
+	import webnotes
+	webnotes.conn.sql("delete from __SessionCache")
+	webnotes.conn.sql("delete from __DocTypeCache")
+	webnotes.msgprint("Cache Cleared")
+
+# load cache
+# ==================================================
+
 def get():
 	import webnotes
 	# get country
