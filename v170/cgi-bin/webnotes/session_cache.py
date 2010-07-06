@@ -13,7 +13,7 @@ def get():
 		if cache:
 			return cache
 	except:
-		webnotes.conn.sql("alter table tabSessions change cache cache longtext")
+		webnotes.conn.sql("alter table __SessionCache change cache cache longtext")
 	
 	# if not create it
 	sd = build()
