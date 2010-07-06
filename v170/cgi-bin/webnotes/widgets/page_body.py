@@ -131,6 +131,8 @@ def get_static_content():
 	return title, content_html
 	
 def get():
+	no_startup = webnotes.form.getvalue('no_startup') or None
+
 	global index_template
 	import webnotes.model.code
 	import webnotes.session_cache
@@ -163,7 +165,7 @@ def get():
 			,'site_description':site_description
 			,'add_in_head':add_in_head
 			,'add_in_body':add_in_body
-			,'startup_data':json.dumps(webnotes.session_cache.get())
+			,'startup_data':(no_startup and '{}' or json.dumps(webnotes.session_cache.get()))
 		}
 		
 	return template
