@@ -86,7 +86,7 @@ function startup() {
 			loadpage(home_page);
 		}
 	}
-	if(_startup_data) {
+	if(keys(_startup_data).length) {
 		LocalDB.sync(_startup_data.docs);
 		callback(_startup_data, '');
 	} else {

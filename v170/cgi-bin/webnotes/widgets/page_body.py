@@ -131,6 +131,7 @@ def get_static_content():
 	return title, content_html
 	
 def get():
+	import webnotes
 	no_startup = webnotes.form.getvalue('no_startup') or None
 
 	global index_template
