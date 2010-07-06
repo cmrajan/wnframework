@@ -8,12 +8,9 @@ def get():
 		country = webnotes.session['data'].get('ipinfo')['CountryName']
 
 	# check if cache exists
-	try:
-		cache = load(country)
-		if cache:
-			return cache
-	except:
-		webnotes.conn.sql("alter table __SessionCache change cache cache longtext")
+	cache = load(country)
+	if cache:
+		return cache
 	
 	# if not create it
 	sd = build()
