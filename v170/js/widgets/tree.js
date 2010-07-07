@@ -144,6 +144,7 @@ function TreeNode(tree, parent, id, imagesrc, onclick, onexpand, opts, label) {
   this.collapse = function() {
     me.expanded = 0;
     $(me.body).slideUp();
+    me.expimage.src = me.exp_img ? me.exp_img : me.tree.exp_img;
   }
   this.expand = function() {
     if(me.onexpand && !me.expanded_once){
@@ -154,6 +155,7 @@ function TreeNode(tree, parent, id, imagesrc, onclick, onexpand, opts, label) {
    	}
     me.expanded = 1;
     me.expanded_once = 1;
+    me.expimage.src = me.col_img ? me.col_img : me.tree.col_img;
   }
   this.show_expanded = function() {  	
   	if(me.tree.do_animate && (!keys(me.nodes).length)) return; // no children

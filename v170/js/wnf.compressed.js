@@ -370,9 +370,9 @@ me.tree.cur_node=null}
 this.expanded=0;this.toggle=function(){if(me.expanded)
 me.collapse();else
 me.expand();}
-this.collapse=function(){me.expanded=0;$(me.body).slideUp();}
+this.collapse=function(){me.expanded=0;$(me.body).slideUp();me.expimage.src=me.exp_img?me.exp_img:me.tree.exp_img;}
 this.expand=function(){if(me.onexpand&&!me.expanded_once){me.onexpand(me);if(!me.tree.do_animate)me.show_expanded();}else{me.show_expanded();}
-me.expanded=1;me.expanded_once=1;}
+me.expanded=1;me.expanded_once=1;me.expimage.src=me.col_img?me.col_img:me.tree.col_img;}
 this.show_expanded=function(){if(me.tree.do_animate&&(!keys(me.nodes).length))return;$(me.body).slideDown();}
 this.setlabel=function(l){me.label.value=l;me.label.innerHTML=l;}
 this.setlabel(this.text);this.setcolor=function(c){this.backColor=c;if(cur_node!=this)
