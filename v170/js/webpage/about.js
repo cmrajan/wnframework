@@ -14,7 +14,7 @@ function show_about() {
 			+"<div style='text-align: center'><img src = 'images/ui/webnotes30x120.gif'></div>"
 			+"<br><br>&copy; 2007-08 Web Notes Technologies Pvt. Ltd."
 			+"<p><span style='color: #888'>Customized Web Based Solutions and Products</span>"
-			+"<br>51 / 2406, Nishigandha, Opp MIG Cricket Club,<br>Bandra (East),<br>Mumbai 51</p>"
+			+"<br>50/2386, Vijaydeep C.H.S,<br>Gandhi Nagar,<br>Opp MIG Cricket Club,<br>Bandra (East),<br>Mumbai 51</p>"
 			+"<p>Phone: +91-22-6526-5364 (M-F 9-6)"
 			+"<br>Email: info@webnotestech.com"
 			+"<br><b>Customer Support: support@webnotestech.com</b></p>"

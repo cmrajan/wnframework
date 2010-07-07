@@ -4,10 +4,9 @@ search_fields = {};
 // -------------------
 
 function setlinkvalue(name) {
-	selector.hide();
-	selector.input.set(name);// in local
+	//selector.input.set(name);// in local - this will be set onchange
 	selector.input.set_input(name); // on screen
-	if(selector.input.txt)selector.input.txt.onchange();
+	selector.hide();
 }
 
 // Link Selector
@@ -102,6 +101,8 @@ function makeselector() {
 	d.onhide = function() {
 		if(page_body.wntoolbar)
 			page_body.wntoolbar.search_sel.disabled = 0;
+		if(d.input && d.input.txt) // link, call onchange
+			d.input.txt.onchange()
 	}
 
 	btn.onclick = function() {

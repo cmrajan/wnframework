@@ -269,7 +269,7 @@ class CSVImport:
 				elif d[i]:
 					self.validate_success = 0
 					self.msg.append('<div style="color: RED">At Row %s and Column %s</div>' % (row,col))
-					self.msg.append('<div style="color: ORANGE">Ingored</div>')
+					self.msg.append('<div style="color: ORANGE">Ignored</div>')
 				col = col + 1 
 			if self.validate_success:
 				self.msg.append('<div style="color: GREEN">At Row %s and Column %s, Data Verification Completed </div>' % (row,col))
@@ -291,7 +291,7 @@ class CSVImport:
 					obj = webnotes.model.code.get_obj(cur_doc.parent and cur_doc.parent_type or cur_doc.doctype, cur_doc.parent or cur_doc.name, with_children = 1)
 					self.msg.append('<div style="color: ORANGE">Row %s => Over-written: %s</div>' % (row, cur_doc.name))
 				else:
-					self.msg.append('<div style="color: ORANGE">Row %s => Ingored: %s</div>' % (row, cur_doc.name))
+					self.msg.append('<div style="color: ORANGE">Row %s => Ignored: %s</div>' % (row, cur_doc.name))
 			else:
 				if cur_doc.parent and webnotes.conn.exists(cur_doc.parenttype, cur_doc.parent) or not cur_doc.parent:
 					self.msg.append(str(fd))
@@ -305,7 +305,7 @@ class CSVImport:
 				obj.on_update()
 		except Exception:
 			self.msg.append('<div style="color: RED"> ERROR: %s</div>' % (str(webnotes.utils.getTraceback())))
-			self.msg.append('<div style="color: ORANGE">Ingored: %s</div>' % (cur_doc.name))
+			self.msg.append('<div style="color: ORANGE">Ignored: %s</div>' % (cur_doc.name))
 
 
 	# do import

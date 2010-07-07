@@ -640,10 +640,11 @@ return v;};var _last_link_value=null;function LinkField(){}LinkField.prototype=n
 if(me.btn1)me.btn1.onclick=function(){if(me.txt.value&&me.df.options){loaddoc(me.df.options,me.txt.value);}}
 me.txt.field_object=this;me.txt.onchange=function(){if(_last_link_value)
 return
-if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname])
+if(me.not_in_form)
+return;if(cur_frm){if(me.txt.value==locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname])
 return;}
 if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value;setTimeout('_last_link_value=null',100);if(!me.txt.value){me.run_trigger();return;}
-$c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options},function(r,rt){if(r.message=='Ok'){me.run_trigger();}else{msgprint('No '+me.df.options+' "'+me.txt.value+'" found for '+me.df.label);me.txt.value='';me.set('');}});}}
+$c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options},function(r,rt){if(selector&&selector.display)return;if(r.message=='Ok'){me.run_trigger();}else{me.txt.value='';me.set('');}});}}
 me.input.set_input=function(val){if(val==undefined)val='';me.txt.value=val;}
 me.get_value=function(){return me.txt.value;}
 me.can_create=0;if((!me.not_in_form)&&in_list(profile.can_create,me.df.options)){me.can_create=1;me.btn2.onclick=function(){var on_save_callback=function(new_rec){if(new_rec){var d=_f.calling_doc_stack.pop();locals[d[0]][d[1]][me.df.fieldname]=new_rec;me.refresh();if(me.grid)me.grid.refresh();}}
@@ -768,7 +769,7 @@ nav_obj.rename_notify=function(dt,oldn,newn){for(var i=0;i<nav_obj.ol.length;i++
 nav_obj.show_last_open=function(){var l=nav_obj.ol[nav_obj.ol.length-2];delete nav_obj.ol[nav_obj.ol.length-1];if(!l)loadpage('_home');else if(l[0]=='Page'){loadpage(l[1]);}else if(l[0]=='Report'){loadreport(l[1],l[2]);}else if(l[0]=='Form'){loaddoc(l[1],l[2]);}else if(l[0]=='Application'){loadapp(l[1]);}else if(l[0]=='DocBrowser'){loaddocbrowser(l[1]);}}
 var _history_current;function historyChange(newLocation,historyData){t=newLocation.split('/');for(var i=0;i<t.length;i++)
 t[i]=decodeURIComponent(t[i]);if(nav_obj.ol.length){var c=nav_obj.ol[nav_obj.ol.length-1];if(t.length==2){if(c[0]==t[0]&&c[1]==t[1])return;}else{if(c[0]==t[0]&&c[1]==t[1]&&c[2]==t[2])return;}}
-if(t[0]=='Form'){_history_current=newLocation;loaddoc(t[1],t[2]);}else if(t[0]=='Report'){_history_current=newLocation;loadreport(t[1],t[2]);}else if(t[0]=='Page'){_history_current=newLocation;loadpage(t[1]);}else if(t[0]=='Application'){_history_current=newLocation;loadapp(t[1]);}else if(t[0]=='DocBrowser'){_history_current=newLocation;loaddocbrowser(t[1]);}};search_fields={};function setlinkvalue(name){selector.hide();selector.input.set(name);selector.input.set_input(name);if(selector.input.txt)selector.input.txt.onchange();}
+if(t[0]=='Form'){_history_current=newLocation;loaddoc(t[1],t[2]);}else if(t[0]=='Report'){_history_current=newLocation;loadreport(t[1],t[2]);}else if(t[0]=='Page'){_history_current=newLocation;loadpage(t[1]);}else if(t[0]=='Application'){_history_current=newLocation;loadapp(t[1]);}else if(t[0]=='DocBrowser'){_history_current=newLocation;loaddocbrowser(t[1]);}};search_fields={};function setlinkvalue(name){selector.input.set_input(name);selector.hide();}
 function makeselector(){var d=new Dialog(540,440,'Search');d.make_body([['Data','Beginning With','Tip: You can use wildcard "%"'],['Select','Search By'],['Button','Search'],['HTML','Result']]);var inp=d.widgets['Beginning With'];var field_sel=d.widgets['Search By'];var btn=d.widgets['Search'];d.sel_type='';d.values_len=0;d.set=function(input,type,label){d.sel_type=type;d.input=input;if(d.style!='Link'){d.rows['Result'].innerHTML='';d.values_len=0;}
 d.style='Link';if(!d.sel_type)d.sel_type='Value';d.set_title('Select a "'+d.sel_type+'" for field "'+label+'"');}
 d.set_search=function(dt){if(d.style!='Search'){d.rows['Result'].innerHTML='';d.values_len=0;}
@@ -781,7 +782,8 @@ try{inp.focus();}catch(e){}
 if(d.input)d.input.set_get_query();var get_sf_list=function(dt){var l=[];var lf=search_fields[dt];for(var i=0;i<lf.length;i++)l.push(lf[i][1]);return l;}
 $ds(d.rows['Search By']);if(search_fields[d.sel_type]){empty_select(field_sel);add_sel_options(field_sel,get_sf_list(d.sel_type),'ID');}else{empty_select(field_sel);add_sel_options(field_sel,['ID'],'ID');$c('webnotes.widgets.search.getsearchfields',{'doctype':d.sel_type},function(r,rt){search_fields[d.sel_type]=r.searchfields;empty_select(field_sel);add_sel_options(field_sel,get_sf_list(d.sel_type));field_sel.selectedIndex=0;});}}
 d.onhide=function(){if(page_body.wntoolbar)
-page_body.wntoolbar.search_sel.disabled=0;}
+page_body.wntoolbar.search_sel.disabled=0;if(d.input&&d.input.txt)
+d.input.txt.onchange()}
 btn.onclick=function(){btn.disabled=true;d.set_doctype=d.sel_type;var q='';if(d.input&&d.input.get_query){var doc={};if(cur_frm)doc=locals[cur_frm.doctype][cur_frm.docname];var q=d.input.get_query(doc,d.input.doctype,d.input.docname);if(!q){return'';}}
 var get_sf_fieldname=function(v){var lf=search_fields[d.sel_type];if(!lf)
 return'name'
@@ -825,7 +827,7 @@ d.make_body([['HTML','info']]);d.rows['info'].innerHTML="<div style='padding: 16
 +"<div style='text-align: center'><img src = 'images/ui/webnotes30x120.gif'></div>"
 +"<br><br>&copy; 2007-08 Web Notes Technologies Pvt. Ltd."
 +"<p><span style='color: #888'>Customized Web Based Solutions and Products</span>"
-+"<br>51 / 2406, Nishigandha, Opp MIG Cricket Club,<br>Bandra (East),<br>Mumbai 51</p>"
++"<br>50/2386, Vijaydeep C.H.S,<br>Gandhi Nagar,<br>Opp MIG Cricket Club,<br>Bandra (East),<br>Mumbai 51</p>"
 +"<p>Phone: +91-22-6526-5364 (M-F 9-6)"
 +"<br>Email: info@webnotestech.com"
 +"<br><b>Customer Support: support@webnotestech.com</b></p>"

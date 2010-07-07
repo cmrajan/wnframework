@@ -520,7 +520,8 @@ LinkField.prototype.make_input = function() {
 			return
 			
 		// not in form, do nothing
-		if(me.not_in_form) return;
+		if(me.not_in_form) 
+			return;
 		
 		// same value, do nothing
 		if(cur_frm) {
@@ -541,11 +542,14 @@ LinkField.prototype.make_input = function() {
 				return;
 			}
 
+			// validate the value just entered
 			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options}, function(r,rt) { 
+				if(selector && selector.display) return; // selecting from popup
+				
 				if(r.message=='Ok') {
 					me.run_trigger();
 				} else {
-					msgprint('No ' + me.df.options + ' "' + me.txt.value + '" found for ' + me.df.label); 
+					//msgprint('No ' + me.df.options + ' "' + me.txt.value + '" found for ' + me.df.label); 
 					me.txt.value = ''; 
 					me.set('');
 				}
