@@ -229,7 +229,8 @@ throw new SyntaxError('JSON.parse');};}}());var cur_dialog;var top_index=91;func
 Dialog.prototype.make_head=function(title){var t=make_table(this.head,1,2,'100%',['100%','16px'],{padding:'2px'});$y($td(t,0,0),{paddingLeft:'16px',fontWeight:'bold',fontSize:'14px',textAlign:'center'});$y($td(t,0,1),{textAlign:'right'});var img=$a($td(t,0,01),'img','',{cursor:'pointer'});img.src='images/icons/close.gif';this.title_text=$td(t,0,0);if(!title)title='';this.title_text.innerHTML=title;var me=this;img.onclick=function(){if(me.oncancel)me.oncancel();me.hide();}
 this.cancel_img=img;}
 Dialog.prototype.no_cancel=function(){$dh(this.cancel_img);this.no_cancel_flag=1;}
-Dialog.prototype.show=function(){var d=get_screen_dims();this.wrapper.style.left=((d.w-this.w)/2)+'px';if(!cint(this.h)){this.wrapper.style.top='60px';}else{var t=(get_scroll_top()+((d.h-this.h)/2));this.wrapper.style.top=(t<60?60:t)+'px';}
+Dialog.prototype.show=function(){if(this.display)
+return;var d=get_screen_dims();this.wrapper.style.left=((d.w-this.w)/2)+'px';if(!cint(this.h)){this.wrapper.style.top='60px';}else{var t=(get_scroll_top()+((d.h-this.h)/2));this.wrapper.style.top=(t<60?60:t)+'px';}
 top_index++;$y(this.wrapper,{zIndex:top_index});$ds(this.wrapper);freeze();this.display=true;cur_dialog=this;if(this.onshow)this.onshow();}
 Dialog.prototype.hide=function(){var me=this;unfreeze();if(this.onhide)this.onhide();$dh(this.wrapper);if(cur_autosug)cur_autosug.clearSuggestions();this.display=false;cur_dialog=null;}
 Dialog.prototype.set_title=function(title){if(!title)title='';this.title_text.innerHTML=title.bold();}
@@ -801,8 +802,8 @@ selector=d;}
 function get_scroll_top(){var st=0;if(document.documentElement&&document.documentElement.scrollTop)
 st=document.documentElement.scrollTop;else if(document.body&&document.body.scrollTop)
 st=document.body.scrollTop;return st;}
-var _loading_div;function set_loading(){if(!_loading_div){_loading_div=$a(popup_cont,'div','loading_div');var t=make_table(_loading_div,1,2,'90px',[null,null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});$a($td(t,0,1),'img').src="images/ui/loading.gif";$td(t,0,0).innerHTML='Loading...'
-if(!isIE)$y($td(t,0,1),{paddingTop:'2px'});}
+var _loading_div;function set_loading(){if(!_loading_div){_loading_div=$a(popup_cont,'div','loading_div');var t=make_table(_loading_div,1,2,'90px',[null,null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});$a($td(t,0,0),'img').src="images/ui/loading.gif";$td(t,0,1).innerHTML='Loading...'
+if(!isIE)$y($td(t,0,0),{paddingTop:'2px'});}
 var d=_loading_div;if(!d)return;if(isIE6){d.style.top=(get_scroll_top()+10)+'px';window.onscroll=function(){d.style.top=(get_scroll_top()+10)+'px';}}else{$y(d,{position:'fixed',top:'10px'});}
 $ds(d);pending_req++;}
 function hide_loading(){var d=_loading_div;if(!d)return;pending_req--;if(!pending_req){$dh(d);if(isIE6){document.body.onscroll=null;}}}
@@ -846,12 +847,13 @@ var load_doc=loaddoc;function loaddoc(doctype,name,onload,menuitem){doctype=get_
 if(doctype=='DocType'&&frms[name]){msgprint("Cannot open DocType \""+name+"\" when its instance is open.");return;}
 var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
 if(!frms[doctype]){_f.add_frm(doctype,show_doc,name);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user},show_doc,null,null);}}
-var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){var frm=frms[doctype];if(menuitem)frm.menuitem=menuitem;if(onload)onload(frm);if(r&&r.n_tweets)frm.n_tweets[name]=r.n_tweets;if(r&&r.last_comment)frm.last_comments[name]=r.last_comment;frm.show(name,null,_f.frm_con.body,0);nav_obj.open_notify('Form',doctype,name);if(frm.menuitem)frm.menuitem.show_selected();}else{msgprint('error:There were errors while loading '+doctype+','+name);}}
+var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){var frm=frms[doctype];if(menuitem)frm.menuitem=menuitem;if(onload)onload(frm);if(r&&r.n_tweets)frm.n_tweets[name]=r.n_tweets;if(r&&r.last_comment)frm.last_comments[name]=r.last_comment;frm.refresh(name);if(!frm.in_dialog)
+nav_obj.open_notify('Form',doctype,name);if(frm.menuitem)frm.menuitem.show_selected();}else{msgprint('error:There were errors while loading '+doctype+','+name);}}
 new_widget('_f.FrmContainer',show_form,1);}
 function new_doc(doctype,onload,in_dialog,on_save_callback,cdt,cdn,cnic){doctype=get_label_doctype(doctype);if(!doctype){if(cur_frm)doctype=cur_frm.doctype;else return;}
-var show_doc=function(){frm=frms[doctype];if(frm.perm[0][CREATE]==1){if(frm.meta.issingle){var d=doctype;LocalDB.set_default_values(locals[doctype][doctype]);}else
-var d=LocalDB.create(doctype);if(onload)onload(d);if(fields_list[doctype]&&fields_list[doctype].length>2){in_dialog=0;}
-if(in_dialog){_f.edit_record(doctype,d,0,on_save_callback,cdt,cdn,cnic);}else{nav_obj.open_notify('Form',doctype,d);frm.show(d,null,_f.frm_con.body,0);}}else{msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');}}
+var show_doc=function(){frm=frms[doctype];if(frm.perm[0][CREATE]==1){if(frm.meta.issingle){var dn=doctype;LocalDB.set_default_values(locals[doctype][doctype]);}else
+var dn=LocalDB.create(doctype);if(onload)onload(dn);if(frm.in_dialog){var fd=_f.frm_dialog;fd.cdt=cdt;fd.cdn=cdn;fd.cnic=cnic;fd.on_save_callback=on_save_callback;}else{nav_obj.open_notify('Form',doctype,dn);}
+frm.refresh(dn);}else{msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');}}
 var show_form=function(){if(!_f.frm_con){_f.frm_con=new _f.FrmContainer();}
 if(!frms[doctype])
 _f.add_frm(doctype,show_doc);else
@@ -994,7 +996,7 @@ $dh('startup_div');$ds('body_div');var t=to_open();if(t){historyChange(t);}else 
 if(keys(_startup_data).length){LocalDB.sync(_startup_data.docs);callback(_startup_data,'');}else{if($i('startup_div'))
 $c('startup',{},callback,null,1);}}
 function to_open(){if(get_url_arg('page'))
-return get_url_arg('page');}
+return get_url_arg('page');if(location.hash){return location.hash.substr(1);}}
 function logout(){$c('logout',args={},function(r,rt){if(r.exc){msgprint(r.exc);return;}
 if(login_file)
 window.location.href=login_file;else

@@ -99,13 +99,13 @@ function loaddoc(doctype, name, onload, menuitem) {
 			// tweets
 			if(r && r.n_tweets) frm.n_tweets[name] = r.n_tweets;
 			if(r && r.last_comment) frm.last_comments[name] = r.last_comment;
-
 			
 			// show
-			frm.show(name, null, _f.frm_con.body, 0);
+			frm.refresh(name);
 
-			// back button
-			nav_obj.open_notify('Form',doctype,name);
+			// notify for back button
+			if(!frm.in_dialog)
+				nav_obj.open_notify('Form',doctype,name);
 
 			// show menuitem selected
 			if(frm.menuitem) frm.menuitem.show_selected();
@@ -125,6 +125,8 @@ function loaddoc(doctype, name, onload, menuitem) {
 
 
 function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
+	// cnic = caller not in container (caller is a dialog)
+	
 	doctype = get_label_doctype(doctype);
 	
 	if(!doctype) {
@@ -133,27 +135,34 @@ function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
 	
 	var show_doc = function() {
 		frm = frms[doctype];
-		// load new doc	
+
 		if (frm.perm[0][CREATE]==1) {
+
+			// load new doc	- create the new doc (if single, just load it)
 			if(frm.meta.issingle) {
-				var d = doctype;
+				var dn = doctype;
 				LocalDB.set_default_values(locals[doctype][doctype]);
 			} else 
-				var d = LocalDB.create(doctype);
-				
-			if(onload)onload(d);
+				var dn = LocalDB.create(doctype);
+
+			// call (optional) onload
+			if(onload)onload(dn);
 			
-			// no-dialog for doctype of more than 8 fields
-			if(fields_list[doctype] && fields_list[doctype].length>2) {
-				in_dialog = 0;	
-			}
 			
-			if(in_dialog) {
-				_f.edit_record(doctype, d, 0, on_save_callback, cdt, cdn, cnic);
+			if(frm.in_dialog) {
+				// attach values so that the "new" value is set in the field from which it was set
+				var fd = _f.frm_dialog;
+				fd.cdt = cdt; 
+				fd.cdn = cdn; 
+				fd.cnic = cnic;
+				fd.on_save_callback = on_save_callback;
 			} else {
-				nav_obj.open_notify('Form',doctype,d);
-				frm.show(d, null, _f.frm_con.body, 0);
+				nav_obj.open_notify('Form',doctype,dn);
 			}
+			
+			// show the form
+			frm.refresh(dn);
+
 		} else {
 			msgprint('error:Not Allowed To Create '+doctype+'\nContact your Admin for help');
 		}
@@ -172,7 +181,7 @@ function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
 		
 	}
 
-	new_widget('_f.FrmContainer', show_form, 1);
+	new_widget('_f.FrmContainer', show_form, 1);	
 }
 var newdoc = new_doc;
 

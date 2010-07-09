@@ -53,8 +53,12 @@ Dialog.prototype.no_cancel = function() {
 }
 
 Dialog.prototype.show = function() {
+	// already live, do nothing
+	if(this.display)
+		return;
+
+	// place it at the center
 	var d = get_screen_dims();
-	
 	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
 	
 	if(!cint(this.h)) {
@@ -64,16 +68,20 @@ Dialog.prototype.show = function() {
 		this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
 	}
 	
+	// place it on top
 	top_index++;
 	$y(this.wrapper,{zIndex:top_index});
 
+	// show it
 	$ds(this.wrapper);
 
+	// hide background
 	freeze();
 
 	this.display = true;
 	cur_dialog = this;
 
+	// call onshow
 	if(this.onshow)this.onshow();
 }
 

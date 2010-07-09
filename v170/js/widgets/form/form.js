@@ -1,92 +1,37 @@
 // Form page structure
 //
-// + this.parent (can change)
+// + this.parent (either FormContainer or Dialog)
 // 		+ this.wrapper
+//			+ this.head
 //			+ this.tip_wrapper
 //			+ this.form_wrapper
+//			|	+ this.tab_wrapper
 //			|	+ this.body
 //			+ this.print_wrapper
 
 
-// Open the Form in a Dialog
-_f.frm_dialog = null;
-_f.dialog_stack = [];
-_f.calling_doc_stack = [];
-_f.FrmDialog = function() {
-	var me = this;
-
-	var d = new Dialog(640, 400, 'Edit Row');
-	d.body_wrapper = $a(d.body, 'div', 'dialog_frm');
-	d.done_btn = $a($a(d.body, 'div', '', {margin:'8px'}),'button');
-	d.done_btn.innerHTML = 'Done'; 
-
-	// done button
-	d.done_btn.onclick = function() { 
-		if(!me.from_grid) {
-			var callback = function(r,rt) {
-				// set field value and refresh
-				if(me.on_save_callback)
-					me.on_save_callback(me.cur_frm.docname);
-				me.dialog.hide();
-			}
-			me.cur_frm.save('Save', callback);
-		} else {
-			me.dialog.hide();
-		}
-	}
-
-	d.onhide = function() {
-		if(_f.cur_grid)
-			_f.cur_grid.refresh_row(_f.cur_grid_ridx, me.dn);
-
-		// composite - Caller is also the same dt 
-		if(me.cdt && me.cur_frm.doctype == me.cdt) {
-			me.cur_frm.show(me.cdn, null, _f.dialog_stack.pop(), me.cnic);
-		}
-	}
-	this.dialog = d;
-}
-_f.edit_record = function(dt, dn, from_grid, on_save_callback, cdt, cdn, cnic) {
-	var d = new _f.FrmDialog();
-
+// called from table edit
+_f.edit_record = function(dt, dn) {
+	d = _f.frm_dialog;
+	
 	var show_dialog = function() {
 		var f = frms[dt];
-		if(from_grid) {
+		if(f.meta.istable) {
 			f.parent_doctype = cur_frm.doctype;
 			f.parent_docname = cur_frm.docname;
 		}
-		f.meta.section_style='Simple';
-
-		if(d.cur_frm) { 
-			d.cur_frm.hide(); 
-		}
 		
-		if(dt==cdt) {
-			_f.dialog_stack.push(f.parent);
-		}
-		f.show(dn, null, d.dialog.body_wrapper, 1);
-	
 		d.cur_frm = f;
 		d.dn = dn;
-		d.from_grid = from_grid;
-		d.on_save_callback = on_save_callback;
+		d.table_form = f.meta.istable;
 		
-		// calling record
-		d.cdt = cdt;
-		d.cdn = cdn;
-		d.cnic = cnic
-		
-		if(from_grid)
-			d.dialog.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
-		else
-			d.dialog.set_title(dt + ': ' + dn);
-		d.dialog.show();
-		_f.frm_dialog = d;
+		// show the form
+		f.refresh(dn);
 	}
 
 	// load
 	if(!frms[dt]) {
-		_f.add_frm(dt, show_dialog, null, d.dialog.body_wrapper);
+		_f.add_frm(dt, show_dialog, null);
 	} else {
 		show_dialog();
 	}
@@ -96,8 +41,8 @@ _f.edit_record = function(dt, dn, from_grid, on_save_callback, cdt, cdn, cnic) {
 _f.Frm = function(doctype, parent) {
 	this.docname = '';
 	this.doctype = doctype;
-	this.dispnot_in_containerlay = 0;
-	this.not_in_container = false;
+	this.display = 0;
+		
 	var me = this;
 	this.is_editable = {};
 	this.opendocs = {};
@@ -218,14 +163,18 @@ _f.Frm.prototype.email_doc = function() {
 
 _f.Frm.prototype.set_heading = function() {
 	var me = this;
+	var ph = this.frm_head.page_head
+
+	// nothing if table
+	if(this.meta.istable) return;
 
 	// main title
-	_f.frm_con.page_head.main_head.innerHTML = get_doctype_label(this.doctype);
+	ph.main_head.innerHTML = get_doctype_label(this.doctype);
 	
 	// sub title
-	_f.frm_con.page_head.sub_head.innerHTML = '';
+	ph.sub_head.innerHTML = '';
 	if(!this.meta.issingle)
-		_f.frm_con.page_head.sub_head.innerHTML = this.docname;
+		ph.sub_head.innerHTML = this.docname;
 
 	// status ---- in recent documents
 	var doc = locals[this.doctype][this.docname];
@@ -249,7 +198,7 @@ _f.Frm.prototype.set_heading = function() {
 		set_st('#0A1');
 		
 		// if submittable, show it
-		if(cur_frm.get_doc_perms()[SUBMIT]) {
+		if(this.get_doc_perms()[SUBMIT]) {
 			sp2 = make_span('To Be Submitted', '#888');
 		}
 	} else if(cint(doc.docstatus)==1) {
@@ -259,11 +208,6 @@ _f.Frm.prototype.set_heading = function() {
 		sp1 = make_span('Cancelled', '#F44');
 		set_st('#F44');
 	}
-	
-	//if(is_testing && this.meta.setup_test) {
-	//	sp2 = $a(null, 'span', '', {marginLeft:'4px',padding:'4px',color:'#FFF',backgroundColor:'#F88'})
-	//	sp2.innerHTML = 'Test Record';
-	//}
 	
 	// created & modified
 	var scrub_date = function(d) {
@@ -280,54 +224,21 @@ _f.Frm.prototype.set_heading = function() {
 	var sp3 = $a(null, 'span', '', {marginLeft:'8px',fontSize:'11px'});
 	sp3.innerHTML = created_str;
 
-	var t = _f.frm_con.page_head.tag_area;
+	// add the tags
+	var t = ph.tag_area;
 	t.innerHTML = '';
-	_f.frm_con.page_head.sub_head.appendChild(sp1);
-	if(sp2)_f.frm_con.page_head.sub_head.appendChild(sp2);
+	ph.sub_head.appendChild(sp1);
+	if(sp2)ph.sub_head.appendChild(sp2);
 	t.appendChild(sp3);
 	
-	// tweets
-	//_f.frm_con.comments_btn.innerHTML = 'Comments (' + cint(this.n_comments[this.docname]) + ')';
-	
-	// lst comment
-	//this.set_last_comment();	
-	// images
-	//set_user_img(_f.frm_con.owner_img, doc.owner);
-	//_f.frm_con.owner_img.title = created_str;
-
-	// _f.frm_con.last_update_area.innerHTML = '';
-	//$dh(_f.frm_con.mod_img);
-	//if(doc.modified_by) {
-	//	_f.frm_con.last_update_area.innerHTML = scrub_date(doc.modified ? doc.modified:'') + ' <span class="link_type" style="margin-left: 8px; font-size: 10px;" onclick="msgprint(\''+created_str.replace('/','<br>')+'\')">Details</span>';
-	//	if(doc.owner != doc.modified_by) {
-	//		$di(_f.frm_con.mod_img);
-	//		set_user_img(_f.frm_con.mod_img, doc.modified_by);
-	//		_f.frm_con.mod_img.title = created_str;
-	//	}
-	//}
-	
+	// hide or show
 	if(this.heading){
-		if(this.meta.hide_heading || this.not_in_container) 
-			$dh(_f.frm_con.head_div);
+		if(this.meta.hide_heading || this.meta.istable) 
+			this.frm_head.hide();
 		else 
-			$ds(_f.frm_con.head_div);
+			this.frm_head.show();
 	}
 }
-
-/* _f.Frm.prototype.set_last_comment = function() {
-	var lc = this.last_comments[this.docname]
-
-	// last comment
-	if(lc && lc[2]) { 
-		_f.frm_con.last_comment.comment.innerHTML = 'Last Comment: <b>'+lc[2]+'</b><div id="comment" style="font-size:11px">By '+lc[1]+' on '+dateutil.str_to_user(lc[0])+'</div>'; 
-		$ds(_f.frm_con.last_comment); 
-		
-		// image
-		set_user_img(_f.frm_con.last_comment.img, lc[1]);
-	} else { 
-		$dh(_f.frm_con.last_comment); 
-	}
-} */
 
 
 // PAGING
@@ -391,13 +302,10 @@ _f.Frm.prototype.setup_meta = function() {
 }
 
 _f.Frm.prototype.setup_std_layout = function() {
-	if(this.not_in_container) $w(this.form_wrapper, '500px');
+	if(this.meta.in_dialog) $w(this.form_wrapper, '500px');
 	//else $w(this.wrapper, pagewidth + 'px');
 	
-	// headings
-	this.header = $a(this.form_wrapper, 'div', 'frm_header');
-	//this.heading = $a(this.header, 'div', 'frm_heading');
-	this.tab_wrapper = $a(this.header, 'div'); $dh(this.tab_wrapper);
+	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
 
 	if(this.meta.section_style=='Tray') {
 		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
@@ -413,6 +321,12 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// layout
 	this.layout = new Layout(this.body, '100%');
 	
+	// header
+	this.frm_head = new _f.FrmHeader(this.head);
+	
+	// hide close btn for dialog rendering
+	if(this.meta.in_dialog) $dh(this.frm_head.page_head.close_btn);
+	
 	// setup tips area
 	this.setup_tips();
 	
@@ -427,6 +341,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// create fields
 	this.setup_fields_std();
 }
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.setup_fields_std = function() {
 	var fl = fields_list[this.doctype]; 
@@ -465,6 +381,8 @@ _f.Frm.prototype.setup_fields_std = function() {
 	}
 }
 
+// --------------------------------------------------------------------------------------
+
 _f.Frm.prototype.setup_template_layout = function() {
 	this.body = $a(this.form_wrapper, 'div');
 	this.layout = null;
@@ -493,14 +411,18 @@ _f.Frm.prototype.setup_template_layout = function() {
 	}
 }
 
+// --------------------------------------------------------------------------------------
+
 _f.Frm.prototype.setup_client_script = function() {
 	// setup client obj
 	if(this.meta.client_script_core || this.meta.client_script || this.meta._client_script) {
 		this.runclientscript('setup', this.doctype, this.docname);
 	}
-	this.script_setup = 1;
 }
 
+// --------------------------------------------------------------------------------------
+
+// change the parent - deprecated
 _f.Frm.prototype.set_parent = function(parent) {
 	if(parent) {
 		this.parent = parent;
@@ -517,6 +439,8 @@ _f.Frm.prototype.setup_print_layout = function() {
 		this.print_body = $a(this.print_wrapper, 'div', 'frm_print_wrapper');
 	}
 }
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_print_layout = function() {
 	$ds(this.print_wrapper);
@@ -539,7 +463,11 @@ _f.Frm.prototype.setup = function() {
 	this.fields = [];
 	this.fields_dict = {};
 
-	this.wrapper = $a(this.parent, 'div', 'frm_wrapper');
+	// wrapper
+	this.wrapper = $a(this.parent.body, 'div', 'frm_wrapper');
+
+	// head
+	this.head = $a(this.wrapper, 'div', 'frm_header');
 
 	// tips
 	this.tip_wrapper = $a(this.wrapper, 'div');
@@ -562,9 +490,13 @@ _f.Frm.prototype.setup = function() {
 	if(this.meta.allow_attach)
 		this.setup_attach();
 
+	// client script must be called after "setup" - there are no fields_dict attached to the frm otherwise
+	this.setup_client_script();
+	
 	this.setup_done = true;
 }
 
+// SHOW!
 // ======================================================================================
 
 _f.Frm.prototype.hide = function() {
@@ -573,33 +505,36 @@ _f.Frm.prototype.hide = function() {
 	hide_autosuggest();
 }
 
-_f.Frm.prototype.show = function(docname, from_refresh, parent, not_in_container) {
-	this.not_in_container = not_in_container;
-	
-	if(!from_refresh && !this.not_in_container && cur_frm && cur_frm != this) {
-		this.defocus_rest();
-		cur_frm.hide();
-	}
-	if(docname)
-		this.docname = docname;
+// --------------------------------------------------------------------------------------
 
-	if(!from_refresh && parent) {
-		this.set_parent(parent);
+_f.Frm.prototype.show_the_frm = function() {
+	// hide other (open) forms
+	if(this.parent.last_displayed && this.parent.last_displayed != this) {
+		this.parent.last_displayed.defocus_rest();
+		this.parent.last_displayed.hide();
 	}
 
+	// show the form
 	if(this.wrapper && this.wrapper.style.display.toLowerCase()=='none') {
 		$ds(this.wrapper);
 		this.display = 1;
 	}
 
-	if(!this.not_in_container) 
+	// set cur_frm - used subsequently in client scripts (not table_froms)
+	if(!this.meta.istable) 
 		cur_frm = this;
-
-	if(!from_refresh)
-		this.refresh();
-		
-	scroll(0,0);
+	
+	// show the dialog
+	if(this.meta.in_dialog && !this.parent.dialog.display) {
+		if(!this.meta.istable)
+			this.parent.table_form = false;
+		this.parent.dialog.show();
+	}
+	
+	this.parent.last_displayed = this;
 }
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.defocus_rest = function() {
 	// deselect others
@@ -628,12 +563,17 @@ _f.Frm.prototype.get_doc_perms = function() {
 
 // refresh
 // ======================================================================================
-_f.Frm.prototype.refresh_container = function() {
+_f.Frm.prototype.refresh_header = function() {
 	// set title
-	set_title(this.meta.issingle ? this.doctype : this.docname);
+	// main title
+	if(this.meta.in_dialog) {
+		_f.frm_dialog.dialog.set_title(cur_frm.doctype + ': ' + cur_frm.docname);
+	} else {
+		set_title(this.meta.issingle ? this.doctype : this.docname);	
+	}	
 
 	// show / hide buttons
-	_f.frm_con.refresh_toolbar();
+	this.frm_head.refresh_toolbar();
 	
 	// add to recent
 	if(page_body.wntoolbar) page_body.wntoolbar.rdocs.add(this.doctype, this.docname, 1);
@@ -642,59 +582,73 @@ _f.Frm.prototype.refresh_container = function() {
 	this.set_heading();
 }
 
-_f.Frm.prototype.refresh = function(no_script) {
+// --------------------------------------------------------------------------------------
+
+_f.Frm.prototype.check_doc_perm = function() {
+	// get perm
+	var dt = this.parent_doctype?this.parent_doctype : this.doctype;
+	var dn = this.parent_docname?this.parent_docname : this.docname;
+	this.perm = get_perm(dt, dn);
+				  
+	if(!this.perm[0][READ]) { 
+		if(user=='Guest') {
+			msgprint('You must log in to view this page');
+		} else {
+			msgprint('No Read Permission');
+		}
+		nav_obj.show_last_open();
+		return 0;
+	}
+	return 1
+}
+
+// --------------------------------------------------------------------------------------
+
+_f.Frm.prototype.refresh = function(docname) {
+	// record switch
+	if(docname) {
+		if(this.docname != docname) scroll(0, 0);
+		this.docname = docname;
+	}
+	cur_frm = this;
+	
 	if(this.docname) { // document to show
 
-		// get perm
-		var dt = this.parent_doctype?this.parent_doctype : this.doctype;
-		var dn = this.parent_docname?this.parent_docname : this.docname;
-		this.perm = get_perm(dt, dn);
-				  
-	  	if(!this.perm[0][READ]) { 
-			if(user=='Guest') {
-				msgprint('You must log in to view this page');
-			} else {
-				msgprint('No Read Permission');
-			}
-	 		nav_obj.show_last_open(); 
-	  		return; 
-	  	}
+		// check permissions
+		if(!this.check_doc_perm()) return;
 
 		// do setup
 		if(!this.setup_done) this.setup();
 
-		// client script must be called after "setup" - there are no fields_dict attached to the frm otherwise
-		if(!this.script_setup)
-			this.setup_client_script();
-
-		this.runclientscript('set_perm',dt,dn);
+		// set customized permissions for this record
+		this.runclientscript('set_perm',this.doctype, this.docname);
 	
-		// set doc
+		// set the doc
 		this.doc = get_local(this.doctype, this.docname);	  
-		  
-		if(!this.opendocs[this.docname]) {
-			this.setnewdoc(this.docname);
-		}
+		
+		// load the record for the first time, if not loaded (call 'onload')
+		if(!this.opendocs[this.docname]) { this.setnewdoc(this.docname); }
 
 		// editable
 		if(this.doc.__islocal) 
 			this.is_editable[this.docname] = 1; // new is editable
 		this.editable = this.is_editable[this.docname];
 		
-		if(this.editable || (!this.editable && this.not_in_container)) {
-			// show form wrapper
+		if(this.editable || (!this.editable && this.meta.istable)) {
+			// show form layout (with fields etc)
+			// ----------------------------------
 			if(this.print_wrapper) {
 				$dh(this.print_wrapper);
 				$ds(this.form_wrapper);
 			}
 
-	 		if(!no_script) this.runclientscript('refresh');
+	 		this.runclientscript('refresh');
 
-			if(!this.not_in_container) {				
-				this.refresh_container();
+			if(!this.meta.istable) {				
+				this.refresh_header();
 			}
 
-			// refresh fields		
+			// refresh fields
 			this.refresh_tabs();
 			this.refresh_fields();
 			this.refresh_dependency();
@@ -704,8 +658,9 @@ _f.Frm.prototype.refresh = function(no_script) {
 			if(this.layout) this.layout.show();
 		
 		} else {
-			// show print wrapper
-			this.refresh_container();
+			// show print layout
+			// ----------------------------------
+			this.refresh_header();
 			if(this.print_wrapper) {
 				this.refresh_print_layout();
 			}
@@ -713,14 +668,15 @@ _f.Frm.prototype.refresh = function(no_script) {
 		}
 		
 		// show the record
-		if(!this.display) this.show(this.docname, 1, null, this.not_in_container);
+		if(!this.display) this.show_the_frm();
 		
 		// show the page
-		page_body.change_to('Forms');
+		if(!this.meta.in_dialog)page_body.change_to('Forms');
 
 	} 
-	//set_frame_dims();
 }
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_tabs = function() {
 	var me = this;
@@ -732,6 +688,8 @@ _f.Frm.prototype.refresh_tabs = function() {
 		me.set_section(me.cur_section[me.docname]);
 	}
 }
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_fields = function() {
 	var me = this;
@@ -746,6 +704,8 @@ _f.Frm.prototype.refresh_fields = function() {
 	// cleanup activities after refresh
 	me.cleanup_refresh(me);
 }
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.cleanup_refresh = function() {
 	var me = this;
@@ -770,6 +730,9 @@ _f.Frm.prototype.cleanup_refresh = function() {
 		set_field_permlevel(fn,1); // make it readonly / hidden
 	}
 }
+
+// Resolve "depends_on" and show / hide accordingly
+// ======================================================================================
 
 _f.Frm.prototype.refresh_dependency = function() {
 	var me = this;
@@ -816,7 +779,7 @@ _f.Frm.prototype.refresh_dependency = function() {
 		if(f.df.depends_on) {
 			var v = d[f.df.depends_on];
 			if(f.df.depends_on.substr(0,3)=='fn:') {
-				f.guardian_has_value = cur_frm.runclientscript(f.df.depends_on.substr(3), cur_frm.doctype, cur_frm.docname);
+				f.guardian_has_value = me.runclientscript(f.df.depends_on.substr(3), me.doctype, me.docname);
 			} else {
 				if(v || (v==0 && !v.substr)) { 
 					// guardian has value
@@ -858,8 +821,7 @@ _f.Frm.prototype.setnewdoc = function(docname) {
 	var me = this;
 	
 	var viewname = docname;
-	if(this.meta.issingle)
-		viewname = this.doctype;
+	if(this.meta.issingle) viewname = this.doctype;
 
 	var iconsrc = 'page.gif';
 	if(this.meta.smallicon) 
@@ -869,23 +831,20 @@ _f.Frm.prototype.setnewdoc = function(docname) {
 	this.runclientscript('onload', this.doctype, this.docname);
 	
 	this.is_editable[docname] = 1;
-	if(this.meta.read_only_onload)
-		this.is_editable[docname] = 0;
+	if(this.meta.read_only_onload) this.is_editable[docname] = 0;
 		
 	// Section Type
-	if(this.meta.section_style=='Tray'||this.meta.section_style=='Tabbed') {
-		this.cur_section[docname] = 0;
-	}
+	if(this.meta.section_style=='Tray'||this.meta.section_style=='Tabbed') { this.cur_section[docname] = 0; }
 
-	if(this.meta.allow_attach)
-		this.set_attachments();
+	// set record attachments
+	if(this.meta.allow_attach) this.set_attachments();
 
 	this.opendocs[docname] = true;
 }
 
 _f.Frm.prototype.edit_doc = function() {
 	// set fields
-	this.is_editable[cur_frm.docname] = true;
+	this.is_editable[this.docname] = true;
 	this.refresh();
 }
 
@@ -929,7 +888,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 	} else { // no validation for cancellation
 		validated = true;
 		validation_message = '';
-		this.runclientscript('validate', cur_frm.doctype, cur_frm.docname);
+		this.runclientscript('validate', this.doctype, this.docname);
 	
 		if(!validated) {
 			if(validation_message)
@@ -941,8 +900,8 @@ _f.Frm.prototype.save = function(save_action, call_back) {
  	
 	
 	var ret_fn = function(r) {
-		if(!cur_frm.not_in_container)
-			cur_frm.refresh();
+		if(!me.meta.istable)
+			me.refresh();
 
 		if(call_back){
 			if(call_back == 'home'){ loadpage('_home'); return; }
@@ -975,7 +934,7 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 		$c('runserverobj', {'docs':doclist, 'method':scriptname }, 
 			function(r, rtxt) { 
 				if(onrefresh)onrefresh(r,rtxt);
-				me.show();
+				me.show_the_frm();
 				if(callingfield)callingfield.input.disabled = false;
 				//if(r.message)alert(r.message);
 			}
@@ -1017,10 +976,10 @@ _f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 		
 		// ---Client String----
 		if(doctype.client_string) { // split client string
-			cur_frm.cstring = {};
+			me.cstring = {};
 			var elist = doctype.client_string.split('---');
 			for(var i=1;i<elist.length;i=i+2) {
-				cur_frm.cstring[strip(elist[i])] = elist[i+1];
+				me.cstring[strip(elist[i])] = elist[i+1];
 			}
 		}
 	}
@@ -1129,17 +1088,17 @@ _f.Frm.prototype.savedoc = function(save_action, onsave, onerr) {
 }
 
 _f.Frm.prototype.savesubmit = function() {
-	var answer = confirm("Permanently Submit "+cur_frm.docname+"?");
+	var answer = confirm("Permanently Submit "+this.docname+"?");
 	if(answer) this.save('Submit');
 }
 
 _f.Frm.prototype.savecancel = function() {
-	var answer = confirm("Permanently Cancel "+cur_frm.docname+"?");
+	var answer = confirm("Permanently Cancel "+this.docname+"?");
 	if(answer) this.save('Cancel');
 }
 
 _f.Frm.prototype.savetrash = function() {
-	var answer = confirm("Permanently moved to Trash: "+cur_frm.docname+"?");
+	var answer = confirm("Permanently moved to Trash: "+this.docname+"?");
 	if(answer) this.save('Trash');
 }
 

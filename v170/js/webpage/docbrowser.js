@@ -40,7 +40,7 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 		if(in_list(profile.can_create,dt)) {
 			var d = $a($a(w,'div','',{marginBottom:'16px'}),'span');
 			d.dt = dt;
-			$(d).html('+ New ' + dt).css('background-color','#039').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').css('-moz-border-radius','5px').css('-webkit-border-radius','5px').click( function() { newdoc(this.dt); } );
+			$(d).html('+ New ' + label).css('background-color','#039').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').css('-moz-border-radius','5px').css('-webkit-border-radius','5px').click( function() { newdoc(this.dt); } );
 		}
 
 

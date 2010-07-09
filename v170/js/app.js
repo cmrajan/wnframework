@@ -98,6 +98,9 @@ function startup() {
 function to_open() {
 	if(get_url_arg('page'))
 		return get_url_arg('page');
+	if(location.hash) {
+		return location.hash.substr(1);
+	}
 }
 
 function logout() {

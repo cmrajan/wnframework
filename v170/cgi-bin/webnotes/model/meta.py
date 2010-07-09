@@ -41,7 +41,7 @@ def get_parent_dt(dt):
 #=================================================================================
 
 def set_fieldname(field_id, fieldname):
-	webnots.conn.set_value('DocField', field_id, 'fieldname', fieldname)
+	webnotes.conn.set_value('DocField', field_id, 'fieldname', fieldname)
 
 #=================================================================================
 

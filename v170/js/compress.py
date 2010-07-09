@@ -41,6 +41,7 @@ out_file_main = 'wnf.compressed.js'
 
 in_files_form = [
 	 'widgets/form/form_container.js'
+	,'widgets/form/form_header.js'
 	,'widgets/form/form.js'
 	,'widgets/form/form_fields.js'
 	,'widgets/form/grid.js'
