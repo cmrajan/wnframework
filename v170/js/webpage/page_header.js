@@ -1,6 +1,16 @@
-// Header.js
-// standard page header
-// -----------------------------
+/* standard page header
+
+	+ wrapper
+		+ [table]
+			+ [r1c1] 
+				+ main_head
+				+ sub_head
+			+ [r1c2] 
+				+ close_btn
+		+ seperator
+		+ toolbar_area
+		+ tag_area
+*/
 
 var def_ph_style = {
 	wrapper: {marginBottom:'16px'}

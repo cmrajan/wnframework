@@ -7,6 +7,8 @@
 			+ this.form_wrapper
 				+ this.tab_wrapper
 				+ this.body
+					+ this.layout
+					+ this.footer
 			+ this.print_wrapper
 */
 
@@ -159,86 +161,11 @@ _f.Frm.prototype.email_doc = function() {
 	_e.dialog.show();
 }
 
+// refresh the heading labels
 // ======================================================================================
 
 _f.Frm.prototype.set_heading = function() {
-	var me = this;
-
-	// nothing if table
-	if(this.meta.istable) return;
-	
-	var ph = this.frm_head.page_head
-
-	// main title
-	ph.main_head.innerHTML = get_doctype_label(this.doctype);
-	
-	// sub title
-	ph.sub_head.innerHTML = '';
-	if(!this.meta.issingle)
-		ph.sub_head.innerHTML = this.docname;
-
-	// status ---- in recent documents
-	var doc = locals[this.doctype][this.docname];
-	var tn = $i('rec_'+this.doctype+'-'+this.docname);
-	var set_st = function(col) { if(tn)$bg(tn,col); }
-	var make_span = function(label, col) {
-		var s= $a(null, 'span', '', {padding: '2px', backgroundColor:col, color:'#FFF', fontWeight:'bold', marginLeft:(me.meta.issingle ? '0px' : '8px'), fontSize:'11px'});
-		s.innerHTML = label;
-		return s;
-	}
-
-	var sp1 = null; var sp2 = null;
-	if(doc.__islocal) {
-		sp1 = make_span('Unsaved Draft', '#F81');
-		set_st('#f81');
-	} else if(doc.__unsaved) {
-		sp1 = make_span('Not Saved', '#F81');
-		set_st('#f81');
-	} else if(cint(doc.docstatus)==0) {
-		sp1 = make_span('Saved', '#0A1');
-		set_st('#0A1');
-		
-		// if submittable, show it
-		if(this.get_doc_perms()[SUBMIT]) {
-			sp2 = make_span('To Be Submitted', '#888');
-		}
-	} else if(cint(doc.docstatus)==1) {
-		sp1 = make_span('Submitted', '#44F');
-		set_st('#44F');
-	} else if(cint(doc.docstatus)==2) {
-		sp1 = make_span('Cancelled', '#F44');
-		set_st('#F44');
-	}
-	
-	// created & modified
-	var scrub_date = function(d) {
-		if(d)t=d.split(' ');else return '';
-		return dateutil.str_to_user(t[0]) + ' ' + t[1];
-	}
-	
-	var created_str = repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s</span>", 
-		{c_by:doc.owner
-		,c_on:scrub_date(doc.creation ? doc.creation:'')
-		,m_by:doc.modified_by?('/ Modified: '+doc.modified_by):''
-		,m_on:doc.modified ? ('on '+scrub_date(doc.modified)) : ''} );
-	
-	var sp3 = $a(null, 'span', '', {marginLeft:'8px',fontSize:'11px'});
-	sp3.innerHTML = created_str;
-
-	// add the tags
-	var t = ph.tag_area;
-	t.innerHTML = '';
-	ph.sub_head.appendChild(sp1);
-	if(sp2)ph.sub_head.appendChild(sp2);
-	t.appendChild(sp3);
-	
-	// hide or show
-	if(this.frm_head){
-		if(this.meta.hide_heading || this.meta.istable) 
-			this.frm_head.hide();
-		else 
-			this.frm_head.show();
-	}
+	if(!this.meta.istable) this.frm_head.refresh_labels(this);
 }
 
 
@@ -322,6 +249,9 @@ _f.Frm.prototype.setup_std_layout = function() {
 
 	// layout
 	this.layout = new Layout(this.body, '100%');
+	
+	// footer
+	this.footer = $a(this.body, 'div', '', {margin:'8px 0px'});
 	
 	// header
 	if(!this.meta.istable) this.frm_head = new _f.FrmHeader(this.head);

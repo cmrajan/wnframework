@@ -73,6 +73,9 @@ _f.FrmHeader.prototype.refresh= function() {
 _f.FrmHeader.prototype.show_toolbar = function() { $ds(this.wrapper); this.refresh(); }
 _f.FrmHeader.prototype.hide_toolbar = function() { $dh(this.wrapper); }
 
+// refresh toolbar
+// -------------------------------------------------------------------
+
 _f.FrmHeader.prototype.refresh_toolbar = function() {
 	var m = cur_frm.meta;
 	
@@ -89,4 +92,101 @@ _f.FrmHeader.prototype.refresh_toolbar = function() {
 			this.show_toolbar();
 		}
 	}
+}
+
+// refresh heading and labels
+// -------------------------------------------------------------------
+
+_f.FrmHeader.prototype.get_timestamp = function(doc) {
+	var scrub_date = function(d) {
+		if(d)t=d.split(' ');else return '';
+		return dateutil.str_to_user(t[0]) + ' ' + t[1];
+	}
+	
+	return repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s</span>", 
+		{c_by:doc.owner
+		,c_on:scrub_date(doc.creation ? doc.creation:'')
+		,m_by:doc.modified_by?('/ Modified: '+doc.modified_by):''
+		,m_on:doc.modified ? ('on '+scrub_date(doc.modified)) : ''} );
+}
+
+// make the status tag
+// -------------------------------------------------------------------
+
+_f.FrmHeader.prototype.get_status_tags = function(doc, f) {
+
+	var make_tag = function(label, col) {
+		var s= $a(null, 'span', '', {padding: '2px', backgroundColor:col, color:'#FFF', fontWeight:'bold', marginLeft:(f.meta.issingle ? '0px' : '8px'), fontSize:'11px'});
+		s.innerHTML = label;
+		return s;
+	}
+
+	var sp1 = null; var sp2 = null;
+	if(doc.__islocal) {
+		label = 'Unsaved Draft'; col = '#F81';
+
+	} else if(doc.__unsaved) {
+		label = 'Not Saved'; col = '#F81';
+
+	} else if(cint(doc.docstatus)==0) {
+		label = 'Saved'; col = '#0A1';
+
+		// if submittable, show it
+		if(f.get_doc_perms()[SUBMIT]) {
+			sp2 = make_tag('To Be Submitted', '#888');
+		}
+
+	} else if(cint(doc.docstatus)==1) {
+		label = 'Submitted'; col = '#44F';
+
+	} else if(cint(doc.docstatus)==2) {
+		label = 'Cancelled'; col = '#F44';
+	}
+
+	sp1 = make_tag(label, col);
+	this.set_in_recent(doc, col);
+
+	return [sp1, sp2];
+}
+
+// refresh "recent" tag colour
+// -------------------------------------------------------------------
+
+_f.FrmHeader.prototype.set_in_recent = function(doc, col) {
+	var tn = $i('rec_'+doc.doctype+'-'+doc.docname);
+	if(tn)
+		$y(tn,{backgroundColor:col}); 
+}
+
+
+// refresh the labels!
+// -------------------------------------------------------------------
+
+_f.FrmHeader.prototype.refresh_labels = function(f) {
+	var ph = this.page_head;
+	
+	// main title
+	ph.main_head.innerHTML = get_doctype_label(f.doctype);
+	
+	// sub title
+	ph.sub_head.innerHTML = '';
+	if(!f.meta.issingle)
+		ph.sub_head.innerHTML = f.docname;
+
+	// get the doc
+	var doc = locals[f.doctype][f.docname];
+	
+	// get the tags
+	var sl = this.get_status_tags(doc, f)
+
+	// add the tags
+	var t = ph.tag_area;
+	t.innerHTML = '';
+	ph.sub_head.appendChild(sl[0]);
+	if(sl[1])ph.sub_head.appendChild(sl[1]);
+
+	// timestamp
+	var ts = $a(null, 'span', '', {marginLeft:'8px',fontSize:'11px'});
+	ts.innerHTML = this.get_timestamp(doc);	
+	t.appendChild(ts);
 }
