@@ -66,9 +66,7 @@ PageHeader.prototype.show_toolbar = function() {
 	$ds(this.toolbar_area);
 	
 	if(!isIE) {
-		$(this.toolbar_area).css('background','-webkit-gradient(linear, left top, left bottom, from(#EEF), to(#DDF))')
-			.css('background','-moz-linear-gradient(top, #EEF, #DDF)')
-			.css('border','1px solid #CCCCFF')
+		$(this.toolbar_area)
 			.css('-moz-border-radius','5px')
 			.css('-webkit-border-radius','5px');
 	}

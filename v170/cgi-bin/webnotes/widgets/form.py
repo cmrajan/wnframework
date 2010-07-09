@@ -398,5 +398,11 @@ def get_fields():
 def validate_link():
 	import webnotes
 	value, options = webnotes.form.getvalue('value'), webnotes.form.getvalue('options')
+
+	# no options, don't validate
+	if not options:
+		webnotes.msgprint("Warning: No Options specified for the link field")
+		return
+		
 	if webnotes.conn.sql("select name from `tab%s` where name=%s" % (options, '%s'), value):
 		webnotes.response['message'] = 'Ok'

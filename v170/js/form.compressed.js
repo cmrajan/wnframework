@@ -69,9 +69,10 @@ this.clear_tip=function(){me.c1.innerHTML='';$dh(me.tip_box);}
 $dh(this.tip_box);}
 _f.Frm.prototype.setup_meta=function(){this.meta=get_local('DocType',this.doctype);this.perm=get_perm(this.doctype);this.setup_print();}
 _f.Frm.prototype.setup_std_layout=function(){if(this.meta.in_dialog)$w(this.form_wrapper,'500px');this.tab_wrapper=$a(this.form_wrapper,'div');$dh(this.tab_wrapper);if(this.meta.section_style=='Tray'){var t=$a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});var r=t.insertRow(0);var c=r.insertCell(0);c.className='frm_tray_area';this.tray_area=c;this.body=$a(r.insertCell(1),'div','frm_body');}else{this.body=$a(this.form_wrapper,'div','frm_body');}
-this.layout=new Layout(this.body,'100%');this.footer=$a(this.body,'div','',{margin:'8px 0px'});if(!this.meta.istable)this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable))
+this.layout=new Layout(this.body,'100%');this.setup_footer();if(!this.meta.istable)this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable))
 this.setup_tabs();if(this.meta.colour)
 this.layout.wrapper.style.backgroundColor='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
+_f.Frm.prototype.setup_footer=function(){this.footer=$a(this.body,'div','',{margin:'8px 0px'});var b=$a(this.footer,'button');b.innerHTML='<h3>Save</h3>';$(b).button();b.onclick=function(){cur_frm.save('Save');}}
 _f.Frm.prototype.setup_fields_std=function(){var fl=fields_list[this.doctype];fl.sort(function(a,b){return a.idx-b.idx});if(fl[0]&&fl[0].fieldtype!="Section Break"){this.layout.addrow();if(fl[0].fieldtype!="Column Break"){var c=this.layout.addcell();$y(c.wrapper,{padding:'8px'});}}
 var sec;for(var i=0;i<fl.length;i++){var f=fl[i];var fn=f.fieldname?f.fieldname:f.label;var fld=make_field(f,this.doctype,this.layout.cur_cell,this);this.fields[this.fields.length]=fld;this.fields_dict[fn]=fld;if(this.meta.section_style!='Simple')
 fld.parent_section=sec;if(f.fieldtype=='Section Break'&&f.options!='Simple')
@@ -105,11 +106,12 @@ if(!this.meta.istable)cur_frm=this;if(this.docname){if(!this.check_doc_perm())re
 if(this.doc.__islocal)
 this.is_editable[this.docname]=1;this.editable=this.is_editable[this.docname];if(this.editable||(!this.editable&&this.meta.istable)){if(this.print_wrapper){$dh(this.print_wrapper);$ds(this.form_wrapper);}
 this.runclientscript('refresh');if(!this.meta.istable){this.refresh_header();}
-this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();if(this.layout)this.layout.show();}else{this.refresh_header();if(this.print_wrapper){this.refresh_print_layout();}
+this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();this.refresh_footer();if(this.layout)this.layout.show();}else{this.refresh_header();if(this.print_wrapper){this.refresh_print_layout();}
 this.runclientscript('edit_status_changed');}
 if(!this.display)this.show_the_frm();if(!this.meta.in_dialog)page_body.change_to('Forms');}}
 _f.Frm.prototype.refresh_tabs=function(){var me=this;if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed'){for(var i in me.sections){me.sections[i].hide();}
 me.set_section(me.cur_section[me.docname]);}}
+_f.Frm.prototype.refresh_footer=function(){if(this.editable&&this.doc.docstatus==0&&!this.meta.istable)$ds(this.footer);else $dh(this.footer);}
 _f.Frm.prototype.refresh_fields=function(){var me=this;for(fkey in me.fields){var f=me.fields[fkey];f.perm=me.perm;f.docname=me.docname;if(f.refresh)f.refresh();}
 me.cleanup_refresh(me);}
 _f.Frm.prototype.cleanup_refresh=function(){var me=this;if(me.fields_dict['amended_from']){if(me.doc.amended_from){unhide_field('amended_from');unhide_field('amendment_date');}else{hide_field('amended_from');hide_field('amendment_date');}}
@@ -399,14 +401,12 @@ as.doAjaxRequest=function(txt){var pointer=as;var q='';var last_txt=txt.split(',
 as.createList(as.aSug);}
 $c('webnotes.utils.email_lib.get_contact_list',{'select':_e.email_as_field,'from':_e.email_as_dt,'where':_e.email_as_in,'txt':(last_txt?strip(last_txt):'%')},call_back);return;}
 var sel;_e.dialog=d;}
-_f.Frm.prototype.setup_attach=function(){var me=this;this.attach_area=$a(this.layout?this.layout.cur_row.wrapper:this.body,'div','attach_area');if(!this.meta.max_attachments)
-this.meta.max_attachments=10;var tab=$a($a(this.attach_area,'div'),'table');tab.insertRow(0);var label_area=tab.rows[0].insertCell(0);var main_area=tab.rows[0].insertCell(1);this.files_area=$a(main_area,'div');this.btn_area=$a(main_area,'div');$w(label_area,"33%");var d=$a(label_area,'div');var img=$a(d,'img','',{marginRight:'8px'});img.src='images/icons/paperclip.gif';$a(d,'span').innerHTML='File Attachments:';me.attach_msg=$a(label_area,'div','comment',{padding:'8px',fontSize:'11px'});me.attach_msg.innerHTML="Changes made to the attachments are not permanent until the document is saved";var btn_add_attach=$a(this.btn_area,'button');btn_add_attach.innerHTML='Add';btn_add_attach.onclick=function(){me.add_attachment();me.sync_attachments(me.docname);me.refresh_attachments();}}
-_f.Frm.prototype.refresh_attachments=function(){if(!this.perm[0][WRITE]){$dh(this.btn_area);}
-else{$ds(this.btn_area);}
-var nattach=0;for(var dn in this.attachments){for(var i in this.attachments[dn]){var a=this.attachments[dn][i];if(a.docname!=this.docname)
-a.hide();else{a.show();nattach++;if(this.perm[0][WRITE]&&this.editable){$ds(a.delbtn);}
+_f.Frm.prototype.setup_attach=function(){var me=this;this.attach_area=$a(this.layout?this.layout.cur_row.wrapper:this.body,'div','attach_area');$(this.attach_area).css('-moz-border-radius','5px').css('-webkit-border-radius','5px');if(!this.meta.max_attachments)
+this.meta.max_attachments=10;var tab=$a($a(this.attach_area,'div'),'table');tab.insertRow(0);var label_area=tab.rows[0].insertCell(0);var main_area=tab.rows[0].insertCell(1);this.files_area=$a(main_area,'div');this.btn_area=$a(main_area,'div');$w(label_area,"33%");var d=$a(label_area,'div');$a(d,'span').innerHTML='<h4>File Attachments:</h4>';me.attach_msg=$a(label_area,'div','comment',{padding:'8px',fontSize:'11px'});me.attach_msg.innerHTML="Changes made to the attachments are not permanent until the document is saved";var btn_add_attach=$a(this.btn_area,'button');btn_add_attach.innerHTML='Add';$(btn_add_attach).button();btn_add_attach.onclick=function(){me.add_attachment();me.sync_attachments(me.docname);me.refresh_attachments();}}
+_f.Frm.prototype.refresh_attachments=function(){var nattach=0;for(var dn in this.attachments){for(var i in this.attachments[dn]){var a=this.attachments[dn][i];if(a.docname!=this.docname)
+a.hide();else{a.show();nattach++;if(this.perm[0][WRITE]&&this.editable&&this.doc.docstatus<1){$ds(a.delbtn);}
 else{$dh(a.delbtn);}}}}
-if(this.editable){if(nattach>=cint(this.meta.max_attachments))
+if(this.perm[0][WRITE]&&cint(this.doc.docstatus)==0){if(nattach>=cint(this.meta.max_attachments))
 $dh(this.btn_area);else
 $ds(this.btn_area);}else{$dh(this.btn_area);}}
 _f.Frm.prototype.set_attachments=function(){this.attachments[this.docname]=[];var atl=locals[this.doctype][this.docname].file_list;if(atl){atl=atl.split('\n');for(var i in atl){var a=atl[i].split(',');var ff=this.add_attachment(a[0],a[1]);}}}

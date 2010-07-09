@@ -251,8 +251,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 	this.layout = new Layout(this.body, '100%');
 	
 	// footer
-	this.footer = $a(this.body, 'div', '', {margin:'8px 0px'});
-	
+	this.setup_footer();
+		
 	// header
 	if(!this.meta.istable) this.frm_head = new _f.FrmHeader(this.head);
 	
@@ -272,6 +272,17 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 	// create fields
 	this.setup_fields_std();
+}
+
+// --------------------------------------------------------------------------------------
+
+_f.Frm.prototype.setup_footer = function() {
+	this.footer = $a(this.body, 'div', '', {margin:'8px 0px'});
+	
+	var b = $a(this.footer,'button');
+	b.innerHTML = '<h3>Save</h3>';
+	$(b).button();
+	b.onclick = function() { cur_frm.save('Save'); }
 }
 
 // --------------------------------------------------------------------------------------
@@ -570,17 +581,26 @@ _f.Frm.prototype.refresh = function(docname) {
 				$ds(this.form_wrapper);
 			}
 
+			// call trigger
 	 		this.runclientscript('refresh');
 
-			if(!this.meta.istable) {				
-				this.refresh_header();
-			}
-
-			// refresh fields
+			// header
+			if(!this.meta.istable) { this.refresh_header(); }
+			
+			// tabs
 			this.refresh_tabs();
+			
+			// fields
 			this.refresh_fields();
+			
+			// dependent fields
 			this.refresh_dependency();
+			
+			// attachments
 			if(this.meta.allow_attach) this.refresh_attachments();
+
+			// footer
+			this.refresh_footer();
 
 			// layout
 			if(this.layout) this.layout.show();
@@ -615,6 +635,13 @@ _f.Frm.prototype.refresh_tabs = function() {
 		
 		me.set_section(me.cur_section[me.docname]);
 	}
+}
+
+// --------------------------------------------------------------------------------------
+
+_f.Frm.prototype.refresh_footer = function() {
+	if(this.editable && this.doc.docstatus==0 && !this.meta.istable) $ds(this.footer);
+	else $dh(this.footer);
 }
 
 // --------------------------------------------------------------------------------------

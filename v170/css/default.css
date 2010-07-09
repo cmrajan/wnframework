@@ -344,8 +344,8 @@ div.frm_tray_head {
 
 div.attach_area {
 	padding: 8px;
-	margin: 8px;
-	border: 1px solid #AAA;
+	margin: 8px 0px;
+	background-color: #EEE;
 }
 
 div.attach_area table {

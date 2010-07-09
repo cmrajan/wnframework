@@ -449,7 +449,7 @@ this.close_btn.onclick=function(){nav_obj.show_last_open();}
 if(!isIE){$(this.close_btn).css('-moz-border-radius','4px').css('-webkit-border-radius','4px');}
 if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;}
 PageHeader.prototype.add_button=function(label,fn,bold,icon){var btn=$a(this.toolbar_area,'button');btn.innerHTML=label;btn.onclick=fn;if(bold)$y(btn,{fontWeight:'bold'});$(btn).button({icons:{primary:icon}});this.show_toolbar();return btn;}
-PageHeader.prototype.show_toolbar=function(){$dh(this.separator);$ds(this.toolbar_area);if(!isIE){$(this.toolbar_area).css('background','-webkit-gradient(linear, left top, left bottom, from(#EEF), to(#DDF))').css('background','-moz-linear-gradient(top, #EEF, #DDF)').css('border','1px solid #CCCCFF').css('-moz-border-radius','5px').css('-webkit-border-radius','5px');}}
+PageHeader.prototype.show_toolbar=function(){$dh(this.separator);$ds(this.toolbar_area);if(!isIE){$(this.toolbar_area).css('-moz-border-radius','5px').css('-webkit-border-radius','5px');}}
 PageHeader.prototype.clear_toolbar=function(){this.toolbar_area.innerHTML='';}
 PageHeader.prototype.make_buttonset=function(){$(this.toolbar_area).buttonset();}
 var cur_autosug;function hide_autosuggest(){if(cur_autosug)cur_autosug.clearSuggestions();}

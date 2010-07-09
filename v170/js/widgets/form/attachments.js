@@ -6,6 +6,10 @@ _f.Frm.prototype.setup_attach = function() {
 	var me = this;
 	
 	this.attach_area = $a(this.layout ? this.layout.cur_row.wrapper : this.body, 'div', 'attach_area');
+	$(this.attach_area)
+		.css('-moz-border-radius','5px')
+		.css('-webkit-border-radius','5px');
+
 	if(!this.meta.max_attachments)
 		this.meta.max_attachments = 10;
 	
@@ -19,8 +23,8 @@ _f.Frm.prototype.setup_attach = function() {
 
 	$w(label_area, "33%");
 	var d = $a(label_area, 'div');
-	var img = $a(d, 'img', '', {marginRight:'8px'}); img.src = 'images/icons/paperclip.gif';
-	$a(d, 'span').innerHTML = 'File Attachments:';
+	//var img = $a(d, 'img', '', {marginRight:'8px'}); img.src = 'images/icons/paperclip.gif';
+	$a(d, 'span').innerHTML = '<h4>File Attachments:</h4>';
 	
 	me.attach_msg = $a(label_area,'div','comment', {padding:'8px', fontSize:'11px'});
 	me.attach_msg.innerHTML = "Changes made to the attachments are not permanent until the document is saved";
@@ -28,6 +32,7 @@ _f.Frm.prototype.setup_attach = function() {
 	// button
 	var btn_add_attach = $a(this.btn_area, 'button');
 	btn_add_attach.innerHTML = 'Add';
+	$(btn_add_attach).button();
 	
 	btn_add_attach.onclick = function() {
 		me.add_attachment();
@@ -37,9 +42,8 @@ _f.Frm.prototype.setup_attach = function() {
 }
 
 _f.Frm.prototype.refresh_attachments = function() {
-	if(!this.perm[0][WRITE]) { $dh(this.btn_area); }
-	else { $ds(this.btn_area); }
 
+	// render attachments
 	var nattach = 0;
 	for(var dn in this.attachments) {
 		for(var i in this.attachments[dn]){
@@ -49,19 +53,23 @@ _f.Frm.prototype.refresh_attachments = function() {
 			else {
 				a.show();
 				nattach++;
-				if(this.perm[0][WRITE] && this.editable) { $ds(a.delbtn); }
+				
+				// show / hide delete button
+				if(this.perm[0][WRITE] && this.editable && this.doc.docstatus < 1) { $ds(a.delbtn); }
 				else { $dh(a.delbtn); }
 			}
 		}
 	}
-	if(this.editable) {
+	
+	// show / hide "Add" button
+	if(this.perm[0][WRITE] && cint(this.doc.docstatus)==0) { 
 		if(nattach >= cint(this.meta.max_attachments))
 			$dh(this.btn_area);
 		else
 			$ds(this.btn_area);
-	} else {
-		$dh(this.btn_area);
-	}
+	} else { 
+		$dh(this.btn_area); 
+	}	
 }
 
 _f.Frm.prototype.set_attachments = function() {
