@@ -38,12 +38,16 @@ function DateFn() {
 			last_date = 29;
 		return y+'-'+int_to_str(m,2)+'-'+last_date;
 	}
+	this.get_user_fmt = function() {
+		var t = locals['Control Panel']['Control Panel'].date_format;
+		if(!t) t = 'dd-mm-yyyy';
+		return t;
+	}
 	this.str_to_user = function(val, no_time_str) {
-		var user_fmt = locals['Control Panel']['Control Panel'].date_format;
+		var user_fmt = this.get_user_fmt();
 		var time_str = '';
 		//alert(user_fmt);
 		
-		if(!user_fmt) user_fmt = 'dd-mm-yyyy';
 		
 		if(val==null||val=='')return null;
 		
@@ -82,6 +86,8 @@ function DateFn() {
 		+ d.getHours()  + ':' + d.getMinutes()   + ':' + d.getSeconds();
 	}
 	this.user_to_str = function(d) {
+		var user_fmt = this.get_user_fmt();
+		
 		if(user_fmt=='dd-mm-yyyy') {
 			var d = d.split('-');
 			return  d[2]+'-'+d[1]+'-'+d[0];

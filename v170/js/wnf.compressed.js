@@ -62,7 +62,8 @@ this.add_days=function(d,days){d.setTime(d.getTime()+(days*24*60*60*1000));retur
 this.month_start=function(){var d=new Date();return d.getFullYear()+'-'+int_to_str(d.getMonth()+1,2)+'-01';}
 this.month_end=function(){var d=new Date();var m=d.getMonth()+1;var y=d.getFullYear();last_date=month_last[m];if(m==2&&(y%4)==0&&((y%100)!=0||(y%400)==0))
 last_date=29;return y+'-'+int_to_str(m,2)+'-'+last_date;}
-this.str_to_user=function(val,no_time_str){var user_fmt=locals['Control Panel']['Control Panel'].date_format;var time_str='';if(!user_fmt)user_fmt='dd-mm-yyyy';if(val==null||val=='')return null;if(val.search(':')!=-1){var tmp=val.split(' ');if(tmp[1])
+this.get_user_fmt=function(){var t=locals['Control Panel']['Control Panel'].date_format;if(!t)t='dd-mm-yyyy';return t;}
+this.str_to_user=function(val,no_time_str){var user_fmt=this.get_user_fmt();var time_str='';if(val==null||val=='')return null;if(val.search(':')!=-1){var tmp=val.split(' ');if(tmp[1])
 time_str=' '+tmp[1];var d=tmp[0];}else{var d=val;}
 if(no_time_str)time_str='';d=d.split('-');if(d.length==3){if(user_fmt=='dd-mm-yyyy')
 val=d[2]+'-'+d[1]+'-'+d[0]+time_str;else if(user_fmt=='dd/mm/yyyy')
@@ -73,7 +74,7 @@ val=d[1]+'-'+d[2]+'-'+d[0]+time_str;}
 return val;}
 this.full_str=function(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+' '
 +d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();}
-this.user_to_str=function(d){if(user_fmt=='dd-mm-yyyy'){var d=d.split('-');return d[2]+'-'+d[1]+'-'+d[0];}
+this.user_to_str=function(d){var user_fmt=this.get_user_fmt();if(user_fmt=='dd-mm-yyyy'){var d=d.split('-');return d[2]+'-'+d[1]+'-'+d[0];}
 else if(user_fmt=='dd/mm/yyyy'){var d=d.split('/');return d[2]+'-'+d[1]+'-'+d[0];}
 else if(user_fmt=='yyyy-mm-dd'){return d;}
 else if(user_fmt=='mm/dd/yyyy'){var d=d.split('/');return d[2]+'-'+d[0]+'-'+d[1];}

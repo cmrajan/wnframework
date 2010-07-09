@@ -1,14 +1,14 @@
-// Form page structure
-//
-// + this.parent (either FormContainer or Dialog)
-// 		+ this.wrapper
-//			+ this.head
-//			+ this.tip_wrapper
-//			+ this.form_wrapper
-//			|	+ this.tab_wrapper
-//			|	+ this.body
-//			+ this.print_wrapper
+/* Form page structure
 
+	+ this.parent (either FormContainer or Dialog)
+ 		+ this.wrapper
+			+ this.head
+			+ this.tip_wrapper
+			+ this.form_wrapper
+				+ this.tab_wrapper
+				+ this.body
+			+ this.print_wrapper
+*/
 
 // called from table edit
 _f.edit_record = function(dt, dn) {
@@ -163,10 +163,11 @@ _f.Frm.prototype.email_doc = function() {
 
 _f.Frm.prototype.set_heading = function() {
 	var me = this;
-	var ph = this.frm_head.page_head
 
 	// nothing if table
 	if(this.meta.istable) return;
+	
+	var ph = this.frm_head.page_head
 
 	// main title
 	ph.main_head.innerHTML = get_doctype_label(this.doctype);
@@ -232,7 +233,7 @@ _f.Frm.prototype.set_heading = function() {
 	t.appendChild(sp3);
 	
 	// hide or show
-	if(this.heading){
+	if(this.frm_head){
 		if(this.meta.hide_heading || this.meta.istable) 
 			this.frm_head.hide();
 		else 
@@ -245,7 +246,8 @@ _f.Frm.prototype.set_heading = function() {
 // ======================================================================================
 
 _f.Frm.prototype.set_section = function(sec_id) {
-	if(!this.sections[sec_id].show) return; // Simple type
+	if(!this.sections[sec_id] || !this.sections[sec_id].show) 
+		return; // Simple type
 	
 	if(this.sections[this.cur_section[this.docname]])
 		this.sections[this.cur_section[this.docname]].hide();
@@ -322,16 +324,16 @@ _f.Frm.prototype.setup_std_layout = function() {
 	this.layout = new Layout(this.body, '100%');
 	
 	// header
-	this.frm_head = new _f.FrmHeader(this.head);
+	if(!this.meta.istable) this.frm_head = new _f.FrmHeader(this.head);
 	
 	// hide close btn for dialog rendering
-	if(this.meta.in_dialog) $dh(this.frm_head.page_head.close_btn);
+	if(this.frm_head && this.meta.in_dialog) $dh(this.frm_head.page_head.close_btn);
 	
 	// setup tips area
 	this.setup_tips();
 	
 	// setup tabbed sections
-	if(this.meta.section_style=='Tabbed') 
+	if(this.meta.section_style=='Tabbed' && !(this.meta.istable))
 		this.setup_tabs();
 
 	// bg colour
@@ -467,7 +469,7 @@ _f.Frm.prototype.setup = function() {
 	this.wrapper = $a(this.parent.body, 'div', 'frm_wrapper');
 
 	// head
-	this.head = $a(this.wrapper, 'div', 'frm_header');
+	this.head = $a(this.wrapper, 'div');
 
 	// tips
 	this.tip_wrapper = $a(this.wrapper, 'div');
@@ -519,10 +521,6 @@ _f.Frm.prototype.show_the_frm = function() {
 		$ds(this.wrapper);
 		this.display = 1;
 	}
-
-	// set cur_frm - used subsequently in client scripts (not table_froms)
-	if(!this.meta.istable) 
-		cur_frm = this;
 	
 	// show the dialog
 	if(this.meta.in_dialog && !this.parent.dialog.display) {
@@ -573,7 +571,7 @@ _f.Frm.prototype.refresh_header = function() {
 	}	
 
 	// show / hide buttons
-	this.frm_head.refresh_toolbar();
+	if(this.frm_head)this.frm_head.refresh_toolbar();
 	
 	// add to recent
 	if(page_body.wntoolbar) page_body.wntoolbar.rdocs.add(this.doctype, this.docname, 1);
@@ -607,11 +605,11 @@ _f.Frm.prototype.check_doc_perm = function() {
 _f.Frm.prototype.refresh = function(docname) {
 	// record switch
 	if(docname) {
-		if(this.docname != docname) scroll(0, 0);
+		if(this.docname != docname && !this.meta.in_dialog && !this.meta.istable) scroll(0, 0);
 		this.docname = docname;
 	}
-	cur_frm = this;
-	
+	if(!this.meta.istable) cur_frm = this;
+			
 	if(this.docname) { // document to show
 
 		// check permissions
