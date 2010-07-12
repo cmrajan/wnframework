@@ -70,9 +70,6 @@ Field.prototype.set_label = function() {
 Field.prototype.set_comment = function() {
 	var me = this;
 	if(this.df.description) {
-		this.label_span.title = me.df.description;
-		$(this.label_span).tooltip();
-
 		if(this.help_icon) {
 			$di(this.help_icon);
 			this.help_icon.title = me.df.description;

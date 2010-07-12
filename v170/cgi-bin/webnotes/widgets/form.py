@@ -401,7 +401,7 @@ def validate_link():
 
 	# no options, don't validate
 	if not options:
-		webnotes.msgprint("Warning: No Options specified for the link field")
+		webnotes.response['message'] = 'Ok'
 		return
 		
 	if webnotes.conn.sql("select name from `tab%s` where name=%s" % (options, '%s'), value):

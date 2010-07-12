@@ -153,7 +153,7 @@ _f.FrmHeader.prototype.get_status_tags = function(doc, f) {
 // -------------------------------------------------------------------
 
 _f.FrmHeader.prototype.set_in_recent = function(doc, col) {
-	var tn = $i('rec_'+doc.doctype+'-'+doc.docname);
+	var tn = $i('rec_'+doc.doctype+'-'+doc.name);
 	if(tn)
 		$y(tn,{backgroundColor:col}); 
 }

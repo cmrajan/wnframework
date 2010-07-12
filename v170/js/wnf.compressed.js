@@ -572,7 +572,7 @@ if(ischk&&!this.in_grid){this.input_area=$a($td(t,0,0),'div');this.disp_area=$a(
 if(this.in_grid){if(this.label_area)$dh(this.label_area);}else{this.input_area.className='input_area';$y(this.wrapper,{marginBottom:'8px'})}
 if(this.onmake)this.onmake();}
 Field.prototype.set_label=function(){if(this.with_label&&this.label_area&&this.label!=this.df.label){this.label_span.innerHTML=this.df.label;this.label=this.df.label;}}
-Field.prototype.set_comment=function(){var me=this;if(this.df.description){this.label_span.title=me.df.description;$(this.label_span).tooltip();if(this.help_icon){$di(this.help_icon);this.help_icon.title=me.df.description;$(this.help_icon).tooltip();}}else{if(this.help_icon)$dh(this.help_icon);}}
+Field.prototype.set_comment=function(){var me=this;if(this.df.description){if(this.help_icon){$di(this.help_icon);this.help_icon.title=me.df.description;$(this.help_icon).tooltip();}}else{if(this.help_icon)$dh(this.help_icon);}}
 Field.prototype.get_status=function(){if(this.in_filter)this.not_in_form=this.in_filter;if(this.not_in_form){return'Write';}
 var fn=this.df.fieldname?this.df.fieldname:this.df.label;this.df=get_field(this.doctype,fn,this.docname);if(!this.df.permlevel)this.df.permlevel=0;var p=this.perm[this.df.permlevel];var ret;if(cur_frm.editable&&p&&p[WRITE])ret='Write';else if(p&&p[READ])ret='Read';else ret='None';if(this.df.fieldtype=='Binary')
 ret='None';if(cint(this.df.hidden))
