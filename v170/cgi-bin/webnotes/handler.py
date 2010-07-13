@@ -27,45 +27,6 @@ def startup():
 
 	webnotes.response.update(webnotes.session_cache.get())
 
-	# update profile from cache
-	webnotes.session['data']['profile'] = webnotes.response['profile']	
-
-def build_session():
-	import webnotes.model
-	import webnotes.model.doc
-	import webnotes.model.doctype
-	import webnotes.widgets.page
-	import webnotes.widgets.menus
-	import webnotes.profile
-	
-	webnotes.response['profile'] = webnotes.user.load_profile()
-
-	doclist = []
-	doclist += webnotes.model.doc.get('Control Panel')
-	cp = doclist[0]
-	
-	
-	doclist += webnotes.model.doctype.get('Event')
-	doclist += webnotes.model.doctype.get('Search Criteria')
-	home_page = webnotes.user.get_home_page()
-
-	if home_page:
-		doclist += webnotes.widgets.page.get(home_page)
-
-	webnotes.response['account_name'] = cp.account_id or ''
-	webnotes.response['sysdefaults'] = webnotes.utils.get_defaults()
-	webnotes.response['n_online'] = int(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0] or 0)
-	webnotes.response['docs'] = doclist
-	webnotes.response['home_page'] = home_page or ''
-	webnotes.response['start_items'] = webnotes.widgets.menus.get_menu_items()
-	if webnotes.session['data'].get('ipinfo'):
-		webnotes.response['ipinfo'] = webnotes.session['data']['ipinfo']
-		
-	webnotes.session['data']['profile'] = webnotes.response['profile']
-	webnotes.response['dt_labels'] = webnotes.model.get_dt_labels()
-
-	# push to session
-
 def cleanup_docs():
 	import webnotes.model.doclist
 	if out.get('docs') and type(out['docs'])!=dict:

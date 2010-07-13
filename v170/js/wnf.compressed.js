@@ -879,7 +879,7 @@ this.cont.innerHTML=content;if(page_name==home_page)
 pages['_home']=this;return this;}
 function render_page(page_name,menuitem){if(!page_name)return;if((!locals['Page'])||(!locals['Page'][page_name])){alert(page_name+' not found');return;}
 var pdoc=locals['Page'][page_name];if(pdoc.style)set_style(pdoc.style)
-var p=new Page(page_name,pdoc.__content?pdoc.__content:pdoc.content);var script=pdoc.__script?pdoc.__script:pdoc.script;p.doc=pdoc;if(script)
+var p=new Page(page_name,pdoc._Page__content?pdoc._Page__content:pdoc.content);var script=pdoc.__script?pdoc.__script:pdoc.script;p.doc=pdoc;if(script)
 try{eval(script);}catch(e){submit_error(e);}
 try{if(pscript['onload_'+page_name])pscript['onload_'+page_name](menuitem);}catch(e){submit_error(e);}
 page_body.change_to(page_name);return p;}
@@ -994,7 +994,7 @@ keypress_observers[i].notify_keypress(ev,ev.keyCode);}});addEvent('click',functi
 click_observers[i].notify_click(ev,target);}});if(isIE){$op($i('dialog_back'),60);}}
 var callback=function(r,rt){if(r.exc)msgprint(r.ext);setup_globals(r);setup_history();setup_events();var a=new Body();page_body.run_startup_code();page_body.setup_sidebar_menu();for(var i=0;i<startup_list.length;i++){startup_list[i]();}
 $dh('startup_div');$ds('body_div');var t=to_open();if(t){historyChange(t);}else if(home_page){loadpage(home_page);}}
-if(keys(_startup_data).length){LocalDB.sync(_startup_data.docs);callback(_startup_data,'');}else{if($i('startup_div'))
+if(keys(_startup_data).length){LocalDB.sync(_startup_data.docs);callback(_startup_data,'');if(_startup_data.server_messages)msgprint(_startup_data.server_messages);}else{if($i('startup_div'))
 $c('startup',{},callback,null,1);}}
 function to_open(){if(get_url_arg('page'))
 return get_url_arg('page');if(location.hash){return location.hash.substr(1);}}

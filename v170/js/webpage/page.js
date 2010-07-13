@@ -36,7 +36,7 @@ function render_page(page_name, menuitem) {
 	if(pdoc.style) set_style(pdoc.style)
 
 	// create page
-	var p = new Page(page_name, pdoc.__content?pdoc.__content:pdoc.content);
+	var p = new Page(page_name, pdoc._Page__content?pdoc._Page__content:pdoc.content);
 	// script
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
 	p.doc = pdoc;

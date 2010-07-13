@@ -129,7 +129,10 @@ def get_static_content():
 	content_html = content
 
 	return title, content_html
-	
+
+# generate the index.cgi file
+# ---------------------------
+
 def get():
 	import webnotes
 	no_startup = webnotes.form.getvalue('no_startup') or None
@@ -155,9 +158,20 @@ def get():
 	
 	if '%(content)s' in template:
 
+		# for SEO
+		# -------
 		title, content = get_static_content()
 		keywords = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
 		site_description = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+		
+		# load the session data
+		# ---------------------
+		sd = webnotes.session_cache.get()
+		
+		# add debug messages
+		sd['server_messages'] = '\n--------------\n'.join(webnotes.message_log)
+		
+		sd = no_startup and '{}' or json.dumps(sd)
 		
 		template = template % {
 			'title':title
@@ -166,7 +180,7 @@ def get():
 			,'site_description':site_description
 			,'add_in_head':add_in_head
 			,'add_in_body':add_in_body
-			,'startup_data':(no_startup and '{}' or json.dumps(webnotes.session_cache.get()))
+			,'startup_data':sd
 		}
 		
 	return template

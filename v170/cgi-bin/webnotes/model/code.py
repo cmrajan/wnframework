@@ -20,11 +20,7 @@ def execute(code, doc=None, doclist=[]):
 	if webnotes.user:
 		get_roles = webnotes.user.get_roles
 	locals().update({'get_obj':get_obj, 'get_server_obj':get_server_obj, 'run_server_obj':run_server_obj, 'updatedb':updatedb, 'check_syntax':check_syntax})
-	
-	# page output
-	# -----------------
-	page_html, out = None, None
-	
+		
 	version = 'v170'
 	NEWLINE = '\n'
 	BACKSLASH = '\\'
@@ -32,17 +28,17 @@ def execute(code, doc=None, doclist=[]):
 	# execute it
 	# -----------------
 	exec code in locals()
-		
+	
 	# if doc
 	# -----------------
 	if doc:
 		d = DocType(doc, doclist)
 		return d
 		
-	if page_html:
+	if locals().get('page_html'):
 		return page_html
 
-	if out:
+	if locals().get('out'):
 		return out
 
 #=================================================================================

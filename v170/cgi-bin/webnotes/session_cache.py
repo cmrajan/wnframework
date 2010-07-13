@@ -39,7 +39,9 @@ def get():
 	# if not create it
 	sd = build()
 	dump(sd, country)
-	
+	# update profile from cache
+	webnotes.session['data']['profile'] = sd['profile']	
+		
 	return sd
 
 # load cache

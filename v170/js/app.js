@@ -89,6 +89,9 @@ function startup() {
 	if(keys(_startup_data).length) {
 		LocalDB.sync(_startup_data.docs);
 		callback(_startup_data, '');
+		
+		// for debug
+		if(_startup_data.server_messages) msgprint(_startup_data.server_messages);
 	} else {
 		if($i('startup_div'))
 			$c('startup',{},callback,null,1);

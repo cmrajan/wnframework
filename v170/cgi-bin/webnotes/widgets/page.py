@@ -23,6 +23,7 @@ class Page:
 		return p.sub(self._page_import, script)
 
 	def load(self):
+	
 		doclist = webnotes.model.doc.get('Page', self.name)
 		doc = doclist[0]
 		
