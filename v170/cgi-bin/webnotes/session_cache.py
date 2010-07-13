@@ -4,10 +4,15 @@
 # ==================================================
 
 def clear():
+	clear_cache()
+
 	import webnotes
-	webnotes.conn.sql("delete from __SessionCache")
-	webnotes.conn.sql("delete from __DocTypeCache")
 	webnotes.msgprint("Cache Cleared")
+
+def clear_cache():
+	import webnotes
+	webnotes.conn.sql("delete from __SessionCache where user=%s" % webnotes.session['user'])
+
 
 # load cache
 # ==================================================

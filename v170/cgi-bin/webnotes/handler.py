@@ -27,6 +27,9 @@ def startup():
 
 	webnotes.response.update(webnotes.session_cache.get())
 
+	# update profile from cache
+	webnotes.session['data']['profile'] = webnotes.response['profile']	
+
 def build_session():
 	import webnotes.model
 	import webnotes.model.doc

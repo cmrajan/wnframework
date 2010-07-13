@@ -185,7 +185,7 @@ class Document:
 
 				# validate links
 				if link_list and link_list.get(f):
-					self.fields[f] = self._validate_link(link_list[f], self.fields[f])
+					self.fields[f] = self._validate_link(link_list[f][0], self.fields[f])
 
 				if self.fields[f]==None:
 					update_str.append("(%s,%s,NULL)")
