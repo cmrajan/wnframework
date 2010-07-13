@@ -9,9 +9,11 @@ def clear():
 	import webnotes
 	webnotes.msgprint("Cache Cleared")
 
-def clear_cache():
+def clear_cache(user=''):
 	import webnotes
-	webnotes.conn.sql("delete from __SessionCache where user=%s", webnotes.session['user'])
+	if not user: 
+		user = webnotes.session['user']
+	webnotes.conn.sql("delete from __SessionCache where user=%s", user)
 
 
 # load cache
