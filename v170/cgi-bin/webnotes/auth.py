@@ -212,16 +212,16 @@ class Authentication:
 			if not as_guest:
 				self.out['message'] = 'Logged In'
 				self.call_on_login_pre_session()
+
+				# clear cache
+				from webnotes.session_cache import clear_cache
+				clear_cache(self.user_id)
 				
 			# validate blocked IP
 			self.validate_ip(self.user_id)
 
 			# start session
 			self.start_session(self.user_id)
-	
-			# clear cache
-			from webnotes.session_cache import clear_cache
-			clear_cache(self.user_id)
 			
 			# second on_login method - post session
 			if not as_guest:
