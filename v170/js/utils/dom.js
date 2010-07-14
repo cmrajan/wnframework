@@ -8,6 +8,7 @@ function addEvent(ev, fn) {
 	}
 }
 
+// set out of 100
 function set_opacity(ele, ieop) {
 	var op = ieop / 100;
 	if (ele.filters) { // internet explorer

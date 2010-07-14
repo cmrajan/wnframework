@@ -16,7 +16,7 @@ var def_ph_style = {
 	wrapper: {marginBottom:'16px'}
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555' }
-	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '2px 4px', backgroundColor:'#CDF', display:'none'}
+	,toolbar_area: { margin:'0px', marginBottom:'4px', padding: '4px', backgroundColor:'#EEE', display:'none'}
 	,separator: { border:'1px solid #000' } // show this when there is no toolbar
 	,tag_area: { color:'#888', marginBottom:'4px', textAlign:'right', fontSize:'10px' }
 	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 
@@ -38,14 +38,12 @@ function PageHeader(parent, main_text, sub_text) {
 	$y($td(this.t1, 0, 1),{textAlign:'right'});
 	this.close_btn = $a($td(this.t1, 0, 1), 'div', '', def_ph_style.close_btn);
 	
-	this.close_btn.onmouseover = function() { $y(this,{color:'#00B', textDecoration:'underline'}) }
-	this.close_btn.onmouseout = function() { $y(this,{color:'#000', textDecoration:'none'}) }
-	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
+	this.close_btn.onmouseover = function() { $op(this, 60); }
+	this.close_btn.onmouseout = function() { $op(this, 100); }
+	this.close_btn.onmousedown = function() { $op(this, 30); }
+	this.close_btn.onmouseup = function() { $op(this, 60); }
 
-	if(!isIE) {
-		$(this.close_btn).css('-moz-border-radius','4px').css('-webkit-border-radius','4px');
-			
-	}
+	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
 
 	if(main_text) this.main_head.innerHTML = main_text;
 	if(sub_text) this.sub_head.innerHTML = sub_text;

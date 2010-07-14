@@ -10,7 +10,7 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {borderBottom: '1px solid #CDF' /*, paddingLeft: '24px', background:'url("images/logos/wnf24.gif") left no-repeat', backgroundPosition: '4px 2px'*/});
+		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#777', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
 		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['5%','55%','40%'],{padding:'2px'});
 				
 		this.menu = new MenuToolbar($td(this.body_tab,0,1));
@@ -54,7 +54,7 @@ function WNToolbar(parent) {
 
 	this.setup_home = function() {
 		var d = $a($td(this.body_tab,0,0),'div');
-		$(d).html('Home').css('background-color','#039').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').corners().click( function() { loadpage(home_page); } );
+		$(d).html('Home').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').click( function() { loadpage(home_page); } );
 	}
 
 	// Recent
@@ -235,13 +235,13 @@ function WNToolbar(parent) {
 	this.setup_logout = function() {
 		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px'});
 		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'13px'});
-		$y(t,{cssFloat:'right'});
+		$y(t,{cssFloat:'right', color:'#FFF'});
 		$y($td(t,0,0),{border:'0px'});
 		$td(t,0,0).innerHTML = user_fullname;
-		$td(t,0,1).innerHTML = '<span class="link_type" style="font-weight: bold" onclick="get_help()">Help</span>';
-		$td(t,0,2).innerHTML = '<span class="link_type" style="font-weight: bold" onclick="get_feedback()">Feedback</span>';
-		$td(t,0,3).innerHTML = '<span class="link_type" onclick="loaddoc(\'Profile\', user);">Profile</span>';
-		$td(t,0,4).innerHTML = '<span class="link_type" onclick="logout()">Logout</span>';
+		$td(t,0,1).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';
+		$td(t,0,2).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';
+		$td(t,0,3).innerHTML = '<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user);">Profile</span>';
+		$td(t,0,4).innerHTML = '<span style="cursor: pointer;" onclick="logout()">Logout</span>';
 		this.menu_table_right = t;
 	}
 

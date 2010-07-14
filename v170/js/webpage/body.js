@@ -91,8 +91,8 @@ function Body() {
 	this.setup = function() {
 		this.cp = locals['Control Panel']['Control Panel'];
 		
+		this.wntoolbar_area = $a(document.getElementsByTagName('body')[0], 'div');
 		this.wrapper = $a($i('body_div'),'div');
-		this.wntoolbar_area = $a(this.wrapper, 'div');
 		this.header = $a(this.wrapper, 'div');
 		this.header_tab = make_table(this.header, 1, 2, '100%', ['68%', '32%']);
 		this.banner_area = $td(this.header_tab, 0, 0);
@@ -116,8 +116,10 @@ function Body() {
 		this.setup_header_footer();
 
 		// core areas;
+		if(user=='Guest') user_defaults.hide_webnotes_toolbar = 1;
 		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
 			this.wntoolbar = new WNToolbar(this.wntoolbar_area);
+			$y(this.wrapper, {marginTop:'36px'});
 		}
 		
 		// page width
