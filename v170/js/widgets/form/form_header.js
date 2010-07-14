@@ -186,7 +186,7 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	if(sl[1])ph.sub_head.appendChild(sl[1]);
 
 	// timestamp
-	var ts = $a(null, 'span', '', {marginLeft:'8px',fontSize:'11px'});
+	var ts = $a(null, 'span', '', {fontSize:'11px'});
 	ts.innerHTML = this.get_timestamp(doc);	
 	t.appendChild(ts);
 }

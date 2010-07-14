@@ -92,7 +92,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 }
 
 
-_f.SectionBreak.prototype.make_simple_section = function(static) {
+_f.SectionBreak.prototype.make_simple_section = function(with_header, collapsible) {
 	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '8px'});
 	var me = this;
 
@@ -106,23 +106,25 @@ _f.SectionBreak.prototype.make_simple_section = function(static) {
 		}
 	}
 	
-	if(static) {
-		this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor: '#EEE'});
-		this.label.innerHTML = this.df.label?this.df.label:'';
-	} else {	
-		if(this.df.label) {
-			this.make_collapsible(head);
-			
-		} else if(!has_col) {
-			// divider
-			$y(head,{margin:'8px', borderBottom:'1px solid #AAA'});
+	if(with_header) {
+		if(collapsible) {
+			if(this.df.label) {
+				this.make_collapsible(head);
+				
+			} else if(!has_col) {
+				// divider
+				$y(head,{margin:'8px', borderBottom:'1px solid #AAA'});
+			}
+		} else {
+			this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor: '#EEE'});
+			this.label.innerHTML = this.df.label?this.df.label:'';
 		}
 	}
 
 	// description
 	if(this.df.description) {
-		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor: (static ? '#EEE' : '')});
-		if(static)$y(d,{paddingTop:'0px'});
+		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor: (with_header ? '#EEE' : '')});
+		if(with_header)$y(d,{paddingTop:'0px'});
 		if(this.df.description.length > 240) {
 			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
 			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
@@ -163,11 +165,11 @@ _f.SectionBreak.prototype.make_body = function() {
 
 			this.make_row();		
 			
-			this.make_simple_section(1);
+			this.make_simple_section(0, 0);
 			if(!isIE) this.hide();
 		} else {
 			this.row = this.frm.layout.addsubrow();
-			this.make_simple_section();
+			this.make_simple_section(1, 1);
 		}
 	} else if(this.frm.meta.section_style=='Tray') {
 		if(this.df.options!='Simple') {
@@ -201,15 +203,15 @@ _f.SectionBreak.prototype.make_body = function() {
 			}
 	
 			this.make_row();
-			this.make_simple_section(1);
+			this.make_simple_section(1, 0);
 			if(!isIE)this.hide();
 		} else {
 			this.row = this.frm.layout.addsubrow();
-			this.make_simple_section();
+			this.make_simple_section(1, 1);
 		}
 	} else if(this.df){
 		this.row = this.frm.layout.addrow();
-		this.make_simple_section();
+		this.make_simple_section(1, 1);
 	}	
 }
 

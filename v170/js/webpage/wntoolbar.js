@@ -234,7 +234,7 @@ function WNToolbar(parent) {
 
 	this.setup_logout = function() {
 		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px'});
-		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'13px'});
+		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'11px'});
 		$y(t,{cssFloat:'right', color:'#FFF'});
 		$y($td(t,0,0),{border:'0px'});
 		$td(t,0,0).innerHTML = user_fullname;

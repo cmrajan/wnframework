@@ -121,7 +121,7 @@ function logout() {
 
 // default print style
 _p.def_print_style = "html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
-	+"\nbody { margin: 12px; }"
+	+"\nbody { }"
 	+"\npre { margin:0; padding:0;}"	
 	+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
 	+"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"

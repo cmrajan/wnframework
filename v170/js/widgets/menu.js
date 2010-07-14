@@ -159,7 +159,8 @@ DropdownMenu.prototype.add_item = function(label, onclick, on_top) {
 	
 	mi.innerHTML = label;
 	mi.label = label;
-	mi.onclick = onclick;
+	mi.my_onclick = onclick;
+	mi.onclick = function() { mclose(); this.my_onclick(); };
 	
 	mi.highlight = function() {
 		if(me.cur_mi) me.cur_mi.clear();
