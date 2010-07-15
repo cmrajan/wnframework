@@ -977,7 +977,7 @@ this.run_startup_code=function(){if(this.cp.startup_css)
 set_style(this.cp.startup_css);try{if(this.cp.startup_code)
 eval(this.cp.startup_code);}catch(e){}}
 this.setup=function(){this.cp=locals['Control Panel']['Control Panel'];this.wntoolbar_area=$a(document.getElementsByTagName('body')[0],'div');this.wrapper=$a($i('body_div'),'div');this.banner_area=$a(this.wrapper,'div');;this.topmenu=$a(this.wrapper,'div');this.breadcrumbs=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div');this.body_spinner=$a(this.wrapper,'div','',{height:'400px',background:'url("images/ui/loading-old.gif") center no-repeat'});this.footer=$a(this.wrapper,'div');if(user_defaults.hide_sidebars){this.cp.left_sidebar_width=null;this.cp.right_sidebar_width=null;}
-this.setup_page_areas();this.setup_header_footer();if(user=='Guest')user_defaults.hide_webnotes_toolbar=1;if(!user_defaults.hide_webnotes_toolbar||user=='Administrator'){this.wntoolbar=new WNToolbar(this.wntoolbar_area);$y(this.wrapper,{marginTop:'36px'});}
+this.setup_page_areas();this.setup_header_footer();if(user=='Guest')user_defaults.hide_webnotes_toolbar=1;if(!user_defaults.hide_webnotes_toolbar||user=='Administrator'){this.wntoolbar=new WNToolbar(this.wntoolbar_area);if(isIE){$y(this.wrapper,{marginTop:'32px'});}else{$y(this.wrapper,{marginTop:'48px'});}}
 if(this.cp.page_width)$y(this.wrapper,{width:cint(this.cp.page_width)+'px'});}
 this.pages={};this.cur_page=null;this.add_page=function(label,onshow,onhide){var c=$a(this.center.body,'div');if(onshow)
 c.onshow=onshow;if(onhide)

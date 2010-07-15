@@ -114,7 +114,11 @@ function Body() {
 		if(user=='Guest') user_defaults.hide_webnotes_toolbar = 1;
 		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
 			this.wntoolbar = new WNToolbar(this.wntoolbar_area);
-			$y(this.wrapper, {marginTop:'36px'});
+			if(isIE) {
+				$y(this.wrapper, {marginTop:'32px'});
+			} else {
+				$y(this.wrapper, {marginTop:'48px'});
+			}
 		}
 		
 		// page width
