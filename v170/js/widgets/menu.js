@@ -14,47 +14,63 @@ function MenuToolbar(parent) {
 }
 MenuToolbar.prototype.add_top_menu = function(label, onclick, add_icon) {
 	var li = $a(this.ul, 'li');
-	$y(li, {marginRight:'8px'});
-	var a = $a(li, 'div', this.top_menu_style);
-	if(add_icon)
-		a.className = this.top_menu_style + ' ' + this.top_menu_icon_style;
 	
-	a.def_class = a.className;
-	a.innerHTML = label;
-		
-	li.label = a;
+	li.item = new MenuToolbarItem(this, li, label, onclick, add_icon);
 
+	this.top_menus[label] = li.item.wrapper;
+	return li.item.wrapper;
+}
+
+function MenuToolbarItem(tbar, parent, label, onclick, add_icon) {
 	var me = this;
-	a.onclick = function() { onclick(); } ;
-	a.onmouseover = function() { 
+	this.wrapper = $a(parent, 'div', tbar.top_menu_style);
+	
+	// add icon
+	if(add_icon) {
+		var t = make_table(this.wrapper, 1, 2, null, ['22px', null], {verticalAlign:'middle'});
+		$y(t,{borderCollapse:'collapse'});
+		var icon = $a($td(t,0,0), 'div', 'wntoolbar-icon ' + add_icon);
+		$td(t,0,1).innerHTML = label;
+	} else {
+		this.wrapper.innerHTML = label;	
+	}
+	
+	this.wrapper.onclick = function() { onclick(); };
+	this.def_class = tbar.top_menu_style;
+	
+	// mouseovers
+	this.wrapper.onmouseover = function() { 
 		this.set_selected();
 		if(this.my_mouseover)this.my_mouseover(this);
 	}
-	a.onmouseout = function() { 
-		if(this.my_mouseout)this.my_mouseout(this);
+	this.wrapper.onmouseout = function() { 
+		if(this.my_mouseout)
+			this.my_mouseout(this);
 		this.set_unselected();
 	}
-	a.set_unselected = function() {
-		if(this.dropdown && this.dropdown.is_active)
+	
+	// select / unselect
+	this.wrapper.set_unselected = function() {
+		if(me.wrapper.dropdown && me.wrapper.dropdown.is_active) {
 			return;
-		this.className = this.def_class;
-		me.is_active = 0;
+		}
+		me.wrapper.className = me.def_class;
 	}
-	a.set_selected = function() { 
-		if(me.cur_top_menu)me.cur_top_menu.set_unselected();
-		this.className = this.def_class + ' '+me.top_menu_mo_style;
+	this.wrapper.set_selected = function() { 
+		if(me.cur_top_menu)
+			me.cur_top_menu.set_unselected();
+		me.wrapper.className = me.def_class + ' '+tbar.top_menu_mo_style;
 		me.cur_top_menu = this;
-		me.is_active = 1;
 	}
-	this.top_menus[label] = a;
-	return a;
+	
+	
 }
-
 var closetimer;
-function mclose() { // close all active
+function mclose(opt) { // close all active
 	for(var i=0;i<all_dropdowns.length;i++) {
 		if(all_dropdowns[i].is_active)
-			all_dropdowns[i].hide();
+			if(opt && opt==all_dropdowns[i]) { /* don't hide caller */ }
+			else all_dropdowns[i].hide();
 	}
 }
 function mclosetime() { closetimer = window.setTimeout(mclose, 700); }
@@ -62,7 +78,7 @@ function mcancelclosetime() { if(closetimer) { window.clearTimeout(closetimer); 
 
 MenuToolbar.prototype.make_dropdown = function(tm) {
 	var me = this;
-	tm.dropdown = new DropdownMenu(tm.parentNode, this.dropdown_width);
+	tm.dropdown = new DropdownMenu(tm, this.dropdown_width);
 	
 	// triggers on top menu
 	tm.my_mouseover = function() {
@@ -103,7 +119,7 @@ function DropdownMenu(parent, width) {
 
 	this.show = function() {
 		// close others
-		mclose();
+		mclose(me);
 		
 		// clear menu timeout
 		mcancelclosetime();
@@ -134,8 +150,8 @@ function DropdownMenu(parent, width) {
 		me.is_active = 0;
 		
 		// events on label
-		if(me.parent.label) {
-			me.parent.label.set_unselected();
+		if(me.parent && me.parent.set_unselected) {
+			me.parent.set_unselected();
 		}
 	}
 

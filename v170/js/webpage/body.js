@@ -2,9 +2,7 @@
 
 	+ body
 		+ wntoolbar
-		+ header
-			+ banner_area
-			+ search_area
+		+ banner_area
 		+ body_spinner
 		+ body
 			+ left_sidebar
@@ -93,10 +91,7 @@ function Body() {
 		
 		this.wntoolbar_area = $a(document.getElementsByTagName('body')[0], 'div');
 		this.wrapper = $a($i('body_div'),'div');
-		this.header = $a(this.wrapper, 'div');
-		this.header_tab = make_table(this.header, 1, 2, '100%', ['68%', '32%']);
-		this.banner_area = $td(this.header_tab, 0, 0);
-		this.search_area = $td(this.header_tab, 0, 1);
+		this.banner_area = $a(this.wrapper, 'div');;
 		
 		this.topmenu = $a(this.wrapper, 'div');
 		this.breadcrumbs = $a(this.wrapper, 'div');

@@ -10,12 +10,14 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#777', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
-		this.body_tab = make_table(this.wrapper, 1, 3, '100%', ['5%','55%','40%'],{padding:'2px'});
-				
-		this.menu = new MenuToolbar($td(this.body_tab,0,1));
+		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#555', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
+		this.table_wrapper = $a(parent, 'div', '', {marginLeft:'16px'});
+		this.body_tab = make_table(this.wrapper, 1, 2, '100%', ['64%','36%'],{padding:'2px'});
+		
+		this.menu = new MenuToolbar($td(this.body_tab,0,0));
 		this.setup_home();
 		this.setup_new();
+		this.setup_search();
 		this.setup_recent();
 		if(in_list(user_roles, ['Administrator']))
 			this.setup_options();
@@ -24,13 +26,12 @@ function WNToolbar(parent) {
 		this.setup_report_builder();
 
 		this.setup_logout();
-		this.setup_search();
 	}
 	
 	// Options
 	// ----------------------------------------------------------------------------------------
 	this.setup_options = function() {
-		var tm = this.menu.add_top_menu('Options', function() { }, "images/ui/down-arrow1.gif");
+		var tm = this.menu.add_top_menu('Pages', function() { }, "sprite-pages");
 		
 		var fn = function() {
 			if(this.dt=='Page')
@@ -44,7 +45,7 @@ function WNToolbar(parent) {
 		profile.start_items.sort(function(a,b){return (a[4]-b[4])});
 		for(var i=0;i< profile.start_items.length;i++) {
 			var d = profile.start_items[i];
-			var mi = this.menu.add_item('Options',d[1], fn);
+			var mi = this.menu.add_item('Pages',d[1], fn);
 			mi.dt = d[0]; mi.dn = d[5]?d[5]:d[1];
 		}
 	}
@@ -53,15 +54,14 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_home = function() {
-		var d = $a($td(this.body_tab,0,0),'div');
-		$(d).html('Home').css('padding','4px 8px').css('cursor','pointer').css('color','#FFF').css('font-weight','bold').click( function() { loadpage(home_page); } );
+		me.menu.add_top_menu('Home', function() { loadpage(home_page); }, "sprite-home");		
 	}
 
 	// Recent
 	// ----------------------------------------------------------------------------------------
 	this.setup_recent = function() {
 	
-		this.rdocs = me.menu.add_top_menu('Recent', function() {  }, "images/ui/down-arrow1.gif");
+		this.rdocs = me.menu.add_top_menu('Recent', function() {  }, "sprite-recent");
 		this.rdocs.items = {};
 	
 		var fn = function() { // recent is only for forms
@@ -124,7 +124,7 @@ function WNToolbar(parent) {
 	// Tools
 	// ----------------------------------------------------------------------------------------
 	this.setup_help = function() {
-		me.menu.add_top_menu('Tools', function() {  }, "images/ui/down-arrow1.gif");
+		me.menu.add_top_menu('Tools', function() {  }, "sprite-tools");
 		this.menu.add_item('Tools','Error Console', function() { err_console.show(); });
 		this.menu.add_item('Tools','Clear Cache', function() { $c('webnotes.session_cache.clear',{},function(r,rt){}) });
 		//this.menu.add_item('Tools','Start / Finish Testing Mode', function() { me.enter_testing(); });
@@ -137,7 +137,7 @@ function WNToolbar(parent) {
 	// New
 	// ----------------------------------------------------------------------------------------
 	this.setup_new = function() {	
-		me.menu.add_top_menu('Create New...', function() { me.show_new(); } );
+		me.menu.add_top_menu('New', function() { me.show_new(); }, 'sprite-new' );
 		me.show_new = function() {
 			if(!me.new_dialog) {
 				var d = new Dialog(240, 140, "Create a new record");
@@ -166,7 +166,7 @@ function WNToolbar(parent) {
 	// Report Builder
 	// ----------------------------------------------------------------------------------------
 	this.setup_report_builder = function() {
-		me.menu.add_top_menu('Report Builder...', function() { me.show_rb(); } );
+		me.menu.add_top_menu('Report', function() { me.show_rb(); }, 'sprite-report' );
 		me.show_rb = function() {
 			if(!me.rb_dialog) {
 				var d = new Dialog(240, 140, "Build a report for");
@@ -194,38 +194,39 @@ function WNToolbar(parent) {
 
 	this.setup_search = function() {
 
-		$y(page_body.search_area, {padding: '8px 0px'});
-		
-		// table
-		var d = $a(page_body.search_area, 'div', '', {cssFloat:'right'});
-		var t = make_table(d, 1, 3, null,['18px', '130px', '60px'], {padding: '2px', verticalAlign:'middle', textAlign:'right'});
-		
-		// icon
-		var img = $a($td(t, 0, 0), 'img'); img.src='images/icons/magnifier.gif';
+		me.menu.add_top_menu('Search', function() { me.show_search(); }, 'sprite-search' );
 
-		// select
-		this.search_sel = new SelectWidget($td(t, 0, 1), [], '120px');
-		this.search_sel.inp.value = 'Select...';
-		
-		function open_quick_search() {
-			var v = sel_val(me.search_sel);
-			if(v) selector.set_search(v);
-			me.search_sel.disabled = 1;
-			selector.show();
-		}
-
-		// replace by labels
-		var nl = profile.can_read;
-		for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
+		me.show_search = function() {
+			if(!me.search_dialog) {
+				var d = new Dialog(240, 140, "Quick Search");
+				d.make_body(
+					[['HTML','Select']
+					,['Button','Go', function() { me.search_dialog.hide(); me.open_quick_search(); }]]);
+				d.onshow = function(){
+					me.search_sel.inp.focus();	
+				}
+				me.search_dialog = d;
 				
-		me.search_sel.set_options(nl.sort());
-		me.search_sel.onchange = function() { open_quick_search(); }
-
-		// button
-		me.search_btn = $a($td(t, 0, 2), 'button')
-		$(me.search_btn).html('Search');
-		me.search_btn.onclick = function() { open_quick_search(); }
-		
+				// select
+				me.search_sel = new SelectWidget(d.widgets['Select'], [], '120px');
+				me.search_sel.inp.value = 'Select...';
+			
+				me.open_quick_search = function() {
+					var v = sel_val(me.search_sel);
+					if(v) selector.set_search(v);
+					me.search_sel.disabled = 1;
+					selector.show();
+				}
+	
+				// replace by labels
+				var nl = profile.can_read;
+				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
+					
+				me.search_sel.set_options(nl.sort());
+				me.search_sel.onchange = function() { me.open_quick_search(); }
+			}
+			me.search_dialog.show();
+		}
 		startup_list.push(makeselector);
 	}
 	
@@ -233,7 +234,7 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
-		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px'});
+		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px'});
 		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'11px'});
 		$y(t,{cssFloat:'right', color:'#FFF'});
 		$y($td(t,0,0),{border:'0px'});

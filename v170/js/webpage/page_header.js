@@ -16,8 +16,8 @@ var def_ph_style = {
 	wrapper: {marginBottom:'16px'}
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555' }
-	,toolbar_area: { margin:'0px', marginBottom:'8px', padding: '2px 4px', backgroundColor:'#EEE', display:'none'}
-	,separator: { borderBottom:'1px solid #000' } // show this when there is no toolbar
+	,toolbar_area: { margin:'0px', padding: '2px 4px', backgroundColor:'#EEE', display:'none'}
+	,separator: { borderBottom:'2px solid #AAA' } // show this when there is no toolbar
 	,tag_area: { color:'#888', margin:'4px 0px', fontSize:'10px' }
 	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 
 		background:"url('images/ui/close_btn.gif') center no-repeat"
@@ -58,11 +58,11 @@ PageHeader.prototype.add_button = function(label, fn, bold, icon) {
 
 PageHeader.prototype.show_toolbar = function() {
 	$ds(this.toolbar_area);
-	if(!isIE) {
+	/*if(!isIE) {
 		$(this.toolbar_area)
 			.css('-moz-border-radius','5px')
 			.css('-webkit-border-radius','5px');
-	}
+	}*/
 }
 PageHeader.prototype.clear_toolbar = function() {
 	this.toolbar_area.innerHTML = '';
