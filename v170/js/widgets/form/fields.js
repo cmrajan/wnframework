@@ -975,9 +975,8 @@ function makeinput_popup(me, iconsrc, iconsrc1, iconsrc2) {
 	var c0 = tab.insertRow(0).insertCell(0);
 	var c1 = tab.rows[0].insertCell(1);
 	
-	me.txt = $a($a(c0, 'div'), 'input', '', {width:'98%'});
-
 	$y(c1,{width: '20px'});
+	me.txt = $a($a($a(c0, 'div', '', {paddingRight:'8px'}), 'div'), 'input', '', {width:'100%'});
 
 	me.btn = $a(c1, 'div', 'wn-icon ' + iconsrc, {width:'16px'});
 
