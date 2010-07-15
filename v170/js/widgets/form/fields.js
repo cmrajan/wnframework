@@ -28,12 +28,12 @@ Field.prototype.make_body = function() {
 		this.label_span = $a($td(t,0,0+ischk), 'span', '', {marginRight:'4px', fontSize:'11px'})
 	
 		// help icon
-		this.help_icon = $a($td(t,0,1+ischk),'img','',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
-		this.help_icon.src = 'images/icons/help.gif';
+		this.help_icon = $a($td(t,0,1+ischk),'div','wn-icon ic-tag',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
+		//this.help_icon.src = 'images/icons/help.gif';
 	
 		// error icon
-		this.label_icon = $a($td(t,0,2+ischk),'img','',{marginRight:'4px'}); $dh(this.label_icon);
-		this.label_icon.src = 'images/icons/error.gif';
+		this.label_icon = $a($td(t,0,2+ischk),'div','wn-icon ic-attention',{marginRight:'4px'}); $dh(this.label_icon);
+		//this.label_icon.src = 'images/icons/error.gif';
 
 	} else {
 		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px'})
@@ -71,7 +71,7 @@ Field.prototype.set_comment = function() {
 	var me = this;
 	if(this.df.description) {
 		if(this.help_icon) {
-			$di(this.help_icon);
+			$ds(this.help_icon);
 			this.help_icon.title = me.df.description;
 			$(this.help_icon).tooltip();
 		} 
@@ -211,7 +211,7 @@ Field.prototype.refresh_label_icon = function() {
 	if(this.label_icon && this.df.reqd) {
 		var v = _f.get_value(this.doctype, this.docname, this.df.fieldname);
 	 	if(is_null(v)) 
-	 		$di(this.label_icon);
+	 		$ds(this.label_icon);
 	 	else 
 	 		$dh(this.label_icon);
 	} else { $dh(this.label_icon) }
@@ -496,7 +496,7 @@ var _last_link_value = null;
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
-	makeinput_popup(this, 'images/icons/magnifier.gif', 'images/icons/arrow_right.gif', 'images/icons/add.gif');
+	makeinput_popup(this, 'ic-zoom', 'ic-sq_next', 'ic-sq_plus');
 	var me = this;
 
 	// magnifier - search
@@ -963,45 +963,41 @@ TimeField.prototype.set_disp=function(v) {
 // Used by date and link fields
 
 function makeinput_popup(me, iconsrc, iconsrc1, iconsrc2) {
-	me.input = $a(me.input_area, 'div');
+	me.input = $a(me.input_area, 'div', '', {width:'80%'});
 	me.input.onchange = function() { /*alert('in_oc'); me.txt.onchange();*/ }
+	me.input.set_width = function(w) {
+		$y(me.input, {width:(w-2)+'px'});
+	}
 	
 	var tab = $a(me.input, 'table');
-	$w(tab, '100%');
-	tab.style.borderCollapse = 'collapse';
+	$y(tab, {width:'100%', borderCollapse:'collapse', tableLayout:'fixed'});
 	
 	var c0 = tab.insertRow(0).insertCell(0);
 	var c1 = tab.rows[0].insertCell(1);
 	
-	me.txt = $a(c0, 'input');
-	$w(me.txt, isIE ? '92%' : '100%');
+	me.txt = $a($a(c0, 'div'), 'input', '', {width:'98%'});
 
-	c0.style.verticalAlign = 'top';
-	$w(c0, "80%");
+	$y(c1,{width: '20px'});
 
-	me.btn = $a(c1, 'img', 'btn-img');
-	me.btn.src = iconsrc;
+	me.btn = $a(c1, 'div', 'wn-icon ' + iconsrc, {width:'16px'});
+
 	if(iconsrc1) // link
 		me.btn.setAttribute('title','Search');
 	else // date
 		me.btn.setAttribute('title','Select Date');
-	me.btn.style.margin = '4px 2px 2px 8px';
 
 	if(iconsrc1) {
 		var c2 = tab.rows[0].insertCell(2);
-		$w(c1, '18px');
-		me.btn1 = $a(c2, 'img', 'btn-img');
-		me.btn1.src = iconsrc1;
+		$y(c2,{width: '20px'});
+		me.btn1 = $a(c2, 'div', 'wn-icon ' + iconsrc1, {width:'16px'});
 		me.btn1.setAttribute('title','Open Link');
-		me.btn1.style.margin = '4px 2px 2px 0px';
 	}
 
 	if(iconsrc2) {
-		$w(c2, '18px');
-		me.btn2 = $a(tab.rows[0].insertCell(3), 'img', 'btn-img');
-		me.btn2.src = iconsrc2;
+		var c3 = tab.rows[0].insertCell(3);
+		$y(c3,{width: '20px'});
+		me.btn2 = $a(c3, 'div', 'wn-icon ' + iconsrc2, {width:'16px'});
 		me.btn2.setAttribute('title','Create New');
-		me.btn2.style.margin = '4px 2px 2px 0px';
 		$dh(me.btn2);
 	}
 		

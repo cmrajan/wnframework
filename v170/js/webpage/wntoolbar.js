@@ -202,41 +202,40 @@ function WNToolbar(parent) {
 
 	this.setup_search = function() {
 
-		me.menu.add_top_menu('Search', function() { me.show_search(); }, 'sprite-search' );
+		me.menu.add_top_menu('Search', function() { me.search_dialog.show(); }, 'sprite-search' );
 
-		me.show_search = function() {
-			if(!me.search_dialog) {
-				var d = new Dialog(240, 140, "Quick Search");
-				d.make_body(
-					[['HTML','Select']
-					,['Button','Go', function() { me.search_dialog.hide(); me.open_quick_search(); }]]);
-				d.onshow = function(){
-					me.search_sel.inp.focus();	
-				}
-				me.search_dialog = d;
-				
-				// select
-				me.search_sel = new SelectWidget(d.widgets['Select'], [], '120px');
-				me.search_sel.inp.value = 'Select...';
-			
-				me.open_quick_search = function() {
-					me.search_dialog.hide();
-					var v = sel_val(me.search_sel);
-					if(v) selector.set_search(v);
-					me.search_sel.disabled = 1;
-					selector.show();
-				}
-	
-				// replace by labels
-				var nl = profile.can_read;
-				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
-					
-				me.search_sel.set_options(nl.sort());
-				me.search_sel.onchange = function() { me.open_quick_search(); }
-			}
-			me.search_dialog.show();
+		// make the dialog
+		// ----------------
+		var d = new Dialog(240, 140, "Quick Search");
+		d.make_body(
+			[['HTML','Select']
+			,['Button','Go', function() { me.search_dialog.hide(); me.open_quick_search(); }]]);
+		d.onshow = function(){
+			me.search_sel.inp.focus();	
 		}
-		startup_list.push(makeselector);
+		me.search_dialog = d;
+		
+		// select
+		me.search_sel = new SelectWidget(d.widgets['Select'], [], '120px');
+		me.search_sel.inp.value = 'Select...';
+	
+		me.open_quick_search = function() {
+			me.search_dialog.hide();
+			var v = sel_val(me.search_sel);
+			if(v) selector.set_search(v);
+			me.search_sel.disabled = 1;
+			selector.show();
+		}
+
+		// replace by labels
+		var nl = profile.can_read;
+		for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
+			
+		me.search_sel.set_options(nl.sort());
+		me.search_sel.onchange = function() { me.open_quick_search(); }
+		
+		// make the selector dialog
+		makeselector();
 	}
 	
 	// Setup User / Logout area

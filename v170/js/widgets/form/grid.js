@@ -231,17 +231,17 @@ _f.Grid.prototype.set_cell_value = function(cell) {
 
 		if(cur_frm.editable && this.can_edit) {
 
-			var ed = $a($td(t,0,1),'img','',{cursor:'pointer'}); ed.cell = cell; ed.title = 'Edit Row';
-			ed.src = 'images/icons/page.gif'; ed.onclick = function() { 
+			var ed = $a($td(t,0,1),'div','wn-icon ic-doc_edit',{cursor:'pointer'}); ed.cell = cell; ed.title = 'Edit Row';
+			ed.onclick = function() { 
 				_f.cur_grid = me;
 				_f.cur_grid_ridx = this.cell.row.rowIndex;
 				_f.edit_record(me.doctype, this.cell.row.docname, 1);				
 			}
 			
 			if(!me.is_scrolltype) {
-				var ca = $a($td(t,0,2),'img','',{cursor:'pointer'});
+				var ca = $a($td(t,0,2),'div','wn-icon ic-round-minus',{cursor:'pointer'});
 				ca.cell = cell; ca.title = 'Delete Row';
-				ca.src = 'images/icons/cancel.gif'; ca.onclick = function() {
+				ca.onclick = function() {
 					me.delete_row(me.doctype, this.cell.row.docname);
 				}
 			}

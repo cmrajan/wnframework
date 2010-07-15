@@ -25,8 +25,8 @@ _f.FormGrid.prototype.make_tbar_link = function(parent, label, fn, icon, isactiv
 
 	var div = $a(parent,'div','',{cursor:'pointer'});
 	var t = make_table(div, 1, 2, '90%', ['20px',null]);
-	var img = $a($td(t,0,0),'img');
-	img.src = 'images/icons/'+icon;
+	var img = $a($td(t,0,0),'div','wn-icon ' + icon);
+
 	var l = $a($td(t,0,1),'span','link_type');
 	l.style.fontSize = '11px';
 	l.innerHTML = label;
@@ -46,10 +46,10 @@ _f.FormGrid.prototype.make_buttons = function() {
 	var me = this;
 	if(this.is_scrolltype) {
 		this.tbar_btns = {};
-		this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'table_row_delete.gif',1);
-		this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'table_row_insert.gif',1);
-		this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'arrow_up.gif',1);
-		this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'arrow_down.gif',1);
+		this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'ic-round_minus',1);
+		this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'ic-round_plus',1);
+		this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'ic-arrow_bottom',1);
+		this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'ic-arrow_top',1);
 		
 		for(var i in this.btns)
 			this.btns[i].isactive = true;
