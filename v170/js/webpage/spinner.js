@@ -1,12 +1,3 @@
-function get_scroll_top() {
-	var st = 0;
-	if(document.documentElement && document.documentElement.scrollTop)
-		st = document.documentElement.scrollTop;
-	else if(document.body && document.body.scrollTop)
-		st = document.body.scrollTop;
-	return st;
-}
-
 var _loading_div;
 function set_loading() {
 	if(!_loading_div) {
@@ -22,9 +13,9 @@ function set_loading() {
 
 	if(isIE6) {
 		d.style.top = (get_scroll_top()+10)+'px';
-		window.onscroll = function() { 
-			d.style.top = (get_scroll_top()+10)+'px'; 
-		}
+		scroll_list.push(function() { 
+			_loading_div.style.top = (get_scroll_top()+10)+'px'; 
+		})
 	} else {
 		$y(d, {position: 'fixed', top: '10px'});
 	} 

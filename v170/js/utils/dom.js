@@ -255,6 +255,15 @@ function get_page_size(){
 	return r;
 }
 
+// get scroll top
+function get_scroll_top() {
+	var st = 0;
+	if(document.documentElement && document.documentElement.scrollTop)
+		st = document.documentElement.scrollTop;
+	else if(document.body && document.body.scrollTop)
+		st = document.body.scrollTop;
+	return st;
+}
 
 // set user image
 var user_img = {};

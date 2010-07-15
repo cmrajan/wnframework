@@ -89,17 +89,17 @@ _f.add_frm = function(doctype, onload, opt_name) {
 		}
 		
 		// show fullpage or in Dialog?
-		var meta = locals.DocType[doctype];
+		var meta = locals['DocType'][doctype];
 		var in_dialog = false;
 		
 		// if is table, its in the Dialog!
 		if(meta.istable) meta.in_dialog = 1;
 		
 		if(cint(meta.in_dialog)) {
-			parent = _f.frm_dialog;	
+			var parent = _f.frm_dialog;	
 			in_dialog = true;
 		} else {
-			parent = _f.frm_con;
+			var parent = _f.frm_con;
 		}
 		
 		// create the object

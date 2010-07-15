@@ -11,7 +11,15 @@ function WNToolbar(parent) {
 	
 	this.setup = function() {
 		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#555', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
-		this.table_wrapper = $a(parent, 'div', '', {marginLeft:'16px'});
+
+		if(isIE6) {
+			$y(me.wrapper, {position:'absolute', top:'0px'});
+			scroll_list.push(function() { 
+				page_body.wntoolbar.wrapper.style.top = (get_scroll_top())+'px'; 
+			})
+		}
+
+		this.table_wrapper = $a(this.wrapper, 'div', '', {marginLeft:'16px'});
 		this.body_tab = make_table(this.wrapper, 1, 2, '100%', ['64%','36%'],{padding:'2px'});
 		
 		this.menu = new MenuToolbar($td(this.body_tab,0,0));
@@ -212,6 +220,7 @@ function WNToolbar(parent) {
 				me.search_sel.inp.value = 'Select...';
 			
 				me.open_quick_search = function() {
+					me.search_dialog.hide();
 					var v = sel_val(me.search_sel);
 					if(v) selector.set_search(v);
 					me.search_sel.disabled = 1;
@@ -234,7 +243,7 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
-		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px'});
+		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px', textAlign:'right'});
 		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'11px'});
 		$y(t,{cssFloat:'right', color:'#FFF'});
 		$y($td(t,0,0),{border:'0px'});

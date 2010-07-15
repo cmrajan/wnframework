@@ -152,4 +152,13 @@ function setup_calendar() {
 
 startup_list.push(setup_calendar);
 
+// ie6 fixed pos fix
+if(isIE6) {
+	var scroll_list = []
+	window.onscroll = function() { 
+		for(var i=0; i<scroll_list.length; i++) {
+			scroll_list[i]();
+		}	
+	}
+}
 window.onload = function() { startup() }
