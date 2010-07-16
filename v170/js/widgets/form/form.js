@@ -619,7 +619,7 @@ _f.Frm.prototype.refresh = function(docname) {
 		if(!this.display) this.show_the_frm();
 		
 		// show the page
-		if(!this.meta.in_dialog)page_body.change_to('Forms');
+		if(!this.meta.in_dialog) page_body.change_to('Forms');
 
 	} 
 }
@@ -888,10 +888,18 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 		if(callingfield)callingfield.input.disabled = true;
 		$c('runserverobj', {'docs':doclist, 'method':scriptname }, 
 			function(r, rtxt) { 
-				if(onrefresh)onrefresh(r,rtxt);
-				me.show_the_frm();
+				// run refresh
+				if(onrefresh)
+					onrefresh(r,rtxt);
+
+				// fields
+				me.refresh_fields();
+				
+				// dependent fields
+				me.refresh_dependency();
+
+				// enable button
 				if(callingfield)callingfield.input.disabled = false;
-				//if(r.message)alert(r.message);
 			}
 		);
 	}

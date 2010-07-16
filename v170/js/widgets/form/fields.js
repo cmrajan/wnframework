@@ -28,12 +28,12 @@ Field.prototype.make_body = function() {
 		this.label_span = $a($td(t,0,0+ischk), 'span', '', {marginRight:'4px', fontSize:'11px'})
 	
 		// help icon
-		this.help_icon = $a($td(t,0,1+ischk),'div','wn-icon ic-tag',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
+		this.help_icon = $a($td(t,0,1+ischk),'div','wn-icon ic-question',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
 		//this.help_icon.src = 'images/icons/help.gif';
 	
 		// error icon
-		this.label_icon = $a($td(t,0,2+ischk),'div','wn-icon ic-attention',{marginRight:'4px'}); $dh(this.label_icon);
-		//this.label_icon.src = 'images/icons/error.gif';
+		this.label_icon = $a($td(t,0,2+ischk),'img','',{marginRight:'4px'}); $dh(this.label_icon);
+		this.label_icon.src = 'images/icons/error.gif';
 
 	} else {
 		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px'})
@@ -581,11 +581,15 @@ LinkField.prototype.make_input = function() {
 			_f.calling_doc_stack.push([me.doctype, me.docname]);
 			new_doc(me.df.options, null, 1, on_save_callback, me.doctype, me.docname, me.frm.not_in_container); 
 		}
+	} else {
+		$dh(me.btn2);
 	}
 
 	me.onrefresh = function() {
-		if(me.can_create && cur_frm.doc.docstatus==0) $ds(me.btn2);
-		else $dh(me.btn2);
+		if(me.can_create && cur_frm.doc.docstatus==0) 
+			$ds(me.btn2);
+		else 
+			$dh(me.btn2);
 	}
 	
 	// add auto suggest

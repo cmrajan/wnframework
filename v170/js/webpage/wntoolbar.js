@@ -10,7 +10,7 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#555', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
+		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#777', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
 
 		if(isIE6) {
 			$y(me.wrapper, {position:'absolute', top:'0px'});
@@ -160,7 +160,7 @@ function WNToolbar(parent) {
 				// replace by labels
 				var nl = profile.can_create;
 				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
-				
+								
 				// labels
 				me.new_sel = new SelectWidget(d.widgets['Select'], nl.sort(), '200px');
 				me.new_sel.onchange = function() { me.new_dialog.hide(); new_doc(me.new_sel.inp.value); }

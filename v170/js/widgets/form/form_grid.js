@@ -21,23 +21,26 @@ _f.FormGrid.prototype.setup = function() {
 	this.make_columns();
 }
 
-_f.FormGrid.prototype.make_tbar_link = function(parent, label, fn, icon, isactive) {
+_f.FormGrid.prototype.make_tbar_link = function(parent, label, fn, icon) {
 
 	var div = $a(parent,'div','',{cursor:'pointer'});
 	var t = make_table(div, 1, 2, '90%', ['20px',null]);
 	var img = $a($td(t,0,0),'div','wn-icon ' + icon);
 
-	var l = $a($td(t,0,1),'span','link_type');
+	$y($td(t,0,0),{textAlign:'right'});
+
+	var l = $a($td(t,0,1),'span','link_type',{color:'#333'});
 	l.style.fontSize = '11px';
 	l.innerHTML = label;
 	div.onclick = fn;
 	div.show = function() { $ds(this); }
 	div.hide = function() { $dh(this); }
 
-	$td(t,0,0).isactive = isactive;
-	$td(t,0,1).isactive = isactive;
-	l.isactive = isactive;
-	div.isactive = isactive;
+	$td(t,0,0).isactive = 1;
+	$td(t,0,1).isactive = 1;
+	l.isactive = 1;
+	div.isactive = 1;
+	img.isactive = 1;
 
 	return div;
 }
@@ -46,10 +49,10 @@ _f.FormGrid.prototype.make_buttons = function() {
 	var me = this;
 	if(this.is_scrolltype) {
 		this.tbar_btns = {};
-		this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'ic-round_minus',1);
-		this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'ic-round_plus',1);
-		this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'ic-arrow_bottom',1);
-		this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'ic-arrow_top',1);
+		this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'ic-round_minus');
+		this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'ic-round_plus');
+		this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'ic-arrow_top');
+		this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'ic-arrow_bottom');
 		
 		for(var i in this.btns)
 			this.btns[i].isactive = true;
@@ -190,11 +193,11 @@ _f.FormGrid.prototype.make_newrow = function(from_add_btn) {
 
 _f.FormGrid.prototype.check_selected = function() {
 	if(!_f.cur_grid_cell) {
-		show_alert('Select a cell first');
+		msgprint('Select a cell first');
 		return false;
 	}
 	if(_f.cur_grid_cell.grid != this) {
-		show_alert('Select a cell first');
+		msgprint('Select a cell first');
 		return false;
 	}
 	return true;
