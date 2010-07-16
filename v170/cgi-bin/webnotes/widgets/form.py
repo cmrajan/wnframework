@@ -131,7 +131,7 @@ def runserverobj():
 					make_csv_output(r, so.doc.doctype)
 				else:
 					webnotes.response['message'] = r
-					
+			
 			if clientlist:
 				doclist.append(main_doc)
 				webnotes.response['docs'] = doclist

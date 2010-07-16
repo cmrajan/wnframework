@@ -36,7 +36,7 @@ class Profile:
 	def get_create_list(self):
 		cl = self.get_allow_list('create')
 		conn = webnotes.conn
-		no_create_list = [r[0] for r in conn.sql('select name from tabDocType where in_create = 1 or istable=1')]
+		no_create_list = [r[0] for r in conn.sql('select name from tabDocType where ifnull(in_create,0)=1 or ifnull(istable,0)=1 or ifnull(issingle,0)=1')]
 		self.can_create = filter(lambda x: x not in no_create_list, cl)
 		return self.can_create
 		
