@@ -165,7 +165,7 @@ _f.Frm.prototype.email_doc = function() {
 // ======================================================================================
 
 _f.Frm.prototype.set_heading = function() {
-	if(!this.meta.istable) this.frm_head.refresh_labels(this);
+	if(!this.meta.istable && this.frm_head) this.frm_head.refresh_labels(this);
 }
 
 
