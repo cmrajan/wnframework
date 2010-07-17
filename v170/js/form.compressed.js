@@ -183,7 +183,7 @@ _f.SectionBreak=function(){this.set_input=function(){};}
 _f.SectionBreak.prototype.make_row=function(){this.row=this.frm.layout.addrow();}
 _f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div','',{backgroundColor:'#EEE',padding:'0px 8px'}),1,2,'100%',[null,'60px'],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,0),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.body,{margin:'16px 24px'});$y($td(t,0,1),{textAlign:'right'});this.exp_icon=$a($td(t,0,1),'div','wn-icon ic-rnd_br_up',{cssFloat:'right'});this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
 this.exp_icon.expand=function(){$ds(me.row.body)
-me.exp_icon.className='wn-icon ic-rnd_br_down';}
+me.exp_icon.className='wn-icon ic-rnd_br_up';}
 this.exp_icon.collapse=function(){$dh(me.row.body)
 me.exp_icon.className='wn-icon ic-rnd_br_down';}
 $y(head,{padding:'2px',borderBottom:'1px solid #ccc',margin:'8px'});this.collapse=this.exp_icon.collapse;this.expand=this.exp_icon.expand;}
@@ -319,8 +319,8 @@ _f.FormGrid.prototype.make_newrow=function(from_add_btn){if(!this.can_add_rows)
 return;if((!from_add_btn)&&(this.field.df['default'].toLowerCase()=='simple'))return;if(this.tab.rows.length){var r=this.tab.rows[this.tab.rows.length-1];if(r.is_newrow)
 return;}
 var r=this.append_row();r.cells[0].div.innerHTML='<b style="font-size: 18px;">*</b>';r.is_newrow=true;}
-_f.FormGrid.prototype.check_selected=function(){if(!_f.cur_grid_cell){msgprint('Select a cell first');return false;}
-if(_f.cur_grid_cell.grid!=this){msgprint('Select a cell first');return false;}
+_f.FormGrid.prototype.check_selected=function(){if(!_f.cur_grid_cell){show_alert('Select a cell first');return false;}
+if(_f.cur_grid_cell.grid!=this){show_alert('Select a cell first');return false;}
 return true;}
 _f.FormGrid.prototype.delete_row=function(dt,dn){if(dt&&dn){LocalDB.delete_record(dt,dn);this.refresh();}else{if(!this.check_selected())return;var r=_f.cur_grid_cell.row;if(r.is_newrow)return;var ci=_f.cur_grid_cell.cellIndex;var ri=_f.cur_grid_cell.row.rowIndex;LocalDB.delete_record(this.doctype,r.docname);this.refresh();if(ri<(this.tab.rows.length-2))
 this.cell_select(null,ri,ci);else _f.cur_grid_cell=null;}

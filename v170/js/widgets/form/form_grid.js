@@ -193,11 +193,11 @@ _f.FormGrid.prototype.make_newrow = function(from_add_btn) {
 
 _f.FormGrid.prototype.check_selected = function() {
 	if(!_f.cur_grid_cell) {
-		msgprint('Select a cell first');
+		show_alert('Select a cell first');
 		return false;
 	}
 	if(_f.cur_grid_cell.grid != this) {
-		msgprint('Select a cell first');
+		show_alert('Select a cell first');
 		return false;
 	}
 	return true;

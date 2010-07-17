@@ -75,7 +75,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	this.exp_icon.expand = function() { 
 		$ds(me.row.body) 
 		//me.exp_icon.src = min_icon; 
-		me.exp_icon.className = 'wn-icon ic-rnd_br_down';
+		me.exp_icon.className = 'wn-icon ic-rnd_br_up';
 	}
 	this.exp_icon.collapse = function() { 
 		$dh(me.row.body) 

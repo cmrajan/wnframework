@@ -23,5 +23,5 @@ debug_log, message_log = [], []
 def errprint(msg):
 	debug_log.append(str(msg or ''))
 
-def msgprint(msg):
-	message_log.append(str(msg or ''))
+def msgprint(msg, small=0):
+	message_log.append((small and '__small:' or '')+str(msg or ''))

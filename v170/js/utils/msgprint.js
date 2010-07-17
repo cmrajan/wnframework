@@ -1,6 +1,12 @@
 var msg_dialog;
 function msgprint(msg, static, callback) {
 
+	// small message
+	if(msg.substr(0,8)=='__small:') {
+		show_alert(msg.substr(8));
+		return;
+	}
+
 	if(!msg_dialog) {
 		msg_dialog = new Dialog(300, 200, "Message");
 		msg_dialog.make_body([['HTML','Msg'],])
@@ -40,15 +46,21 @@ function msgprint(msg, static, callback) {
 
 
 // Floating Message
-
-function FloatingMessage() {
-	if($i('fm_cancel')) {
-		$i('fm_cancel').onclick = function() {
-			$dh($i('floating_message'));	
-		}
-		this.show = function(content) {
-			$i('fm_content').innerHTML = content;
-			$ds($i('floating_message'));
-		}
+var growl_area;
+function show_alert(txt) {
+	if(!growl_area) {
+		growl_area = $a(popup_cont, 'div', '', {position:'fixed', bottom:'8px', right:'8px', width: '320px', zIndex:10});
 	}
+	var wrapper = $a(growl_area, 'div', '', {position:'relative'});
+	var body = $a(wrapper, 'div', 'notice');
+	
+	// close
+	var c = $a(body, 'div', 'wn-icon ic-round_delete', {cssFloat:'right'});
+	$(c).click(function() { $dh(this.wrapper) });
+	c.wrapper = wrapper;
+	
+	// text
+	var t = $a(body, 'div', '', { color:'#FFF' });
+	$(t).html(txt);
+	$(wrapper).hide().fadeIn(1000);
 }

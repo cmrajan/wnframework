@@ -7,7 +7,7 @@ def clear():
 	clear_cache()
 
 	import webnotes
-	webnotes.msgprint("Cache Cleared")
+	webnotes.response['message'] = "Cache Cleared"
 
 def clear_cache(user=''):
 	import webnotes
