@@ -640,7 +640,7 @@ _f.Frm.prototype.refresh_tabs = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_footer = function() {
-	if(this.editable && this.doc.docstatus==0 && !this.meta.istable) $ds(this.footer);
+	if(this.editable && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE]) $ds(this.footer);
 	else $dh(this.footer);
 }
 

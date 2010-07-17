@@ -48,7 +48,9 @@ _f.FrmHeader.prototype.refresh= function() {
 		this.page_head.add_button('Amend', function() { cur_frm.amend_doc() }, 0, 'ui-icon-scissors');
 
 	// New
-	this.page_head.add_button('New', function() { new_doc() }, 0, 'ui-icon-document');
+	if(in_list(profile.can_create, cur_frm.doctype)) {
+		this.page_head.add_button('New', function() { new_doc() }, 0, 'ui-icon-document');
+	}
 	
 	// Refresh
 	this.page_head.add_button('Refresh', function() { cur_frm.reload_doc(); }, 0, 'ui-icon-refresh');
@@ -62,7 +64,7 @@ _f.FrmHeader.prototype.refresh= function() {
 		this.page_head.add_button('Email', function() { cur_frm.email_doc(); }, 0, 'ui-icon-mail-closed');
 	
 	// Copy
-	if(!cur_frm.meta.allow_copy)
+		if(in_list(profile.can_create, cur_frm.doctype) && !cur_frm.meta.allow_copy)
 		this.page_head.add_button('Copy', function() { cur_frm.copy_doc(); }, 0, 'ui-icon-copy');
 
 	// Trash
