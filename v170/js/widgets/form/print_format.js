@@ -35,7 +35,7 @@ _p.field_tab = function(layout_cell) {
 // standard layout
 // ==========================================================================
 
-_p.print_std_add_table = function(t, layout, pf_list) {
+_p.print_std_add_table = function(t, layout, pf_list, dt, no_letterhead) {
 	if(t.appendChild) { 
 		// one table only
 		layout.cur_cell.appendChild(t);
@@ -45,10 +45,12 @@ _p.print_std_add_table = function(t, layout, pf_list) {
 			// add to current page
 			layout.cur_cell.appendChild(t[ti]);
 			layout.close_borders();
-			pf_list[pf_list.length] = '<div style="page-break-after: always;"></div>';
+			pf_list[pf_list.length] = '<div style="page-break-after: always;" class="page_break"></div>';
 							
 			// new page
-			layout = add_layout();
+			layout = _p.add_layout(dt, no_letterhead);
+			pf_list[pf_list.length]=layout;
+	
 			layout.addrow(); 
 			layout.addcell();
 		
@@ -59,6 +61,7 @@ _p.print_std_add_table = function(t, layout, pf_list) {
 		// last table
 		layout.cur_cell.appendChild(t[t.length-1]);
 	}
+	return layout;
 }
 
 // --------------------------------------------------------------------
@@ -85,26 +88,29 @@ _p.print_std_add_field = function(dt, dn, f, layout) {
 
 // --------------------------------------------------------------------
 
+_p.add_layout = function(dt, no_letterhead) {
+	var l = new Layout();
+	if(locals['DocType'][dt].print_outline=='Yes') l.with_border = 1;
+
+	// add letter head
+	var cp = locals['Control Panel']['Control Panel'];
+	l.addrow();
+	if(cp.letter_head && !no_letterhead) {
+		l.cur_row.header.innerHTML = cp.letter_head;
+	}
+	
+	return l;
+}
+
+// --------------------------------------------------------------------
+
 _p.print_std = function(no_letterhead) {
 	var dn = cur_frm.docname;
 	var dt = cur_frm.doctype;
 	var pf_list = [];
 
-	function add_layout() {
-		var l = new Layout();
-		if(locals['DocType'][dt].print_outline=='Yes') l.with_border = 1;
-		pf_list[pf_list.length]=l;
-		return l;
-	}
-
-	var layout = add_layout();
-
-	// add letter head
-	var cp = locals['Control Panel']['Control Panel'];
-	pf_list[pf_list.length-1].addrow();
-	if(cp.letter_head && !no_letterhead) {
-		pf_list[pf_list.length-1].cur_row.header.innerHTML = cp.letter_head;
-	}
+	var layout = _p.add_layout(dt, no_letterhead);
+	pf_list[pf_list.length]=layout;
 
 	// heading
 	var h1 = $a(layout.cur_row.header, 'h1', '', {fontSize:'22px', marginBottom:'8px'}); 
@@ -156,7 +162,7 @@ _p.print_std = function(no_letterhead) {
 					break;
 				 case 'Table': 
 					var t = print_table(dt, dn,f.fieldname,f.options,null,null,null,null);
-					_p.print_std_add_table(t, layout, pf_list);
+					layout = _p.print_std_add_table(t, layout, pf_list, dt, no_letterhead);
 				 	break;
 				 case 'HTML': 
 				 	var tmp = $a(layout.cur_cell, 'div');

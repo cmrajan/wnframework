@@ -265,6 +265,11 @@ div.frm_print_wrapper {
 	-webkit-box-shadow: 1px 1px 8px #229;
 }
 
+div.page_break {
+	margin: 24px 0px;
+	border-top: 1px dashed #888;
+}
+
 div.grid_tbarlinks {
 	border-bottom: 0px;
 	background-color: #CCC;
@@ -500,6 +505,7 @@ div.time_field select{
 	z-index: 1;
 	height: 30px;
 	padding: 0px;
+	overflow: hidden;
 	/*background-color: #fff;*/
 }
 

@@ -189,11 +189,9 @@ def _do_action(doc, doclist, so, method_name, docstatus):
 			run_server_obj(so, 'custom_'+method_name)
 		errmethod = ''
 
-		for d in [doc] + doclist:
-			set(d, 'docstatus', docstatus)
-			
-	else:
-		for d in [doc] + doclist:
+	# set docstatus for all children records
+	for d in [doc] + doclist:
+		if int(d.docstatus or 0) != 2:
 			set(d, 'docstatus', docstatus)
 
 def check_integrity(doc):

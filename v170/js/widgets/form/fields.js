@@ -251,8 +251,6 @@ Field.prototype.set_input = function(val) {
 
 Field.prototype.run_trigger = function() {
 	if(this.not_in_form) {
-		if(this.report)
-			this.report.run();
 		return;
 	}
 
@@ -582,7 +580,7 @@ LinkField.prototype.make_input = function() {
 			new_doc(me.df.options, null, 1, on_save_callback, me.doctype, me.docname, me.frm.not_in_container); 
 		}
 	} else {
-		$dh(me.btn2);
+		$dh(me.btn2); $y($td(me.tab,0,2), {width:'0px'});
 	}
 
 	me.onrefresh = function() {
@@ -967,13 +965,18 @@ TimeField.prototype.set_disp=function(v) {
 // Used by date and link fields
 
 function makeinput_popup(me, iconsrc, iconsrc1, iconsrc2) {
-	me.input = $a(me.input_area, 'div', '', {width:'80%'});
+	me.input = $a(me.input_area, 'div');
+	if(!me.not_in_form)
+		$y(me.input, {width:'80%'});
+		
 	me.input.onchange = function() { /*alert('in_oc'); me.txt.onchange();*/ }
 	me.input.set_width = function(w) {
 		$y(me.input, {width:(w-2)+'px'});
 	}
 	
 	var tab = $a(me.input, 'table');
+	me.tab = tab;
+	
 	$y(tab, {width:'100%', borderCollapse:'collapse', tableLayout:'fixed'});
 	
 	var c0 = tab.insertRow(0).insertCell(0);
