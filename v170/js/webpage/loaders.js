@@ -111,7 +111,9 @@ function loaddoc(doctype, name, onload, menuitem) {
 			if(frm.menuitem) frm.menuitem.show_selected();
 
 		} else {
-			msgprint('error:There were errors while loading ' + doctype + ',' + name);
+			// nothing, go home - there were errors
+			if(r.exc) { msgprint('There were errors while loading ' + doctype + ' ' + name); }
+			loadpage('_home');
 		}
 	}
 		

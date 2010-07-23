@@ -58,7 +58,7 @@ class Document:
 		else:
 			dataset = webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
 			if not dataset:
-				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name))
+				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name), 1)
 				raise Exception
 			self.load_values(dataset[0], webnotes.conn.get_description())
 

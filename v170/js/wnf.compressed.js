@@ -195,7 +195,7 @@ function makeArgString(dict){var varList=[];for(key in dict){varList[varList.len
 return varList.join('&');}
 function open_url_post(URL,PARAMS){var temp=document.createElement("form");temp.action=URL;temp.method="POST";temp.style.display="none";for(var x in PARAMS){var opt=document.createElement("textarea");opt.name=x;opt.value=PARAMS[x];temp.appendChild(opt);}
 document.body.appendChild(temp);temp.submit();return temp;}
-var msg_dialog;function msgprint(msg,issmall,callback){if(issmall){show_alert(msg);}
+var msg_dialog;function msgprint(msg,issmall,callback){if(issmall){show_alert(msg);return;}
 if(msg.substr(0,8)=='__small:'){show_alert(msg.substr(8));return;}
 if(!msg_dialog){msg_dialog=new Dialog(300,200,"Message");msg_dialog.make_body([['HTML','Msg'],])
 msg_dialog.onhide=function(){msg_dialog.msg_area.innerHTML='';$dh(msg_dialog.msg_icon);if(msg_dialog.custom_onhide)msg_dialog.custom_onhide();}
@@ -854,7 +854,8 @@ if(doctype=='DocType'&&frms[name]){msgprint("Cannot open DocType \""+name+"\" wh
 var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
 if(!frms[doctype]){_f.add_frm(doctype,show_doc,name);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user},show_doc,null,null);}}
 var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){var frm=frms[doctype];if(menuitem)frm.menuitem=menuitem;if(onload)onload(frm);if(r&&r.n_tweets)frm.n_tweets[name]=r.n_tweets;if(r&&r.last_comment)frm.last_comments[name]=r.last_comment;frm.refresh(name);if(!frm.in_dialog)
-nav_obj.open_notify('Form',doctype,name);if(frm.menuitem)frm.menuitem.show_selected();}else{msgprint('error:There were errors while loading '+doctype+','+name);}}
+nav_obj.open_notify('Form',doctype,name);if(frm.menuitem)frm.menuitem.show_selected();}else{if(r.exc){msgprint('There were errors while loading '+doctype+' '+name);}
+loadpage('_home');}}
 new_widget('_f.FrmContainer',show_form,1);}
 function new_doc(doctype,onload,in_dialog,on_save_callback,cdt,cdn,cnic){doctype=get_label_doctype(doctype);if(!doctype){if(cur_frm)doctype=cur_frm.doctype;else return;}
 var show_doc=function(){frm=frms[doctype];if(frm.perm[0][CREATE]==1){if(frm.meta.issingle){var dn=doctype;LocalDB.set_default_values(locals[doctype][doctype]);}else
@@ -882,7 +883,7 @@ var pages=[];function Page(page_name,content){var me=this;this.name=page_name;th
 this.cont=page_body.add_page(page_name,this.onshow);if(content)
 this.cont.innerHTML=content;if(page_name==home_page)
 pages['_home']=this;return this;}
-function render_page(page_name,menuitem){if(!page_name)return;if((!locals['Page'])||(!locals['Page'][page_name])){alert(page_name+' not found');return;}
+function render_page(page_name,menuitem){if(!page_name)return;if((!locals['Page'])||(!locals['Page'][page_name])){loadpage('_home');return;}
 var pdoc=locals['Page'][page_name];if(pdoc.style)set_style(pdoc.style)
 var p=new Page(page_name,pdoc._Page__content?pdoc._Page__content:pdoc.content);var script=pdoc.__script?pdoc.__script:pdoc.script;p.doc=pdoc;if(script)
 try{eval(script);}catch(e){submit_error(e);}

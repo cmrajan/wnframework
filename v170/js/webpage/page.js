@@ -28,7 +28,9 @@ function Page(page_name, content) {
 function render_page(page_name, menuitem) {
 	if(!page_name)return;
 	if((!locals['Page']) || (!locals['Page'][page_name])) {
-		alert(page_name + ' not found'); return;
+		// no page, go home
+		loadpage('_home');
+		return;
 	}
 	var pdoc = locals['Page'][page_name];
 

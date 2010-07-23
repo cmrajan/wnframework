@@ -9,7 +9,8 @@ _f.cur_grid.refresh_row(_f.cur_grid_ridx,me.dn);}
 this.dialog=d;}
 _f.add_frm=function(doctype,onload,opt_name){if(frms['DocType']&&frms['DocType'].opendocs[doctype]){msgprint("error:Cannot create an instance of \""+doctype+"\" when the DocType is open.");return;}
 if(frms[doctype]){return frms[doctype];}
-var callback=function(r,rt){if(!locals['DocType'][doctype]){return;}
+var callback=function(r,rt){if(!locals['DocType'][doctype]){if(r.exc){msgprint("Unable to load "+doctype,1);}
+loadpage('_home');return;}
 var meta=locals['DocType'][doctype];var in_dialog=false;if(meta.istable)meta.in_dialog=1;if(cint(meta.in_dialog)){var parent=_f.frm_dialog;in_dialog=true;}else{var parent=_f.frm_con;}
 var f=new _f.Frm(doctype,parent);f.in_dialog=in_dialog;if(onload)onload(r,rt);}
 var is_new=0;if(opt_name&&locals[doctype]&&locals[doctype][opt_name]&&locals[doctype][opt_name].__islocal){is_new=1;}

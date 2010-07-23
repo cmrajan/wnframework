@@ -85,6 +85,8 @@ _f.add_frm = function(doctype, onload, opt_name) {
 	// Load Doctype from server
 	var callback = function(r,rt) {
 		if(!locals['DocType'][doctype]) {
+			if(r.exc) { msgprint("Unable to load " + doctype, 1); }
+			loadpage('_home');
 			return;
 		}
 		
