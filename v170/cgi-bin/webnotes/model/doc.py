@@ -3,7 +3,8 @@ import webnotes.model.meta
 
 from webnotes.utils import *
 
-class BaseDocType:
+# actually should be "BaseDocType" deprecated. Only for v160
+class SuperDocType:
 	def __init__(self):
 		pass
 		
