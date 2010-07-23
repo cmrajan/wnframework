@@ -118,3 +118,10 @@ def copytables(srctype, src, srcfield, tartype, tar, tarfield, srcfields, tarfie
 			
 		l.append(newrow)
 	return l
+
+# DB Exists
+#=================================================================================
+
+def db_exists(dt, dn):
+	import webnotes
+	return webnotes.conn.exists(dt, dn)
