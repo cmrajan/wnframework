@@ -11,10 +11,11 @@ def clear():
 
 def clear_cache(user=''):
 	import webnotes
-	if not user: 
-		user = webnotes.session['user']
 	try:
-		webnotes.conn.sql("delete from __SessionCache where user=%s", user)
+		if user:
+			webnotes.conn.sql("delete from __SessionCache where user=%s", user)
+		else:
+			webnotes.conn.sql("delete from __SessionCache")
 	except Exception, e:
 		if e.args[0]==1146:
 			make_cache_table()
