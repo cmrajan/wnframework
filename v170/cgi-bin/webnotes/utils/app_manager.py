@@ -164,6 +164,7 @@ class App:
 	# ----------------------------------
 	def sync_doc(self, dt, dn):
 		import webnotes
+		from webnotes.utils import transfer
 		
 		webnotes.conn = self.master_conn
 		import webnotes.model.doc
@@ -173,7 +174,7 @@ class App:
 		
 		# put
 		webnotes.conn = self.conn
-		print webnotes.utils.transfer.set_doc([d.fields for d in doclist], ovr = 1)
+		print transfer.set_doc([d.fields for d in doclist], ovr = 1)
 	
 	# get the list from master
 	# ----------------------------------
