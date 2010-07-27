@@ -19,6 +19,7 @@ class AppManager:
 		if not al:
 			self.acc_conn = webnotes.db.Database(use_default=1)
 			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount')]
+		print al
 		for a in al:
 			self.app_list.append(App(self.master, a))
 
