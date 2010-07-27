@@ -21,7 +21,7 @@ class AppManager:
 			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount')]
 		print al
 		for a in al:
-			self.app_list.append(App(self.master, a))
+			self.app_list.append(App(a, self.master))
 
 	# sync all the apps
 	# ----------------------------------
