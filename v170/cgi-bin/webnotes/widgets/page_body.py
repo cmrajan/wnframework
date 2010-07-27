@@ -65,16 +65,13 @@ import webnotes
 def get_page_content(page):
 	if not page:
 		return 'No Title', 'No Content'
-	
+
+	content = 'Oops - No SEO Friendly Content - Use "static_content" in page to set this!'
 	if webnotes.conn.sql("select name from tabDocField where fieldname='static_content' and parent='Page'"):
 		content = webnotes.conn.sql("select content, static_content from tabPage where name=%s", page)
 		if content:
-			content = content[0][1] or content[0][0]
-	else:
-		content = webnotes.conn.sql("select content from tabPage where name=%s", page)
-		if content:
-			content = content[0][0]
-	
+			content = content[0][1]
+
 	# title
 	if webnotes.conn.sql("select name from tabDocField where fieldname='page_title' and parent='Page'"):
 		title = webnotes.conn.sql("select page_title from tabPage where name=%s", page)[0][0]

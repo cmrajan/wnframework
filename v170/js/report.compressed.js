@@ -139,7 +139,7 @@ this.add_btn=$a($a($td(t,0,1),'div'),'button','',{width:'110px'});this.add_btn.i
 this.remove_btn=$a($a($td(t,0,1),'div'),'button','',{width:'110px'});this.remove_btn.innerHTML='<b>&lt; Remove</b>';this.remove_btn.onclick=function(){me.move(me.sel_fields,'remove');}
 this.remove_all=$a($a($td(t,0,1),'div'),'button','',{width:'40px'});this.remove_all.innerHTML='&lt;&lt;';this.remove_all.onclick=function(){me.move(me.sel_fields,'remove',1);}
 this.dn_btn=$a($a($td(t,0,1),'div'),'button','',{width:'70px'});this.dn_btn.innerHTML='Down &darr;';this.dn_btn.onclick=function(){me.move_down();}
-$a($td(t,0,2),'h3','',{marginBottom:'8px'}).innerHTML='Seleted Columns';this.sel_fields=$a($td(t,0,2),'select','',{height:'200px',width:'100%',border:'1px solid #AAA'});this.sel_fields.multiple=true;this.sel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}}
+$a($td(t,0,2),'h3','',{marginBottom:'8px'}).innerHTML='Selected Columns';this.sel_fields=$a($td(t,0,2),'select','',{height:'200px',width:'100%',border:'1px solid #AAA'});this.sel_fields.multiple=true;this.sel_fields.onchange=function(){for(var i=0;i<this.options.length;i++)this.options[i].field.is_selected=this.options[i].selected;}}
 _r.ReportColumnPicker.prototype.get_by_sel_idx=function(s,idx){for(var j=0;j<s.options.length;j++){if(s.options[j].field.sel_idx==idx)
 return s.options[j].field;}
 return{}}

@@ -1014,7 +1014,7 @@ _r.ReportColumnPicker.prototype.make_body = function() {
 	this.dn_btn.onclick = function() { me.move_down(); }
 
 	// multiple fields
-	$a($td(t,0,2), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Seleted Columns';
+	$a($td(t,0,2), 'h3', '', {marginBottom:'8px'}).innerHTML = 'Selected Columns';
 	this.sel_fields = $a($td(t,0,2), 'select', '', {height:'200px', width:'100%', border:'1px solid #AAA'});
 	this.sel_fields.multiple = true;
 	this.sel_fields.onchange = function() { for(var i=0; i<this.options.length; i++) this.options[i].field.is_selected = this.options[i].selected; }
