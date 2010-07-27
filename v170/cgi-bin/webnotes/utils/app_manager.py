@@ -173,7 +173,7 @@ class App:
 		
 		# put
 		webnotes.conn = self.conn
-		print webnotes.model.import_docs.set_doc([d.fields for d in doclist], ovr = 1)
+		print webnotes.utils.transfer.set_doc([d.fields for d in doclist], ovr = 1)
 	
 	# get the list from master
 	# ----------------------------------
