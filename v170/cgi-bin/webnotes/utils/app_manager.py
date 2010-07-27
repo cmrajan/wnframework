@@ -86,8 +86,6 @@ class App:
 		self.ac_name = ac_name
 		self.master = master
 		self.verbose = 0
-		self.db_login = self.get_db_login(ac_name)
-		
 	
 	# Get db Login
 	# -------------
@@ -104,10 +102,10 @@ class App:
 			webnotes.session = {'user': 'Administrator'}
 			
 		self.master_conn = webnotes.db.Database(ac_name = self.master)
-		self.master_conn.use(self.master)
+		self.master_conn.use(self.get_db_login(self.master))
 
 		self.conn = webnotes.db.Database(ac_name = ac_name)
-		self.conn.use(self.db_login)
+		self.conn.use(self.get_db_login(ac_name))
 	
 	# close
 	# ----------------------------------
