@@ -129,7 +129,7 @@ class App:
 		self.sync_records('Print Format')
 		self.sync_records('DocType Mapper')
 		self.sync_records('DocType Label')
-		self.sync_control_panel()
+		#self.sync_control_panel()
 		self.close()
 		
 	# sync control panel
