@@ -100,10 +100,11 @@ class App:
 	def connect(self, ac_name):
 		if not webnotes.session:
 			webnotes.session = {'user': 'Administrator'}
-			
+		print "ac_name"+ac_name
+		print "self.master"+self.master	
 		self.master_conn = webnotes.db.Database(ac_name = self.master)
 		self.master_conn.use(self.get_db_login(self.master))
-
+		print "ac_name"+ac_name
 		self.conn = webnotes.db.Database(ac_name = ac_name)
 		self.conn.use(self.get_db_login(ac_name))
 	
