@@ -33,6 +33,7 @@ class AppManager:
 				app.sync_doc(dt, dn)
 				app.close()
 			else:
+				print "app.ac_name : "+app.ac_name
 				app.sync(ac_name = app.ac_name)
 	
 	# execute a script in all apps
