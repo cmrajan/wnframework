@@ -18,22 +18,22 @@ class AppManager:
 	def load_app_list(self, al=[]):
 		if not al:
 			self.acc_conn = webnotes.db.Database(use_default=1)
-			al = [a[0] for a in self.acc_conn.sql('select db_name from tabAccount')]
+			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount')]
 		for a in al:
-			self.app_list.append(App(a['db_name'], self.master))
+			self.app_list.append(App(self.master, a))
 
 	# sync all the apps
 	# ----------------------------------
 	def sync_apps(self, dt='', dn='', app_list=[]):
-		''' app_list is list of db_names '''
+		''' app_list is list of ac_names '''
 		self.load_app_list(app_list)
 		for app in self.app_list:
 			if dt and dn:
-				app.connect()
+				app.connect(app.ac_name)
 				app.sync_doc(dt, dn)
 				app.close()
 			else:
-				app.sync()
+				app.sync(ac_name = app.ac_name)
 	
 	# execute a script in all apps
 	# ----------------------------------
@@ -81,22 +81,32 @@ class AppManager:
 # Application Instance
 # =====================================================================================
 class App:
-	def __init__(self, master, db_login):
+	def __init__(self, master, ac_name):
 		self.ignore_modules = ['Development', 'Recycle Bin', 'System']
-		self.db_login = db_login
+		self.ac_name = ac_name
 		self.master = master
 		self.verbose = 0
+		self.db_login = self.get_db_login(ac_name)
+		
 	
+	# Get db Login
+	# -------------
+	def get_db_login(self, ac_name):
+		acc_conn = webnotes.db.Database(use_default=1)
+		det = acc_conn.sql('select db_login, db_name from tabAccount where ac_name = "%s"' % (ac_name))
+		return det[0][0] or det[0][1]
+
+
 	# make connections to master and app
 	# ----------------------------------
-	def connect(self):
+	def connect(self, ac_name):
 		if not webnotes.session:
 			webnotes.session = {'user': 'Administrator'}
 			
-		self.master_conn = webnotes.db.Database(user = self.master)
+		self.master_conn = webnotes.db.Database(ac_name = self.master)
 		self.master_conn.use(self.master)
 
-		self.conn = webnotes.db.Database(user = self.db_login)
+		self.conn = webnotes.db.Database(ac_name = ac_name)
 		self.conn.use(self.db_login)
 	
 	# close
@@ -107,9 +117,9 @@ class App:
 	
 	# sync application doctypes
 	# ----------------------------------
-	def sync(self, verbose = 0):			
+	def sync(self, verbose = 0, ac_name = ''):			
 		self.verbose = verbose
-		self.connect()
+		self.connect(ac_name)
 		self.sync_records('Role')
 		self.sync_records('DocType')
 		self.sync_records('Search Criteria')
@@ -210,5 +220,3 @@ class App:
 		import webnotes.model
 		
 		webnotes.model.delete_doc(dt, dn)
-		
-		

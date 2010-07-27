@@ -196,18 +196,37 @@ def parse_val(v):
 	return v
 
 def fmt_money(amount, fmt = '%.2f'):
-	import re
-	temp = fmt % amount
-	if temp.find('.')==-1:
-		temp += '.'
-	profile=re.compile(r"(\d)(\d\d\d[.,])")
-	while 1: 
-		temp, count = re.subn(profile,r"\1,\2",temp) 
-		if not count: 
-			break
-	if temp[-1]=='.':
-		temp = temp[:-1]
-	return temp
+	curr = webnotes.conn.sql("select value from tabSingles where doctype = 'Control Panel' and field = 'currency_format'")
+	curr = curr and curr[0][0] or 'Millions'
+
+	val = 2
+	if curr == 'Millions': val = 3
+
+	if cstr(amount).find('.') == -1:	temp = '00'
+	else: temp = cstr(amount).split('.')[1]
+
+	l = []
+	minus = ''
+	if flt(amount) < 0: minus = '-'
+
+	amount = ''.join(cstr(amount).split(','))
+	amount = cstr(abs(flt(amount))).split('.')[0]
+	
+	# main logic	
+	if len(cstr(amount)) > 3:
+	  nn = amount[len(amount)-3:]
+	  l.append(nn)
+	  amount = amount[0:len(amount)-3]
+	  while len(cstr(amount)) > val:
+	    nn = amount[len(amount)-val:]
+	    l.insert(0,nn)
+	    amount = amount[0:len(amount)-val]
+	
+	if len(amount) > 0:  l.insert(0,amount)
+
+	amount = ','.join(l)+'.'+temp
+	amount = minus + amount
+	return amount
 	
 # Get Defaults
 # ------------

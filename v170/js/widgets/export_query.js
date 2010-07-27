@@ -24,8 +24,8 @@ function export_query(query, callback) {
 }
 
 function export_csv(q, report_name, sc_id, is_simple, filter_values, colnames) {
-	var args = {}
-	args.cmd = 'webnotes.widgets.query_builder.runquery_csv';
+    var args = {}
+    args.cmd = 'webnotes.widgets.query_builder.runquery_csv';
     if(is_simple) 
     	args.simple_query = q; 
     else 

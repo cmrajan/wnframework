@@ -5,15 +5,18 @@ import MySQLdb
 from webnotes import defs
 
 class Database:
-	def __init__(self, host='', user='', password='', use_default = 0):
+	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
 		self.user = user or defs.db_login
 		self.password = password or defs.db_password
+
+		if ac_name:
+			self.user = self.get_db_login(ac_name) or defs.db_login
 		
 		if use_default:
 			self.user = defs.db_login
 			self.password = defs.db_password
-		
+
 		self.is_testing = 0
 		self.in_transaction = 0
 		self.testing_tables = []
@@ -23,6 +26,18 @@ class Database:
 		if use_default:
 			self.use(defs.db_name)
 		
+
+	def get_db_login(self, ac_name):
+		import webnotes.db
+		c = webnotes.db.Database(use_default = 1)
+		try:
+			res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
+		except:
+			pass
+		if res:
+			return res[0][1] or res[0][0]
+
+
 	def connect(self):
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
 		self._cursor = self._conn.cursor()
