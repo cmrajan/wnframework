@@ -84,7 +84,8 @@ class AppManager:
 # =====================================================================================
 class App:
 	def __init__(self, master, ac_name):
-		self.ignore_modules = ['Development', 'Recycle Bin', 'System']
+		#self.ignore_modules = ['Development', 'Recycle Bin', 'System']
+		self.ignore_modules = ['Recycle Bin']
 		self.ac_name = ac_name
 		self.master = master
 		self.verbose = 0
