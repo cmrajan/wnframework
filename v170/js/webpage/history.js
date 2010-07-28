@@ -1,6 +1,10 @@
 // Navigation Object
 
 var nav_obj = {}
+
+nav_obj.observers = [];
+nav_obj.add_observer = function(o) { nav_obj.observers.push(o); }
+
 nav_obj.ol = [];
 nav_obj.open_notify = function(t, dt, dn) {
 	// last should not be this (refresh)
@@ -30,6 +34,12 @@ nav_obj.open_notify = function(t, dt, dn) {
 		nav_obj.on_open(id);
 	
 	dhtmlHistory.add(id,'');
+	
+	// notify observers (for menu?)
+	for(var i=0; i<nav_obj.observers.length; i++) {
+		var o = nav_obj.observers[i];
+		if(o && o.notify) o.notify(t, dt, dn);
+	}
 }
 
 nav_obj.rename_notify = function(dt, oldn, newn) {
@@ -50,8 +60,6 @@ nav_obj.show_last_open = function() {
 		loadreport(l[1],l[2]);
 	} else if(l[0]=='Form') {
 		loaddoc(l[1],l[2]);
-	} else if(l[0]=='Application') {
-		loadapp(l[1]);
 	} else if(l[0]=='DocBrowser') {
 		loaddocbrowser(l[1]);
 	}
