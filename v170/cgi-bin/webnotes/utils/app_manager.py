@@ -19,7 +19,6 @@ class AppManager:
 		if not al:
 			self.acc_conn = webnotes.db.Database(use_default=1)
 			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount')]
-		print al
 		for a in al:
 			self.app_list.append(App(self.master,a))
 
@@ -29,12 +28,15 @@ class AppManager:
 		''' app_list is list of ac_names '''
 		self.load_app_list(app_list)
 		for app in self.app_list:
+			print "---------------------------------------"
+			print "Source Account : "+self.master
+			print "Target Account : "+app.ac_name
+			print "---------------------------------------"
 			if dt and dn:
 				app.connect(app.ac_name)
 				app.sync_doc(dt, dn)
 				app.close()
 			else:
-				print "app.ac_name : "+app.ac_name
 				app.sync(ac_name = app.ac_name)
 	
 	# execute a script in all apps
@@ -45,29 +47,33 @@ class AppManager:
 	
 	# create a new app
 	# ----------------------------------
-	def new_app(self, ac_name):
+	def new_app(self, ac_name, source):
 		import webnotes.setup
 
 		# setup
 		print 'Creating new application...'
-		ret = webnotes.setup.create_account(ac_name)
+		ret = webnotes.setup.create_account(ac_name, source)
 		ret, db_name = ret.split(',')
-		print app_id + ' created'
+		print app_id + ' created !!!'
 		
 		# sync
-		app = App(self.master, db_name)
+		app = App(self.master, ac_name)
+		app.connect(ac_name)
+		app.change_engine()
 		app.delete_doc('DocType', 'Ticket') # clear Ticket as it is very different from the new ticket
+		app.close()
 		app.sync(1)
-		print app_id + ' synced'
-		
-		# run setup script
-		app.run_setup_control()
+		print app_id + ' synced !!!'
 	
+
 	# create multiple apps
 	# ----------------------------------
-	def create_apps(self, n, start):
+	def create_apps(self, n, source='Framework'):
+		acc_conn = webnotes.db.Database(use_default=1)
+		curr = acc_conn.sql('select current from tabSeries where name = "ax"')
+		curr = curr and int(curr[0][0]) or 0
 		for i in range(n):
-			self.new_app('ax.%07d' % (start + i))
+			self.new_app('ax.%07d' % (curr + i + 1), source)
 			
 	# get the next app in line
 	# ----------------------------------
@@ -103,11 +109,8 @@ class App:
 	def connect(self, ac_name):
 		if not webnotes.session:
 			webnotes.session = {'user': 'Administrator'}
-		print "ac_name"+ac_name
-		print "self.master"+self.master	
 		self.master_conn = webnotes.db.Database(ac_name = self.master)
 		self.master_conn.use(self.get_db_login(self.master))
-		print "ac_name"+ac_name
 		self.conn = webnotes.db.Database(ac_name = ac_name)
 		self.conn.use(self.get_db_login(ac_name))
 	
@@ -209,17 +212,17 @@ class App:
 		from webnotes.model.code import get_obj
 		sc = get_obj('Control Panel').execute_test(script)
 			
-	# run setup control in the app
-	# ----------------------------------
-	def run_setup_control(self):
-		webnotes.conn = self.conn
-		from webnotes.model.code import get_obj
-		sc = get_obj('Setup Control').do_setup()
 		
 	# delete a record
 	# ----------------------------------
 	def delete_doc(self, dt, dn):
 		webnotes.conn = self.conn
 		import webnotes.model
-		
 		webnotes.model.delete_doc(dt, dn)
+
+
+	# Change File Data Engine innoDb -> MyISAM
+	# -----------------------------------------
+	def change_engine(self):
+		webnotes.conn = self.conn
+		webnotes.conn.sql("alter table `tabFile Data` set engine = 'MyISAM'")
