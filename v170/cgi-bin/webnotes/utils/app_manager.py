@@ -61,10 +61,12 @@ class AppManager:
 	# ----------------------------------
 	def create_apps(self, n, source):
 		acc_conn = webnotes.db.Database(use_default=1)
-		curr = acc_conn.sql('select current from tabSeries where name = "ax"')
-		curr = curr and int(curr[0][0]) or 0
+		curr_ac_name = sql("select ac_name from tabAccount where ac_name like 'ax%' Order by ac_name desc limit 1")
+		curr_ac_name = curr_ac_name and curr_ac_name[0][0] or 0
+		if curr_ac_name:
+			curr_ac_name = cint(curr_ac_name[2:])
 		for i in range(n):
-			self.new_app('ax.%07d' % (curr + i + 1), source)
+			self.new_app('ax%07d' % (curr + i + 1), source)
 			
 	# get the next app in line
 	# ----------------------------------
