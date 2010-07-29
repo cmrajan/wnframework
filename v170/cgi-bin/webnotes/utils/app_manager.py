@@ -55,20 +55,11 @@ class AppManager:
 		ret = webnotes.setup.create_account(ac_name, source)
 		ret, db_name = ret.split(',')
 		print ac_name + ' created !!!'
-		
-		# sync
-		app = App(self.master, ac_name)
-		app.connect(ac_name)
-		app.change_engine()
-		app.delete_doc('DocType', 'Ticket') # clear Ticket as it is very different from the new ticket
-		app.close()
-		app.sync(1)
-		print ac_name + ' synced !!!'
 	
 
 	# create multiple apps
 	# ----------------------------------
-	def create_apps(self, n, source='Framework'):
+	def create_apps(self, n, source):
 		acc_conn = webnotes.db.Database(use_default=1)
 		curr = acc_conn.sql('select current from tabSeries where name = "ax"')
 		curr = curr and int(curr[0][0]) or 0
@@ -183,6 +174,7 @@ class App:
 		webnotes.conn = self.conn
 		print transfer.set_doc([d.fields for d in doclist], ovr = 1)
 	
+
 	# get the list from master
 	# ----------------------------------
 	def get_master_list(self, dt):
@@ -211,18 +203,3 @@ class App:
 		webnotes.conn = self.conn
 		from webnotes.model.code import get_obj
 		sc = get_obj('Control Panel').execute_test(script)
-			
-		
-	# delete a record
-	# ----------------------------------
-	def delete_doc(self, dt, dn):
-		webnotes.conn = self.conn
-		import webnotes.model
-		webnotes.model.delete_doc(dt, dn)
-
-
-	# Change File Data Engine innoDb -> MyISAM
-	# -----------------------------------------
-	def change_engine(self):
-		webnotes.conn = self.conn
-		webnotes.conn.sql("alter table `tabFile Data` set engine = 'MyISAM'")
