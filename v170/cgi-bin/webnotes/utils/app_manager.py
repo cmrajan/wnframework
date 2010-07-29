@@ -54,7 +54,7 @@ class AppManager:
 		print 'Creating new application...'
 		ret = webnotes.setup.create_account(ac_name, source)
 		ret, db_name = ret.split(',')
-		print app_id + ' created !!!'
+		print ac_name + ' created !!!'
 		
 		# sync
 		app = App(self.master, ac_name)
@@ -63,7 +63,7 @@ class AppManager:
 		app.delete_doc('DocType', 'Ticket') # clear Ticket as it is very different from the new ticket
 		app.close()
 		app.sync(1)
-		print app_id + ' synced !!!'
+		print ac_name + ' synced !!!'
 	
 
 	# create multiple apps
