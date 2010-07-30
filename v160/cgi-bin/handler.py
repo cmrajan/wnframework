@@ -613,7 +613,7 @@ def remove_attach(form, session):
 	
 def downloadfile(form, session):
 	fid = form.getvalue('file_id')
-	res = sql("select file_name, `blob_content` from `tabFile Data` where name = '%s'" % fid)
+	res = sql("select file_name, `blob_content` from `tabFile Data` where name = '%s' or file_name = '%s'" % (fid,fid))
 	if res:
 		out['type'] = 'download'
 		out['filename'] = res[0][0]
@@ -1498,7 +1498,7 @@ def backupdb(form, session):
 
 	out['type'] = 'download'
 	out['filename'] = db_name+'.tar.gz'
-	out['filecontent'] = open('../backups/' + db_name+'.tar.gz','rb').read()
+	out['filecontent'] = open('/backups/dumps/' + db_name+'.tar.gz','rb').read()
 
 # Error log
 # ---------
@@ -1777,63 +1777,63 @@ except:
 	pass
 
 def compressBuf(buf):
-	import gzip, cStringIO
-	zbuf = cStringIO.StringIO()
-	zfile = gzip.GzipFile(mode = 'wb',  fileobj = zbuf, compresslevel = 5)
-	zfile.write(buf)
-	zfile.close()
-	return zbuf.getvalue()
+        import gzip, cStringIO
+        zbuf = cStringIO.StringIO()
+        zfile = gzip.GzipFile(mode = 'wb',  fileobj = zbuf, compresslevel = 5)
+        zfile.write(buf)
+        zfile.close()
+        return zbuf.getvalue()
 
 if out.get('type')=='csv':
-	print "Content-Type: text/csv"
-	print "Content-Disposition: filename="+out['doctype'].replace(' ', '_')+".csv"
-	print
-	print out['result']
+        print "Content-Type: text/csv"
+        print "Content-Disposition: filename="+out['doctype'].replace(' ', '_')+".csv"
+        print
+        print out['result']
 elif out.get('type')=='iframe':
-	print "Content-Type: text/html"
-	print
-	print out['result']
+        print "Content-Type: text/html"
+        print
+        print out['result']
 elif out.get('type')=='download':
-	import mimetypes
-	print "Content-Type: %s" % (mimetypes.guess_type(out['filename'])[0] or 'application/unknown')
-	print "Content-Disposition: filename="+out['filename'].replace(' ', '_')
-	print
-	print out['filecontent']
+        import mimetypes
+        print "Content-Type: %s" % (mimetypes.guess_type(out['filename'])[0] or 'application/unknown')
+        print "Content-Disposition: filename="+out['filename'].replace(' ', '_')
+        print
+        print out['filecontent']
 else:
-	if server.debug_log:
-		save_log = 1
-		if server.debug_log[0].startswith('[Validation Error]'):
-			save_log = 0
+        if server.debug_log:
+                save_log = 1
+                if server.debug_log[0].startswith('[Validation Error]'):
+                        save_log = 0
 
-		t = '\n----------------\n'.join(server.debug_log)
-		if errdoctype: 
-			t = t + '\nDocType: ' + errdoctype
-		if errdoc: 
-			t = t + '\nName: ' + errdoc
-		if errmethod: 
-			t = t + '\nMethod: ' + errmethod
-		out['exc'] = t
+                t = '\n----------------\n'.join(server.debug_log)
+                if errdoctype:
+                        t = t + '\nDocType: ' + errdoctype
+                if errdoc:
+                        t = t + '\nName: ' + errdoc
+                if errmethod:
+                        t = t + '\nMethod: ' + errmethod
+                out['exc'] = t
 
-		if save_log: # don't save validation errors
-			try:  save_log(t, 'Server')
-			except: pass
+                if save_log: # don't save validation errors
+                        try:  save_log(t, 'Server')
+                        except: pass
 
-	if server.message_log:
-		out['server_messages'] = '\n----------------\n'.join(server.message_log)
+        if server.message_log:
+                out['server_messages'] = '\n----------------\n'.join(server.message_log)
 
-	str_out = str(out)
+        str_out = str(out)
 
-	if acceptsGzip and len(str_out)>512:
-		out_buf = compressBuf(str_out)
-		print "Content-Encoding: gzip"
-		print "Content-Length: %d" % (len(out_buf))
-	print "Content-Type: text/html"
-	if cookies:
-		if server.cookies: cookes.update(server.cookies)
-		print cookies
-	print # Headers end
-	
+        if acceptsGzip and len(str_out)>512:
+                out_buf = compressBuf(str_out)
+                print "Content-Encoding: gzip"
+                print "Content-Length: %d" % (len(out_buf))
+        print "Content-Type: text/html"
+        if cookies:
+                if server.cookies: cookes.update(server.cookies)
+                print cookies
+        print # Headers end
+
 if out_buf:
-	sys.stdout.write(out_buf)
+        sys.stdout.write(out_buf)
 elif str_out:
-	print str_out
+        print str_out
