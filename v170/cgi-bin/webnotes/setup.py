@@ -151,7 +151,8 @@ def import_db(source, target='', is_accounts=0):
 	sql("update tabDocType set server_code_compiled = NULL")
 
 	# temp
- 	sql("alter table tabSessions change sessiondata sessiondata longtext") 
+ 	sql("alter table tabSessions change sessiondata sessiondata longtext")
+ 	sql("alter table tabSessions add index sid(sid)")
 	
 	return target
 
