@@ -122,7 +122,7 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsibl
 
 	// description
 	if(this.df.description) {
-		var d = $a(head, 'div', '', {margin:'0px', padding:'8px', backgroundColor: (with_header ? '#EEE' : '')});
+		var d = $a(head, 'div', '', {margin:'0px', padding:'4px', backgroundColor: (with_header ? '#EEE' : ''), color:'#444', fontSize:'14px'});
 		if(with_header)$y(d,{paddingTop:'0px'});
 		if(this.df.description.length > 240) {
 			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
