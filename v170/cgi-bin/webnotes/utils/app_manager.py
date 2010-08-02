@@ -94,7 +94,7 @@ class App:
 	def get_db_login(self, ac_name):
 		acc_conn = webnotes.db.Database(use_default=1)
 		det = acc_conn.sql('select db_login, db_name from tabAccount where ac_name = "%s"' % (ac_name))
-		return det[0][0] or det[0][1]
+		return det and cstr(det[0][0]) or cstr(det[0][1])
 
 
 	# make connections to master and app
