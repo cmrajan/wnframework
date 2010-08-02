@@ -51,10 +51,11 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 
 	} else {
 		$ds(this.loading_div);
-		$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + field_list, 
+		$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + cstr(field_list), 
 		function(r,rt) { 
 			me.dt_details[dt] = r.message; 
 			$dh(me.loading_div);
+			if(r.message.field_list) { field_list = r.message.field_list; }
 			if(r.message) me.make(dt, label, field_list); });
 	}
 	
@@ -86,7 +87,8 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	}
 		
 	if(user_defaults.hide_report_builder) lst.opts.show_report = 0;
-		
+	
+	// build th query
 	lst.is_std_query = 1;
 	lst.get_query = function() {
 		q = {};
@@ -94,6 +96,8 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		q.table = repl('`tab%(dt)s`', {dt:this.dt});
 	
 		for(var i=0;i<this.cl.length;i++) fl.push(q.table+'.`'+this.cl[i][0]+'`')
+		if(me.dt_details[dt].submittable)
+			fl.push(q.table + '.docstatus');			
 		q.fields = fl.join(', ');
 		q.conds = q.table + '.docstatus < 2 ';
 		
@@ -101,6 +105,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
 	}
 	
+	// make the columns
 	lst.colwidths=['5%']; lst.colnames=['Sr']; lst.coltypes=['Data']; lst.coloptions = [''];
 
 	for(var i=0;i < lst.cl.length;i++) {
@@ -113,6 +118,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	}
 	lst.make(wrapper);
 
+	// add the filters
 	var sf = me.dt_details[dt].filters;
 	for(var i=0;i< sf.length;i++) {
 		var fname = sf[i][0]; var label = sf[i][1]; var ftype = sf[i][2]; var fopts = sf[i][3];
@@ -125,7 +131,28 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		}
 	}
 	me.lists[dt] = wrapper;
-		
+	
+	// customize ID field - for submittable doctypes
+	if(me.dt_details[dt].submittable) {
+		lst.show_cell = function(cell,ri,ci,d) {
+			if (ci==0){
+				// link
+				var s1 = $a(cell, 'span', 'link_type', {marginRight:'8px'});
+				s1.innerHTML = d[ri][0];
+				s1.dt = dt; s1.dn = d[ri][0];
+				s1.onclick = function() { loaddoc(this.dt, this.dn); };
+
+				// tag
+				var docstatus = cint(d[ri][d[ri].length - 1]);
+				var hl=$a(cell,'span','',{padding: '1px', color:'#FFF', backgroundColor:(docstatus ? '#44F' : '#999'), fontSize:'10px'});
+				hl.innerHTML = (docstatus ? 'Submitted' : 'Draft');
+			} else{
+				// show standard output
+				lst.std_cell(d,ri,ci);
+			}
+		}
+	}
+	
 	// default sort
 	lst.set_default_sort('name', in_list(lst.coltypes, 'Date') ? 'DESC' : 'ASC');
 	lst.run();

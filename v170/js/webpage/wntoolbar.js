@@ -194,7 +194,7 @@ function WNToolbar(parent) {
 				me.rb_sel.onchange = function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); };
 			}
 			me.rb_dialog.show();
-		}		
+		}
 	}
 
 	// Setup Search
