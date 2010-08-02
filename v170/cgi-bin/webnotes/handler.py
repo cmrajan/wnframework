@@ -388,15 +388,16 @@ else:
 	
 			# execute
 			if locals().has_key(cmd):
-				if (not webnotes.conn.in_transaction): 
+				if (not webnotes.conn.in_transaction) and (not read_only):
 					sql("START TRANSACTION")
 				
 				locals()[cmd]()
 						
 				# update session
 				webnotes.auth_obj.update()
-
-				sql("COMMIT")
+				
+				if webnotes.conn.in_transaction:
+					sql("COMMIT")
 			else:
 				if cmd!='login':
 					webnotes.msgprint('No Method: %s' % cmd)

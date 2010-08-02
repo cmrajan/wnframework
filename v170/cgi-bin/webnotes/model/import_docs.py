@@ -336,4 +336,63 @@ class CSVImport:
 			st_list.append([d.strip() for d in s])
 		return st_list
 
+# Get Template method
+# -----------------------------------------------------------------
+
+def get_template(overwrite = 0):
+	import webnotes.model
+
+	from webnotes.utils import getCSVelement
+	
+	form = webnotes.form
+	sql = webnotes.conn.sql
+
+	dt = form.getvalue('dt')
+	pt, pf = '', ''
+	tmp_lbl, tmp_ml = [],[]
+	
+	# is table?
+	dtd = sql("select istable, autoname from tabDocType where name='%s'" % dt)
+	if dtd and dtd[0][0]:
+		res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % dt)
+		if res1:
+			pt, pf = res1[0][0], res1[0][1]
+
+	# line 1
+	dset = []
+	if pt and pf:
+		lbl, ml = [pt], ['[Mandatory]']
+		line1 = '%s,%s,%s' % (getCSVelement(dt), getCSVelement(pt), getCSVelement(pf))
+		line2 = ',,,,,,Please fill valid %(p)s No in %(p)s column.' % {'p':getCSVelement(pt)}
+	else:
+		if dtd[0][1]=='Prompt' or overwrite:
+			lbl, ml= [overwrite and dt or 'Name'], ['[Mandatory][Special Characters are not allowed]']
+		else:
+			lbl, ml= [], []
+		line1 = '%s' % getCSVelement(dt)
+		line2 = (overwrite and ',,,,,,Please fill valid %(d)s No in %(d)s' % {'d':dt}) or ',,'
+
+	# Help on Line 
+	line1 = line1 + ',,,Please fill columns which are Mandatory., Please do not modify the structure'
+	
+	# fieldnames
+	res = sql("select fieldname, fieldtype, label, reqd, hidden from tabDocField where parent='%s' and docstatus!=2" % dt)
+
+	for r in res:
+		if not r[1] in webnotes.model.no_value_fields and r[0] != 'trash_reason' and not r[4] and not r[3]:
+			tmp_lbl.append(getCSVelement(r[2]))
+			tmp_ml.append('')
+		elif not r[1] in webnotes.model.no_value_fields and r[0] != 'trash_reason' and not r[4] and r[3]:
+			lbl.append(getCSVelement(r[2]))
+			ml.append(getCSVelement('[Mandatory]'))
+	
+	dset.append(line1)
+	dset.append(line2)
+	dset.append(','.join(ml + tmp_ml))
+	dset.append(','.join(lbl + tmp_lbl))
+	
+	txt = '\n'.join(dset)
+	webnotes.response['result'] = txt
+	webnotes.response['type'] = 'csv'
+	webnotes.response['doctype'] = dt
 
