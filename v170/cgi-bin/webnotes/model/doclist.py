@@ -66,7 +66,7 @@ def getlist(doclist, field):
 # Copy doclist
 # ------------
 
-def copy(doclist, no_copy = []):
+def copy_doclist(doclist, no_copy = []):
 	from webnotes.model.doc import Document
 	
 	cl = []
