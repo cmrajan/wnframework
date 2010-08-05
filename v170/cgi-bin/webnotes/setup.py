@@ -107,59 +107,60 @@ def get_db_name(conn, server_prefix):
 	return dbn
 
 def import_db(source, target='', is_accounts=0):
-	try:
-		# dump source
-	
-		import webnotes
-		import webnotes.db
-		import defs
-		import os
+	# dump source
 
-		mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
+	import webnotes
+	import webnotes.db
+	import defs
+	import os
 
-		# default, use current user id
-		if webnotes.conn:
-			conn = webnotes.conn
-	
-			if conn.in_transaction:
-				conn.sql('COMMIT')
+	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
 
-		# login as root (if set)
-		if defs.root_login:
-			conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
-		sql = conn.sql
+	# default, use current user id
+	if webnotes.conn:
+		conn = webnotes.conn
 
-		# get database number
-		if not target:
-			target = get_db_name(conn, defs.server_prefix)
-	
-		# create user and db
-		sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, defs.db_password))
-		sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
-		sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, target))
-		sql("FLUSH PRIVILEGES")
-		sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
+		if conn.in_transaction:
+			conn.sql('COMMIT')
 
-		source_path = get_source_path(source)		
+	# login as root (if set)
+	if defs.root_login:
+		conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
+	sql = conn.sql
 
-		# import in target
-		os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target, source_path))
+	# get database number
+	if not target:
+		target = get_db_name(conn, defs.server_prefix)
 
-		sql("use %s;" % target)
-		sql("DROP TABLE IF EXISTS `__DocTypeCache`")
-		sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
-		sql("update tabProfile set password = password('admin') where name='Administrator'")
-		sql("update tabDocType set server_code_compiled = NULL")
+	# create user and db
+	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, defs.db_password))
+	sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
+	sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, target))
+	sql("FLUSH PRIVILEGES")
+	sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
 
-		# temp
-	 	sql("alter table tabSessions change sessiondata sessiondata longtext")
-	 	sql("alter table tabSessions add index sid(sid)")
+	source_path = get_source_path(source)		
+
+	# import in target
+	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target, source_path))
+
+	sql("use %s;" % target)
+	sql("DROP TABLE IF EXISTS `__DocTypeCache`")
+	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
+	sql("update tabProfile set password = password('admin') where name='Administrator'")
+	sql("update tabDocType set server_code_compiled = NULL")
+
+	# temp
+ 	sql("alter table tabSessions change sessiondata sessiondata longtext")
+	try: 	
+		sql("alter table tabSessions add index sid(sid)")
 	except Exception, e:
 		if e.args[0]==1061:
 			pass
 		else:
 			raise e
 	return target
+
 
 def get_source_path(s):
 	import os
