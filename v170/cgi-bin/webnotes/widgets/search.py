@@ -60,9 +60,9 @@ def build_for_autosuggest(res):
 		results.append({'id':r[0], 'value':r[0], 'info':info})
 	return results
 	
-def scrub_custom_query(query, txt):
+def scrub_custom_query(query, key, txt):
 	if '%(key)s' in query:
-		query = query.replace('%(key)s', 'name')
+		query = query.replace('%(key)s', key)
 	if '%s' in query:
 		query = query % (txt + '%')
 		
@@ -95,7 +95,7 @@ def search_widget():
 	user_query = webnotes.form.getvalue('query') or ''
 
 	if user_query:
-		query = scrub_custom_query(user_query, txt)
+		query = scrub_custom_query(user_query, key, txt)
 	else:
 		query = make_query(', '.join(get_std_fields_list(dt, key)), dt, key, txt, webnotes.form.getvalue('start') or 0, webnotes.form.getvalue('page_len') or 50)
 	
