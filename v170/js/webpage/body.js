@@ -50,7 +50,7 @@ function Body() {
 		}
 		this.center.header = $a(this.center, 'div');
 		this.center.body = $a(this.center, 'div');
-		this.center.loading = $a(this.center, 'div', '', {margin:'200px 0px', fontSize:'14px', color:'#999', textAlign:'middle'});
+		this.center.loading = $a(this.center, 'div', '', {margin:'200px 0px', fontSize:'14px', color:'#999', textAlign:'center'});
 		this.center.loading.innerHTML = 'Loading...'
 	}
 
