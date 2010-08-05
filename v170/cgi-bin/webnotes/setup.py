@@ -158,7 +158,7 @@ def import_db(source, target='', is_accounts=0):
 		return target
 
 	except Exception, e:
-		if e.args[0]=1061:
+		if e.args[0]==1061:
 			pass
 		else:
 			raise e
