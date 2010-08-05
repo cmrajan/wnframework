@@ -154,14 +154,12 @@ def import_db(source, target='', is_accounts=0):
 		# temp
 	 	sql("alter table tabSessions change sessiondata sessiondata longtext")
 	 	sql("alter table tabSessions add index sid(sid)")
-	
-		return target
-
 	except Exception, e:
 		if e.args[0]==1061:
 			pass
 		else:
 			raise e
+	return target
 
 def get_source_path(s):
 	import os
