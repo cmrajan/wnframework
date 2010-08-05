@@ -3,7 +3,6 @@
 	+ body
 		+ wntoolbar
 		+ banner_area
-		+ body_spinner
 		+ body
 			+ left_sidebar
 			+ center
@@ -51,6 +50,8 @@ function Body() {
 		}
 		this.center.header = $a(this.center, 'div');
 		this.center.body = $a(this.center, 'div');
+		this.center.loading = $a(this.center, 'div', '', {margin:'200px 0px', fontSize:'14px', color:'#999', textAlign:'middle'});
+		this.center.loading.innerHTML = 'Loading...'
 	}
 
 	this.setup_sidebar_menu = function() {
@@ -96,7 +97,6 @@ function Body() {
 		this.topmenu = $a(this.wrapper, 'div');
 		this.breadcrumbs = $a(this.wrapper, 'div');
 		this.body = $a(this.wrapper, 'div');
-		this.body_spinner = $a(this.wrapper, 'div', '', {height:'400px', background:'url("images/ui/loading-old.gif") center no-repeat'});
 		this.footer = $a(this.wrapper, 'div');
 		
 		// sidebars
@@ -136,7 +136,7 @@ function Body() {
 	this.cur_page = null;
 	this.add_page = function(label, onshow, onhide) {
 		var c = $a(this.center.body, 'div');
-		if(onshow) 
+		if(onshow)
 			c.onshow = onshow;
 		if(onhide)
 			c.onhide = onhide;
@@ -147,7 +147,7 @@ function Body() {
 	
 	this.change_to = function(label) {
 		// hide existing
-		$dh(this.body_spinner);
+		$dh(this.center.loading);
 		if(me.cur_page &&  me.pages[label]!=me.cur_page) {
 			if(me.cur_page.onhide)
 				me.cur_page.onhide();
@@ -155,7 +155,7 @@ function Body() {
 		}
 		// show
 		me.cur_page = me.pages[label];
-		$ds(me.cur_page);
+		$(me.cur_page).fadeIn();
 	
 		// on show
 		if(me.cur_page.onshow)

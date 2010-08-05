@@ -976,21 +976,21 @@ this.setup_page_areas=function(){var n=this.no_of_columns();if(n==1)
 this.center=this.body;else{this.body_table=make_table(this.body,1,n,'100%');$y(this.body_table,{tableLayout:'fixed'});var c=0;if(cint(this.cp.left_sidebar_width)){this.left_sidebar=$td(this.body_table,0,c);$y(this.left_sidebar,{width:cint(this.cp.left_sidebar_width)+'px'});c++;}
 this.center=$a($td(this.body_table,0,c),'div');c++;if(cint(this.cp.right_sidebar_width)){this.right_sidebar=$td(this.body_table,0,c);$y(this.right_sidebar,{width:cint(this.cp.right_sidebar_width)+'px'})
 c++;}}
-this.center.header=$a(this.center,'div');this.center.body=$a(this.center,'div');}
+this.center.header=$a(this.center,'div');this.center.body=$a(this.center,'div');this.center.loading=$a(this.center,'div','',{margin:'200px 0px',fontSize:'14px',color:'#999',textAlign:'middle'});this.center.loading.innerHTML='Loading...'}
 this.setup_sidebar_menu=function(){if(this.left_sidebar&&this.cp.show_sidebar_menu){new_widget('SidebarMenu',function(m){sidebar_menu=m;m.make_menu('');});}}
 this.setup_header_footer=function(){var hh=this.cp.header_height?(cint(this.cp.header_height)+'px'):'40px';$y(this.header,{height:hh,borderBottom:'1px solid #CCC'});if(this.cp.client_name)this.banner_area.innerHTML=this.cp.client_name;var fh=this.cp.footer_height?(cint(this.cp.footer_height)+'px'):'0px';$y(this.footer,{height:fh});if(this.cp.footer_html)this.footer.innerHTML=this.cp.footer_html;}
 this.run_startup_code=function(){if(this.cp.startup_css)
 set_style(this.cp.startup_css);try{if(this.cp.startup_code)
 eval(this.cp.startup_code);}catch(e){}}
-this.setup=function(){this.cp=locals['Control Panel']['Control Panel'];this.wntoolbar_area=$a(document.getElementsByTagName('body')[0],'div');this.wrapper=$a($i('body_div'),'div');this.banner_area=$a(this.wrapper,'div');;this.topmenu=$a(this.wrapper,'div');this.breadcrumbs=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div');this.body_spinner=$a(this.wrapper,'div','',{height:'400px',background:'url("images/ui/loading-old.gif") center no-repeat'});this.footer=$a(this.wrapper,'div');if(user_defaults.hide_sidebars){this.cp.left_sidebar_width=null;this.cp.right_sidebar_width=null;}
+this.setup=function(){this.cp=locals['Control Panel']['Control Panel'];this.wntoolbar_area=$a(document.getElementsByTagName('body')[0],'div');this.wrapper=$a($i('body_div'),'div');this.banner_area=$a(this.wrapper,'div');;this.topmenu=$a(this.wrapper,'div');this.breadcrumbs=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div');this.footer=$a(this.wrapper,'div');if(user_defaults.hide_sidebars){this.cp.left_sidebar_width=null;this.cp.right_sidebar_width=null;}
 this.setup_page_areas();this.setup_header_footer();if(user=='Guest')user_defaults.hide_webnotes_toolbar=1;if(!user_defaults.hide_webnotes_toolbar||user=='Administrator'){this.wntoolbar=new WNToolbar(this.wntoolbar_area);if(isIE){$y(this.wrapper,{marginTop:'32px'});}else{$y(this.wrapper,{marginTop:'48px'});}}
 if(this.cp.page_width)$y(this.wrapper,{width:cint(this.cp.page_width)+'px'});}
 this.pages={};this.cur_page=null;this.add_page=function(label,onshow,onhide){var c=$a(this.center.body,'div');if(onshow)
 c.onshow=onshow;if(onhide)
 c.onhide=onhide;this.pages[label]=c;$dh(c);return c;}
-this.change_to=function(label){$dh(this.body_spinner);if(me.cur_page&&me.pages[label]!=me.cur_page){if(me.cur_page.onhide)
+this.change_to=function(label){$dh(this.center.loading);if(me.cur_page&&me.pages[label]!=me.cur_page){if(me.cur_page.onhide)
 me.cur_page.onhide();$dh(me.cur_page);}
-me.cur_page=me.pages[label];$ds(me.cur_page);if(me.cur_page.onshow)
+me.cur_page=me.pages[label];$(me.cur_page).fadeIn();if(me.cur_page.onshow)
 me.cur_page.onshow(me.cur_page);}
 this.setup();}
 var popup_cont;var session={};function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);popup_cont=$a(document.getElementsByTagName('body')[0],'div');var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;session.rt=profile.can_read;if(r.ipinfo)session.ipinfo=r.ipinfo;session.dt_labels=r.dt_labels;session.rev_dt_labels={}
