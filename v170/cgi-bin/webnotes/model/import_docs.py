@@ -1,53 +1,51 @@
 import webnotes
 
 def import_docs(docs = []):
-	from webnotes.model.doc import Document
-	import webnotes.model.code
+        from webnotes.model.doc import Document
+        import webnotes.model.code
 
-	doc_list = {}
-	created_docs = []
-	already_exists = []
+        doc_list = {}
+        created_docs = []
+        already_exists = []
 
-	out, tmp ="", ""
+        out, tmp ="", ""
 
-	for d in docs:
-		cur_doc = Document(fielddata = d)
-		if not cur_doc.parent in already_exists: # parent should not exist
-			try:
-				cur_doc.save(1)
-				out += "Created: " + cur_doc.name + "\n"
-				created_docs.append(cur_doc)
-	
-				# make in groups
-				if cur_doc.parent:
-					if not doc_list.has_key(cur_doc.parent):
-						doc_list[cur_doc.parent] = []
-					doc_list[cur_doc.parent].append(cur_doc)
+        for d in docs:
+                cur_doc = Document(fielddata = d)
+                if not cur_doc.parent in already_exists: # parent should not exist
+                        try:
+                                cur_doc.save(1)
+                                out += "Created: " + cur_doc.name + "\n"
+                                created_docs.append(cur_doc)
+        
+                                # make in groups
+                                if cur_doc.parent:
+                                        if not doc_list.has_key(cur_doc.parent):
+                                                doc_list[cur_doc.parent] = []
+                                        doc_list[cur_doc.parent].append(cur_doc)
 
-			except Exception, e:
-				out += "Creation Warning/Error: " + cur_doc.name + " :"+ str(e) + "\n"
-				already_exists.append(cur_doc.name)
+                        except Exception, e:
+                                out += "Creation Warning/Error: " + cur_doc.name + " :"+ str(e) + "\n"
+                                already_exists.append(cur_doc.name)
 
-	# Run scripts for main docs
-	for m in created_docs:
-		if doc_list.has_key(m.name):
-			tmp = webnotes.model.code.run_server_obj(webnotes.model.code.get_server_obj(m, doc_list.get(m.name, [])),'on_update')
+        # Run scripts for main docs
+        for m in created_docs:
+                if doc_list.has_key(m.name):
+                        tmp = webnotes.model.code.run_server_obj(webnotes.model.code.get_server_obj(m, doc_list.get(m.name, [])),'on_update')
 
-			# update database (in case of DocType)
-			if m.doctype=='DocType':
-				import webnotes.model.doctype
-				try: webnotes.model.doctype.update_doctype(doc_list.get(m.name, []))
-				except: pass
-			
-			out += 'Executed: '+ str(m.name) + ', Err:' + str(tmp) + "\n"
+                        # update database (in case of DocType)
+                        if m.doctype=='DocType':
+                                import webnotes.model.doctype
+                                try: webnotes.model.doctype.update_doctype(doc_list.get(m.name, []))
+                                except: pass
+                        
+                        out += 'Executed: '+ str(m.name) + ', Err:' + str(tmp) + "\n"
 
-	return out
+        return out
 
-#=============================================================================================
-	
+#======================================================================================================================================
+
 import webnotes
-import webnotes.utils
-
 sql = webnotes.conn.sql
 flt = webnotes.utils.flt
 cint = webnotes.utils.cint
@@ -109,7 +107,7 @@ class CSVImport:
 			lb_list.pop(lb_list.index(self.dt_list[1]))
 
 		dtd = sql("select autoname from `tabDocType` where name = '%s' " % self.dt_list[0])[0][0]
-		if self.prompt_autoname_flag:
+		if self.prompt_autoname_flag or self.overwrite:
 			self.fields.append('name')
 			lb_list.pop(lb_list.index('Name'))
 		
@@ -124,13 +122,13 @@ class CSVImport:
 				
 					else:	self.fields.append(sql("select fieldname from tabDocField where parent ='%s' and label = '%s' " % (self.dt_list[0], l))[0][0] or '')
 			except Exception, e:
-				self.msg.append('<div style="color: RED"> At Row 5 and Column %s : =>ERROR: %s </div>' % ( c, e))
+				self.msg.append('<div style="color: RED"> At Row 5 and Column %s : =>ERROR: %s </div>' % ( cl, e))
 				self.validate_success = 0
 			cl = cl + 1
 	
 		if not self.overwrite:
 			# get_reqd_fields
-			reqd_list = [d[0] for d in sql("select label from `tabDocField` where parent = '%s' and ifnull(reqd,'') != ''" % self.dt_list[0])	if d[0] not in lb_list] or []
+			reqd_list = [d[0] for d in sql("select label from `tabDocField` where parent = '%s' and ifnull(reqd,'') not in ('', 0)  and docstatus !=2" % self.dt_list[0])	if d[0] not in lb_list] or []
 		
 			# Check if Reqd field not present in self.fields
 			if reqd_list:
@@ -212,6 +210,7 @@ class CSVImport:
 			self.validate_success = 0
 		return d
 
+
 	def get_field_type_list(self):
 		# get_date_fields
 		date_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Date' and docstatus !=2" % self.dt_list[0])]
@@ -223,7 +222,7 @@ class CSVImport:
 		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and docstatus !=2" % self.dt_list[0])]
 		
 		# get_reqd_fields
-		reqd_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and ifnull(reqd,'') not in ('', 0)  and docstatus !=2" % self.dt_list[0])]
+		reqd_list = self.overwrite and ['name'] or [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and ifnull(reqd,'') not in ('', 0)  and docstatus !=2" % self.dt_list[0])]
 
 		if len(self.dt_list)> 1 and 'parent' not in reqd_list: reqd_list.append('parent')
 
@@ -301,8 +300,8 @@ class CSVImport:
 				else: 
 					self.msg.append('<div style="color: RED">Row %s => Invalid %s : %s</div>' % (row, cur_doc.parenttype, cur_doc.parent))
 			if obj:
-				obj.validate()
-				obj.on_update()
+				if obj.has_key('validate') : obj.validate()
+				if obj.has_key('on_update') : obj.on_update()
 		except Exception:
 			self.msg.append('<div style="color: RED"> ERROR: %s</div>' % (str(webnotes.utils.getTraceback())))
 			self.msg.append('<div style="color: ORANGE">Ignored: %s</div>' % (cur_doc.name))
@@ -339,15 +338,17 @@ class CSVImport:
 # Get Template method
 # -----------------------------------------------------------------
 
-def get_template(overwrite = 0):
+def get_template():
 	import webnotes.model
 
 	from webnotes.utils import getCSVelement
 	
 	form = webnotes.form
 	sql = webnotes.conn.sql
-
+        # get form values
 	dt = form.getvalue('dt')
+        overwrite = cin(form.getvalue('overwrite')) or 0
+
 	pt, pf = '', ''
 	tmp_lbl, tmp_ml = [],[]
 	
@@ -366,7 +367,7 @@ def get_template(overwrite = 0):
 		line2 = ',,,,,,Please fill valid %(p)s No in %(p)s column.' % {'p':getCSVelement(pt)}
 	else:
 		if dtd[0][1]=='Prompt' or overwrite:
-			lbl, ml= [overwrite and dt or 'Name'], ['[Mandatory][Special Characters are not allowed]']
+			lbl, ml= ['Name'], ['[Mandatory][Special Characters are not allowed]']
 		else:
 			lbl, ml= [], []
 		line1 = '%s' % getCSVelement(dt)
@@ -379,9 +380,11 @@ def get_template(overwrite = 0):
 	res = sql("select fieldname, fieldtype, label, reqd, hidden from tabDocField where parent='%s' and docstatus!=2" % dt)
 
 	for r in res:
+                # restrict trash_reason field, hidden and required fields 
 		if not r[1] in webnotes.model.no_value_fields and r[0] != 'trash_reason' and not r[4] and not r[3]:
 			tmp_lbl.append(getCSVelement(r[2]))
 			tmp_ml.append('')
+                # restrict trash_reason field and hidden fields and add Mandatory indicator for required fields
 		elif not r[1] in webnotes.model.no_value_fields and r[0] != 'trash_reason' and not r[4] and r[3]:
 			lbl.append(getCSVelement(r[2]))
 			ml.append(getCSVelement('[Mandatory]'))
