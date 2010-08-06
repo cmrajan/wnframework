@@ -347,7 +347,7 @@ def get_template():
 	sql = webnotes.conn.sql
         # get form values
 	dt = form.getvalue('dt')
-        overwrite = cin(form.getvalue('overwrite')) or 0
+        overwrite = cint(form.getvalue('overwrite')) or 0
 
 	pt, pf = '', ''
 	tmp_lbl, tmp_ml = [],[]
