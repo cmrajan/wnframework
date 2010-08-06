@@ -77,10 +77,7 @@ class _DocType:
 		return csc + '\n' + cs
 		
 	def _build_client_script(self, doclist):
-		# get custom (if present)
-		custom = self.get_custom_script(self.name, 'Client')
-
-		client_script = [str(doclist[0].client_script_core or ''), str(doclist[0].client_script or ''), (custom or '')]
+		client_script = [str(doclist[0].client_script_core or ''), str(doclist[0].client_script or '')]
 
 		# make into a single script
 		client_script = '\n'.join(client_script)
@@ -125,15 +122,6 @@ class _DocType:
 			if doclist[0].client_script: doclist[0].client_script = None
 			if doclist[0].client_script_core: doclist[0].client_script_core = None
 
-	# get additional script from the "Custom Script" table
-	#=================================================================================
-
-	def get_custom_script(self, dt, script_type):
-		if 'tabCustom Script' in  [t[0] for t in webnotes.conn.sql("show tables")]:
-			script = webnotes.conn.sql("select script from `tabCustom Script` where dt=%s and script_type=%s and ifnull(docstatus,0)<2", (dt, script_type))
-			return script and script[0][0] or ''
-		return ''
-
 	# write code to cache
 	#=================================================================================
 	
@@ -152,12 +140,11 @@ class _DocType:
 		def __init__(self, d, dl):
 			self.doc, self.doclist = d, dl'''
 	
-		custom = self.get_custom_script(doc.name, 'Server') or ''
-		c = [doc.server_code_core or '', doc.server_code or '', custom or '']
+		c = [doc.server_code_core or '', doc.server_code or '']
 	
 		# add default code if no code
 		# ---------------------------
-		if not (c[0].strip() or c[1].strip() or c[2].strip()):
+		if not (c[0].strip() or c[1].strip()):
 			c[0] = std_code
 	
 		code = None
@@ -168,8 +155,8 @@ class _DocType:
 			code = compile('\n'.join(c), '<string>', 'exec')
 			webnotes.model.meta.set_dt_value(doc.name, 'server_code_error', ' ')
 		except:
-			webnotes.model.meta.set_dt_value(doc.name, 'server_code_error', '<pre>'+webnotes.utils.getTraceback()+'</pre>')
-			code = compile(std_code, '<string>', 'exec')
+			webnotes.msgprint('Uncaught Server Script Error in ' + doc.name + '!')
+			webnotes.msgprint(webnotes.utils.getTraceback())
 					
 		# add to cache
 		# ------------
