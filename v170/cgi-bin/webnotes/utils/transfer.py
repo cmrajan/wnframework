@@ -243,7 +243,7 @@ def ovr_doctype(self, doclist, ovr, ignore, onupdate):
 	cur_doc.server_code_core = cstr(doc.server_code_core)
 	cur_doc.client_script_core = cstr(doc.client_script_core)
 	
-	cur_doc.save(ignore_fields = ignore, check_links = 0)
+	
 
 	# update schema
 	# -------------
@@ -254,7 +254,8 @@ def ovr_doctype(self, doclist, ovr, ignore, onupdate):
 		pass
 	
 	set(doc,'modified',orig_modified)
-	
+	cur_doc.save(ignore_fields = ignore, check_links = 0)
+
 	if in_transaction: sql("COMMIT")
 	
 	if added == 0:
