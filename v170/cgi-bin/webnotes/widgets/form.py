@@ -398,7 +398,7 @@ def validate_link():
 	value, options = webnotes.form.getvalue('value'), webnotes.form.getvalue('options')
 
 	# no options, don't validate
-	if not options:
+	if not options or options=='null' or options=='undefined':
 		webnotes.response['message'] = 'Ok'
 		return
 		
