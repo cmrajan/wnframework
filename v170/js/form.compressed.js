@@ -150,7 +150,7 @@ _f.Frm.prototype.runclientscript=function(caller,cdt,cdn){var _dt=this.parent_do
 ret=this.cscript[caller](doc,cdt,cdn);if(this.cscript['custom_'+caller])
 ret+=this.cscript['custom_'+caller](doc,cdt,cdn);}catch(e){submit_error(e);}
 if(caller&&caller.toLowerCase()=='setup'){var doctype=get_local('DocType',this.doctype);var cs=doctype._client_script?doctype._client_script:(doctype.client_script_core+doctype.client_script);if(cs){try{var tmp=eval(cs);}catch(e){submit_error(e);}}
-if(doctype.client_string){me.cstring={};var elist=doctype.client_string.split('---');for(var i=1;i<elist.length;i=i+2){me.cstring[strip(elist[i])]=elist[i+1];}}}
+if(doctype.client_string){this.cstring={};var elist=doctype.client_string.split('---');for(var i=1;i<elist.length;i=i+2){this.cstring[strip(elist[i])]=elist[i+1];}}}
 return ret;}
 _f.Frm.prototype.copy_doc=function(onload,from_amend){if(!this.perm[0][CREATE]){msgprint('You are not allowed to create '+this.meta.name);return;}
 var dn=this.docname;var newdoc=LocalDB.copy(this.doctype,dn,from_amend);if(this.meta.allow_attach&&newdoc.file_list)

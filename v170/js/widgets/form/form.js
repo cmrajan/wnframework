@@ -939,10 +939,10 @@ _f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 		
 		// ---Client String----
 		if(doctype.client_string) { // split client string
-			me.cstring = {};
+			this.cstring = {};
 			var elist = doctype.client_string.split('---');
 			for(var i=1;i<elist.length;i=i+2) {
-				me.cstring[strip(elist[i])] = elist[i+1];
+				this.cstring[strip(elist[i])] = elist[i+1];
 			}
 		}
 	}
