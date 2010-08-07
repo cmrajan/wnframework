@@ -248,7 +248,10 @@ def ovr_doctype(self, doclist, ovr, ignore, onupdate):
 	# update schema
 	# -------------
 	import webnotes.model.doctype
-	webnotes.model.doctype.update_doctype(so.doclist)
+	try:
+		webnotes.model.doctype.update_doctype(so.doclist)
+	except:
+		pass
 	
 	set(doc,'modified',orig_modified)
 
