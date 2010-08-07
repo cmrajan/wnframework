@@ -127,6 +127,9 @@ class App:
 		self.sync_records('Print Format')
 		self.sync_records('DocType Mapper')
 		self.sync_records('DocType Label')
+		self.sync_records('GL Mapper')
+		self.sync_records('TDS Category')
+		self.sync_records('TDS Rate Chart')
 		self.sync_control_panel()
 		self.close()
 		
