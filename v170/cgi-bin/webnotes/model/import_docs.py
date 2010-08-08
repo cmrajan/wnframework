@@ -94,13 +94,14 @@ class CSVImport:
 		if len(self.dt_list) > 1 and self.overwrite:
 			self.msg.append('<div style="color:RED"> Error: Overwrite is not possible for Document %s </div>' % self.dt_list[0])
 			self.validate_success = 0
+			return
 		
 		elif self.overwrite and 'Name' != lb_list[0]:
-			self.msg.append('<div style="color:RED"> Error: At Row 5 and Column 1: To Overwrite fieldname should be Name" </div>' % self.dt_list[0])
+			self.msg.append('<div style="color:RED"> Error : At Row 4 and Column 1: To Overwrite fieldname should be Name </div>')
 			self.validate_success = 0
-		
+			return
 		# labelnames
-		res = [d[0] for d in sql("select label from tabDocField where parent='%s' and docstatus!=2 and (ifnull(hidden,'') = '' or ifnull(hidden,0) = 0)" % self.dt_list[0])] or []
+		res = self.validate_success and [d[0] for d in sql("select label from tabDocField where parent='%s' and docstatus!=2 and ifnull(hidden,'') in ('',0)" % self.dt_list[0])] or []
 
 		if len(self.dt_list) > 1 and self.dt_list[1]:
 			self.fields.append('parent')
@@ -116,13 +117,13 @@ class CSVImport:
 			try:
 				if l:
 					if not (l in res):
-						self.msg.append('<div style="color: RED">Error: At Row 5 and Column %s Field %s is not present in %s</div>' % (cl, l, self.dt_list[0]))
+						self.msg.append('<div style="color: RED">Error : At Row 4 and Column %s Field %s is not present in %s</div>' % (cl, l, self.dt_list[0]))
 						self.validate_success = 0
 						# this condition is for child doctype
 				
-					else:	self.fields.append(sql("select fieldname from tabDocField where parent ='%s' and label = '%s' " % (self.dt_list[0], l))[0][0] or '')
+					else:	self.fields.append(sql("select fieldname from tabDocField where parent ='%s' and label = '%s' and ifnull(fieldname,'') !='' " % (self.dt_list[0], l))[0][0] or '')
 			except Exception, e:
-				self.msg.append('<div style="color: RED"> At Row 5 and Column %s : =>ERROR: %s </div>' % ( cl, e))
+				self.msg.append('<div style="color: RED"> At Row 4 and Column %s : =>ERROR: %s </div>' % ( cl, e))
 				self.validate_success = 0
 			cl = cl + 1
 	
@@ -132,7 +133,7 @@ class CSVImport:
 		
 			# Check if Reqd field not present in self.fields
 			if reqd_list:
-				self.msg.append('<div style="color: RED"> Error: At Row 5 Mandatory Fields %s of Document %s are Required.</div>' % (reqd_list , self.dt_list[0]))
+				self.msg.append('<div style="color: RED"> Error : At Row 4 Mandatory Fields %s of Document %s are Required. </div>' %(reqd_list , self.dt_list[0]))
 				self.validate_success = 0
 		if self.validate_success:
 			self.msg.append('<div style="color: GREEN">Fields OK for %s</div>' % self.dt_list[0])
@@ -237,7 +238,7 @@ class CSVImport:
 
 		
 		# load data
-		row = 6
+		row = 5
 		for d in self.data:
 			self.validate_success, fd, col = 1, {}, 1
 			self.msg.append('<p><b>Checking Row %s </b></p>' % (row))
@@ -300,8 +301,8 @@ class CSVImport:
 				else: 
 					self.msg.append('<div style="color: RED">Row %s => Invalid %s : %s</div>' % (row, cur_doc.parenttype, cur_doc.parent))
 			if obj:
-				if obj.has_key('validate') : obj.validate()
-				if obj.has_key('on_update') : obj.on_update()
+				if hasattr(obj, 'validate') : obj.validate()
+				if hasattr(obj, 'on_update') : obj.on_update()
 		except Exception:
 			self.msg.append('<div style="color: RED"> ERROR: %s</div>' % (str(webnotes.utils.getTraceback())))
 			self.msg.append('<div style="color: ORANGE">Ignored: %s</div>' % (cur_doc.name))
@@ -371,7 +372,7 @@ def get_template():
 		else:
 			lbl, ml= [], []
 		line1 = '%s' % getCSVelement(dt)
-		line2 = (overwrite and ',,,,,,Please fill valid %(d)s No in %(d)s' % {'d':dt}) or ',,'
+		line2 = (overwrite and ',,,,,,Please fill valid %(d)s No in %(n)s' % {'d':dt,'n': 'Name'}) or ',,'
 
 	# Help on Line 
 	line1 = line1 + ',,,Please fill columns which are Mandatory., Please do not modify the structure'
