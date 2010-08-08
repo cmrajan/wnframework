@@ -83,10 +83,9 @@ def load_month_events():
 def import_csv():
 	import webnotes.model.import_docs
 	form = webnotes.form
-	from webnotes.utils import cint
-
+	
 	i = webnotes.model.import_docs.CSVImport()
-	r = i.import_csv(form.getvalue('csv_file'), form.getvalue('dateformat'), cint(form.getvalue('overwrite')))
+	r = i.import_csv(form.getvalue('csv_file'), form.getvalue('dateformat'), form.getvalue('overwrite'))
 		
 	webnotes.response['type']='iframe'
 	rhead = '''<style>body, html {font-family: Arial; font-size: 12px;}</style>'''
