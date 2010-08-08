@@ -193,7 +193,7 @@ var newdoc = new_doc;
 var pscript={};
 var cur_page;
 function loadpage(page_name, call_back, menuitem) {
-	if(page_name=='_home' || page_name=='Home')
+	if(page_name=='_home')
 		page_name = home_page;
 	var fn = function(r,rt) {
 		if(page_body.pages[page_name]) {
