@@ -31,16 +31,6 @@ def cleanup_docs():
 	import webnotes.model.doclist
 	if out.get('docs') and type(out['docs'])!=dict:
 		out['docs'] = webnotes.model.doclist.compress(out['docs'])
-		
-def set_timezone():
-	import os
-	os.environ['TZ'] = hasattr(webnotes.defs, 'user_timezone') and webnotes.defs.user_timezone or 'Asia/Calcutta'
-	try:
-		time.tzset()
-	except:
-		pass # for Windows
-
-set_timezone()
 
 def runserverobj():
 	import webnotes.widgets.form

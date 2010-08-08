@@ -2,6 +2,7 @@
 
 import webnotes
 
+user_time_zone = None
 month_name = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image', 'Graph']
 default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
@@ -105,13 +106,26 @@ def date_diff(string_ed_date, string_st_date):
 	import datetime
 	return webnotes.conn.sql("SELECT DATEDIFF('%s','%s')" %(getdate(string_ed_date), getdate(string_st_date)))[0][0]
 
+def now_datetime():
+	global user_time_zone
+	from datetime import datetime
+	from pytz import timezone
+	
+	# get localtime
+	if not user_time_zone:
+		user_time_zone = webnotes.conn.get_value('Control Panel', None, 'time_zone') or 'Asia/Calcutta'
+
+	# convert to UTC
+	utcnow = timezone('UTC').localize(datetime.utcnow())
+
+	# convert to user time zone
+	return utcnow.astimezone(timezone(user_time_zone))
+
 def now():
-	import time
-	return time.strftime('%Y-%m-%d %H:%M:%S')
+	return now_datetime().strftime('%Y-%m-%d %H:%M:%S')
 	
 def nowdate():
-	import time
-	return time.strftime('%Y-%m-%d')
+	return now_datetime().strftime('%Y-%m-%d')
 
 def get_first_day(dt, d_years=0, d_months=0):
 	import datetime
