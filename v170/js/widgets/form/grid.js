@@ -7,12 +7,10 @@ _f.Grid.prototype.init = function(parent, row_height) {
 	
 	this.alt_row_bg = '#F2F2FF';
 	this.row_height = row_height;
-	if(this.is_scrolltype) {
-		if(!row_height)this.row_height = '26px';
-		this.make_ui(parent);
-	} else {
-		this.make_ui_simple(parent);
-	}
+
+	// make the grid
+	if(!row_height)this.row_height = '26px';
+	this.make_ui(parent);
 		
 	// Sr No
 	this.insert_column('', '', 'Int', 'Sr', '50px', '', [1,0,0]);
@@ -49,36 +47,11 @@ _f.Grid.prototype.make_ui = function(parent) {
 	this.wrapper.onscroll = function() { me.head_wrapper.style.top = me.wrapper.scrollTop+'px'; }
 }
 
-_f.Grid.prototype.make_ui_simple = function(parent) { 
-
-	var ht = make_table($a(parent, 'div'), 1, 2, '100px', ['60%','40%']);
-
-	this.main_title = $td(ht,0,0); this.main_title.className = 'columnHeading';
-	$td(ht,0,1).style.textAlign = 'right';
-
-	this.btn_area = $a(parent,'button','',{marginBottom:'8px', fontWeight:'bold'});
-	this.btn_area.innerHTML = '+ Add Row';
-	
-	this.wrapper = $a(parent, 'div', 'grid_wrapper_simple');
-	this.head_wrapper = $a(this.wrapper, 'div','grid_head_wrapper_simple');
-
-	this.head_tab = $a(this.head_wrapper, 'table', 'grid_head_table');
-	this.head_row = this.head_tab.insertRow(0);
-
-	this.tab_wrapper = $a(this.wrapper, 'div','grid_tab_wrapper_simple');	
-	this.tab = $a(this.tab_wrapper, 'table', 'grid_table');
-
-	var me = this;
-	
-}
-
 _f.Grid.prototype.show = function() { 
 	if(this.can_add_rows) {
-		if(this.is_scrolltype)$ds(this.tbar_div);
-		else $ds(this.btn_area);
+		$ds(this.tbar_div);
 	} else {
-		if(this.is_scrolltype)$dh(this.tbar_div);
-		else $dh(this.btn_area);
+		$dh(this.tbar_div);
 	}
 	$ds(this.wrapper);
 }
@@ -93,10 +66,6 @@ _f.Grid.prototype.insert_column = function(doctype, fieldname, fieldtype, label,
 	
 	var col = this.head_row.insertCell(idx);
 	
-	if(!this.is_scrolltype){ 
-		col.style.padding = '2px';
-		col.style.borderRight = '1px solid #AA9';
-	}
 	col.doctype = doctype; // for report (fields may be from diff doctypes)
 	col.fieldname = fieldname;
 	col.fieldtype = fieldtype;
@@ -159,8 +128,7 @@ _f.Grid.prototype.append_row = function(idx, docname) {
 		$w(cell, hc.style.width);
 		cell.row = row;
 		cell.grid = this;
-		if(this.is_scrolltype)	cell.className = 'grid_cell';
-		else					cell.className = 'grid_cell_simple';
+		cell.className = 'grid_cell';
 
 		cell.div = $a(cell, 'div', 'grid_cell_div');
 		if(this.row_height) {
@@ -176,7 +144,7 @@ _f.Grid.prototype.append_row = function(idx, docname) {
 		if(!hc.fieldname) cell.div.style.cursor = 'default'; // Index
 	}
 
-	if(this.is_scrolltype)this.set_ht();
+	this.set_ht();
 
 	return row;	
 }
@@ -238,13 +206,6 @@ _f.Grid.prototype.set_cell_value = function(cell) {
 				_f.edit_record(me.doctype, this.cell.row.docname, 1);				
 			}
 			
-			if(!me.is_scrolltype) {
-				var ca = $a($td(t,0,2),'div','wn-icon ic-round-minus',{cursor:'pointer'});
-				ca.cell = cell; ca.title = 'Delete Row';
-				ca.onclick = function() {
-					me.delete_row(me.doctype, this.cell.row.docname);
-				}
-			}
 		} else {
 			cell.div.innerHTML = (cell.row.rowIndex + 1);
 			cell.div.style.cursor = 'default';
@@ -428,19 +389,14 @@ _f.Grid.prototype.append_rows = function(n) { for(var i=0;i<n;i++) this.append_r
 _f.Grid.prototype.truncate_rows = function(n) { for(var i=0;i<n;i++) this.tab.deleteRow(this.tab.rows.length-1); }
 
 _f.Grid.prototype.set_data = function(data) {
-	// data is list of docnames
 
 	// deselect if not done yet
 	this.cell_deselect();
 
 	// set table widths
-	if(this.is_scrolltype) {
-		this.tab.style.width = this.total_width + 'px';
-		this.head_tab.style.width = this.total_width + 'px';
-	} else {
-		this.tab.style.width = '100%';
-		this.head_tab.style.width = '100%';
-	}
+	this.tab.style.width = this.total_width + 'px';
+	this.head_tab.style.width = this.total_width + 'px';
+
 	// append if reqd
 	if(data.length > this.tab.rows.length)
 		this.append_rows(data.length - this.tab.rows.length);
@@ -458,7 +414,7 @@ _f.Grid.prototype.set_data = function(data) {
 		this.make_newrow();
 	}
 	
-	if(this.is_scrolltype)this.set_ht();
+	this.set_ht();
 	
 	if(this.wrapper.onscroll)this.wrapper.onscroll();
 }

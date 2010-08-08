@@ -511,17 +511,17 @@ LinkField.prototype.make_input = function() {
 	me.txt.field_object = this;
 	me.txt.onchange = function() { 
 		// check values are not set in quick succession due to un-intentional event call
-		if(_last_link_value)
-			return
+		if(_last_link_value) return
 			
 		// not in form, do nothing
-		if(me.not_in_form) 
-			return;
+		if(me.not_in_form) return;
 		
 		// same value, do nothing
 		if(cur_frm) {
-			if(me.txt.value == locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname])
-				return;
+			if(me.txt.value == locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]) { 
+				me.set(me.txt.value); // one more time, grid bug?
+				return; 
+			}
 		}
 		
 		if(me.as && me.as.ul) {

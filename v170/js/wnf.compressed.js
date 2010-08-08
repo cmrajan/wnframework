@@ -644,11 +644,8 @@ else if(cint(t[1])>12||cint(t[1])<1){return this.clear();}
 else if(cint(t[2])>31||cint(t[2])<1){return this.clear();}
 return v;};var _last_link_value=null;function LinkField(){}LinkField.prototype=new Field();LinkField.prototype.with_label=1;LinkField.prototype.make_input=function(){makeinput_popup(this,'ic-zoom','ic-sq_next','ic-sq_plus');var me=this;me.btn.onclick=function(){selector.set(me,me.df.options,me.df.label);selector.show(me.txt);}
 if(me.btn1)me.btn1.onclick=function(){if(me.txt.value&&me.df.options){loaddoc(me.df.options,me.txt.value);}}
-me.txt.field_object=this;me.txt.onchange=function(){if(_last_link_value)
-return
-if(me.not_in_form)
-return;if(cur_frm){if(me.txt.value==locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname])
-return;}
+me.txt.field_object=this;me.txt.onchange=function(){if(_last_link_value)return
+if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]){me.set(me.txt.value);return;}}
 if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value;setTimeout('_last_link_value=null',100);if(!me.txt.value){me.run_trigger();return;}
 $c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options},function(r,rt){if(selector&&selector.display)return;if(r.message=='Ok'){me.run_trigger();}else{me.txt.value='';me.set('');}});}}
 me.input.set_input=function(val){if(val==undefined)val='';me.txt.value=val;}

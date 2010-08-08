@@ -9,8 +9,6 @@ _f.FormGrid = function(field) {
 	this.col_break_width = cint(this.field.col_break_width);
 	if(!this.col_break_width) this.col_break_width = 100;
 	
-	this.is_scrolltype = true;
-	if(field.df['default'] && field.df['default'].toLowerCase() =='simple') this.is_scrolltype=false;
 	this.init(field.parent, field.df.width);
 	this.setup();
 }
@@ -47,27 +45,14 @@ _f.FormGrid.prototype.make_tbar_link = function(parent, label, fn, icon) {
 
 _f.FormGrid.prototype.make_buttons = function() {
 	var me = this;
-	if(this.is_scrolltype) {
-		this.tbar_btns = {};
-		this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'ic-round_minus');
-		this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'ic-round_plus');
-		this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'ic-arrow_top');
-		this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'ic-arrow_bottom');
+	this.tbar_btns = {};
+	this.tbar_btns['Del'] = this.make_tbar_link($td(this.tbar_tab,0,0),'Del', function() { me.delete_row(); }, 'ic-round_minus');
+	this.tbar_btns['Ins'] = this.make_tbar_link($td(this.tbar_tab,0,1),'Ins', function() { me.insert_row(); }, 'ic-round_plus');
+	this.tbar_btns['Up'] = this.make_tbar_link($td(this.tbar_tab,0,2),'Up', function() { me.move_row(true); }, 'ic-arrow_top');
+	this.tbar_btns['Dn'] = this.make_tbar_link($td(this.tbar_tab,0,3),'Dn', function() { me.move_row(false); }, 'ic-arrow_bottom');
 		
-		for(var i in this.btns)
-			this.btns[i].isactive = true;
-	} else {
-		// new button
-		this.btn_area.onclick = function() {
-			// activate row,
-			me.make_newrow(1);
-			var dn = me.add_newrow();
-			// edit record
-			cur_grid = me;
-			cur_grid_ridx = me.tab.rows.length - 1; // the last row is the fresh one
-			_f.edit_record(me.doctype, dn, 1);
-		}
-	}
+	for(var i in this.btns)
+		this.btns[i].isactive = true;
 }
 
 _f.FormGrid.prototype.make_columns = function() {
@@ -86,12 +71,10 @@ _f.FormGrid.prototype.make_columns = function() {
 		}
 	}
 	
-	if(!this.is_scrolltype) {
-		// set width as percent
-		for(var i=0;i<this.head_row.cells.length; i++) {
-			var c = this.head_row.cells[i];
-			$w(c,cint(cint(c.style.width) / this.total_width * 100)+'%')
-		}
+	// set width as percent
+	for(var i=0;i<this.head_row.cells.length; i++) {
+		var c = this.head_row.cells[i];
+		$w(c,cint(cint(c.style.width) / this.total_width * 100)+'%')
 	}
 }
 
@@ -175,8 +158,6 @@ _f.FormGrid.prototype.add_newrow = function() {
 _f.FormGrid.prototype.make_newrow = function(from_add_btn) {
 	if(!this.can_add_rows) // No Addition
 		return;
-		
-	if((!from_add_btn) && (this.field.df['default'].toLowerCase()=='simple')) return; // no empty row if simple
 		
 	// check if exists
 	if(this.tab.rows.length) {
