@@ -280,7 +280,6 @@ class CSVImport:
 		# load metadata
 		from webnotes.model.doc import Document
 		cur_doc = Document(fielddata = fd)
-		self.msg.append(str(cur_doc.parent))
 		cur_doc.doctype, cur_doc.parenttype, cur_doc.parentfield = self.dt_list[0], len(self.dt_list) > 1 and self.dt_list[1] or '', len(self.dt_list) > 1 and self.dt_list[2] or ''
 		obj = ''
 		# save the document
@@ -294,7 +293,6 @@ class CSVImport:
 					self.msg.append('<div style="color: ORANGE">Row %s => Ignored: %s</div>' % (row, cur_doc.name))
 			else:
 				if cur_doc.parent and webnotes.conn.exists(cur_doc.parenttype, cur_doc.parent) or not cur_doc.parent:
-					self.msg.append(str(fd))
 					cur_doc.save(1)
 					obj = webnotes.model.code.get_obj(cur_doc.parent and cur_doc.parenttype or cur_doc.doctype, cur_doc.parent or cur_doc.name, with_children = 1)
 					self.msg.append('<div style="color: GREEN">Row %s => Created: %s</div>' % (row, cur_doc.name))
@@ -305,8 +303,6 @@ class CSVImport:
 				if hasattr(obj, 'on_update') : obj.on_update()
 		except Exception:
 			self.msg.append('<div style="color: RED"> Validation: %s</div>' % "\n".join(webnotes.message_log))
-			self.msg.append('<div style="color: ORANGE">Ignored: %s </div>' % str(cur_doc.name))
-
 
 	# do import
 	# --------------------------------------------------------------------
