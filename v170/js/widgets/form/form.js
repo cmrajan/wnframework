@@ -673,7 +673,7 @@ _f.Frm.prototype.cleanup_refresh = function() {
 	}
 
 	if(me.fields_dict['trash_reason']) {
-		if(me.doc.trash_reason and me.doc.docstatus == 2) {
+		if(me.doc.trash_reason && me.doc.docstatus == 2) {
 			unhide_field('trash_reason');
 		} else {
 			hide_field('trash_reason');
