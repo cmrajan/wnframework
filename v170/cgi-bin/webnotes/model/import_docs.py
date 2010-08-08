@@ -304,7 +304,8 @@ class CSVImport:
 				if hasattr(obj, 'validate') : obj.validate()
 				if hasattr(obj, 'on_update') : obj.on_update()
 		except Exception:
-			self.msg.append('<div style="color: RED"> ERROR: %s</div>' % (str(webnotes.utils.getTraceback())))
+			self.msg.append('<div style="color: RED"> Validation: %s</div>' % (str(webnotes.utils.getTraceback())))
+			self.msg.append('<div style="color: YELLOW"> TIP: Try to Save %s : %s to get the exact validation</div>' % (str(obj.doc.doctype), str(obj.doc.name)))
 			self.msg.append('<div style="color: ORANGE">Ignored: %s</div>' % (cur_doc.name))
 
 
