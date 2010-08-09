@@ -116,28 +116,24 @@ def runserverobj():
 		return
 				
 	if so:
-		try:
-			r = webnotes.model.code.run_server_obj(so, method, arg)
-			doclist = so.doclist # reference back [in case of null]
-			if r:
-				try:
-					if r['doclist']:
-						clientlist += r['doclist']
-				except:
-					pass
-				
-				#build output as csv
-				if cint(webnotes.form.getvalue('as_csv')):
-					make_csv_output(r, so.doc.doctype)
-				else:
-					webnotes.response['message'] = r
+		r = webnotes.model.code.run_server_obj(so, method, arg)
+		doclist = so.doclist # reference back [in case of null]
+		if r:
+			try:
+				if r['doclist']:
+					clientlist += r['doclist']
+			except:
+				pass
 			
-			if clientlist:
-				doclist.append(main_doc)
-				webnotes.response['docs'] = doclist
-		except Exception, e:
-			webnotes.errprint(webnotes.utils.getTraceback())
-			raise e
+			#build output as csv
+			if cint(webnotes.form.getvalue('as_csv')):
+				make_csv_output(r, so.doc.doctype)
+			else:
+				webnotes.response['message'] = r
+		
+		if clientlist:
+			doclist.append(main_doc)
+			webnotes.response['docs'] = doclist
 
 def make_csv_output(res, dt):
 	import webnotes
