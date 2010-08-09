@@ -66,7 +66,7 @@ class AppManager:
 		if curr_ac_name:
 			curr_ac_name = int(curr_ac_name[2:])
 		for i in range(n):
-			self.new_app('AC%07d' % (curr_ac_name + i + 1), source)
+			self.new_app('AC%05d' % (curr_ac_name + i + 1), source)
 			
 	# get the next app in line
 	# ----------------------------------
