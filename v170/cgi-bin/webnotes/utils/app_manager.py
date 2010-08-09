@@ -130,7 +130,16 @@ class App:
 		self.sync_records('GL Mapper')
 		self.sync_records('TDS Rate Chart')
 		self.sync_control_panel()
+		self.clear_cache()
 		self.close()
+
+
+	# Clear Cache
+	# ------------
+	def clear_cache(self):
+		self.conn.sql("start transaction")
+		self.conn.sql("delete from __DocTypeCache")
+		self.conn.sql("delete from __SessionCache")		
 		
 	# sync control panel
 	# ----------------------------------
