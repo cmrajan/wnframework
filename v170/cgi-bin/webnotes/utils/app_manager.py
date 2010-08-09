@@ -18,7 +18,7 @@ class AppManager:
 	def load_app_list(self, al=[]):
 		if not al:
 			self.acc_conn = webnotes.db.Database(use_default=1)
-			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount')]
+			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount where ac_name != %s',self.master)]
 		for a in al:
 			self.app_list.append(App(self.master,a))
 
@@ -61,12 +61,12 @@ class AppManager:
 	# ----------------------------------
 	def create_apps(self, n, source):
 		acc_conn = webnotes.db.Database(use_default=1)
-		curr_ac_name = acc_conn.sql("select ac_name from tabAccount where ac_name like 'ac%' Order by ac_name desc limit 1")
+		curr_ac_name = acc_conn.sql("select ac_name from tabAccount where ac_name like 'AC%' Order by ac_name desc limit 1")
 		curr_ac_name = curr_ac_name and curr_ac_name[0][0] or 0
 		if curr_ac_name:
 			curr_ac_name = int(curr_ac_name[2:])
 		for i in range(n):
-			self.new_app('ac%07d' % (curr_ac_name + i + 1), source)
+			self.new_app('AC%07d' % (curr_ac_name + i + 1), source)
 			
 	# get the next app in line
 	# ----------------------------------
