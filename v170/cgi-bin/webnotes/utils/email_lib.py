@@ -28,8 +28,6 @@ class EMail:
 		self.msg.attach(msg)
 		
 	def attach(self, n):
-		import webnotes.model
-		#res = webnotes.model.get_file(n)
 		import webnotes.utils		
 		res = webnotes.utils.get_file(n)
 		if not res:
@@ -64,6 +62,7 @@ class EMail:
 			msg = MIMEBase(maintype, subtype)
 			msg.set_payload(fcontent)
 			# Encode the payload using Base64
+			from email import encoders
 			encoders.encode_base64(msg)
 		# Set the filename parameter
 		msg.add_header('Content-Disposition', 'attachment', filename=fname)
