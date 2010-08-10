@@ -29,8 +29,9 @@ class EMail:
 		
 	def attach(self, n):
 		import webnotes.model
-		res = webnotes.model.get_file(n)
-
+		#res = webnotes.model.get_file(n)
+		import webnotes.utils		
+		res = webnotes.utils.get_file(n)
 		if not res:
 			self.msg.attach('Sender tried to attach an unknown file id: ' + n)
 	
