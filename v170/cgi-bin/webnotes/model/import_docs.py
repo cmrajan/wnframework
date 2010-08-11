@@ -202,7 +202,7 @@ class CSVImport:
 		try:
 			if d and f:
 				dt = sql("select options, label from `tabDocField` where fieldname ='%s' and parent = '%s' " % (f, self.dt_list[0]))
-				dt, lbl = dt[0][0].strip(), dt[0][1].strip()
+				dt, lbl = dt and dt[0][0].strip(), dt and dt[0][1].strip()
 				options = l and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n')
 				if options and d not in options :
 					msg = '<div style="color: RED">At Row ' + str(r) + ' and Column ' + str(c)+ ' : => Data "' + str(d) + '" in field ['+ str(lbl) +'] Not Found in '
