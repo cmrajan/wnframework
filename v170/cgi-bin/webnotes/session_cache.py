@@ -52,7 +52,7 @@ def load(country):
 	import webnotes
 	
 	try:
-		sd = webnotes.conn.sql("select cache from __SessionCache where user=%s", webnotes.session['user'])
+		sd = webnotes.conn.sql("select cache from __SessionCache where user='%s' %s" % (webnotes.session['user'], (country and (" and country='%s'" % country) or '')))
 		if sd:
 			return eval(sd[0][0])
 		else:
