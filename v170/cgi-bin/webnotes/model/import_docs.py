@@ -57,35 +57,36 @@ class CSVImport:
 		self.csv_data = None
 		self.import_date_format = None
 
-	def validate_doctype(self, dt_list):
-		cl, tables, self.dt_list, self.prompt_autoname_flag = 0, [t[0] for t in sql("show tables")], [], 0
-		self.msg.append('<p><b>Identifying Documents</b></p>')
-	 
-		dtd = sql("select name, istable, autoname from `tabDocType` where name = '%s' " % dt_list[0])
-		if dtd and dtd[0][0]:
-			self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[0] + '</div>')
-			self.dt_list.append(dt_list[0])
-			if dtd[0][2] and 'Prompt' in dtd[0][2]: self.prompt_autoname_flag = 1
-			if flt(dtd[0][1]):
-				res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % self.dt_list[0])
-				if res1 and res1[0][0] == dt_list[1]:
-					self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[1] + '</div>')
-					self.dt_list.append(dt_list[1])
-				else : 
-					self.msg.append('<div style="color:RED"> Error: At Row 1, Column 3 => %s is not a valid Document </div>' % dt_list[1])
-					self.valiadte_success = 0
+        def validate_doctype(self, dt_list):
+                cl, tables, self.dt_list, self.prompt_autoname_flag = 0, [t[0] for t in sql("show tables")], [], 0
+                self.msg.append('<p><b>Identifying Documents</b></p>')
+	
+                dtd = sql("select name, istable, autoname from `tabDocType` where name = '%s' " % dt_list[0])
+                if dtd and dtd[0][0]:
+                        self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[0] + '</div>')
+                        self.dt_list.append(dt_list[0])
+                        if dtd[0][2] and 'Prompt' in dtd[0][2]: self.prompt_autoname_flag = 1
+                        if flt(dtd[0][1]):
+                                res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % self.dt_list[0])
+                                if res1 and res1[0][0] == dt_list[1]:
+                                        self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[1] + '</div>')
+                                        self.dt_list.append(dt_list[1])
+                                else : 
+                                        self.msg.append('<div style="color:RED"> Error: At Row 1, Column 2 => %s is not a valid Document </div>' % dt_list[1])
+                                        self.validate_success = 0
 
-				if res1 and res1[0][1] == dt_list[2]:
-					self.msg.append('<div style="color: GREEN" >Identified Document Fieldname: ' + dt_list[2] + '</div>')
-					self.dt_list.append(dt_list[2])
-				else :
-					self.msg.append('<div style="color:RED"> Error: At Row 1, Column 4 => %s is not a valid Fieldname </div>' % dt_lsit[2])
-					self.valiadte_success = 0
-			elif dt_list[1] or dt_list[2]:
-				self.msg.append('<div style="color:RED"> Error: At Row 1, Column %s => %s is not a valid Document </div>' % ((dt_list[1] and 2) or (dt_list[2] and 3)))
-		else:
-			self.msg.append('<div style="color:RED"> Error: At Row 1, Column 2 => %s is not a valid Document </div>' % dt_list[0])
-			self.validate_success = 0
+                                if res1 and res1[0][1] == dt_list[2]:
+                                        self.msg.append('<div style="color: GREEN" >Identified Document Fieldname: ' + dt_list[2] + '</div>')
+                                        self.dt_list.append(dt_list[2])
+                                else :
+                                        self.msg.append('<div style="color:RED"> Error: At Row 1, Column 3 => %s is not a valid Fieldname </div>' % dt_list[2])
+                                        self.validate_success = 0
+                        elif dt_list[1] or dt_list[2]:
+                                self.msg.append('<div style="color:RED"> Error: At Row 1, Column 1 => %s is not a Table.  </div>' % dt_list[0])
+				self.validate_success = 0
+                else:
+                        self.msg.append('<div style="color:RED"> Error: At Row 1, Column 1 => %s is not a valid Document </div>' % dt_list[0])
+                        self.validate_success = 0
 
 
 	def validate_fields(self, lb_list):
@@ -204,7 +205,12 @@ class CSVImport:
 				dt, lbl = dt[0][0].strip(), dt[0][1].strip()
 				options = l and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n')
 				if options and d not in options :
-					self.msg.append('<div style="color: RED">At Row %s and Column %s : => Data "%s" in field [%s] Not Found in options %s</div>\n' % (r, c, d, lbl, options))
+					msg = '<div style="color: RED">At Row ' + str(r) + ' and Column ' + str(c)+ ' : => Data "' + str(d) + '" in field ['+ str(lbl) +'] Not Found in '
+					msg = msg.__add__( s and  str( 'Select Options [' +str(dt.replace('\n', ',')) +']' ) or str('Master ' + str('link:' in dt and dt[5:] or dt)))
+					msg = msg.__add__('</div>\n')
+					self.msg.append(msg)
+
+					#self.msg.append('<div style="color: RED">At Row %s and Column %s : => Data "%s" in field [%s] Not Found in options %s</div>\n' % (r, c, d, lbl, options))
 					self.validate_success = 0
 		except Exception, e:
 			self.msg.append('<div style="color: RED"> ERROR: %s </div>' % (str(webnotes.utils.getTraceback())))
@@ -298,12 +304,15 @@ class CSVImport:
 					self.msg.append('<div style="color: GREEN">Row %s => Created: %s</div>' % (row, cur_doc.name))
 				else: 
 					self.msg.append('<div style="color: RED">Row %s => Invalid %s : %s</div>' % (row, cur_doc.parenttype, cur_doc.parent))
+		except Exception:
+			self.msg.append('<div style="color: RED"> Validation: %s</div>' % str(webnotes.utils.getTraceback()))
+		try:
 			if obj:
 				if hasattr(obj, 'validate') : obj.validate()
 				if hasattr(obj, 'on_update') : obj.on_update()
 		except Exception:
-			self.msg.append('<div style="color: RED"> Validation: %s</div>' % "\n".join(webnotes.message_log))
-
+			self.msg.append('<div style="color: RED"> Validation: %s</div>' % str(webnotes.message_log[-1:]))
+			
 	# do import
 	# --------------------------------------------------------------------
 	def import_csv(self, csv_data, import_date_format = 'yyyy-mm-dd', overwrite = 0):
