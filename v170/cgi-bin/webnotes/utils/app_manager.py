@@ -242,8 +242,9 @@ class App:
 		webnotes.conn = self.conn
 		from webnotes.model.code import get_obj
 		sc = get_obj('Control Panel').execute_test(script)
-		if sc.get('exc'):
+		print sc
+		if sc['exc']:
 			print sc['exc']
-		elif sc.get('server_messages'):  # this returns msg in msgprints from remote account
+		elif sc['server_messages']:  # this returns msg in msgprints from remote account
 			print sc['server_messages']
 		self.close()
