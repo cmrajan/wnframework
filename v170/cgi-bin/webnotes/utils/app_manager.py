@@ -238,6 +238,7 @@ class App:
 	# run script remotely
 	# ----------------------------------
 	def run_script(self, script):
+		self.connect(ac_name = self.ac_name)
 		webnotes.conn = self.conn
 		from webnotes.model.code import get_obj
 		ret = get_obj('Control Panel').execute_test(script)
@@ -245,3 +246,4 @@ class App:
 			print ret['exc']
 		elif ret.get('server_messages'):  # this returns msg in msgprints from remote account
 			print ret['server_messages']
+		self.close()
