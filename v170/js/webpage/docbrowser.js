@@ -93,7 +93,7 @@ DocBrowser.prototype.make_new = function(dt, label, field_list) {
 	if(in_list(profile.can_create,dt)) {
 		var d = $a($a(w,'div','',{marginBottom:'16px'}),'button');
 		d.dt = dt;
-		$(d).html('+ New ' + label).css('font-size','16px').css('font-weight','bold').button().click( function() { newdoc(this.dt); } );
+		$(d).html('+ New ' + label).css('font-size','14px').css('font-weight','bold').button().click( function() { newdoc(this.dt); } );
 	}
 
 
