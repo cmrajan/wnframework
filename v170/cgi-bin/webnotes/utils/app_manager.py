@@ -22,25 +22,42 @@ class AppManager:
 		for a in al:
 			self.app_list.append(App(self.master,a))
 
-	# sync all the apps
+
+	# load list of all doctypes, reports and pages in module
+	# ------------------------------------------------------------
+	def load_dt_list(self, app, mod=[], dt=[]):
+		self.dt_list = dt
+		if mod:
+			transfer_types = ['Role', 'DocType', 'Search Criteria', 'Page', 'Module Def', 'Print Format', 'DocType Mapper', 'DocType Label', 'GL Mapper', 'TDS Rate Chart']
+			for m in mod:
+				for dt in transfer_types:
+					try:
+						dl2 = app.master_conn.sql('select name from `tab%s` where module="%s"' % (dt,m))
+						self.dt_list += [[dt+','+e[0]] for e in dl2]
+					except:
+						pass
+
+
+	# sync all the apps (app_list -> ac_names , mod_list -> modules, dt_list -> [doctypes,docname])
 	# ----------------------------------
-	def sync_apps(self, app_list=[], dt_list = []):
-		''' app_list is list of ac_names '''
-		''' dt_list is list of doctype and docnames '''
+	def sync_apps(self, app_list=[], mod_list = [], dt_list = []):
+		self.app_list, self.dt_list = [], []
 		self.load_app_list(app_list)
+		print "Source Account : "+self.master
 		for app in self.app_list:
 			print "---------------------------------------"
-			print "Source Account : "+self.master
 			print "Target Account : "+app.ac_name
 			print "---------------------------------------"
-			if dt_list:
-				for d in dt_list:
-					app.connect(app.ac_name)
+			if mod_list or dt_list:
+				app.connect(app.ac_name)
+				self.load_dt_list(app, mod_list, dt_list)
+				for d in self.dt_list:
 					app.sync_doc(d[0], d[1])
-					app.close()
+				app.close()
 			else:
 				app.sync(ac_name = app.ac_name)
 	
+
 	# execute a script in all apps
 	# ----------------------------------
 	def execute_script(self, script):
@@ -91,7 +108,7 @@ class App:
 		self.master = master
 		self.verbose = 0
 	
-	# Get db Login
+	# Get db Logintransfer_types = ['Role',  'Print Format','DocType', 'Page', 'DocType Mapper', 'Search Criteria','Menu Item']
 	# -------------
 	def get_db_login(self, ac_name):
 		import webnotes.utils
