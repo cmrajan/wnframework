@@ -60,10 +60,15 @@ class AppManager:
 
 	# execute a script in all apps
 	# ----------------------------------
-	def execute_script(self, script):
-		for app in self.app_list():
+	def execute_script(self, script, app_list = []):
+		self.load_app_list(app_list)
+		for app in self.app_list:
+			print "=========================="
+			print "Target Account : "+app
+			print "--------------------------"
 			app.run_script(script)
-	
+
+
 	# create a new app
 	# ----------------------------------
 	def new_app(self, ac_name, source):
@@ -235,4 +240,8 @@ class App:
 	def run_script(self, script):
 		webnotes.conn = self.conn
 		from webnotes.model.code import get_obj
-		sc = get_obj('Control Panel').execute_test(script)
+		ret = get_obj('Control Panel').execute_test(script)
+		if ret.get('exc'):
+			print ret['exc']
+		elif ret.get('server_messages'):  # this returns msg in msgprints from remote account
+			print ret['server_messages']
