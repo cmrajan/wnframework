@@ -24,18 +24,20 @@ class AppManager:
 
 	# sync all the apps
 	# ----------------------------------
-	def sync_apps(self, dt='', dn='', app_list=[]):
+	def sync_apps(self, app_list=[], dt_list = []):
 		''' app_list is list of ac_names '''
+		''' dt_list is list of doctype and docnames '''
 		self.load_app_list(app_list)
 		for app in self.app_list:
 			print "---------------------------------------"
 			print "Source Account : "+self.master
 			print "Target Account : "+app.ac_name
 			print "---------------------------------------"
-			if dt and dn:
-				app.connect(app.ac_name)
-				app.sync_doc(dt, dn)
-				app.close()
+			if dt_list:
+				for d in dt_list:
+					app.connect(app.ac_name)
+					app.sync_doc(d[0], d[1])
+					app.close()
 			else:
 				app.sync(ac_name = app.ac_name)
 	
