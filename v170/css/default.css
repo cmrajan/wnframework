@@ -567,16 +567,14 @@ div.srs_results_area {
 }
 
 div.srs_filter_wrapper {
-	background: -webkit-gradient(linear, left top, left bottom, from(#EEEEEE), to(#E0E0E0));
-	background: -moz-linear-gradient(top, #EEEEEE, #E0E0E0);
+	border: 1px solid #CCF;
 	
+	background-color: #EEF;
+	margin:0px 0px 8px 0px;
+
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
-
-	border: 1px solid #CCC;
-	
-	background-color: #EEEEF2;
-	margin:0px 0px 8px 0px;
+	border-radius: 5px;
 }
 
 div.srs_filter_area {

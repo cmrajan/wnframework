@@ -255,7 +255,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	if(!this.filter_set) {
 		// actual area
 		var h = $a(this.filter_area, 'div', '', {fontSize:'14px', fontWeight:'bold', marginBottom:'4px'}); 
-		h.innerHTML = 'Apply Filters';
+		h.innerHTML = 'Filter your search';
 		this.filter_area.div = $a(this.filter_area, 'div'); 
 				
 		this.perm = [[1,1],]
