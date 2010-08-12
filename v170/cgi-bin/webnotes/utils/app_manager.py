@@ -240,8 +240,10 @@ class App:
 	def run_script(self, script):
 		self.connect(ac_name = self.ac_name)
 		webnotes.conn = self.conn
-		from webnotes.model.code import get_obj
-		sc = get_obj('Control Panel').execute_test(script)
+		#from webnotes.model.code import get_obj
+		#sc = get_obj('Control Panel').execute_test(script)
+		from webnotes.model import code
+		sc = code.execute(script)
 		print sc
 		if sc['exc']:
 			print sc['exc']
