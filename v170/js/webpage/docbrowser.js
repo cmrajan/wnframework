@@ -6,7 +6,12 @@ DocBrowser = function() {
 	this.my_page = page_body.add_page('DocBrowser');
 	this.wrapper = $a(this.my_page,'div','',{margin:'8px'});
 
-	this.list_wrapper = $a(this.wrapper, 'div');
+	this.body = $a(this.wrapper, 'div');
+
+	var h = $a(this.body, 'div','',{marginBottom:'8px'});
+	this.page_head = new PageHeader(h, 'List');
+
+	this.list_wrapper = $a(this.body, 'div');
 	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
@@ -19,8 +24,9 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 		$dh(this.cur_list);
 		
 	$ds(this.loading_div);
-	$dh(this.no_result_area);
-	$dh(this.list_wrapper);
+	$dh(this.body);
+
+	this.page_head.main_head.innerHTML = get_doctype_label(dt) + ' List';
 
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
@@ -31,7 +37,9 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 				$ds(l);
 				me.cur_list = l;
 				set_title(l._label);
-				$dh(me.loading_div);	
+				$dh(me.loading_div);
+				$ds(me.body);
+
 				$dh(me.no_result_area);
 				$ds(me.list_wrapper);
 			} else {
@@ -58,7 +66,8 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 		// call make_new
 		if(r.message) {
 			me.make_new(dt, label, r.message.field_list);
-			$dh(me.loading_div);		
+			$dh(me.loading_div);
+			$ds(me.body);
 			$dh(me.no_result_area);
 			$ds(me.list_wrapper);
 		}
@@ -70,12 +79,14 @@ DocBrowser.prototype.make = function(dt, label, field_list) {
 
 DocBrowser.prototype.show_no_result = function(dt) {
 	if(!this.no_result_area) {
-		this.no_result_area = $a(this.wrapper, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
+		this.no_result_area = $a(this.body, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
 	}
 	$dh(this.loading_div);
+	$ds(this.body);
+	
 	$dh(this.list_wrapper);
 	$ds(this.no_result_area);
-	this.no_result_area.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:dt});
+	this.no_result_area.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(dt)});
 }
 
 DocBrowser.prototype.make_new = function(dt, label, field_list) {
@@ -83,12 +94,8 @@ DocBrowser.prototype.make_new = function(dt, label, field_list) {
 	var label = get_doctype_label(label);
 				
 	// make a new wrapper
-	var w = $a(this.list_wrapper, 'div');
-	
-	w.head = $a(w,'div','',{marginBottom:'8px'});
-
-	me.page_head = new PageHeader(w.head, label + ' List');
-
+	var w = $a(this.wrapper, 'div');
+		
 	// new button
 	if(in_list(profile.can_create,dt)) {
 		var d = $a($a(w,'div','green_buttons',{marginBottom:'16px'}),'button');
