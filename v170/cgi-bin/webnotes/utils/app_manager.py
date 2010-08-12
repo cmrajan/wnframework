@@ -18,7 +18,7 @@ class AppManager:
 	def load_app_list(self, al=[]):
 		if not al:
 			self.acc_conn = webnotes.db.Database(use_default=1)
-			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount where ac_name != %s',self.master)]
+			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount where ac_name != %s and ac_name != "ax0000523"',self.master)]
 		for a in al:
 			self.app_list.append(App(self.master,a))
 
@@ -33,7 +33,7 @@ class AppManager:
 				for dt in transfer_types:
 					try:
 						dl2 = app.master_conn.sql('select name from `tab%s` where module="%s"' % (dt,m))
-						self.dt_list += [[dt+','+e[0]] for e in dl2]
+						self.dt_list += [[dt,e[0]] for e in dl2]
 					except:
 						pass
 
