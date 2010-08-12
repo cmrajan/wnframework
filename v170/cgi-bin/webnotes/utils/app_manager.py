@@ -245,8 +245,8 @@ class App:
 		from webnotes.model import code
 		sc = code.execute(script)
 		print sc
-		if sc['exc']:
-			print sc['exc']
-		elif sc['server_messages']:  # this returns msg in msgprints from remote account
-			print sc['server_messages']
+		#if sc['exc']:
+		#	print sc['exc']
+		#elif sc['server_messages']:  # this returns msg in msgprints from remote account
+		#	print sc['server_messages']
 		self.close()
