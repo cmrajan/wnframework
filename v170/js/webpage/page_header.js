@@ -46,8 +46,11 @@ function PageHeader(parent, main_text, sub_text) {
 	if(sub_text) this.sub_head.innerHTML = sub_text;
 }
 
-PageHeader.prototype.add_button = function(label, fn, bold, icon) {
-	var btn = $a(this.toolbar_area,'button','',{fontSize:'11px'});
+PageHeader.prototype.add_button = function(label, fn, bold, icon, green) {
+	if(green)
+		var btn = $a($a(this.toolbar_area, 'span', 'green_buttons'),'button','',{fontSize:'11px'});
+	else
+		var btn = $a(this.toolbar_area,'button','',{fontSize:'11px'});
 	btn.innerHTML = label; 
 	btn.onclick = fn;
 	if(bold)$y(btn, {fontWeight: 'bold'});

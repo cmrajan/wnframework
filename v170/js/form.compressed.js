@@ -19,10 +19,10 @@ _f.FrmHeader=function(parent){var me=this;this.bg_color='#FFF';this.wrapper=$a(p
 _f.FrmHeader.prototype.show=function(){$ds(this.wrapper);}
 _f.FrmHeader.prototype.hide=function(){$dh(this.wrapper);}
 _f.FrmHeader.prototype.refresh=function(){var me=this;var p=cur_frm.get_doc_perms();this.page_head.clear_toolbar();if(cur_frm.meta.read_only_onload&&!cur_frm.doc.__islocal){if(!cur_frm.editable)
-this.page_head.add_button('Edit',function(){cur_frm.edit_doc();},1,'ui-icon-document');else
+this.page_head.add_button('Edit',function(){cur_frm.edit_doc();},1,'ui-icon-document',1);else
 this.page_head.add_button('Done Editing',function(){cur_frm.is_editable[cur_frm.docname]=0;cur_frm.refresh();},1,'ui-icon-document');}
 if(cur_frm.editable&&cint(cur_frm.doc.docstatus)==0&&p[WRITE])
-this.page_head.add_button('Save',function(){cur_frm.save('Save');},1,'ui-icon-disk');if(cint(cur_frm.doc.docstatus)==0&&p[SUBMIT]&&(!cur_frm.doc.__islocal))
+this.page_head.add_button('Save',function(){cur_frm.save('Save');},1,'ui-icon-disk',1);if(cint(cur_frm.doc.docstatus)==0&&p[SUBMIT]&&(!cur_frm.doc.__islocal))
 this.page_head.add_button('Submit',function(){cur_frm.savesubmit();},0,'ui-icon-locked');if(cint(cur_frm.doc.docstatus)==1&&p[CANCEL])
 this.page_head.add_button('Cancel',function(){cur_frm.savecancel()},0,'ui-icon-closethick');if(cint(cur_frm.doc.docstatus)==2&&p[AMEND])
 this.page_head.add_button('Amend',function(){cur_frm.amend_doc()},0,'ui-icon-scissors');if(in_list(profile.can_create,cur_frm.doctype)){this.page_head.add_button('New',function(){new_doc()},0,'ui-icon-document');}
@@ -74,7 +74,7 @@ _f.Frm.prototype.setup_std_layout=function(){if(this.meta.in_dialog)$w(this.form
 this.layout=new Layout(this.body,'100%');this.setup_footer();if(!this.meta.istable)this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable))
 this.setup_tabs();if(this.meta.colour)
 this.layout.wrapper.style.backgroundColor='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
-_f.Frm.prototype.setup_footer=function(){this.footer=$a(this.body,'div','',{margin:'8px'});var b=$a(this.footer,'button');b.innerHTML='<b>Save</b>';$(b).button({icons:{primary:'ui-icon-disk'}});b.onclick=function(){cur_frm.save('Save');}}
+_f.Frm.prototype.setup_footer=function(){this.footer=$a(this.body,'div','green_buttons',{fontSize:'13px'});var b=$a(this.footer,'button');b.innerHTML='Save';$(b).button({icons:{primary:'ui-icon-disk'}});b.onclick=function(){cur_frm.save('Save');}}
 _f.Frm.prototype.setup_fields_std=function(){var fl=fields_list[this.doctype];fl.sort(function(a,b){return a.idx-b.idx});if(fl[0]&&fl[0].fieldtype!="Section Break"){this.layout.addrow();if(fl[0].fieldtype!="Column Break"){var c=this.layout.addcell();$y(c.wrapper,{padding:'8px'});}}
 var sec;for(var i=0;i<fl.length;i++){var f=fl[i];var fn=f.fieldname?f.fieldname:f.label;var fld=make_field(f,this.doctype,this.layout.cur_cell,this);this.fields[this.fields.length]=fld;this.fields_dict[fn]=fld;if(this.meta.section_style!='Simple')
 fld.parent_section=sec;if(f.fieldtype=='Section Break'&&f.options!='Simple')

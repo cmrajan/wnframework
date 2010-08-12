@@ -277,10 +277,10 @@ _f.Frm.prototype.setup_std_layout = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.setup_footer = function() {
-	this.footer = $a(this.body, 'div', '', {margin:'8px'});
+	this.footer = $a(this.body, 'div', 'green_buttons', {fontSize:'13px'});
 	
 	var b = $a(this.footer,'button');
-	b.innerHTML = '<b>Save</b>';
+	b.innerHTML = 'Save';
 	$(b).button({icons:{ primary: 'ui-icon-disk' }});
 	b.onclick = function() { cur_frm.save('Save'); }
 }
