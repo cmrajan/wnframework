@@ -64,7 +64,7 @@ class AppManager:
 		self.load_app_list(app_list)
 		for app in self.app_list:
 			print "=========================="
-			print "Target Account : "+app
+			print "Target Account : "+app.ac_name
 			print "--------------------------"
 			app.run_script(script)
 
