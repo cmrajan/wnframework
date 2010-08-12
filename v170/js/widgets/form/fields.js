@@ -509,49 +509,10 @@ LinkField.prototype.make_input = function() {
 	}
 
 	me.txt.field_object = this;
-	me.txt.onchange = function() { 
-		// check values are not set in quick succession due to un-intentional event call
-		if(_last_link_value) return
-			
-		// not in form, do nothing
-		if(me.not_in_form) return;
-		
-		// same value, do nothing
-		if(cur_frm) {
-			if(me.txt.value == locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]) { 
-				me.set(me.txt.value); // one more time, grid bug?
-				return; 
-			}
-		}
-		
-		if(me.as && me.as.ul) {
-			// still setting value
-		} else {
-			me.set(me.txt.value);
-			_last_link_value = me.txt.value;
-			setTimeout('_last_link_value=null', 100);
-			
-			// run trigger if value is cleared
-			if(!me.txt.value) {
-				me.run_trigger();
-				return;
-			}
+	
+	// set onchange triggers
+	me.set_onchange();
 
-			// validate the value just entered
-			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options}, function(r,rt) { 
-				if(selector && selector.display) return; // selecting from popup
-				
-				if(r.message=='Ok') {
-					me.run_trigger();
-				} else {
-					//msgprint('No ' + me.df.options + ' "' + me.txt.value + '" found for ' + me.df.label); 
-					me.txt.value = ''; 
-					me.set('');
-				}
-			});
-			
-		}
-	}
 	me.input.set_input = function(val) {
 		if(val==undefined)val='';
 		me.txt.value = val;
@@ -559,7 +520,6 @@ LinkField.prototype.make_input = function() {
 	me.get_value = function() {
 		return me.txt.value;
 	}
-	
 	
 	// add button - for inline creation of records
 	me.can_create = 0;
@@ -600,6 +560,56 @@ LinkField.prototype.make_input = function() {
 	this.as = new AutoSuggest(me.txt, opts);
 	
 }
+
+LinkField.prototype.set_onchange = function() { 
+	var me = this;
+	me.txt.onchange = function() { 
+		// check values are not set in quick succession due to un-intentional event call
+		if(_last_link_value) return
+			
+		// not in form, do nothing
+		if(me.not_in_form) return;
+		
+		// same value, do nothing
+		if(cur_frm) {
+			if(me.txt.value == locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]) { 
+				me.set(me.txt.value); // one more time, grid bug?
+				return; 
+			}
+		}
+		
+		if(me.as && me.as.ul) {
+			// still setting value
+		} else {
+			me.set(me.txt.value);
+			_last_link_value = me.txt.value;
+			setTimeout('_last_link_value=null', 100);
+			
+			// run trigger if value is cleared
+			if(!me.txt.value) {
+				me.run_trigger();
+				return;
+			}
+
+			// validate the value just entered
+			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options}, function(r,rt) { 
+				if(selector && selector.display) return; // selecting from popup
+				
+				if(r.message=='Ok') {
+					me.run_trigger();
+				} else {
+					var astr = '';
+					if(in_list(profile.can_create, me.df.options)) astr = repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dt)s', {dt:me.df.options})
+					msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s', {val:me.txt.value, dt:me.df.options, add:astr})); 
+					me.txt.value = ''; 
+					me.set('');
+				}
+			});
+			
+		}
+	}
+}
+
 LinkField.prototype.set_get_query = function() { 
 	if(this.get_query)return;
 

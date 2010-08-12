@@ -10,13 +10,14 @@ function msgprint(msg, issmall, callback) {
 	}
 
 	if(!msg_dialog) {
-		msg_dialog = new Dialog(300, 200, "Message");
+		msg_dialog = new Dialog(400, 200, "Message");
 		msg_dialog.make_body([['HTML','Msg'],])
 		msg_dialog.onhide = function() {
 			msg_dialog.msg_area.innerHTML = '';
 			$dh(msg_dialog.msg_icon);
 			if(msg_dialog.custom_onhide) msg_dialog.custom_onhide();
 		}
+		$y(msg_dialog.rows['Msg'], {fontSize:'14px', lineHeight:'1.5em', padding:'16px'})
 		var t = make_table(msg_dialog.rows['Msg'], 1, 2, '100%',['20px','250px'],{padding:'2px',verticalAlign: 'Top'});
 		msg_dialog.msg_area = $td(t,0,1);
 		msg_dialog.msg_icon = $a($td(t,0,0),'img');
