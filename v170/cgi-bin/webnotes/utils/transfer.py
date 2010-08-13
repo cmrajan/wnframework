@@ -263,9 +263,7 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	
 	webnotes.conn.set(doc,'modified',orig_modified)
 	
-
-
-	if in_transaction: sql("COMMIT")
+	if webnotes.conn.in_transaction: sql("COMMIT")
 	
 	if added == 0:
 		added_fields = ''
@@ -281,6 +279,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
+	from webnotes.model.code import get_obj
 	from webnotes.utils import cint
 	from webnotes.utils import cstr
 	import webnotes.db
@@ -332,7 +331,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	
 	webnotes.conn.set(doc,'modified',orig_modified)
 	
-	if in_transaction: sql("COMMIT")
+	if webnotes.conn.in_transaction: sql("COMMIT")
 	
 	if added == 0:
 		added_fields = ''
