@@ -261,7 +261,7 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	except:
 		pass
 	
-	webnotes.db.set(doc,'modified',orig_modified)
+	webnotes.conn.set(doc,'modified',orig_modified)
 	
 
 
@@ -330,7 +330,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 		if hasattr(so, 'on_update'):
 			so.on_update()
 	
-	webnotes.db.set(doc,'modified',orig_modified)
+	webnotes.conn.set(doc,'modified',orig_modified)
 	
 	if in_transaction: sql("COMMIT")
 	
