@@ -249,7 +249,7 @@ def ovr_doctype(self, doclist, ovr, ignore, onupdate):
 	# -------------
 	import webnotes.model.doctype
 	try:
-		webnotes.model.doctype.update_doctype(so.doclist)
+		webnotes.model.doctype.update_doctype(cur_doc.doclist)
 	except:
 		pass
 	
