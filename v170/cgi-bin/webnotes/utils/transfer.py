@@ -105,10 +105,10 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 			# Special Treatement
 			# ------------------
 			if allow_transfer_control:
-				if webnotes.conn.exists('DocType', 'Transfer Control'):
-					tc = get_obj('Transfer Control')
-					if tc.override_transfer.has_key(doc.doctype):
-						return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate) 
+				#if webnotes.conn.exists('DocType', 'Transfer Control'):
+				#	tc = get_obj('Transfer Control')
+				#	if tc.override_transfer.has_key(doc.doctype):
+				#		return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate) 
 			
 				if doc.doctype == 'DocType':
 					return ovr_doctype(doclist, ovr, ignore, onupdate) 
@@ -177,7 +177,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 # Transfer DocType
 # ==============================================================================
 
-def ovr_doctype(self, doclist, ovr, ignore, onupdate):
+def ovr_doctype(doclist, ovr, ignore, onupdate):
 	doclist = [Document(fielddata = d) for d in doclist]
 	doc = doclist[0]
 	orig_modified = doc.modified
@@ -269,7 +269,7 @@ def ovr_doctype(self, doclist, ovr, ignore, onupdate):
 # Transfer Mapper
 # ==============================================================================
 
-def ovr_mapper(self, doclist, ovr, ignore, onupdate):
+def ovr_mapper(doclist, ovr, ignore, onupdate):
 	doclist = [Document(fielddata = d) for d in doclist]
 	doc = doclist[0]
 	orig_modified = doc.modified
