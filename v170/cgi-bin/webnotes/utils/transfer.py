@@ -182,6 +182,7 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
 	from webnotes.utils import cint
+	from webnotes.utils import cstr
 	doc_list = [Document(fielddata = d) for d in doc_list]
 	doc = doc_list[0]
 	orig_modified = doc.modified
