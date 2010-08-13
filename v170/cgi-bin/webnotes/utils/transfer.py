@@ -178,6 +178,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 # ==============================================================================
 
 def ovr_doctype(doc_list, ovr, ignore, onupdate):
+	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
 	doc_list = [Document(fielddata = d) for d in doc_list]
