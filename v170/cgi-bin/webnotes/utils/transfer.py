@@ -178,6 +178,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 # ==============================================================================
 
 def ovr_doctype(doclist, ovr, ignore, onupdate):
+	from webnotes.model.doc import Document
 	doclist = [Document(fielddata = d) for d in doclist]
 	doc = doclist[0]
 	orig_modified = doc.modified
@@ -210,7 +211,7 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 			nd.oldfieldname, nd.oldfieldtype = '', ''
 			nd.idx = cint(idx)+1
 			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
-			fld_lst += '\n'+'Label : '+cstr(d.label)+'	 ---	 Fieldtype : '+cstr(d.fieldtype)+'	 ---	 Fieldname : '+cstr(d.fieldname)+'	 ---	 Options : '+cstr(d.options)
+			fld_lst += 'Label : '+cstr(d.label)+'	 ---	 Fieldtype : '+cstr(d.fieldtype)+'	 ---	 Fieldname : '+cstr(d.fieldname)+'	 ---	 Options : '+cstr(d.options)
 			added += 1
 			
 		# clean up
