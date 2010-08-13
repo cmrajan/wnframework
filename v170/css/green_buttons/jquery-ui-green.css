@@ -308,7 +308,7 @@ button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a l
 button.ui-button-icons-only { width: 3.7em; } 
 
 /*button text element */
-.green_buttons .ui-button .ui-button-text { display: block; line-height: 1.4;  }
+.green_buttons .ui-button .ui-button-text { display: block; line-height: 1.2;  }
 .green_buttons .ui-button-text-only .ui-button-text { padding: .4em 1em; }
 .green_buttons .ui-button-icon-only .ui-button-text, .green_buttons .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
 .green_buttons .ui-button-text-icon-primary .ui-button-text, .green_buttons .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
