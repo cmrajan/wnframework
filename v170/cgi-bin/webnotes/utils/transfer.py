@@ -183,7 +183,6 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	from webnotes.model import doclist
 	from webnotes.utils import cint
 	from webnotes.utils import cstr
-	from webnotes.db import set
 	doc_list = [Document(fielddata = d) for d in doc_list]
 	doc = doc_list[0]
 	orig_modified = doc.modified
@@ -262,8 +261,8 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	except:
 		pass
 	
-	#set(doc,'modified',orig_modified)
-	sql("update `tabDocType` set modified = %s where name = %s", (orig_modified, doc.name))
+	webnotes.db.set(doc,'modified',orig_modified)
+	
 
 
 	if in_transaction: sql("COMMIT")
@@ -284,7 +283,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	from webnotes.model import doclist
 	from webnotes.utils import cint
 	from webnotes.utils import cstr
-	from webnotes.db import set
+	import webnotes.db
 	doc_list = [Document(fielddata = d) for d in doc_list]
 	doc = doc_list[0]
 	orig_modified = doc.modified
@@ -331,9 +330,8 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 		if hasattr(so, 'on_update'):
 			so.on_update()
 	
-	#set(doc,'modified',orig_modified)
-	sql("update `tabDocType Mapper` set modified = %s where name = %s", (orig_modified, doc.name))
-
+	webnotes.db.set(doc,'modified',orig_modified)
+	
 	if in_transaction: sql("COMMIT")
 	
 	if added == 0:
@@ -341,4 +339,3 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	else:
 		added_fields =	' Added Fields:'+ cstr(fld_lst)
 	return doc.name + ('Upgraded: %s fields added' % added)+added_fields
-	
