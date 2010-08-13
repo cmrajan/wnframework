@@ -261,7 +261,8 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	except:
 		pass
 	
-	set(doc,'modified',orig_modified)
+	#set(doc,'modified',orig_modified)
+	sql("update `tabDocType` set modified = %s where name = %s", (orig_modified, doc.name))
 
 
 	if in_transaction: sql("COMMIT")
@@ -325,8 +326,9 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 		if hasattr(so, 'on_update'):
 			so.on_update()
 	
-	set(doc,'modified',orig_modified)
-	
+	#set(doc,'modified',orig_modified)
+	sql("update `tabDocType Mapper` set modified = %s where name = %s", (orig_modified, doc.name))
+
 	if in_transaction: sql("COMMIT")
 	
 	if added == 0:
