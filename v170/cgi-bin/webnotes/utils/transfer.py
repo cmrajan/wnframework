@@ -189,7 +189,9 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 	prevlabel = ''
 	idx = 0
 	fld_lst = ''
-			
+	
+	sql = webnotes.conn.sql
+
 	# fields
 	# ------
 	for d in doclist.getlist(doc_list, 'fields'):
