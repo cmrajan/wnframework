@@ -22,7 +22,7 @@ _r.ReportContainer = function() {
 	var runbtn = this.page_head.add_button('Run', function() { if(me.cur_rb){
 		me.cur_rb.dt.start_rec = 1;
 		me.cur_rb.dt.run();} 
-	}, 1, 'ui-icon-circle-triangle-e');
+	}, 1, 'ui-icon-circle-triangle-e', 1);
 
 
 	// new

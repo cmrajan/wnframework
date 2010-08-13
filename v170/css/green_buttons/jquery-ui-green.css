@@ -56,7 +56,7 @@
 
 /* Component containers
 ----------------------------------*/
-.green_buttons .ui-widget { font-family: Arial, Lucida Sans, Arial, sans-serif; font-size: 1.1em; }
+.green_buttons .ui-widget { font-family: Arial, Lucida Sans, Arial, sans-serif; font-size: 1em; }
 .green_buttons .ui-widget .ui-widget { font-size: 1em; }
 .green_buttons .ui-widget input, .green_buttons .ui-widget select, .green_buttons .ui-widget textarea, .green_buttons .ui-widget button { font-family: Arial, Lucida Sans, Arial, sans-serif; font-size: 1em; }
 .green_buttons .ui-widget-content { border: 1px solid #72b42d; background: #285c00 url(images/ui-bg_inset-soft_10_285c00_1x100.png) 50% bottom repeat-x; color: #ffffff; }
