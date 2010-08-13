@@ -277,7 +277,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.setup_footer = function() {
-	this.footer = $a(this.body, 'div', 'green_buttons');
+	this.footer = $a(this.body, 'div', 'green_buttons', {marginLeft:'8px'});
 	
 	var b = $a(this.footer,'button');
 	b.innerHTML = 'Save';
