@@ -179,6 +179,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 
 def ovr_doctype(doclist, ovr, ignore, onupdate):
 	from webnotes.model.doc import Document
+	from webnotes.model import doclist
 	doclist = [Document(fielddata = d) for d in doclist]
 	doc = doclist[0]
 	orig_modified = doc.modified
@@ -191,7 +192,7 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 			
 	# fields
 	# ------
-	for d in getlist(doclist, 'fields'):
+	for d in doclist.getlist(doclist, 'fields'):
 		fld = ''
 		# if exists
 		if d.fieldname:
@@ -224,7 +225,7 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 			
 	# Print Formats
 	# -------------
-	for d in getlist(doclist, 'formats'):
+	for d in doclist.getlist(doclist, 'formats'):
 		fld = ''
 		# if exists
 		if d.format:
@@ -271,6 +272,8 @@ def ovr_doctype(doclist, ovr, ignore, onupdate):
 # ==============================================================================
 
 def ovr_mapper(doclist, ovr, ignore, onupdate):
+	from webnotes.model.doc import Document
+	from webnotes.model import doclist
 	doclist = [Document(fielddata = d) for d in doclist]
 	doc = doclist[0]
 	orig_modified = doc.modified
@@ -280,7 +283,7 @@ def ovr_mapper(doclist, ovr, ignore, onupdate):
 			
 	# Field Mapper Details fields
 	# ------
-	for d in getlist(doclist, 'field_mapper_details'):
+	for d in doclist.getlist(doclist, 'field_mapper_details'):
 		fld = ''
 		# if exists
 		if d.from_field and d.to_field:
@@ -296,7 +299,7 @@ def ovr_mapper(doclist, ovr, ignore, onupdate):
 			
 	# Table Mapper Details fields
 	# ------
-	for d in getlist(doclist, 'table_mapper_details'):
+	for d in doclist.getlist(doclist, 'table_mapper_details'):
 		fld = ''
 		# if exists
 		if d.from_table and d.to_table: 
