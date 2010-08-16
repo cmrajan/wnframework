@@ -203,7 +203,7 @@ class CSVImport:
 			if d and f:
 				dt = sql("select options, label from `tabDocField` where fieldname ='%s' and parent = '%s' " % (f, self.dt_list[0]))
 				dt, lbl = dt and dt[0][0].strip(), dt and dt[0][1].strip()
-				options = l and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n')
+				options = l and dt and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n') or ''
 				if options and d not in options :
 					msg = '<div style="color: RED">At Row ' + str(r) + ' and Column ' + str(c)+ ' : => Data "' + str(d) + '" in field ['+ str(lbl) +'] Not Found in '
 					msg = msg.__add__( s and  str( 'Select Options [' +str(dt.replace('\n', ',')) +']' ) or str('Master ' + str('link:' in dt and dt[5:] or dt)))
@@ -226,7 +226,7 @@ class CSVImport:
 		link_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and (fieldtype='Link' and ifnull(options,'') != '') or (fieldtype='Select' and ifnull(options,'') like '%%link:%%') and docstatus !=2 " % self.dt_list[0])]
 
 		# get_select_fileds
-		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and ifnull(options,'') != '' and docstatus !=2" % self.dt_list[0])]
+		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and docstatus !=2" % self.dt_list[0])]
 		
 		# get_reqd_fields
 		reqd_list = self.overwrite and ['name'] or [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and ifnull(reqd,'') not in ('', 0)  and docstatus !=2" % self.dt_list[0])]
