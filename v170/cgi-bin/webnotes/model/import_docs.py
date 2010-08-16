@@ -226,7 +226,7 @@ class CSVImport:
 		link_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and (fieldtype='Link' and ifnull(options,'') != '') or (fieldtype='Select' and ifnull(options,'') like '%%link:%%') and docstatus !=2 " % self.dt_list[0])]
 
 		# get_select_fileds
-		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and docstatus !=2" % self.dt_list[0])]
+		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and ifnull(options,'') != '' and docstatus !=2" % self.dt_list[0])]
 		
 		# get_reqd_fields
 		reqd_list = self.overwrite and ['name'] or [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and ifnull(reqd,'') not in ('', 0)  and docstatus !=2" % self.dt_list[0])]
