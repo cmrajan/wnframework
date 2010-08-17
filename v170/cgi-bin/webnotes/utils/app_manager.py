@@ -66,6 +66,7 @@ class AppManager:
 			src_app = App(self.master, self.master)
 			src_app.connect(self.master)
 			script = src_app.conn.sql("select patch_code from `tabPatch` where name = %s", patch_id)
+			script =script and sript[0][0] or ''
 			src_app.close()
 
 		for app in self.app_list:
