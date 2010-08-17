@@ -100,7 +100,8 @@ class AppManager:
 		if not app_list:
 			from webnotes.utils.webservice import FrameworkServer
 			fw = FrameworkServer('www.iwebnotes.com','/','__system@webnotestech.com','password')
-			app_list = fw.runserverobj('App Control','App Control','get_unwanted_apps','').message
+			app_list = fw.runserverobj('App Control','App Control','get_unwanted_apps','')
+			app_list = app_list['message']
 		print app_list
 		self.delete_app_list(app_list)
 
