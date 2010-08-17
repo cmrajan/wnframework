@@ -247,6 +247,8 @@ class App:
 		self.connect(ac_name = self.ac_name)
 		webnotes.conn = self.conn
 		from webnotes.model import code
+		self.conn.sql("start transaction")
 		sc = code.execute(script)
+		self.conn.sql("commit")
 		print sc
 		self.close()
