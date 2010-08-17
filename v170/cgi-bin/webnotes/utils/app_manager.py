@@ -37,6 +37,20 @@ class AppManager:
 					except:
 						pass
 
+	# Delete App List
+	# -----------------
+	def delete_app_list(self, al=[]):
+		import defs
+		import webnotes.utils
+		acc_conn = webnotes.db.Database(use_default=1)
+		acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
+		if defs.root_login:
+			root_conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
+			for a in al:
+				db = acc_conn.sql('select db_login, db_name from tabAccount where ac_name = "%s"' % (a))
+				db = db and webnotes.utils.cstr(db[0][0]) or webnotes.utils.cstr(db[0][1])
+				root_conn.sql("DROP DATABASE '%s'" % (db))
+
 
 	# sync all the apps (app_list -> ac_names , mod_list -> modules, dt_list -> [doctypes,docname])
 	# ----------------------------------
@@ -61,6 +75,7 @@ class AppManager:
 	# execute a script in all apps
 	# ----------------------------------
 	def execute_script(self, patch_id = '', script = '', app_list = []):
+		self.app_list = []
 		self.load_app_list(app_list)
 		if patch_id:
 			src_app = App(self.master, self.master)
@@ -74,6 +89,16 @@ class AppManager:
 			print "Target Account : "+app.ac_name
 			print "--------------------------"
 			app.run_script(script)
+
+
+	# Delete Unwanted Database
+	# --------------------------
+	def delete_apps(self, app_list=[]):
+		if not app_list:
+			from webnotes.utils.webservice import FrameworkServer
+			fw = FrameworkServer('www.iwebnotes.com','/','__system@webnotestech.com','password')
+			app_list = fw.runserverobj('App Control','App Control','get_unwanted_apps','')
+		self.delete_app_list(app_list)
 
 
 	# create a new app
@@ -242,6 +267,7 @@ class App:
 		else:
 			return 1
 	
+
 	# run script remotely
 	# ----------------------------------
 	def run_script(self, script):
