@@ -40,12 +40,12 @@ class AppManager:
 	# Delete App List
 	# -----------------
 	def delete_app_list(self, al=[]):
-		import defs
+		import webnotes.defs
 		import webnotes.utils
 		acc_conn = webnotes.db.Database(use_default=1)
 		acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
-		if defs.root_login:
-			root_conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
+		if webnotes.defs.root_login:
+			root_conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 			for a in al:
 				db = acc_conn.sql('select db_login, db_name from tabAccount where ac_name = "%s"' % (a))
 				db = db and webnotes.utils.cstr(db[0][0]) or webnotes.utils.cstr(db[0][1])
