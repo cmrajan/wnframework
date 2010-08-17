@@ -60,8 +60,14 @@ class AppManager:
 
 	# execute a script in all apps
 	# ----------------------------------
-	def execute_script(self, script, app_list = []):
+	def execute_script(self, patch_id = '', script = '', app_list = []):
 		self.load_app_list(app_list)
+		if patch_id:
+			src_app = App(self.master, self.master)
+			src_app.connect(self.master)
+			script = src_app.conn.sql("select patch_code from `tabPatch` where name = %s", patch_id)
+			src_app.close()
+
 		for app in self.app_list:
 			print "=========================="
 			print "Target Account : "+app.ac_name
@@ -240,13 +246,7 @@ class App:
 	def run_script(self, script):
 		self.connect(ac_name = self.ac_name)
 		webnotes.conn = self.conn
-		#from webnotes.model.code import get_obj
-		#sc = get_obj('Control Panel').execute_test(script)
 		from webnotes.model import code
 		sc = code.execute(script)
 		print sc
-		#if sc['exc']:
-		#	print sc['exc']
-		#elif sc['server_messages']:  # this returns msg in msgprints from remote account
-		#	print sc['server_messages']
 		self.close()
