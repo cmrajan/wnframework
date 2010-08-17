@@ -47,11 +47,12 @@ class AppManager:
 		if webnotes.defs.root_login:
 			root_conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 			for a in al:
-				db = acc_conn.sql('select db_login, db_name from tabAccount where ac_name = "%s"' % (a))
-				db = db and webnotes.utils.cstr(db[0][0]) or webnotes.utils.cstr(db[0][1])
-				root_conn.sql("DROP DATABASE '%s'" % (db))
-				print "Database : "+db+" deleted"
-				print "-------------------------------------"
+				db = acc_conn.sql('select db_name from tabAccount where ac_name = "%s"' % (a))
+				db = db and webnotes.utils.cstr(db[0][0]) or ''
+				if db:
+					root_conn.sql("DROP DATABASE '%s'" % (db))
+					print "Database : "+db+" deleted"
+					print "-------------------------------------"
 
 
 	# sync all the apps (app_list -> ac_names , mod_list -> modules, dt_list -> [doctypes,docname])
