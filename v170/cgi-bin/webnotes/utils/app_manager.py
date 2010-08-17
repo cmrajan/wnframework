@@ -43,8 +43,6 @@ class AppManager:
 		import webnotes.defs
 		import webnotes.utils
 		acc_conn = webnotes.db.Database(use_default=1)
-		acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
-		print webnotes.defs.root_login
 		if webnotes.defs.root_login:
 			root_conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 			for a in al:
@@ -54,6 +52,10 @@ class AppManager:
 					root_conn.sql("DROP DATABASE '%s'" % (db))
 					print "Database : "+db+" deleted"
 					print "-------------------------------------"
+			acc_conn.sql("START TRANSACTION")
+			acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
+			acc_conn.sql("COMMIT")
+			print "No more unwanted Databases !!!"
 
 
 	# sync all the apps (app_list -> ac_names , mod_list -> modules, dt_list -> [doctypes,docname])
