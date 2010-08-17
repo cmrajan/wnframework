@@ -44,6 +44,7 @@ class AppManager:
 		import webnotes.utils
 		acc_conn = webnotes.db.Database(use_default=1)
 		acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
+		print webnotes.defs.root_login
 		if webnotes.defs.root_login:
 			root_conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 			for a in al:
