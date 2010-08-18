@@ -52,7 +52,7 @@ class AppManager:
 				db = db and webnotes.utils.cstr(db[0][0]) or ''
 				print "db"+db				
 				if db:
-					root_conn.sql("DROP DATABASE '%s'" % (db))
+					root_conn.sql("DROP DATABASE %s" % (db))
 					print "Database : "+db+" deleted"
 					print "-------------------------------------"
 			acc_conn.sql("START TRANSACTION")
