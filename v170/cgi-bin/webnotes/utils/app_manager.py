@@ -50,7 +50,6 @@ class AppManager:
 			for a in al:
 				db = acc_conn.sql('select db_name from tabAccount where ac_name = "%s"' % (a))
 				db = db and webnotes.utils.cstr(db[0][0]) or ''
-				print "db"+db				
 				if db:
 					root_conn.sql("DROP DATABASE %s" % (db))
 					print "Database : "+db+" deleted"
