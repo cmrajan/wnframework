@@ -42,6 +42,8 @@ class AppManager:
 	def delete_app_list(self, al=[]):
 		import webnotes.defs
 		import webnotes.utils
+		import webnotes.db
+		root_conn, acc_conn = None, None
 		if webnotes.defs.root_login:
 			root_conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 			acc_conn = webnotes.db.Database(use_default=1)		
