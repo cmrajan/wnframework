@@ -78,6 +78,8 @@ class AppManager:
 				self.load_dt_list(app, mod_list, dt_list)
 				for d in self.dt_list:
 					app.sync_doc(d[0], d[1])
+				# Clear cache
+				app.clear_cache()
 				app.close()
 			else:
 				app.sync(ac_name = app.ac_name)
