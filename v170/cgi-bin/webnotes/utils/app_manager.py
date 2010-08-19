@@ -109,10 +109,12 @@ class AppManager:
 	def delete_apps(self, app_list=[]):
 		from webnotes.utils.webservice import FrameworkServer
 		fw = FrameworkServer('www.iwebnotes.com','/','__system@webnotestech.com','password')
-		app_list = fw.runserverobj('App Control','App Control','delete_apps',app_list)
-		app_list = app_list['message']
-		print app_list
-		self.delete_app_list(app_list)
+		apps = fw.runserverobj('App Control','App Control','delete_apps',app_list)
+		if apps['exc']:
+			print apps['exc']
+		apps = apps['message']
+		print apps
+		self.delete_app_list(apps)
 
 
 	# create a new app
