@@ -289,7 +289,9 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	cur_doc = Document('DocType Mapper',doc.name)
 	added = 0
 	fld_lst = ''
-			
+		
+	sql = webnotes.conn.sql
+	
 	# Field Mapper Details fields
 	# ------
 	for d in doclist.getlist(doc_list, 'field_mapper_details'):
