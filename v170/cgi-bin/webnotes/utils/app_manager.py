@@ -209,11 +209,12 @@ class App:
 	# Clear Cache
 	# ------------
 	def clear_cache(self):
+		import webnotes.utils
 		self.conn.sql("start transaction")
 		self.conn.sql("delete from __DocTypeCache")
 		self.conn.sql("delete from __SessionCache")
 		webnotes.conn = self.conn
-		clear_recycle_bin()
+		webnotes.utils.clear_recycle_bin()
 		self.conn.sql("commit")
 		
 	# sync control panel
