@@ -211,7 +211,9 @@ class App:
 	def clear_cache(self):
 		self.conn.sql("start transaction")
 		self.conn.sql("delete from __DocTypeCache")
-		self.conn.sql("delete from __SessionCache")		
+		self.conn.sql("delete from __SessionCache")
+		webnotes.conn = self.conn
+		clear_recycle_bin()
 		self.conn.sql("commit")
 		
 	# sync control panel
