@@ -86,7 +86,7 @@ class AppManager:
 	
 
 	# execute a script in all apps
-	# ----------------------------------
+	# ----------------------------
 	def execute_script(self, patch_id = '', script = '', app_list = []):
 		self.app_list = []
 		self.load_app_list(app_list)

@@ -292,7 +292,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 			
 	# Field Mapper Details fields
 	# ------
-	for d in doclist.getlist(doclist, 'field_mapper_details'):
+	for d in doclist.getlist(doc_list, 'field_mapper_details'):
 		fld = ''
 		# if exists
 		if d.from_field and d.to_field:
