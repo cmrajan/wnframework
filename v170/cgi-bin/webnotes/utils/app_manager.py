@@ -212,6 +212,7 @@ class App:
 		self.conn.sql("start transaction")
 		self.conn.sql("delete from __DocTypeCache")
 		self.conn.sql("delete from __SessionCache")		
+		self.conn.sql("commit")
 		
 	# sync control panel
 	# ----------------------------------
