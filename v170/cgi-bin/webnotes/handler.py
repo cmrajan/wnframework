@@ -362,16 +362,26 @@ else:
 		if webnotes.conn:
 			sql = webnotes.conn.sql
 		
+			# NOTE:
+			# guest should only be allowed: 
+			# getdoc (if Guest access)
+			# runserverobj (if Guest access)
+		
 			# get command cmd
 			cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
 			read_only = form.has_key('_read_only') and form.getvalue('_read_only') or None
 
-
 			# load module
+			if webnotes.session['user'] == 'Guest':
+				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoc']:
+					webnotes.msgprint('Guest not allowed to perform this action')
+					raise Exception
+
 			module = ''
 			if '.' in cmd:
 				module = '.'.join(cmd.split('.')[:-1])
 				cmd = cmd.split('.')[-1]
+
 				
 				exec 'from %s import %s' % (module, cmd) in locals()
 	

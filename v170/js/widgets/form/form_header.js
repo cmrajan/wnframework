@@ -22,7 +22,7 @@ _f.FrmHeader.prototype.refresh= function() {
 		if(!cur_frm.editable)
 				this.page_head.add_button('Edit', function() { 
 					cur_frm.edit_doc();
-				}, 1, 'ui-icon-document'
+				}, 1, 'ui-icon-document', 1
 			);
 		else
 			this.page_head.add_button('Done Editing', function() { 
@@ -33,7 +33,7 @@ _f.FrmHeader.prototype.refresh= function() {
 	
 	// Save
 	if(cur_frm.editable && cint(cur_frm.doc.docstatus)==0 && p[WRITE])
-		this.page_head.add_button('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk');
+		this.page_head.add_button('Save', function() { cur_frm.save('Save');}, 1, 'ui-icon-disk',1);
 	
 	// Submit
 	if(cint(cur_frm.doc.docstatus)==0 && p[SUBMIT] && (!cur_frm.doc.__islocal))

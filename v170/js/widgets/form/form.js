@@ -2,14 +2,15 @@
 
 	+ this.parent (either FormContainer or Dialog)
  		+ this.wrapper
-			+ this.head
-			+ this.tip_wrapper
 			+ this.form_wrapper
+				+ this.head
+				+ this.tip_wrapper
 				+ this.tab_wrapper
 				+ this.body
 					+ this.layout
 					+ this.footer
 			+ this.print_wrapper
+				+ this.head
 */
 
 // called from table edit
@@ -378,8 +379,27 @@ _f.Frm.prototype.set_parent = function(parent) {
 
 _f.Frm.prototype.setup_print_layout = function() {
 	if(this.meta.read_only_onload) {
-		this.print_wrapper = $a(this.wrapper, 'div', '', {backgroundColor:'#46A',padding: '32px'});
-		this.print_body = $a(this.print_wrapper, 'div', 'frm_print_wrapper');
+		this.print_wrapper = $a(this.wrapper, 'div');
+		this.print_head = $a(this.print_wrapper, 'div', '', {backgroundColor:'#CCF'});
+		this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#46A', padding: '32px'}), 'div', 'frm_print_wrapper');
+		
+		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '2px'});
+		this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
+		this.view_btn = $($a(this.view_btn_wrapper, 'button', '', {marginRight:'4px'}))
+			.html('View Details')
+			.button({icons:{ primary: 'ui-icon-document' }})
+			.click(function() { cur_frm.edit_doc() });
+		this.print_btn = $($a($td(t,0,0), 'button'))
+			.html('Print')
+			.button({icons:{ primary: 'ui-icon-print' }})
+			.click(function() { cur_frm.print_doc() });
+
+		$y($td(t,0,1), {textAlign: 'right'});
+		this.close_btn = $($a($td(t,0,1), 'button', '', {cssFloat: 'right'}))
+			.html('Close')
+			.button({icons:{ primary: 'ui-icon-closethick' }})
+			.click(function() { nav_obj.show_last_open(); });
+
 	}
 }
 
@@ -392,6 +412,12 @@ _f.Frm.prototype.refresh_print_layout = function() {
 	var me = this;
 	var print_callback = function(print_html) {
 		me.print_body.innerHTML = print_html;
+	}
+	
+	if(user!='Guest') {
+		$di(this.view_btn_wrapper);
+	} else {
+		$dh(this.view_btn_wrapper);		
 	}
 
 	// create print format here
@@ -408,18 +434,18 @@ _f.Frm.prototype.setup = function() {
 
 	// wrapper
 	this.wrapper = $a(this.parent.body, 'div', 'frm_wrapper');
-
-	// head
-	this.head = $a(this.wrapper, 'div');
-
-	// tips
-	this.tip_wrapper = $a(this.wrapper, 'div');
 	
 	// create area for print fomrat
 	this.setup_print_layout();
 	
 	// forms go in forms wrapper
 	this.form_wrapper = $a(this.wrapper, 'div');
+
+	// head
+	this.head = $a(this.form_wrapper, 'div');
+
+	// tips
+	this.tip_wrapper = $a(this.form_wrapper, 'div');
 	
 	if(this.meta.use_template) {
 		// template layout
@@ -531,6 +557,11 @@ _f.Frm.prototype.check_doc_perm = function() {
 				  
 	if(!this.perm[0][READ]) { 
 		if(user=='Guest') {
+			// allow temp access? via encryted akey
+			if(_f.temp_access[dt][dn]) {
+				this.perm = [[1,0,0]]
+				return 1;
+			}
 			msgprint('You must log in to view this page');
 		} else {
 			msgprint('No Read Permission');
@@ -640,8 +671,10 @@ _f.Frm.prototype.refresh_tabs = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_footer = function() {
-	if(this.editable && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE]) $ds(this.footer);
-	else $dh(this.footer);
+	if(this.editable && !this.meta.in_dialog && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE]) 
+		$ds(this.footer);
+	else 
+		$dh(this.footer);
 }
 
 // --------------------------------------------------------------------------------------

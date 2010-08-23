@@ -59,7 +59,7 @@ class Document:
 			dataset = webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
 			if not dataset:
 				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name), 1)
-				raise Exception
+				raise Exception, '[WNF] %s %s does not exist' % (self.doctype, self.name)
 			self.load_values(dataset[0], webnotes.conn.get_description())
 
 	# Load Fields from dataset
@@ -138,7 +138,7 @@ class Document:
 		elif autoname and autoname.startswith('field:'):
 			n = self.fields[autoname[6:]]
 			if not n:
-				raise Exception, 'Name is required'
+				raise Exception, '[WNF] Name is required'
 			self.name = n.strip()
 			
 		elif self.fields.get('__newname',''): # new from client
@@ -408,19 +408,56 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 	
 	return l
 
+def check_perm(doc):
+	import webnotes
+	
+	# find roles with read access for this record at 0
+	rl = webnotes.conn.sql("select role, `match` from tabDocPerm where parent=%s and ifnull(`read`,0) = 1 and ifnull(permlevel,0)=0", doc.doctype)
+	
+	# check if roles match
+	my_rl = webnotes.user.get_roles()
+
+	has_perm, match = 0, None
+	
+	# loop through everything to find matches, matches will over-ride other conditions
+	for r in rl:
+		if r[0] in my_rl:
+			has_perm = 1
+			if r[1]:
+				match = r[1]
+	
+	if has_perm and match:
+		# check if user has matching value
+		if doc.fields.get(match, 'no value') in webnotes.user.get_defaults().get(match, 'no default'):
+			has_perm = 1
+		else:
+			has_perm = 0
+			
+	# check for access key
+	if webnotes.form.has_key('akey'):
+		import webnotes.utils.encrypt
+		if webnotes.utils.encrypt.decrypt(webnotes.form.getvalue('akey')) == doc.name:
+			has_perm = 1
+			webnotes.response['print_access'] = 1
+			
+	return has_perm
 
 # called from everywhere
 # load a record and its child records and bundle it in a list - doclist
-# if it is called from_doctype, it will also merge custom fields (post processing)
 # ---------------------------------------------------------------------
 
-def get(dt, dn='', with_children = 1, from_doctype=0):
+def get(dt, dn='', with_children = 1):
 	import webnotes.model
 
 	dn = dn or dt
 
 	# load the main doc
 	doc = Document(dt, dn)
+
+	# check permission - for doctypes, pages
+	if dt not in ('DocType', 'Page', 'Control Panel') and (not check_perm(doc)):
+		webnotes.msgprint("No read permission")
+		raise Exception, '[WNF] No read permission'
 	
 	if not with_children:
 		# done
@@ -432,6 +469,6 @@ def get(dt, dn='', with_children = 1, from_doctype=0):
 	# load chilren
 	doclist = [doc,]
 	for t in tablefields:
-		doclist += getchildren(doc.name, t[0], t[1], dt, from_doctype)
+		doclist += getchildren(doc.name, t[0], t[1], dt)
 
 	return doclist

@@ -76,6 +76,13 @@ def load_single_doc(dt, dn, user):
 
 	return dl
 
+# Check Guest Access
+#===========================================================================================
+def check_guest_access(doc):
+	if webnotes.session['user']=='Guest' and not webnotes.conn.sql("select name from tabDocPerm where role='Guest' and parent=%s and ifnull(`read`,0)=1", doc.doctype):
+		webnotes.msgprint("Guest not allowed to call this object")
+		raise Exception
+
 # Runserverobj - run server calls from form
 #===========================================================================================
 
@@ -114,6 +121,8 @@ def runserverobj():
 	# check integrity
 	if not check_integrity(so.doc):
 		return
+		
+	check_guest_access(so.doc)
 				
 	if so:
 		r = webnotes.model.code.run_server_obj(so, method, arg)

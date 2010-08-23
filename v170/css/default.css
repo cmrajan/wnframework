@@ -10,7 +10,7 @@ body {
 	background: url(foo) fixed;
 }
 
-input, select, button { font-size: 12px; font-family: Arial; }
+input, select, button { font-size: 12px; font-family: Arial, Helvetica, Sans; }
 
 li { margin: 4px; }
 
@@ -26,7 +26,7 @@ button { margin: 2px; margin-left: 0px; }
 
 select { border: 1px solid #888; }
 
-textarea { font-family: Arial, Sans; height: 120px; width: 90%; overflow-x: auto; border: 1px solid #AAA; font-size: 12px; }
+textarea { font-family: Arial, Helvetica, Sans; height: 120px; width: 90%; overflow-x: auto; border: 1px solid #AAA; font-size: 12px; }
 
 table { padding: 0px; }
 
@@ -886,62 +886,6 @@ div.ann_body {
 	padding: 0px 8px 8px 8px;
 	color: #444;
 	font-size: 11px;
-}
-
-/* To Do List */
-
-div.todo_page {
-	width: 100%;
-	background-color: #FFF;
-	border-right: 1px solid #CCC;
-}
-div.todo_page_plain {
-	background-color: #FFF;
-}
-
-div.todo_head {
-	height: 60px;
-	border-bottom: 1px solid #FDD;
-	padding-left: 20px;
-}
-div.todo_head_plain {
-	height: 20px;
-}
-
-
-div.todo_head div {
-}
-
-table.todo_items_table, div.todo_head table {
-	border-collapse: collapse;
-	width: 100%;
-}
-table.todo_items_table td {
-	font-family: Comic Sans MS;
-	border-bottom: 1px solid #EEE;
-	height: 24px;
-}
-
-table.todo_items_table td div {
-	font-family: Comic Sans MS;
-}
-
-.todo_input {
-	border: 0px solid #000;
-	width: 80%;
-	font-family: Comic Sans MS;
-	background-color: #FFD;
-}
-.todo_checked {
-	background: url('../images/ui/checked_box.gif') center no-repeat;
-}
-.todo_unchecked {
-	background: url('../images/ui/plain_box.gif') center no-repeat;
-}
-
-div.todo_links div { 
-	float: right;
-	padding: 3px;
 }
 
 /* Documents */

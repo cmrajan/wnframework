@@ -4,10 +4,19 @@ Author: Paul Chakravarti (paul_dot_chakravarti_at_gmail_dot_com)
 License: Public Domain
 """ 
 
-def encrypt(data, encryption_key = '1234567890123456'):
+def get_key():
+	# Encryption key is datetime of creation of DocType, DocType"
+	import webnotes
+	return webnotes.conn.sql("select creation from tabDocType where name='DocType'")[0][0].strftime('%Y%m%d%H%M%s')[:16]
+
+def encrypt(data, encryption_key = None):
+	if not encryption_key:
+		encryption_key = get_key()
 	return crypt(encryption_key, data).encode('hex')
 
-def decrypt(data, encryption_key = '1234567890123456'):
+def decrypt(data, encryption_key = None):
+	if not encryption_key:
+		encryption_key = get_key()
 	return crypt(encryption_key, data.decode('hex'))
 
 def crypt(key,data,iv='\00\00\00\00\00\00\00\00',n=32):

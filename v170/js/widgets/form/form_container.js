@@ -17,6 +17,8 @@ _f.FrmContainer = function() {
 // =======================================================================
 _f.frm_dialog = null;
 _f.calling_doc_stack = [];
+_f.temp_access = {};
+
 _f.FrmDialog = function() {
 	var me = this;
 	this.last_displayed = null;
@@ -24,8 +26,9 @@ _f.FrmDialog = function() {
 	var d = new Dialog(640, 400, 'Edit Row');
 	this.body = $a(d.body, 'div', 'dialog_frm');
 	$y(d.body, {backgroundColor:'#EEE'});
-	d.done_btn = $a($a(d.body, 'div', '', {margin:'8px'}),'button');
-	d.done_btn.innerHTML = 'Done'; 
+	d.done_btn = $a($a(d.body, 'div', 'green_buttons', {margin:'8px'}),'button');
+	d.done_btn.innerHTML = 'Done';
+	$(d.done_btn).button();
 
 	// done button
 	d.done_btn.onclick = function() { 
@@ -85,9 +88,15 @@ _f.add_frm = function(doctype, onload, opt_name) {
 	// Load Doctype from server
 	var callback = function(r,rt) {
 		if(!locals['DocType'][doctype]) {
-			if(r.exc) { msgprint("Unable to load " + doctype, 1); }
+			if(r.exc) { msgprint("Did not load " + doctype, 1); }
 			loadpage('_home');
 			return;
+		}
+		
+		if(r.print_access) {
+			if(!_f.temp_access[doctype])
+				_f.temp_access[doctype] = {};
+			_f.temp_access[doctype][opt_name] = 1;	
 		}
 		
 		// show fullpage or in Dialog?
@@ -119,7 +128,9 @@ _f.add_frm = function(doctype, onload, opt_name) {
 	
 	if(opt_name && !is_new) {
 		// get both
-		$c('webnotes.widgets.form.getdoc', {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user}, callback);
+		var args = {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user};
+		if(get_url_arg('akey')) args['akey'] = get_url_arg('akey');
+		$c('webnotes.widgets.form.getdoc', args, callback);
 	} else {
 		// get doctype only
 		$c('webnotes.widgets.form.getdoctype', args={'doctype':doctype}, callback);

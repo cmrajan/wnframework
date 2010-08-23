@@ -10,7 +10,7 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#777', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
+		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#555', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
 
 		if(isIE6) {
 			$y(me.wrapper, {position:'absolute', top:'0px'});
