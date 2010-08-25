@@ -11,10 +11,14 @@ WNF requires the following applications
 1. Python
 2. MySQL
 3. MySQL-Python (connector)
-4. simplejson (for Python version 2.4 or lower)
-5. email
-6. Apache
-7. PIL (optional)
+4. simplejson (for Python 2.4 or lower)
+5. email (for Python 2.4 or lower)
+6. pytz (easy_install pytz)
+7. Apache
+8. PIL (optional - for image processing (thumbnails etc) 
+	- yum install libjpeg-devel
+	- yum install python-imaging
+	)
 
 ------------------------------------------------------------------------
 1. Configuring Apache

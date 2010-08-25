@@ -1,4 +1,4 @@
-import Cookie, sys, time, os
+import Cookie, sys, os
 import webnotes
 import webnotes.defs
 import webnotes.utils

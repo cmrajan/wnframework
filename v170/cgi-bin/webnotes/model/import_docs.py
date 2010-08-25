@@ -290,6 +290,9 @@ class CSVImport:
 		obj = ''
 		# save the document
 		try:
+			if webnotes.conn.in_transaction:
+				sql("COMMIT")
+			sql("START TRANSACTION")
 			if cur_doc.name and webnotes.conn.exists(self.dt_list[0], cur_doc.name):
 				if self.overwrite:
 					cur_doc.save()
@@ -310,7 +313,10 @@ class CSVImport:
 			if obj:
 				if hasattr(obj, 'validate') : obj.validate()
 				if hasattr(obj, 'on_update') : obj.on_update()
+			sql("COMMIT")
+
 		except Exception:
+			sql("ROLLBACK")
 			self.msg.append('<div style="color: RED"> Validation: %s</div>' % str(webnotes.message_log[-1:]))
 			
 	# do import
