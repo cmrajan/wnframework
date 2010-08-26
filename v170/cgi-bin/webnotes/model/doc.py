@@ -455,9 +455,9 @@ def get(dt, dn='', with_children = 1):
 	doc = Document(dt, dn)
 
 	# check permission - for doctypes, pages
-	if dt not in ('DocType', 'Page', 'Control Panel') and (not check_perm(doc)):
-		webnotes.msgprint("No read permission")
-		raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
+	#if dt not in ('DocType', 'Page', 'Control Panel') and (not check_perm(doc)):
+	#	webnotes.msgprint("No read permission")
+	#	raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
 	
 	if not with_children:
 		# done
