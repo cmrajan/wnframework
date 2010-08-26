@@ -25,7 +25,7 @@ _f.FrmHeader.prototype.refresh= function() {
 				}, 1, 'ui-icon-document', 1
 			);
 		else
-			this.page_head.add_button('Done Editing', function() { 
+			this.page_head.add_button('Print View', function() { 
 				cur_frm.is_editable[cur_frm.docname] = 0;				
 				cur_frm.refresh(); }, 1, 'ui-icon-document' );	
 	}
