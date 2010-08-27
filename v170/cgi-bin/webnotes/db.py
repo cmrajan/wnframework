@@ -19,6 +19,7 @@ class Database:
 
 		self.is_testing = 0
 		self.in_transaction = 0
+		self.transaction_writes = 0
 		self.testing_tables = []
 		
 		self.connect()
@@ -51,9 +52,16 @@ class Database:
 	def check_transaction_status(self, query):
 		if query and query.strip().lower()=='start transaction':
 			self.in_transaction = 1
+			self.transaction_writes = 0
 
 		if query and query.strip().lower() in ['commit', 'rollback']:
 			self.in_transaction = 0
+			
+		if self.in_transaction and query[:6].lower() in ['update', 'insert']:
+			self.transaction_writes += 1
+			if self.transaction_writes > 500:
+				raise Exception, 'Bad Query!!! Too many writes'
+				self.sql("ROLLBACK")
 	
 	def fetch_as_dict(self):
 		result = self._cursor.fetchall()
