@@ -56,10 +56,10 @@ class Database:
 
 		if query and query.strip().lower() in ['commit', 'rollback']:
 			self.in_transaction = 0
-			
+
 		if self.in_transaction and query[:6].lower() in ['update', 'insert']:
 			self.transaction_writes += 1
-			if self.transaction_writes > 500:
+			if self.transaction_writes > 5000:
 				raise Exception, 'Bad Query!!! Too many writes'
 				self.sql("ROLLBACK")
 	
