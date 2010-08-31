@@ -49,6 +49,7 @@ class Authentication:
 		self.login_flag = 0
 		self.user_id = None
 		self.cp = None
+		self.session = {'data':{}}
 		
 		self.get_env()
 		self.set_db()
@@ -282,12 +283,8 @@ class Authentication:
 	# =================================================================================
 	
 	def start_session(self, user):
-		if not self.session:
-			self.session = {}
 		self.session['user'] = user
 		self.session['sid'] = webnotes.utils.generate_hash()
-		if not self.session.get('data'):
-			self.session['data'] = {}
 		self.session['data']['session_ip'] = self.remote_ip;
 
 		# get ipinfo
