@@ -282,10 +282,12 @@ class Authentication:
 	# =================================================================================
 	
 	def start_session(self, user):
-		self.session = {}
+		if not self.session:
+			self.session = {}
 		self.session['user'] = user
 		self.session['sid'] = webnotes.utils.generate_hash()
-		self.session['data'] = {}
+		if not self.session.get('data'):
+			self.session['data'] = {}
 		self.session['data']['session_ip'] = self.remote_ip;
 
 		# get ipinfo
