@@ -29,13 +29,17 @@ try:
 		import webnotes.profile
 		import Cookie
 
-		out_cookies = Cookie.SimpleCookie()
+		cookies = Cookie.SimpleCookie()
 
-		auth_obj = webnotes.auth.Authentication(webnotes.form, out_cookies, {})
+		auth_obj = webnotes.auth.Authentication(webnotes.form, cookies, {})
 	
 		print "Content-Type: text/html"
-		if out_cookies:
-			print out_cookies
+
+		# print cookies, if there ar additional cookies defined during the request, add them here
+		if cookies or webnotes.add_cookies: 
+		for c in webnotes.add_cookies.keys():
+			cookies[c] = webnotes.add_cookies[c]
+
 		print
 		print webnotes.widgets.page_body.get()
 
