@@ -31,7 +31,11 @@ def set_dt_value(doctype, field, value):
 	return webnotes.conn.set_value('DocType', doctype, field, value)
 
 def is_single(doctype):
-	return get_dt_values(doctype, 'issingle')[0][0]
+	try:
+		return get_dt_values(doctype, 'issingle')[0][0]
+	except IndexError, e:
+		raise Exception, 'Cannot determine whether %s is single' % doctype
+
 #=================================================================================
 
 def get_parent_dt(dt):
