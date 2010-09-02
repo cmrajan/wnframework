@@ -217,7 +217,7 @@ class Database:
 			return r and r[0][0] or None
 
 	def set_value(self, dt, dn, field, val):
-		if dn:
+		if dn or dt!=dn:
 			self.sql("update `tab"+dt+"` set `"+field+"`=%s where name=%s", (val, dn))
 		else:
 			self.sql("update tabSingles set value=%s where field=%s and doctype=%s", (val, field, dt))
