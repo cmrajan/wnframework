@@ -130,6 +130,7 @@ class Authentication:
 		# -------------------
 		if not ac_name:
 			ac_name = self.form.getvalue('ac_name') or self.cookies.get('ac_name')
+			self.add_cookies['ac_name'] = ac_name
 		
 		c = webnotes.db.Database(use_default=1)
 		if ac_name:

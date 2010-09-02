@@ -39,9 +39,6 @@ def runserverobj():
 def logout():
 	webnotes.auth_obj.logout()
 
-def get_login_url():
-	return webnotes.session['data'].get('login_from')
-
 # DocType Mapper
 # ------------------------------------------------------------------------------------
 
@@ -497,6 +494,7 @@ else:
 		
 	print "Content-Type: text/html; Charset: ISO-8859-1"
 	
+	# if there ar additional cookies defined during the request, add them here
 	if cookies or webnotes.add_cookies: 
 		for c in webnotes.add_cookies.keys():
 			cookies[c] = webnotes.add_cookies[c]
