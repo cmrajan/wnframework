@@ -241,6 +241,12 @@ function WNToolbar(parent) {
 	// Setup User / Logout area
 	// ----------------------------------------------------------------------------------------
 
+	// Get payment url
+	this.get_payment_url = function() {		
+		var login_url = $c('get_login_url',args={},function(r,rt) {});
+		return 'http://' + login_url + '/index.cgi?#Page/Test Payment Page';
+	}
+
 	this.setup_logout = function() {
 		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px', textAlign:'right'});
 		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'11px'});
@@ -249,10 +255,13 @@ function WNToolbar(parent) {
 		$td(t,0,0).innerHTML = user_fullname;
 		$td(t,0,1).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';
 		$td(t,0,2).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';
-		$td(t,0,3).innerHTML = '<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user);">Profile</span>';
+		$td(t,0,3).innerHTML = '<a href="'+this.get_payment_url()+'" target="_blank" style="color:#FFF;">Buy Credits</a>';
 		$td(t,0,4).innerHTML = '<span style="cursor: pointer;" onclick="logout()">Logout</span>';
 		this.menu_table_right = t;
 	}
+
+
+
 
 	this.download_backup = function() {
 		$c('webnotes.utils.backups.get_backup',{},function(r,rt) {});
