@@ -455,7 +455,7 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0):
 	doc = Document(dt, dn)
 
 	# check permission - for doctypes, pages
-	if (from_get_obj and webnotes.session['user'] != 'Guest') or (dt in ('DocType', 'Page', 'Control Panel')):
+	if (dt in ('DocType', 'Page', 'Control Panel')) or (from_get_obj and webnotes.session.get('user') != 'Guest'):
 		pass # dont check permissions for non-guest get_obj calls and metadata
 	else:
 		if not check_perm(doc):
