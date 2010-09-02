@@ -39,6 +39,8 @@ def runserverobj():
 def logout():
 	webnotes.auth_obj.logout()
 
+def get_login_url():
+	return webnotes.session['data'].get('login_from')
 
 # DocType Mapper
 # ------------------------------------------------------------------------------------
