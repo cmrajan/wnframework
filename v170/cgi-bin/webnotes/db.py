@@ -223,7 +223,7 @@ class Database:
 			if self.sql("select value from tabSingles where field=%s and doctype=%s", (field, dt)):
 				self.sql("update tabSingles set value=%s where field=%s and doctype=%s", (val, field, dt))
 			else:
-				self.sql("insert into tabSingles(dt, field, value) values (%s, %s, %s)", (dt, field, value))
+				self.sql("insert into tabSingles(dt, field, value) values (%s, %s, %s)", (dt, field, val))
 				
 	def set(self, doc, field, val):
 		self.set_value(doc.doctype, doc.name, field, val)
