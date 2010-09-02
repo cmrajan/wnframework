@@ -288,7 +288,7 @@ function get_url_arg(name) {
 	if( results == null )
 		return "";
 	else
-		return results[1];
+		return decodeURIComponent(results[1]);
 }
 
 function get_cookie(c) {
