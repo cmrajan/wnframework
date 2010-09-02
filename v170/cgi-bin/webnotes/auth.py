@@ -237,8 +237,8 @@ class Authentication:
 			self.cp = webnotes.model.code.get_obj('Control Panel')
 			if hasattr(self.cp, 'on_login'):
 				self.cp.on_login(self)
-		except:
-			pass
+		except Exception, e:
+			self.out['on_login Exception'] = webnotes.utils.getTraceback()
 
 	def call_on_login_post_session(self):
 		if not self.cp:
