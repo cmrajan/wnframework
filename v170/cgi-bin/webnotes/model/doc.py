@@ -446,7 +446,7 @@ def check_perm(doc):
 # load a record and its child records and bundle it in a list - doclist
 # ---------------------------------------------------------------------
 
-def get(dt, dn='', with_children = 1):
+def get(dt, dn='', with_children = 1, from_get_obj = 0):
 	import webnotes.model
 
 	dn = dn or dt
@@ -455,10 +455,13 @@ def get(dt, dn='', with_children = 1):
 	doc = Document(dt, dn)
 
 	# check permission - for doctypes, pages
-	#if dt not in ('DocType', 'Page', 'Control Panel') and (not check_perm(doc)):
-	#	webnotes.msgprint("No read permission")
-	#	raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
-	
+	if (from_get_obj and webnotes.session['user'] != 'Guest') or (dt in ('DocType', 'Page', 'Control Panel')):
+		pass # dont check permissions for non-guest get_obj calls and metadata
+	else:
+		if not check_perm(doc):
+			webnotes.msgprint("No read permission for %s %s" % dt, dn)
+			raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
+
 	if not with_children:
 		# done
 		return [doc,]

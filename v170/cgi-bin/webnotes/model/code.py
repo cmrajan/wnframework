@@ -92,9 +92,9 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 		if not dn:
 			dn = dt
 		if with_children:
-			doclist = webnotes.model.doc.get(dt, dn)
+			doclist = webnotes.model.doc.get(dt, dn, from_get_obj=1)
 		else:
-			doclist = webnotes.model.doc.get(dt, dn, with_children = 0)
+			doclist = webnotes.model.doc.get(dt, dn, with_children = 0, from_get_obj=1)
 		return get_server_obj(doclist[0], doclist)
 	else:
 		return get_server_obj(doc, doclist)

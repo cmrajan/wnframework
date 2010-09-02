@@ -190,7 +190,7 @@ def send_form():
 	
 		# footer
 		c = webnotes.app_conn or webnotes.conn
-		email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')
+		email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.iwebnotes.com">Web Notes</a></div>')
 		
 		for a in al:
 			email.attach(a.split(',')[0])
