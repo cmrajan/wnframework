@@ -96,14 +96,21 @@ class AppManager:
 		if patch_id:
 			src_app = App(self.master, self.master)
 			src_app.connect(self.master)
-			script = src_app.conn.sql("select patch_code from `tabPatch` where name = %s", patch_id)
-			script =script and script[0][0] or ''
-			src_app.close()
+			src_script = src_app.conn.sql("select patch_code, ready_to_go from `tabPatch` where name = %s", patch_id)
+			script =src_script and src_script[0][0] or ''
+			if src_script and src_script[0][1] == 'No':
+				src_app.close()
+				print "The patch is not ready to go!!!"
+				raise Exception
 
 		for app in self.app_list:
 			print "Target Account : "+app.ac_name
 			print "--------------------------"
 			app.run_script(script)
+
+		if patch_id:
+			src_app.conn.sql("update tabPatch set patched_all_accounts = 'Yes' where name = '%s'" % patch_id)
+			src_app.close()
 
 
 	# Delete Unwanted Database
