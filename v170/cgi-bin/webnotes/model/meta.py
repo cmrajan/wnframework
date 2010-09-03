@@ -71,6 +71,6 @@ def get_search_criteria(dt):
 #=================================================================================
 
 def get_print_format_html(name):
-	html = webnotes.conn.sql('select html from `tabPrint Format` where name="%s"' % name)[0][0]
+	html = webnotes.conn.sql('select html from `tabPrint Format` where name="%s"' % name)
 	return html and html[0][0] or ''
 	

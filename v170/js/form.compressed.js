@@ -363,7 +363,7 @@ _p.print_style=".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:top;
 _p.formats={}
 _p.build=function(fmtname,onload,no_letterhead){if(!cur_frm){alert('No Document Selected');return;}
 var doc=locals[cur_frm.doctype][cur_frm.docname];if(fmtname=='Standard'){onload(_p.render(_p.print_std(no_letterhead),_p.print_style,doc,doc.name,no_letterhead));}else{if(!_p.formats[fmtname])
-$c('webnotes.widgets.form.get_print_format',{'name':fmtname},function(r,t){_p.formats[fmtname]=r.message;onload(_p.render(_p.formats[fmtname],'',doc,doc.name,no_letterhead));});else
+$c('webnotes.widgets.form.get_print_format',{'name':fmtname},function(r,rt){_p.formats[fmtname]=r.message;onload(_p.render(_p.formats[fmtname],'',doc,doc.name,no_letterhead));});else
 onload(_p.render(_p.formats[fmtname],'',doc,doc.name,no_letterhead));}}
 _p.render=function(body,style,doc,title,no_letterhead){var block=document.createElement('div');var tmp_html='';block.innerHTML=body;if(doc&&cint(doc.docstatus)==0&&cur_frm.perm[0][SUBMIT]){var tmp_html='<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">DRAFT</div>This box will go away after the document is submitted.</div>';}
 style=_p.def_print_style+style;var jslist=block.getElementsByTagName('script');while(jslist.length>0){for(var i=0;i<jslist.length;i++){var code=jslist[i].innerHTML;var p=jslist[i].parentNode;var sp=$a(p,'span');p.replaceChild(sp,jslist[i]);var h=eval(code);if(!h)h='';sp.innerHTML=h;}

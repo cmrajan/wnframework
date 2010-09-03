@@ -220,7 +220,7 @@ _p.build = function(fmtname, onload, no_letterhead) {
 	} else {
 		if(!_p.formats[fmtname]) // not loaded, get data
 			$c('webnotes.widgets.form.get_print_format', {'name':fmtname }, 
-				function(r,t) { 
+				function(r,rt) { 
 					_p.formats[fmtname] = r.message;
 					onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead)); 
 				}
@@ -234,7 +234,7 @@ _p.render = function(body, style, doc, title, no_letterhead) {
 	var block = document.createElement('div');
 	var tmp_html = '';
 	block.innerHTML = body;
-
+	
 	if(doc && cint(doc.docstatus)==0 && cur_frm.perm[0][SUBMIT])  {
 		var tmp_html = '<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">DRAFT</div>This box will go away after the document is submitted.</div>';
 	}
