@@ -459,7 +459,7 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0):
 		pass # dont check permissions for non-guest get_obj calls and metadata
 	else:
 		if not check_perm(doc):
-			webnotes.msgprint("No read permission for %s %s" % dt, dn)
+			webnotes.msgprint("No read permission for %s %s" % (dt, dn))
 			raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
 
 	if not with_children:
