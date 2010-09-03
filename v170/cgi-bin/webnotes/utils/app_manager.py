@@ -51,9 +51,13 @@ class AppManager:
 				db = acc_conn.sql('select db_name from tabAccount where ac_name = "%s"' % (a))
 				db = db and webnotes.utils.cstr(db[0][0]) or ''
 				if db:
-					root_conn.sql("DROP DATABASE %s" % (db))
-					print "Database : "+db+" deleted"
-					print "-------------------------------------"
+					try:					
+						root_conn.sql("DROP DATABASE %s" % (db))
+						print "Database : "+db+" deleted"
+						print "-------------------------------------"
+					except:
+						print "Database "+db+" not found"
+						pass
 			acc_conn.sql("START TRANSACTION")
 			acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
 			acc_conn.sql("COMMIT")
@@ -98,7 +102,6 @@ class AppManager:
 			src_app.close()
 
 		for app in self.app_list:
-			print "=========================="
 			print "Target Account : "+app.ac_name
 			print "--------------------------"
 			app.run_script(script)
