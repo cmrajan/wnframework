@@ -261,7 +261,7 @@ class App:
 		import webnotes.model.doc
 
 		# get from master
-		doclist = webnotes.model.doc.get(dt, dn)
+		doclist = webnotes.model.doc.get(dt, dn, from_get_obj = 1)
 		
 		# put
 		webnotes.conn = self.conn
@@ -302,3 +302,8 @@ class App:
 		self.conn.sql("commit")
 		print sc
 		self.close()
+
+def do_transfer(master='brownie', dt_list = [], app_list = [], mod_list = []):
+	webnotes.conn = webnotes.db.Database(use_default = 1)
+	app = AppManager(master)
+	app.sync_apps(dt_list = dt_list, app_list = app_list, mod_list = mod_list)
