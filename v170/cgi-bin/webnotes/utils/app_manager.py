@@ -1,6 +1,5 @@
 import webnotes
 import webnotes.db
-import webnotes.model.import_docs
 
 # Application Manager
 # =====================================================================================
