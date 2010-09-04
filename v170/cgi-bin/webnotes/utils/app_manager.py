@@ -178,7 +178,6 @@ class App:
 		det = acc_conn.sql('select db_login, db_name from tabAccount where ac_name = "%s"' % (ac_name))
 		return det and webnotes.utils.cstr(det[0][1]) or webnotes.utils.cstr(det[0][0])
 
-
 	# make connections to master and app
 	# ----------------------------------
 	def connect(self, ac_name):

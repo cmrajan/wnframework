@@ -372,7 +372,7 @@ else:
 
 			# load module
 			if webnotes.session['user'] == 'Guest':
-				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoc']:
+				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoc','logout']:
 					webnotes.msgprint('Guest not allowed to perform this action')
 					raise Exception
 
