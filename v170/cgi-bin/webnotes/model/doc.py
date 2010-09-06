@@ -417,24 +417,27 @@ def check_perm(doc):
 	# check if roles match
 	my_rl = webnotes.user.get_roles()
 
-	has_perm, match = 0, None
+	has_perm, match = 0, []
 	
 	# loop through everything to find if there is a match
 	for r in rl:
 		if r[0] in my_rl:
 			has_perm = 1
 			if r[1] and match != -1:
-				match = r[1]
+				match.append(r[1]) # add to match check
 			else:
 				match = -1 # has permission and no match, so match not required!
 	
 	if has_perm and match and match != -1:
 		# check if user has matching value
-		if doc.fields.get(match, 'no value') in webnotes.user.get_defaults().get(match, 'no default'):
-			has_perm = 1
-		else:
-			has_perm = 0
-			
+		user_defaults = webnotes.user.get_defaults()
+		for m in match:
+			if doc.fields.get(m, 'no value') in user_defaults.get(m, 'no default'):
+				has_perm = 1
+				break # permission found! break
+			else:
+				has_perm = 0
+
 	# check for access key
 	if webnotes.form.has_key('akey'):
 		import webnotes.utils.encrypt
