@@ -1,5 +1,5 @@
 index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html manifest="webnotes.manifest">
+<html>
 <head id="head">
 <!-- Web Notes Framework : www.webnotesframework.org -->
 
