@@ -227,3 +227,35 @@ function DocLink(p, doctype, name, onload) {
 	a.onclick=function() { loaddoc(this.dt,this.dn,onload) }; return a;
 }
 var doc_link = DocLink;
+
+// in words
+function in_words(n) {
+    n=cint(n)
+    if(known[n]) return known[n];
+    var bestguess = n + '';
+    var remainder = 0
+    if(n<=20)
+    	alert('Error while converting to words');
+    else if(n<100) {
+        return in_words(Math.floor(n/10)*10) + '-' + in_words(n%10);
+    } else if(n<1000) {
+        bestguess= in_words(Math.floor(n/100)) + ' ' + 'hundred';
+        remainder = n%100;
+    } else if(n<100000) {
+        bestguess= in_words(Math.floor(n/1000)) + ' ' + 'thousand';
+        remainder = n%1000;
+    } else if(n < 10000000) {
+        bestguess= in_words(Math.floor(n/100000)) + ' ' + 'lakh';
+        remainder = n%100000;
+    } else {
+        bestguess= in_words(Math.floor(n/10000000)) + ' ' + 'crore'
+        remainder = n%10000000
+    }
+    if(remainder) {
+        if(remainder >= 100) comma = ','
+        else comma = ''
+        return bestguess + comma + ' ' + in_words(remainder);
+    } else {
+        return bestguess;
+    }
+}
