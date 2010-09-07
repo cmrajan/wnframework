@@ -247,6 +247,8 @@ $t(c1,d[1]);}
 if(d[0]=='HTML'){if(d[2])row.innerHTML=d[2];this.widgets[d[1]]=row;}
 else if(d[0]=='Check'){var i=$a_input(c2,'checkbox','',{width:'20px'});c1.innerHTML=d[1];this.widgets[d[1]]=i;}
 else if(d[0]=='Data'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a(c2,'input');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
+else if(d[0]=='Link'){c1.innerHTML=d[1];var f=make_field({fieldtype:'Link','label':d[1],'options':d[2]},'',c2,this,0,1);f.not_in_form=1;f.dialog=this;this.widgets[d[1]]=f.input;}
+else if(d[0]=='Date'){c1.innerHTML=d[1];var f=make_field({fieldtype:'Date','label':d[1],'options':d[2]},'',c2,this,0,1);f.not_in_form=1;f.dialog=this;}
 else if(d[0]=='Password'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a_input(c2,'password');if(d[3])$a(c2,'div','comment').innerHTML=d[3];}
 else if(d[0]=='Select'){c1.innerHTML=d[1];this.widgets[d[1]]=$a(c2,'select','',{width:'160px'})
 if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
@@ -982,7 +984,8 @@ this.setup_sidebar_menu=function(){if(this.left_sidebar&&this.cp.show_sidebar_me
 this.setup_header_footer=function(){var hh=this.cp.header_height?(cint(this.cp.header_height)+'px'):'40px';$y(this.header,{height:hh,borderBottom:'1px solid #CCC'});if(this.cp.client_name)this.banner_area.innerHTML=this.cp.client_name;var fh=this.cp.footer_height?(cint(this.cp.footer_height)+'px'):'0px';$y(this.footer,{height:fh});if(this.cp.footer_html)this.footer.innerHTML=this.cp.footer_html;}
 this.run_startup_code=function(){if(this.cp.startup_css)
 set_style(this.cp.startup_css);try{if(this.cp.startup_code)
-eval(this.cp.startup_code);}catch(e){}}
+eval(this.cp.startup_code);if(this.cp.custom_startup_code)
+eval(this.cp.custom_startup_code);}catch(e){}}
 this.setup=function(){this.cp=locals['Control Panel']['Control Panel'];this.wntoolbar_area=$a(document.getElementsByTagName('body')[0],'div');this.wrapper=$a($i('body_div'),'div');this.banner_area=$a(this.wrapper,'div');;this.topmenu=$a(this.wrapper,'div');this.breadcrumbs=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div');this.footer=$a(this.wrapper,'div');if(user_defaults.hide_sidebars){this.cp.left_sidebar_width=null;this.cp.right_sidebar_width=null;}
 this.setup_page_areas();this.setup_header_footer();if(user=='Guest')user_defaults.hide_webnotes_toolbar=1;if(!user_defaults.hide_webnotes_toolbar||user=='Administrator'){this.wntoolbar=new WNToolbar(this.wntoolbar_area);if(isIE){$y(this.wrapper,{marginTop:'32px'});}else{$y(this.wrapper,{marginTop:'48px'});}}
 if(this.cp.page_width)$y(this.wrapper,{width:cint(this.cp.page_width)+'px'});}

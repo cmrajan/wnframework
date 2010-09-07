@@ -134,6 +134,19 @@ Dialog.prototype.make_row = function(d) {
 		this.widgets[d[1]] = $a(c2, 'input');
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
 	} 
+	else if(d[0]=='Link') {
+		c1.innerHTML = d[1];
+		var f = make_field({fieldtype:'Link', 'label':d[1], 'options':d[2]}, '', c2, this, 0, 1);
+		f.not_in_form = 1;
+		f.dialog = this;
+		this.widgets[d[1]] = f.input;
+	}
+	else if(d[0]=='Date') {
+		c1.innerHTML = d[1];
+		var f = make_field({fieldtype:'Date', 'label':d[1], 'options':d[2]}, '', c2, this, 0, 1);
+		f.not_in_form = 1;
+		f.dialog = this;
+	}
 	else if(d[0]=='Password') {
 		c1.innerHTML = d[1];
 		c2.style.overflow = 'auto';

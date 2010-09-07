@@ -1,5 +1,12 @@
 # Tree (Hierarchical) Nested Set Model (nsm)
-# ----------------------------------------
+# 
+# To use the nested set model,
+# use the following pattern
+# 1. name your parent field as "parent_node" if not have a property nsm_parent_field as your field name in the document class
+# 2. have a field called "old_parent" in your fields list - this identifies whether the parent has been changed
+# 3. call update_nsm(doc_obj) in the on_upate method
+
+# ------------------------------------------
 
 import webnotes
 
@@ -12,7 +19,7 @@ def update_nsm(doc_obj):
 		pf = doc_obj.nsm_parent_field
 	if hasattr(doc_obj,'nsm_oldparent_field'):
 		opf = doc_obj.nsm_oldparent_field
-	p, op = d.fields[pf], d.fields[opf]
+	p, op = d.fields[pf], d.fields.get(opf, '')
 
 	# has parent changed (?) or parent is None (root)
 	if not doc_obj.doc.lft and not doc_obj.doc.rgt:

@@ -26,8 +26,8 @@ _f.Frm.prototype.setup_attach = function() {
 	//var img = $a(d, 'img', '', {marginRight:'8px'}); img.src = 'images/icons/paperclip.gif';
 	$a(d, 'span').innerHTML = '<h4>File Attachments:</h4>';
 	
-	me.attach_msg = $a(label_area,'div','comment', {padding:'8px', fontSize:'11px'});
-	me.attach_msg.innerHTML = "Changes made to the attachments are not permanent until the document is saved";
+	//me.attach_msg = $a(label_area,'div','comment', {padding:'8px', fontSize:'11px'});
+	//me.attach_msg.innerHTML = "Changes made to the attachments are not permanent until the document is saved";
 
 	// button
 	var btn_add_attach = $a(this.btn_area, 'button');

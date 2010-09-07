@@ -82,6 +82,8 @@ function Body() {
 		try{
 			if(this.cp.startup_code)
 				eval(this.cp.startup_code);
+			if(this.cp.custom_startup_code)
+				eval(this.cp.custom_startup_code);
 		} catch(e) {
 			// pass
 		}

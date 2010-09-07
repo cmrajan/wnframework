@@ -26,23 +26,24 @@ _f.FrmDialog = function() {
 	var d = new Dialog(640, 400, 'Edit Row');
 	this.body = $a(d.body, 'div', 'dialog_frm');
 	$y(d.body, {backgroundColor:'#EEE'});
-	d.done_btn = $a($a(d.body, 'div', 'green_buttons', {margin:'8px'}),'button');
-	d.done_btn.innerHTML = 'Done';
-	$(d.done_btn).button();
+	d.done_btn_area = $a(d.body, 'div', 'green_buttons', {margin:'8px'});
 
 	// done button
-	d.done_btn.onclick = function() { 
+	me.on_complete = function() { 
 
 		if(me.table_form) {
 			// table form, just hide the dialog (saving will be done with the parent)
 			me.dialog.hide();
 		} else {
 			// form in dialog, so save it
-			var callback = function(r,rt) {
+			var callback = function(r) {
 				// set field value and refresh
 				if(me.on_save_callback)
 					me.on_save_callback(cur_frm.docname);
-				me.dialog.hide();
+				if(!r.exc) {
+					// check if there is another dialog open?
+					me.dialog.hide();
+				}
 			}
 			cur_frm.save('Save', callback);
 		}
@@ -52,13 +53,17 @@ _f.FrmDialog = function() {
 	// -------------------------------------------
 	d.onshow = function() {
 		// set the dialog title
+		d.done_btn_area.innerHTML = '';
+		d.done_btn = $a(d.done_btn_area, 'button');
+		d.done_btn.onclick = function() { me.on_complete() };
 		if(me.table_form) {
 			d.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
 			d.done_btn.innerHTML = 'Done Editing';
 		} else {
-			d.set_title(cur_frm.doctype + ': ' + cur_frm.docname);
+			d.set_title(cur_frm.doctype==cur_frm.doctype ? (cur_frm.doctype) : (cur_frm.doctype + ': ' + cur_frm.docname));
 			d.done_btn.innerHTML = 'Save';
 		}
+		$(d.done_btn).button();
 	}
 
 	// on hide, refresh grid or call onsave

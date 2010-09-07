@@ -232,9 +232,6 @@ _f.Frm.prototype.setup_meta = function() {
 }
 
 _f.Frm.prototype.setup_std_layout = function() {
-	if(this.meta.in_dialog) $w(this.form_wrapper, '500px');
-	//else $w(this.wrapper, pagewidth + 'px');
-	
 	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
 
 	if(this.meta.section_style=='Tray') {
@@ -535,9 +532,7 @@ _f.Frm.prototype.get_doc_perms = function() {
 _f.Frm.prototype.refresh_header = function() {
 	// set title
 	// main title
-	if(this.meta.in_dialog) {
-		_f.frm_dialog.dialog.set_title(cur_frm.doctype + ': ' + cur_frm.docname);
-	} else {
+	if(!this.meta.in_dialog) {
 		set_title(this.meta.issingle ? this.doctype : this.docname);	
 	}	
 
@@ -897,15 +892,15 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 
 		if(call_back){
 			if(call_back == 'home'){ loadpage('_home'); return; }
-			call_back();
+			call_back(r);
 		}
 	}
 
 	var me = this;
-	var ret_fn_err = function() {
+	var ret_fn_err = function(r) {
 		var doc = locals[me.doctype][me.docname];
-		me.savingflag = false;	
-		ret_fn();
+		me.savingflag = false;
+		ret_fn(r);
 	}
 	
 	this.savingflag = true;

@@ -45,6 +45,9 @@ def execute(code, doc=None, doclist=[]):
 #=================================================================================
 
 def get_recompiled_code(dt):
+	# clear from cache
+	import webnotes
+	webnotes.conn.sql("delete from __DocTypeCache where name=%s", dt)
 	
 	# compile
 	import webnotes.model.doctype
@@ -79,7 +82,7 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		return execute(marshal.loads(sc_compiled), doc, doclist)
 	except TypeError, e:
 		# error? re-compile
-	
+
 		sc_compiled = get_recompiled_code(dt)
 		return execute(marshal.loads(sc_compiled), doc, doclist)
 		
