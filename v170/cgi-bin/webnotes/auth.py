@@ -79,7 +79,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or form.getvalue('sid'):
+		if self.login_flag or form.getvalue('sid') or form.getvalue('ac_name'):
 			self.set_cookies()
 			self.set_remember_me()
 		
@@ -130,7 +130,6 @@ class Authentication:
 		# -------------------
 		if not ac_name:
 			ac_name = self.form.getvalue('ac_name') or self.cookies.get('ac_name')
-			webnotes.add_cookies['ac_name'] = ac_name
 		
 		c = webnotes.db.Database(use_default=1)
 		if ac_name:
