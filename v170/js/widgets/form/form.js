@@ -149,6 +149,7 @@ _f.Frm.prototype.email_doc = function() {
 	// make selector
 	if(!_e.dialog) _e.make();
 	
+	// set print selector
 	sel = this.print_sel;
 	var c = $td(_e.dialog.rows['Format'].tab,0,1);
 	
@@ -158,6 +159,14 @@ _f.Frm.prototype.email_doc = function() {
 	}
 	c.appendChild(this.print_sel);
 	c.cur_sel = this.print_sel;
+
+	// hide / show attachments
+	_e.dialog.widgets['Send With Attachments'].checked = 0;
+	if(cur_frm.doc.file_list) {
+		$ds(_e.dialog.rows['Send With Attachments']);
+	} else {
+		$dh(_e.dialog.rows['Send With Attachments']);
+	}
 
 	_e.dialog.widgets['Subject'].value = this.meta.name + ': ' + this.docname;
 	_e.dialog.show();
