@@ -146,7 +146,7 @@ function make_table(parent,nr,nc,table_width,widths,cell_style){var t=$a(parent,
 if(cell_style){for(var s in cell_style)c.style[s]=cell_style[s];}}}
 t.append_row=function(){return append_row(this);}
 return t;}
-function append_row(t){var r=t.insertRow(t.rows.length);if(t.rows.length>1){for(var i=0;i<t.rows[0].cells.length;i++){var c=r.insertCell(i);if(t.cell_style){for(var s in t.cell_style)c.style[s]=t.cell_style[s];}}}
+function append_row(t,at){var r=t.insertRow(at?at:t.rows.length);if(t.rows.length>1){for(var i=0;i<t.rows[0].cells.length;i++){var c=r.insertCell(i);if(t.cell_style){for(var s in t.cell_style)c.style[s]=t.cell_style[s];}}}
 return r}
 function $td(t,r,c){if(r<0)r=t.rows.length+r;if(c<0)c=t.rows[0].cells.length+c;return t.rows[r].cells[c];}
 function $sum(t,cidx){var s=0;if(cidx<1)cidx=t.rows[0].cells.length+cidx;for(var ri=0;ri<t.rows.length;ri++){var c=t.rows[ri].cells[cidx];if(c.div)s+=flt(c.div.innerHTML);else if(c.value)s+=flt(c.value);else s+=flt(c.innerHTML);}

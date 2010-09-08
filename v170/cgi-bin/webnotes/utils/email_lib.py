@@ -145,7 +145,7 @@ def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc
 	email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.webnotestech.com">Web Notes</a></div>')
 	email.send()
 
-def get_contact_list(form, session):
+def get_contact_list():
 	import webnotes
 
 	cond = ['`%s` like "%s%%"' % (f, webnotes.form.getvalue('txt')) for f in webnotes.form.getvalue('where').split(',')]

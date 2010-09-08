@@ -181,8 +181,8 @@ function make_table(parent, nr, nc, table_width, widths, cell_style) {
 	return t;
 }
 
-function append_row(t) {
-	var r = t.insertRow(t.rows.length);
+function append_row(t, at) {
+	var r = t.insertRow(at ? at : t.rows.length);
 	if(t.rows.length>1) {
 		for(var i=0;i<t.rows[0].cells.length;i++) {
 			var c = r.insertCell(i);
