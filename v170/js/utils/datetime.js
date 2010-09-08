@@ -44,7 +44,7 @@ function DateFn() {
 		return t;
 	}
 	this.str_to_user = function(val, no_time_str) {
-		var user_fmt = this.get_user_fmt();
+		var user_fmt = dateutil.get_user_fmt();
 		var time_str = '';
 		//alert(user_fmt);
 		

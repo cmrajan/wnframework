@@ -72,7 +72,7 @@ this.month_start=function(){var d=new Date();return d.getFullYear()+'-'+int_to_s
 this.month_end=function(){var d=new Date();var m=d.getMonth()+1;var y=d.getFullYear();last_date=month_last[m];if(m==2&&(y%4)==0&&((y%100)!=0||(y%400)==0))
 last_date=29;return y+'-'+int_to_str(m,2)+'-'+last_date;}
 this.get_user_fmt=function(){var t=locals['Control Panel']['Control Panel'].date_format;if(!t)t='dd-mm-yyyy';return t;}
-this.str_to_user=function(val,no_time_str){var user_fmt=this.get_user_fmt();var time_str='';if(val==null||val=='')return null;if(val.search(':')!=-1){var tmp=val.split(' ');if(tmp[1])
+this.str_to_user=function(val,no_time_str){var user_fmt=dateutil.get_user_fmt();var time_str='';if(val==null||val=='')return null;if(val.search(':')!=-1){var tmp=val.split(' ');if(tmp[1])
 time_str=' '+tmp[1];var d=tmp[0];}else{var d=val;}
 if(no_time_str)time_str='';d=d.split('-');if(d.length==3){if(user_fmt=='dd-mm-yyyy')
 val=d[2]+'-'+d[1]+'-'+d[0]+time_str;else if(user_fmt=='dd/mm/yyyy')
