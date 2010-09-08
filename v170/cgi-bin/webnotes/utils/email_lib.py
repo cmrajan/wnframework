@@ -172,9 +172,15 @@ def send_form():
 	# get attachments
 	al = []
 	if cint(form.getvalue('with_attachments')):
-		al = webnotes.conn.sql('select file_list from `tab%s` where name="%s"' % (form.getvalue('dt'), form.getvalue('dn')))
-		if al:
-			al = (al[0][0] or '').split('\n')
+		try:
+			al = webnotes.conn.sql('select file_list from `tab%s` where name="%s"' % (form.getvalue('dt'), form.getvalue('dn')))
+			if al:
+				al = (al[0][0] or '').split('\n')
+		except Exception, e:
+			if e.args[0]==1146:
+				pass # no attachments in single types!
+			else:
+				raise Exception, e
 	if recipients:
 		recipients = recipients.replace(';', ',')
 		recipients = recipients.split(',')

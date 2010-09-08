@@ -157,6 +157,7 @@ _f.Frm.prototype.email_doc = function() {
 		c.cur_sel = null;
 	}
 	c.appendChild(this.print_sel);
+	c.cur_sel = this.print_sel;
 
 	_e.dialog.widgets['Subject'].value = this.meta.name + ': ' + this.docname;
 	_e.dialog.show();
