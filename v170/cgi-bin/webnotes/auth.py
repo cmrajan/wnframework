@@ -243,7 +243,10 @@ class Authentication:
 		if not self.cp:
 			return
 		if hasattr(self.cp, 'on_login_post_session'):
-			self.cp.on_login_post_session(self)
+			try:
+				self.cp.on_login_post_session(self)
+			except Exception, e:
+				self.out['on_login Exception'] = webnotes.utils.getTraceback()
 	
 	def check_password(self, user, pwd):
 		if not (user and pwd):
