@@ -174,7 +174,7 @@ def send_form():
 	if cint(form.getvalue('with_attachments')):
 		al = webnotes.conn.sql('select file_list from `tab%s` where name="%s"' % (form.getvalue('dt'), form.getvalue('dn')))
 		if al:
-			al = al[0][0].split('\n')
+			al = (al[0][0] or '').split('\n')
 	if recipients:
 		recipients = recipients.replace(';', ',')
 		recipients = recipients.split(',')
@@ -193,7 +193,8 @@ def send_form():
 		email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.iwebnotes.com">Web Notes</a></div>')
 		
 		for a in al:
-			email.attach(a.split(',')[0])
+			if a:
+				email.attach(a.split(',')[0])
 
 		email.send()
 	webnotes.msgprint('Sent')
