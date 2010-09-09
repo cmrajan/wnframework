@@ -327,7 +327,7 @@ class Authentication:
 		elif self.account:
 			self.out_cookies['ac_name'] = self.account
 		
-		if self.session.get('sid')
+		if self.session.get('sid'):
 			self.out_cookies['sid'] = self.session['sid']
 
 	# Set the remember me cookie, give expiry to cookies
