@@ -261,7 +261,9 @@ def savedocs():
 		try:
 			t = doc.save(is_new)
 		except NameError, e:
-			webnotes.msgprint('Name Exists')
+			webnotes.msgprint('%s "%s" already exists' % (doc.doctype, doc.name))
+			if webnotes.conn.sql("select docstatus from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]==2:
+				webnotes.msgprint('[%s "%s" has also been trashed / cancelled]' % (doc.doctype, doc.name))
 			webnotes.errprint(webnotes.utils.getTraceback())
 			raise e
 		
