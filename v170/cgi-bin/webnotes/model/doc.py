@@ -415,7 +415,10 @@ def check_perm(doc):
 	rl = webnotes.conn.sql("select role, `match` from tabDocPerm where parent=%s and ifnull(`read`,0) = 1 and ifnull(permlevel,0)=0", doc.doctype)
 	
 	# check if roles match
-	my_rl = webnotes.user.get_roles()
+	if webnotes.user:
+		my_rl = webnotes.user.get_roles()
+	else:
+		my_rl = ['Guest']
 
 	has_perm, match = 0, []
 	
