@@ -17,12 +17,10 @@ def getcoldef(ftype, length=''):
 	elif t in ('float'): 
 		dt = 'decimal' 
 		if not length: length = '14,6' 
-	elif t == 'small text':
-		dt = 'text'
 	elif t == 'check':
 		dt = 'int'
 		if not length: length = '1' 
-	elif t in ('long text', 'code', 'text editor'): 
+	elif t in ('small text', 'long text', 'code', 'text editor'): 
 		dt = 'text';
 	elif t in ('data', 'link', 'password', 'select', 'read only'):
 		dt = 'varchar';

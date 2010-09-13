@@ -442,7 +442,7 @@ def check_perm(doc):
 				has_perm = 0
 
 	# check for access key
-	if webnotes.form.has_key('akey'):
+	if webnotes.form and webnotes.form.has_key('akey'):
 		import webnotes.utils.encrypt
 		if webnotes.utils.encrypt.decrypt(webnotes.form.getvalue('akey')) == doc.name:
 			has_perm = 1
