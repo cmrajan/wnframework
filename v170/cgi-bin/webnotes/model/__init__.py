@@ -105,12 +105,13 @@ def clear_recycle_bin():
 #=================================================================================
 
 def copytables(srctype, src, srcfield, tartype, tar, tarfield, srcfields, tarfields=[]):
+	import webnotes.model.doc
 	if not tarfields: 
 		tarfields = srcfields
 	l = []
-	data = getchildren(src.name, srctype, srcfield)
+	data = webnotes.model.doc.getchildren(src.name, srctype, srcfield)
 	for d in data:
-		newrow = addchild(tar, tarfield, tartype, local = 1)
+		newrow = webnotes.model.doc.addchild(tar, tarfield, tartype, local = 1)
 		newrow.idx = d.idx
 	
 		for i in range(len(srcfields)):
