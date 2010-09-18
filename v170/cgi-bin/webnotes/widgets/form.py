@@ -402,7 +402,7 @@ def get_fields():
 #===========================================================================================
 def validate_link():
 	import webnotes
-	value, options = webnotes.form.getvalue('value'), webnotes.form.getvalue('options')
+	value, options, fetch = webnotes.form.getvalue('value'), webnotes.form.getvalue('options'), webnotes.form.getvalue('fetch')
 
 	# no options, don't validate
 	if not options or options=='null' or options=='undefined':
@@ -410,4 +410,9 @@ def validate_link():
 		return
 		
 	if webnotes.conn.sql("select name from `tab%s` where name=%s" % (options, '%s'), value):
+	
+		# get fetch values
+		if fetch:
+			webnotes.response['fetch_values'] = [c for c in webnotes.conn.sql("select %s from `tab%s` where name=%s" % (fetch, options, '%s'), value)[0]]
+	
 		webnotes.response['message'] = 'Ok'

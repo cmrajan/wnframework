@@ -55,6 +55,7 @@ _f.Frm = function(doctype, parent) {
 	this.grids = [];
 	this.cscript = {};
 	this.pformat = {};
+	this.fetch_dict = {};
 	this.parent = parent;
 	this.attachments = {};
 	this.tinymce_id_list = [];
@@ -362,10 +363,22 @@ _f.Frm.prototype.setup_template_layout = function() {
 	}
 }
 
+
+// --------------------------------------------------------------------------------------
+
+_f.Frm.prototype.add_fetch = function(link_field, src_field, tar_field) {
+	if(!this.fetch_dict[link_field]) {
+		this.fetch_dict[link_field] = {'columns':[], 'fields':[]}
+	}
+	this.fetch_dict[link_field].columns.push(src_field);
+	this.fetch_dict[link_field].fields.push(tar_field);
+}
+
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.setup_client_script = function() {
 	// setup client obj
+
 	if(this.meta.client_script_core || this.meta.client_script || this.meta._client_script) {
 		this.runclientscript('setup', this.doctype, this.docname);
 	}
@@ -946,6 +959,7 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 		);
 	}
 }
+
 
 // ======================================================================================
 

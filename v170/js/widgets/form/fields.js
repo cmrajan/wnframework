@@ -592,11 +592,18 @@ LinkField.prototype.set_onchange = function() {
 			}
 
 			// validate the value just entered
-			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options}, function(r,rt) { 
+			var fetch = '';
+			if(cur_frm.fetch_dict[me.df.fieldname])
+				fetch = cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');
+				
+			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options, 'fetch': fetch}, function(r,rt) { 
 				if(selector && selector.display) return; // selecting from popup
 				
 				if(r.message=='Ok') {
 					me.run_trigger();
+					
+					// set fetch values
+					if(r.fetch_values) me.set_fetch_values(r.fetch_values);
 				} else {
 					var astr = '';
 					if(in_list(profile.can_create, me.df.options)) astr = repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s', {dt:me.df.options, dtl:get_doctype_label(me.df.options)})
@@ -609,22 +616,22 @@ LinkField.prototype.set_onchange = function() {
 		}
 	}
 }
+LinkField.prototype.set_fetch_values = function(fetch_values) { 
+	var fl = cur_frm.fetch_dict[this.df.fieldname].fields;
+	for(var i=0; i< fl.length; i++) {
+		locals[this.doctype][this.docname][fl[i]] = fetch_values[i];
+		if(!this.grid) refresh_field(fl[i]);
+	}
+	// refresh grid
+	if(this.grid) this.grid.refresh();
+}
 
 LinkField.prototype.set_get_query = function() { 
 	if(this.get_query)return;
 
-	// if from grid
-	if(cur_frm && cur_frm.not_in_container && cur_frm.parent_doctype) {
-		// find the corresponding get_query method from the grid?
-		var gl = cur_frm.grids;
-		for(var i = 0; i < gl.length; i++) {
-			if(gl[i].grid.doctype = this.df.parent) {
-				// found the grid
-				var f = gl[i].grid.get_field(this.df.fieldname);
-				if(f.get_query) this.get_query = f.get_query;
-				break;
-			}
-		}
+	if(this.grid) {
+		var f = this.grid.get_field(this.df.fieldname);
+		if(f.get_query) this.get_query = f.get_query;
 	}
 }
 
