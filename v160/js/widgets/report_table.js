@@ -1655,5 +1655,5 @@ function middletext(par, t, size) {
 	if(!size)size = 10;
 	var tb = $a(par, 'div', 'absdiv');
 	tb.style.top = ((par.clientHeight - size) / 2) + 'px';
-	tb.innerHTML = t;
+	tb.innerHTML = t; 
 }
