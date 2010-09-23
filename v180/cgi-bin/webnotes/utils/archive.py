@@ -13,6 +13,7 @@ class Archiver:
 		self.res_sql_del = ("DELETE FROM `arc%s` WHERE " %(self.dt))
 		self.child_doc_sql = ("INSERT")
 		self.condition = ''
+        self.res_children = []
 		
 	def _sync_schema(self):
 		# if not exists, create it
@@ -82,8 +83,15 @@ class Archiver:
 		webnotes.conn.sql(self.arc_sql_ins)
 		webnotes.conn.sql(self.arc_sql_del)
 		webnotes.conn.sql('commit')
-
-
+    
+    def get_children(self,filters):
+        for each in filters:
+            self.res_children.append(webnotes.conn.sql("select parent,parentfield from `tabDocField` where name = %s" %filters[0]))
+    
+    def archive_children(self):
+        for each in self.res_children:
+            child_arch = Archiver(each[0])
+            child_arch.archive()
 	def restore(self):
 		self._sync_schema()
 		self.res_sql_ins = self.res_sql_ins + self.condition
