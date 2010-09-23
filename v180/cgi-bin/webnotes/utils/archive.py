@@ -83,7 +83,6 @@ class Archiver:
 		webnotes.conn.sql(self.arc_sql_ins)
 		webnotes.conn.sql(self.arc_sql_del)
 		webnotes.conn.sql('commit')
-    
     def get_children(self,filters):
         for each in filters:
             self.res_children.append(webnotes.conn.sql("select parent,parentfield from `tabDocField` where name = %s" %filters[0]))
