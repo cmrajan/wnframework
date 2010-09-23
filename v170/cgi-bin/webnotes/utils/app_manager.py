@@ -254,6 +254,7 @@ class App:
 			if e.args[0]==1146:
 				print "No table %s in master" % dt
 			else:
+				self.close()
 				raise e
 	
 	# sync a particular record
@@ -298,15 +299,21 @@ class App:
 
 	# run script remotely
 	# ----------------------------------
-	def run_script(self, script):
-		self.connect(ac_name = self.ac_name)
-		webnotes.conn = self.conn
-		from webnotes.model import code
-		self.conn.sql("start transaction")
-		sc = code.execute(script)
-		self.conn.sql("commit")
-		print sc
-		self.close()
+        def run_script(self, script):
+                try:
+                        self.connect(ac_name = self.ac_name)
+                        webnotes.conn = self.conn
+                        from webnotes.model import code
+                        self.conn.sql("start transaction")
+                        sc = code.execute(script)
+                        self.conn.sql("commit")
+                        print sc
+                        self.close()
+                except Exception, e:
+                        self.conn.sql("rollback")
+                        self.close()
+			raise e
+
 
 def do_transfer(master='brownie', dt_list = [], app_list = [], mod_list = []):
 	webnotes.conn = webnotes.db.Database(use_default = 1)
