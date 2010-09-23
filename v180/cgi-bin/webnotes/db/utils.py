@@ -1,9 +1,9 @@
 import inspect
 import os
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
+from webnotes.conf import settings
+from webnotes.core.exceptions import ImproperlyConfigured
+from webnotes.utils.importlib import import_module
 
 DEFAULT_DB_ALIAS = 'default'
 
@@ -19,10 +19,10 @@ class IntegrityError(DatabaseError):
 
 def load_backend(backend_name):
     try:
-        module = import_module('.base', 'django.db.backends.%s' % backend_name)
+        module = import_module('.base', 'webnotes.db.backends.%s' % backend_name)
         import warnings
         warnings.warn(
-            "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
+            "Short names for DATABASE_ENGINE are deprecated; prepend with 'webnotes.db.backends.'",
             PendingDeprecationWarning
         )
         return module
@@ -43,7 +43,7 @@ def load_backend(backend_name):
             available_backends.sort()
             if backend_name not in available_backends:
                 error_msg = ("%r isn't an available database backend. \n" +
-                    "Try using django.db.backends.XXX, where XXX is one of:\n    %s\n" +
+                    "Try using webnotes.db.backends.XXX, where XXX is one of:\n    %s\n" +
                     "Error was: %s") % \
                     (backend_name, ", ".join(map(repr, available_backends)), e_user)
                 raise ImproperlyConfigured(error_msg)
@@ -70,9 +70,9 @@ class ConnectionHandler(object):
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
-        conn.setdefault('ENGINE', 'django.db.backends.dummy')
-        if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
-            conn['ENGINE'] = 'django.db.backends.dummy'
+        conn.setdefault('ENGINE', 'webnotes.db.backends.dummy')
+        if conn['ENGINE'] == 'webnotes.db.backends.' or not conn['ENGINE']:
+            conn['ENGINE'] = 'webnotes.db.backends.dummy'
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TEST_CHARSET', None)
         conn.setdefault('TEST_COLLATION', None)

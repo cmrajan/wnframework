@@ -1,20 +1,20 @@
 import datetime
 import os
 
-import django.utils.copycompat as copy
+import webnotes.utils.copycompat as copy
 
-from django.conf import settings
-from django.db.models.fields import Field
-from django.core.files.base import File, ContentFile
-from django.core.files.storage import default_storage
-from django.core.files.images import ImageFile, get_image_dimensions
-from django.core.files.uploadedfile import UploadedFile
-from django.utils.functional import curry
-from django.db.models import signals
-from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext_lazy, ugettext as _
-from django import forms
-from django.db.models.loading import cache
+from webnotes.conf import settings
+from webnotes.db.models.fields import Field
+from webnotes.core.files.base import File, ContentFile
+from webnotes.core.files.storage import default_storage
+from webnotes.core.files.images import ImageFile, get_image_dimensions
+from webnotes.core.files.uploadedfile import UploadedFile
+from webnotes.utils.functional import curry
+from webnotes.db.models import signals
+from webnotes.utils.encoding import force_unicode, smart_str
+from webnotes.utils.translation import ugettext_lazy, ugettext as _
+from webnotes import forms
+from webnotes.db.models.loading import cache
 
 class FieldFile(File):
     def __init__(self, instance, field, name):

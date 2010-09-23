@@ -5,20 +5,20 @@ import time
 import math
 from itertools import tee
 
-import django.utils.copycompat as copy
+import webnotes.utils.copycompat as copy
 
-from django.db import connection
-from django.db.models.fields.subclassing import LegacyConnection
-from django.db.models.query_utils import QueryWrapper
-from django.conf import settings
-from django import forms
-from django.core import exceptions, validators
-from django.utils.datastructures import DictWrapper
-from django.utils.functional import curry
-from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode, force_unicode, smart_str
-from django.utils import datetime_safe
+from webnotes.db import connection
+from webnotes.db.models.fields.subclassing import LegacyConnection
+from webnotes.db.models.query_utils import QueryWrapper
+from webnotes.conf import settings
+from webnotes import forms
+from webnotes.core import exceptions, validators
+from webnotes.utils.datastructures import DictWrapper
+from webnotes.utils.functional import curry
+from webnotes.utils.text import capfirst
+from webnotes.utils.translation import ugettext_lazy as _
+from webnotes.utils.encoding import smart_unicode, force_unicode, smart_str
+from webnotes.utils import datetime_safe
 
 class NOT_PROVIDED:
     pass
@@ -135,7 +135,7 @@ class Field(object):
     def to_python(self, value):
         """
         Converts the input value into the expected Python data type, raising
-        django.core.exceptions.ValidationError if the data can't be converted.
+        webnotes.core.exceptions.ValidationError if the data can't be converted.
         Returns the converted value. Subclasses should override this.
         """
         return value
@@ -416,7 +416,7 @@ class Field(object):
         setattr(instance, self.name, data)
 
     def formfield(self, form_class=forms.CharField, **kwargs):
-        "Returns a django.forms.Field instance for this database Field."
+        "Returns a webnotes.forms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.has_default():
             if callable(self.default):
@@ -765,13 +765,13 @@ class DecimalField(Field):
         Formats a number into a string with the requisite number of digits and
         decimal places.
         """
-        # Method moved to django.db.backends.util.
+        # Method moved to webnotes.db.backends.util.
         #
         # It is preserved because it is used by the oracle backend
-        # (django.db.backends.oracle.query), and also for
+        # (webnotes.db.backends.oracle.query), and also for
         # backwards-compatibility with any external code which may have used
         # this method.
-        from django.db.backends import util
+        from webnotes.db.backends import util
         return util.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):

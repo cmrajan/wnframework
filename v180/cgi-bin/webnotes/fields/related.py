@@ -1,17 +1,17 @@
-from django.conf import settings
-from django.db import connection, router, transaction
-from django.db.backends import util
-from django.db.models import signals, get_model
-from django.db.models.fields import (AutoField, Field, IntegerField,
+from webnotes.conf import settings
+from webnotes.db import connection, router, transaction
+from webnotes.db.backends import util
+from webnotes.db.models import signals, get_model
+from webnotes.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
-from django.db.models.related import RelatedObject
-from django.db.models.query import QuerySet
-from django.db.models.query_utils import QueryWrapper
-from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext_lazy as _, string_concat, ungettext, ugettext
-from django.utils.functional import curry
-from django.core import exceptions
-from django import forms
+from webnotes.db.models.related import RelatedObject
+from webnotes.db.models.query import QuerySet
+from webnotes.db.models.query_utils import QueryWrapper
+from webnotes.utils.encoding import smart_unicode
+from webnotes.utils.translation import ugettext_lazy as _, string_concat, ungettext, ugettext
+from webnotes.utils.functional import curry
+from webnotes.core import exceptions
+from webnotes import forms
 
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
@@ -540,7 +540,7 @@ def create_many_related_manager(superclass, rel=False):
             # *objs - objects to add. Either object instances, or primary keys of object instances.
 
             # If there aren't any objects, there is nothing to do.
-            from django.db.models import Model
+            from webnotes.db.models import Model
             if objs:
                 new_ids = set()
                 for obj in objs:
@@ -939,7 +939,7 @@ class OneToOneField(ForeignKey):
             setattr(instance, self.attname, data)
 
 def create_many_to_many_intermediary_model(field, klass):
-    from django.db import models
+    from webnotes.db import models
     managed = True
     if isinstance(field.rel.to, basestring) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
         to_model = field.rel.to

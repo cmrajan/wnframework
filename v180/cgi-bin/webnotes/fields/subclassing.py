@@ -19,7 +19,7 @@ def call_with_connection(func):
 
     def inner(*args, **kwargs):
         if 'connection' not in kwargs:
-            from django.db import connection
+            from webnotes.db import connection
             kwargs['connection'] = connection
             warn("%s has been called without providing a connection argument. " %
                 func.__name__, PendingDeprecationWarning,
@@ -44,7 +44,7 @@ def call_with_connection_and_prepared(func):
 
     def inner(*args, **kwargs):
         if 'connection' not in kwargs:
-            from django.db import connection
+            from webnotes.db import connection
             kwargs['connection'] = connection
             warn("%s has been called without providing a connection argument. " %
                 func.__name__, PendingDeprecationWarning,
