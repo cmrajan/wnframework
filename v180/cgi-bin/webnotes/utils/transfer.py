@@ -282,7 +282,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	from webnotes.model.code import get_obj
 	from webnotes.utils import cint
 	from webnotes.utils import cstr
-	import webnotes.db
+	import webnotes.db.db
 	doc_list = [Document(fielddata = d) for d in doc_list]
 	doc = doc_list[0]
 	orig_modified = doc.modified

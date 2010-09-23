@@ -1,5 +1,5 @@
 import webnotes
-import webnotes.db
+import webnotes.db.db
 
 # Application Manager
 # =====================================================================================

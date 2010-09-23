@@ -30,7 +30,7 @@
 #-----------------------------------------------------
 
 import webnotes
-import webnotes.db
+import webnotes.db.db
 import webnotes.utils
 import webnotes.profile
 

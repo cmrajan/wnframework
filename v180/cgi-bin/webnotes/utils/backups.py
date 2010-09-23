@@ -39,10 +39,10 @@ def backup_db(db, conn, from_all=0):
 def backup_all():
 	# backups folder
 	import os
-	import webnotes.db
+	import webnotes.db.db
 	global backup_folder
 	
-	conn = webnotes.db.Database(use_default=1)
+	conn = webnotes.db.db.Database(use_default=1)
 	dblist = conn.sql('select db_name from tabAccount')
 
 	# backup -all in /backups folder
