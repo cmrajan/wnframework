@@ -8,9 +8,12 @@ Calendar=function() {
 }
 
 Calendar.prototype.init=function (parent) {
- 	var tmp = $a(parent, 'div', 'standard_title');
+/* 	var tmp = $a(parent, 'div', 'standard_title');
 	tmp.innerHTML = 'Calendar';
-	tmp.style.margin = '8px 0px 0px 16px';
+	tmp.style.margin = '8px 0px 0px 16px';*/
+
+	var tmp = $a(parent,'div');
+	new PageHeader(tmp,'Calendar')
 
 	this.wrapper = $a(parent, 'div', 'cal_wrapper');
  	this.body = $a(this.wrapper, 'div', 'cal_body');

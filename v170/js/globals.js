@@ -89,3 +89,7 @@ var sendmail;
 // icons
 var exp_icon = "images/ui/right-arrow.gif"; 
 var min_icon = "images/ui/down-arrow.gif";
+
+// space holder div
+var space_holder_div = $a(null,'div','space_holder');
+space_holder_div.innerHTML = 'Loading...'

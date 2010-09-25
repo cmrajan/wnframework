@@ -265,21 +265,6 @@ function get_scroll_top() {
 	return st;
 }
 
-// set user image
-var user_img = {};
-function set_user_img(img, username) {
-	function set_it() {
-		if(user_img[username]=='no_img')
-			img.src = 'images/ui/no_img/no_img_m.gif'; // no image
-		else
-			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
-	}
-	if(user_img[username]) 
-		set_it();
-	else
-		$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
-}
-
 function get_url_arg(name) {
 	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 	var regexS = "[\\?&]"+name+"=([^&#]*)";
@@ -300,4 +285,45 @@ function get_cookie(c) {
 	return unescape(t.substring(ind+c.length+1,ind1));
 }
 
+// add space holder
+add_space_holder = function(parent,cs){
+	if(!cs) cs = {margin:'170px 0px'}	
+	$y(space_holder_div,cs);
+	parent.appendChild(space_holder_div);
+}
 
+// remove space holder
+remove_space_holder = function(){
+	if(space_holder_div.parentNode)
+		space_holder_div.parentNode.removeChild(space_holder_div);
+}
+
+// set user image
+var user_img = {}
+
+set_user_img = function(img,username, get_latest) {
+
+	function set_it() {
+		if(user_img[username]=='no_img_m')
+			img.src = 'images/ui/no_img/no_img_m.gif';
+		else if(user_img[username]=='no_img_f')
+			img.src = 'images/ui/no_img/no_img_f.gif'; // no image
+		else
+			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
+
+	}
+
+	if(get_latest){
+		$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
+	}
+	else{
+		if(user_img[username]) {
+			set_it();
+		}
+
+		else{
+			$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
+		}
+	}
+
+}

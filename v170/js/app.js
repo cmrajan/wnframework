@@ -162,3 +162,8 @@ if(isIE6) {
 	}
 }
 window.onload = function() { startup() }
+
+// set custom tooltip
+set_custom_tooltip = function(parent,tip_content,cs){
+  new CustomTooltip(parent,tip_content,cs);
+}

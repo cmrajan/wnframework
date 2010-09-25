@@ -33,6 +33,8 @@ in_files_main = [
        ,'webpage/body.js'
        ,'app.js'
        ,'tiny_mce/tiny_mce_gzip.js'
+       ,'widgets/calendar.js'
+       ,'widgets/tooltip.js'
      ]
 
 out_file_main = 'wnf.compressed.js'
