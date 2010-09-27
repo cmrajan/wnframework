@@ -75,9 +75,9 @@ def get_module():
 		
 	webnotes.response['super_doclist'] = super_doclist
 
+
 # Import a record (with its chilren)
 # ==============================================================================
-
 def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 	import webnotes
 	from webnotes.model.doc import Document
@@ -114,7 +114,10 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 					return ovr_doctype(doclist, ovr, ignore, onupdate) 
 
 				if doc.doctype == 'DocType Mapper':
-					return ovr_mapper(doclist, ovr, ignore, onupdate) 
+					return ovr_mapper(doclist, ovr, ignore, onupdate)
+
+        if doc.doctype == 'Module Def':
+          return ovr_module_def(doclist, ovr, ignore, onupdate)
 					
 			# check modified timestamp
 			# ------------------------
@@ -173,6 +176,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 		sql("COMMIT")
 
 	return doc.name + ': Completed'
+
 
 # Transfer DocType
 # ==============================================================================
@@ -286,6 +290,16 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	doc_list = [Document(fielddata = d) for d in doc_list]
 	doc = doc_list[0]
 	orig_modified = doc.modified
+	cur_doc = Document('DocType Mapper',doc.name)import webnotes
+	from webnotes.model.doc import Document
+	from webnotes.model import doclist
+	from webnotes.model.code import get_obj
+	from webnotes.utils import cint
+	from webnotes.utils import cstr
+	import webnotes.db
+	doc_list = [Document(fielddata = d) for d in doc_list]
+	doc = doc_list[0]
+	orig_modified = doc.modified
 	cur_doc = Document('DocType Mapper',doc.name)
 	added = 0
 	fld_lst = ''
@@ -328,6 +342,112 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	
 	if onupdate:
 		so = get_obj('DocType Mapper', doc.name, with_children = 1)
+		if hasattr(so, 'on_update'):
+			so.on_update()
+	
+	webnotes.conn.set(doc,'modified',orig_modified)
+	
+	if webnotes.conn.in_transaction: sql("COMMIT")
+	
+	if added == 0:
+		added_fields = ''
+	else:
+		added_fields =	' Added Fields:'+ cstr(fld_lst)
+	return doc.name + ('Upgraded: %s fields added' % added)+added_fields
+
+	added = 0
+	fld_lst = ''
+		
+	sql = webnotes.conn.sql
+	
+	# Field Mapper Details fields
+	# ------
+	for d in doclist.getlist(doc_list, 'field_mapper_details'):
+		fld = ''
+		# if exists
+		if d.from_field and d.to_field:
+			fld = sql("select name from `tabField Mapper Detail` where from_field=%s and to_field=%s and parent=%s", (d.from_field, d.to_field, d.parent))
+					
+		if (not fld) and d.from_field and d.to_field: # must have label
+			# add field
+			nd = Document(fielddata = d.fields)
+			nd.oldfieldname, nd.oldfieldtype = '', ''
+			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
+			fld_lst += '\n'+'From Field : '+cstr(d.from_field)+'	 ---	 To Field : '+cstr(d.to_field)
+			added += 1
+			
+	# Table Mapper Details fields
+	# ------
+	for d in doclist.getlist(doc_list, 'table_mapper_details'):
+		fld = ''
+		# if exists
+		if d.from_table and d.to_table: 
+			fld = sql("select name from `tabTable Mapper Detail` where from_table=%s and to_table = %s and parent=%s", (d.from_table, d.to_table, d.parent))
+					
+		if (not fld) and d.from_table and d.to_table: # must have label
+			# add field
+			nd = Document(fielddata = d.fields)
+			nd.oldfieldname, nd.oldfieldtype = '', ''
+			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
+			fld_lst += '\n'+'From Table : '+cstr(d.from_table)+'	 ---	 To Table : '+cstr(d.to_table)
+			added += 1
+					 
+	cur_doc.save(ignore_fields = ignore, check_links = 0)
+	
+	if onupdate:
+		so = get_obj('DocType Mapper', doc.name, with_children = 1)
+		if hasattr(so, 'on_update'):
+			so.on_update()
+	
+	webnotes.conn.set(doc,'modified',orig_modified)
+	
+	if webnotes.conn.in_transaction: sql("COMMIT")
+	
+	if added == 0:
+		added_fields = ''
+	else:
+		added_fields =	' Added Fields:'+ cstr(fld_lst)
+	return doc.name + ('Upgraded: %s fields added' % added)+added_fields
+
+
+# Transfer Module Def
+# ============================================================
+def ovr_module_def(doc_list, ovr, ignore, onupdate):
+  import webnotes
+	from webnotes.model.doc import Document
+	from webnotes.model import doclist
+	from webnotes.model.code import get_obj
+	from webnotes.utils import cint
+	from webnotes.utils import cstr
+	import webnotes.db
+	doc_list = [Document(fielddata = d) for d in doc_list]
+	doc = doc_list[0]
+	orig_modified = doc.modified
+	cur_doc = Document('Module Def',doc.name)
+	added = 0
+	fld_lst = ''
+		
+	sql = webnotes.conn.sql
+	
+	# Module Def Item table fields
+	for d in doclist.getlist(doc_list, 'items'):
+		fld = ''
+		# if exists
+		if d.doc_type and d.doc_name:
+			fld = sql("select name from `tabModule Def Item` where from_field=%s and to_field=%s and parent=%s", (d.doc_type, d.doc_name, d.parent))
+					
+		if (not fld) and d.doc_type and d.doc_name:
+			# add field
+			nd = Document(fielddata = d.fields)
+			nd.oldfieldname, nd.oldfieldtype = '', ''
+			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
+			fld_lst += '\n'+'Doc Type : '+cstr(d.doc_type)+'	 ---	 Doc Name : '+cstr(d.doc_name)
+			added += 1
+			
+	cur_doc.save(ignore_fields = ignore, check_links = 0)
+	
+	if onupdate:
+		so = get_obj('Module Def', doc.name, with_children = 1)
 		if hasattr(so, 'on_update'):
 			so.on_update()
 	
