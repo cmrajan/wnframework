@@ -414,9 +414,8 @@ def ovr_module_def(doc_list, ovr, ignore, onupdate):
 	doc = doc_list[0]
 	orig_modified = doc.modified
 	cur_doc = Document('Module Def',doc.name)
-	added = 0
-	fld_lst = ''
-	prev_dt, prev_dn = '', ''
+	added, idx = 0, 0
+	fld_lst, prev_dt, prev_dn = '', '', ''
 		
 	sql = webnotes.conn.sql
 	
@@ -434,6 +433,7 @@ def ovr_module_def(doc_list, ovr, ignore, onupdate):
 			# add field
 			nd = Document(fielddata = d.fields)
 			nd.oldfieldname, nd.oldfieldtype = '', ''
+			nd.idx = cint(idx)+1
 			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
 			fld_lst += '\n'+'Doc Type : '+cstr(d.doc_type)+'	 ---	 Doc Name : '+cstr(d.doc_name)
 			added += 1
