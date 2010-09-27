@@ -108,7 +108,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 				#if webnotes.conn.exists('DocType', 'Transfer Control'):
 				#	tc = get_obj('Transfer Control')
 				#	if tc.override_transfer.has_key(doc.doctype):
-				#		return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate) 
+				#		return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate)
 			
 				if doc.doctype == 'DocType':
 					return ovr_doctype(doclist, ovr, ignore, onupdate) 
