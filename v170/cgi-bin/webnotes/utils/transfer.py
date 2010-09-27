@@ -426,6 +426,7 @@ def ovr_module_def(doc_list, ovr, ignore, onupdate):
 	cur_doc = Document('Module Def',doc.name)
 	added = 0
 	fld_lst = ''
+	prev_dt, prev_dn = '', ''
 		
 	sql = webnotes.conn.sql
 	
@@ -434,15 +435,22 @@ def ovr_module_def(doc_list, ovr, ignore, onupdate):
 		fld = ''
 		# if exists
 		if d.doc_type and d.doc_name:
-			fld = sql("select name from `tabModule Def Item` where from_field=%s and to_field=%s and parent=%s", (d.doc_type, d.doc_name, d.parent))
+			fld = sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s and parent=%s", (d.doc_type, d.doc_name, d.parent))
 					
 		if (not fld) and d.doc_type and d.doc_name:
+			if prev_dt and prev_dn:
+				idx = sql("select idx from `tabModule Def Item` where doc_type = %s and doc_name = %s and parent = %s",(prev_dt, prev_dn, d.parent))[0][0]
+			sql("update tabDocField set idx = idx + 1 where parent=%s and idx > %s", (d.parent, cint(idx)))
 			# add field
 			nd = Document(fielddata = d.fields)
 			nd.oldfieldname, nd.oldfieldtype = '', ''
 			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
 			fld_lst += '\n'+'Doc Type : '+cstr(d.doc_type)+'	 ---	 Doc Name : '+cstr(d.doc_name)
 			added += 1
+
+		# clean up
+		prev_dt = d.doc_type
+		prev_dn = d.doc_name
 			
 	cur_doc.save(ignore_fields = ignore, check_links = 0)
 	
