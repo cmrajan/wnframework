@@ -158,7 +158,7 @@ function WNToolbar(parent) {
 				me.new_dialog = d;
 				
 				// replace by labels
-				var nl = profile.can_create;
+				var nl = profile.can_create.join(',').split(',');
 				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
 								
 				// labels
@@ -187,7 +187,7 @@ function WNToolbar(parent) {
 				me.rb_dialog = d;			
 
 				// replace by labels
-				var nl = profile.can_get_report;
+				var nl = profile.can_get_report.join(',').split(',');
 				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
 				
 				me.rb_sel = new SelectWidget(d.widgets['Select'], nl.sort(), '200px');
@@ -228,11 +228,7 @@ function WNToolbar(parent) {
 		}
 
 		// replace by labels
-		var nl = [];
-
-		for(i=0; i<profile.can_read.length; i++){
-			nl.push(profile.can_read[i]);
-		}
+		var nl = profile.can_read.join(',').split(',');
 
 		for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
 		
