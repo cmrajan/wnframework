@@ -116,8 +116,8 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 				if doc.doctype == 'DocType Mapper':
 					return ovr_mapper(doclist, ovr, ignore, onupdate)
 
-        if doc.doctype == 'Module Def':
-          return ovr_module_def(doclist, ovr, ignore, onupdate)
+				if doc.doctype == 'Module Def':
+					return ovr_module_def(doclist, ovr, ignore, onupdate)
 					
 			# check modified timestamp
 			# ------------------------
@@ -413,7 +413,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 # Transfer Module Def
 # ============================================================
 def ovr_module_def(doc_list, ovr, ignore, onupdate):
-  import webnotes
+	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
 	from webnotes.model.code import get_obj
