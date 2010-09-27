@@ -228,9 +228,14 @@ function WNToolbar(parent) {
 		}
 
 		// replace by labels
-		var nl = profile.can_read;
+		var nl = [];
+
+		for(i=0; i<profile.can_read.length; i++){
+			nl.push(profile.can_read[i]);
+		}
+
 		for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
-			
+		
 		me.search_sel.set_options(nl.sort());
 		me.search_sel.onchange = function() { me.open_quick_search(); }
 		

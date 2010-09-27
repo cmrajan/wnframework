@@ -779,7 +779,8 @@ me.rb_dialog=d;var nl=profile.can_get_report;for(var i=0;i<nl.length;i++)nl[i]=g
 me.rb_dialog.show();}}
 this.setup_search=function(){me.menu.add_top_menu('Search',function(){me.search_dialog.show();},'sprite-search');var d=new Dialog(240,140,"Quick Search");d.make_body([['HTML','Select'],['Button','Go',function(){me.search_dialog.hide();me.open_quick_search();}]]);d.onshow=function(){me.search_sel.inp.focus();}
 me.search_dialog=d;me.search_sel=new SelectWidget(d.widgets['Select'],[],'120px');me.search_sel.inp.value='Select...';me.open_quick_search=function(){me.search_dialog.hide();var v=sel_val(me.search_sel);if(v)selector.set_search(v);me.search_sel.disabled=1;selector.show();}
-var nl=profile.can_read;for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.search_sel.set_options(nl.sort());me.search_sel.onchange=function(){me.open_quick_search();}
+var nl=[];for(i=0;i<profile.can_read.length;i++){nl.push(profile.can_read[i]);}
+for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.search_sel.set_options(nl.sort());me.search_sel.onchange=function(){me.open_quick_search();}
 makeselector();}
 this.setup_logout=function(){var w=$a($td(this.body_tab,0,1),'div','',{paddingTop:'2px',textAlign:'right'});var t=make_table(w,1,5,null,[],{padding:'2px 4px',borderLeft:'1px solid #CCC',fontSize:'11px'});$y(t,{cssFloat:'right',color:'#FFF'});$y($td(t,0,0),{border:'0px'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;}
 this.download_backup=function(){$c('webnotes.utils.backups.get_backup',{},function(r,rt){});}
