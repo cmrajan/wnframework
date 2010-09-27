@@ -290,16 +290,6 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 	doc_list = [Document(fielddata = d) for d in doc_list]
 	doc = doc_list[0]
 	orig_modified = doc.modified
-	cur_doc = Document('DocType Mapper',doc.name)import webnotes
-	from webnotes.model.doc import Document
-	from webnotes.model import doclist
-	from webnotes.model.code import get_obj
-	from webnotes.utils import cint
-	from webnotes.utils import cstr
-	import webnotes.db
-	doc_list = [Document(fielddata = d) for d in doc_list]
-	doc = doc_list[0]
-	orig_modified = doc.modified
 	cur_doc = Document('DocType Mapper',doc.name)
 	added = 0
 	fld_lst = ''
