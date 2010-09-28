@@ -35,6 +35,7 @@ in_files_main = [
        ,'tiny_mce/tiny_mce_gzip.js'
        ,'widgets/calendar.js'
        ,'widgets/tooltip.js'
+       ,'widgets/content_tip.js'
      ]
 
 out_file_main = 'wnf.compressed.js'

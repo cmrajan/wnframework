@@ -1152,3 +1152,14 @@ $y(this.tip,{width:this.width+'px'})
 if(this.offset.left+this.parent_width+this.width>this.screen_width){this.left=-this.width;}
 else this.left=this.parent_width;if(this.offset.top+this.parent_height+this.height>this.screen_bottom){this.top=-this.height;}
 else this.top=this.parent_height;$(this.tip).css('top',this.top+'px').css('left',this.left+'px').css('display','block')},function(e){$(this.tip).css('display','none');})}
+ContentTip=function(parent,tip_content,cs){$y(parent,{position:'relative',cursor:'pointer'});this.parent=parent;this.tip_content=tip_content;if(cs)this.cs=cs;this.make();this.onhover();}
+ContentTip.prototype.make=function(){this.wrapper=$a(null,'div','tip',{paddingBottom:'8px'});this.body=$a(this.wrapper,'div','tip_body');this.arrow_wrapper=$a(null,'div','tip_arrow_container');this.arrow_main=$a(this.arrow_wrapper,'div','tip_arrow main');this.arrow_border=$a(this.arrow_wrapper,'div','tip_arrow border');this.parent.tip=this.wrapper;this.set_style()
+this.set_param();}
+ContentTip.prototype.set_param=function(){$(this.wrapper).appendTo('body');var tmp=$a(null,'div');tmp.innerHTML=this.tip_content;this.body.appendChild(tmp);this.parent.width=$(this.wrapper).outerWidth()+4*2;this.set_parent();}
+ContentTip.prototype.set_parent=function(){$(this.wrapper).remove();$(this.wrapper).appendTo(this.parent);$(this.arrow_wrapper).appendTo(this.body);}
+ContentTip.prototype.onhover=function(){$(this.parent).hover(function(){$y(this.tip,{width:this.width+'px'});var top=-($(this.tip).outerHeight());$(this.tip).css('top',top+'px').css('display','block')},function(e){$(this.tip).css('display','none');});}
+ContentTip.prototype.set_style=function(){if(this.cs){for(d in this.cs){if(d=='backgroundColor'){this.body.style[d]=this.cs[d];this.arrow_main.style['borderTop']='14px solid '+this.cs[d];}
+else if(!d.match(/border+/g)){this.body.style[d]=this.cs[d];}}}
+this.set_border(4);}
+ContentTip.prototype.set_border=function(border_size,border_color){var bs=border_size?border_size:0;var bc=border_color?border_color:'#444';$y(this.body,{border:bs+'px'+' solid '+bc});if(bs){$y(this.arrow_border,{borderTop:bs+14+'px'+' solid '+bc});$y(this.arrow_border,{borderLeft:(bs+14)/2+'px'+' transparent '+bc});$y(this.arrow_border,{borderRight:(bs+14)/2+'px'+' transparent '+bc});$y(this.arrow_border,{top:bs+'px'});}
+else{$y(this.arrow_border,{border:'0px'+' solid '+bc});}}
