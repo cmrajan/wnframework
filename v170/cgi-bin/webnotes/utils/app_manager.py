@@ -7,17 +7,21 @@ import webnotes.db
 class AppManager:
 	def __init__(self, master):
 		self.master = master
-		self.acc_conn = None
+		self.account_conn = None
 		self.app_list = []
 		if not webnotes.session:
 			webnotes.session = {'user':'Administrator'}
+			
 	
 	# load list of applications
 	# ----------------------------------
 	def load_app_list(self, al=[]):
 		if not al:
-			self.acc_conn = webnotes.db.Database(use_default=1)
-			al = [a[0] for a in self.acc_conn.sql('select ac_name from tabAccount where ac_name != %s and ac_name != "ax0000523"',self.master)]
+			self.account_conn = webnotes.db.Database(use_default=1)
+			al = [a[0] for a in self.account_conn.sql('select ac_name from tabAccount where ac_name != %s and ac_name != "ax0000523"',self.master)]
+		else:
+			pass
+			# Gotta see what has to be done here. guessing it is for multitenancy case.
 		for a in al:
 			self.app_list.append(App(self.master,a))
 
@@ -152,11 +156,11 @@ class AppManager:
 	# get the next app in line
 	# ----------------------------------
 	def register_app(self):
-		ret = self.acc_conn.sql("select ac_name from tabAccount where ifnull(registered,0)=0 order by ac_name limit 1")
+		ret = self.account_conn.sql("select ac_name from tabAccount where ifnull(registered,0)=0 order by ac_name limit 1")
 		if not ret:
 			raise Exception, "No more apps to register"
 
-		self.acc_conn.sql("update tabAccount set registered=1 where ac_name=%s", ret[0][0])
+		self.account_conn.sql("update tabAccount set registered=1 where ac_name=%s", ret[0][0])
 		return ret[0][0]
 		
 		
@@ -166,10 +170,12 @@ class App:
 	def __init__(self, master, ac_name):
 		self.ignore_modules = ['Development', 'Recycle Bin', 'System']
 		#self.ignore_modules = ['Recycle Bin']
+		self.custom = False		#To denote whether the code is customised or standard.
 		self.ac_name = ac_name
 		self.master = master
 		self.verbose = 0
-	
+        self.status = None
+
 	# Get db Logintransfer_types = ['Role',  'Print Format','DocType', 'Page', 'DocType Mapper', 'Search Criteria','Menu Item']
 	# -------------
 	def get_db_login(self, ac_name):
