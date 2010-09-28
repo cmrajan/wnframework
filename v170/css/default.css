@@ -1857,3 +1857,47 @@ height:0.7em;
   color:#666;
   cursor:pointer;
 }
+
+/*Content Tip*/
+.tip_arrow_container{
+  position:relative;
+  text-align:center;
+}
+
+.tip {
+  position:absolute;
+  display:none;
+}
+
+.tip_body {
+  background-color:#ffd;
+  z-index = -1;
+  border:0px solid #444;
+  color:#000;
+  padding:4px 6px;
+  -moz-border-radius : 5px;
+  -webkit-border-radius: 5px;
+}
+
+.tip_arrow {
+  width:0px;
+  height:0px;
+  position:absolute;
+}
+
+.tip_arrow.main {
+  border-top:14px solid #ffd;
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  z-index:9999;
+  top:0px;
+  left:4px;
+}
+
+.tip_arrow.border {
+  border-top:18px solid #444;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  top:4px;
+  left:2px;
+}
