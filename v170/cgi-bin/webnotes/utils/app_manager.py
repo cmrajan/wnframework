@@ -174,7 +174,7 @@ class App:
 		self.ac_name = ac_name
 		self.master = master
 		self.verbose = 0
-        self.status = None
+		self.status = None
 
 	# Get db Logintransfer_types = ['Role',  'Print Format','DocType', 'Page', 'DocType Mapper', 'Search Criteria','Menu Item']
 	# -------------
