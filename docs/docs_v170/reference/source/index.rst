@@ -3,20 +3,32 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Web Notes Framework documentation!
-=============================================
+Documentation
+=============
+
+Web Notes Framework is a web application framework that is buit on Python and Javascript. It contains:
+
+* Meta-data modelling
+* Object-Relational Mapper (like Django)
+* Admin / Developer web-interface to build the application
+* Roles based permission structure
+* Form Rendering
+* Report Builder
+* Built-in AJAX and navigation widgets
+
+The server and client sides are tightly integrated for maximum abstraction and efficiency.
+
+For corrections / suggestions / contributions for the documentation, 
+please mail me at rushabh@iwebnotes.com
 
 Contents:
 
 .. toctree::
    
    intro
-   concepts
+   build_app
    server_side_api
-   server_side_internals
    client_side_widgets
-   javascript_utils
-   navigation
    sitemap
    glossary
 

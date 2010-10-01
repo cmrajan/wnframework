@@ -1,10 +1,11 @@
-Client Side Widgets
-===================
+4. Client Side API
+==================
 
 API for client side widgets
 
 .. toctree::
 
+  local_data
   form_widget
   report_builder
   dialog
@@ -12,3 +13,5 @@ API for client side widgets
   tree
   tabbed_page
   autosuggest
+  javascript_utils
+  navigation

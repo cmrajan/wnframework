@@ -1,5 +1,5 @@
-Server Side API
-===============
+3. Server Side API
+==================
 
 List of modules on the server-side that are commonly used for developing applications
 
@@ -11,3 +11,5 @@ List of modules on the server-side that are commonly used for developing applica
    email_lib
    profile
    webservice
+   server_side_internals
+   

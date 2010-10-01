@@ -1,5 +1,5 @@
-Generating Sitemaps
-===================
+5. Generating Sitemaps
+======================
 
 The `sitemap` module can be to generate sitemap.xml for search engines to index the site
 as per http://www.sitemaps.org/protocol.php

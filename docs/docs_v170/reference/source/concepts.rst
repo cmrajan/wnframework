@@ -4,14 +4,12 @@ Concepts
 Structure
 ---------
 
-This page explains the basic architecture and concepts of the Framework
-
 The Framework is in two parts
 
 1. Server-side - in Python
 2. Client-side - in Javascript
 
-The server-side Framework contains all the logic for setting up the user session,
+The server-side framework contains all the logic for setting up the user session,
 co-ordinating data between the user and managing roles and permissions.
 
 The client-side renders all the widgets like menus, toolbars, forms, report builder etc and manages
@@ -28,3 +26,5 @@ in-built IDE for development. A usual development contains of the following step
    #. Designing of the navigation and other pages - :term:`Page`
    #. Creating and setting users and roles
    #. Writing custom logic, events
+   
+See next section for how to build a new app.
