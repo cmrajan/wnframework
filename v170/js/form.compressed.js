@@ -75,7 +75,7 @@ this.clear_tip=function(){me.c1.innerHTML='';$dh(me.tip_box);}
 $dh(this.tip_box);}
 _f.Frm.prototype.setup_meta=function(){this.meta=get_local('DocType',this.doctype);this.perm=get_perm(this.doctype);this.setup_print();}
 _f.Frm.prototype.setup_std_layout=function(){this.tab_wrapper=$a(this.form_wrapper,'div');$dh(this.tab_wrapper);if(this.meta.section_style=='Tray'){var t=$a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});var r=t.insertRow(0);var c=r.insertCell(0);c.className='frm_tray_area';this.tray_area=c;this.body=$a(r.insertCell(1),'div','frm_body');}else{this.body=$a(this.form_wrapper,'div','frm_body');}
-this.layout=new Layout(this.body,'100%');this.setup_footer();if(!this.meta.istable)this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable))
+this.layout=new Layout(this.body,'100%');this.setup_footer();if(!(this.meta.istable||user=='Guest'))this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable))
 this.setup_tabs();if(this.meta.colour)
 this.layout.wrapper.style.backgroundColor='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
 _f.Frm.prototype.setup_footer=function(){this.footer=$a(this.body,'div','green_buttons',{marginLeft:'8px'});var b=$a(this.footer,'button');b.innerHTML='Save';$(b).button({icons:{primary:'ui-icon-disk'}});b.onclick=function(){cur_frm.save('Save');}}
@@ -95,7 +95,7 @@ $(this.print_close_btn).html('Close').button({icons:{primary:'ui-icon-closethick
 _f.Frm.prototype.refresh_print_layout=function(){$ds(this.print_wrapper);$dh(this.form_wrapper);var me=this;var print_callback=function(print_html){me.print_body.innerHTML=print_html;}
 if(user!='Guest'){$di(this.view_btn_wrapper);$di(this.print_close_btn);}else{$dh(this.view_btn_wrapper);$dh(this.print_close_btn);}
 _p.build(this.default_format,print_callback);}
-_f.Frm.prototype.setup=function(){var me=this;this.fields=[];this.fields_dict={};this.wrapper=$a(this.parent.body,'div','frm_wrapper');this.setup_print_layout();this.form_wrapper=$a(this.wrapper,'div');this.head=$a(this.form_wrapper,'div');this.tip_wrapper=$a(this.form_wrapper,'div');if(this.meta.use_template){this.setup_template_layout();}else{this.setup_std_layout();}
+_f.Frm.prototype.setup=function(){var me=this;this.fields=[];this.fields_dict={};this.wrapper=$a(this.parent.body,'div','frm_wrapper');this.setup_print_layout();this.saved_wrapper=$a(this.wrapper,'div');this.form_wrapper=$a(this.wrapper,'div');this.head=$a(this.form_wrapper,'div');this.tip_wrapper=$a(this.form_wrapper,'div');if(this.meta.use_template){this.setup_template_layout();}else{this.setup_std_layout();}
 if(this.meta.allow_attach)
 this.setup_attach();this.setup_client_script();this.setup_done=true;}
 _f.Frm.prototype.hide=function(){$dh(this.wrapper);this.display=0;hide_autosuggest();}
@@ -152,7 +152,10 @@ locals[this.doctype][this.docname].trash_reason=reason;}
 if(save_action=='Cancel'){var reason=prompt('Reason for cancellation (mandatory)','');if(!strip(reason)){msgprint('Reason is mandatory, not cancelled');return;}
 locals[this.doctype][this.docname].cancel_reason=reason;locals[this.doctype][this.docname].cancelled_on=dateutil.full_str();locals[this.doctype][this.docname].cancelled_by=user;}else{validated=true;validation_message='';this.runclientscript('validate',this.doctype,this.docname);if(!validated){if(validation_message)
 msgprint('Validation Error: '+validation_message);this.savingflag=false;return'Error';}}
-var ret_fn=function(r){if(!me.meta.istable)
+var ret_fn=function(r){if(user=='Guest'&&!r.exc){$dh(me.form_wrapper);$ds(me.saved_wrapper);me.saved_wrapper.innerHTML='<div style="padding: 150px 16px; text-align: center; font-size: 14px;">'
++(cur_frm.message_after_save?cur_frm.message_after_save:'Your '+cur_frm.doctype+' has been sent. Thank you!')
++'</div>';return;}
+if(!me.meta.istable)
 me.refresh();if(call_back){if(call_back=='home'){loadpage('_home');return;}
 call_back(r);}}
 var me=this;var ret_fn_err=function(r){var doc=locals[me.doctype][me.docname];me.savingflag=false;ret_fn(r);}
@@ -341,7 +344,7 @@ var swap_row=this.tab.rows[r.rowIndex+1];}
 if(swap_row){var cidx=_f.cur_grid_cell.cellIndex;this.cell_deselect();var aidx=locals[this.doctype][r.docname].idx;locals[this.doctype][r.docname].idx=locals[this.doctype][swap_row.docname].idx;locals[this.doctype][swap_row.docname].idx=aidx;var adocname=swap_row.docname;this.refresh_row(swap_row.rowIndex,r.docname);this.refresh_row(r.rowIndex,adocname);this.cell_select(this.tab.rows[swap_row.rowIndex].cells[cidx]);this.set_unsaved();}}
 _p.show_dialog=function(){if(!_p.dialog){_p.make_dialog();}
 _p.dialog.show();}
-_p.make_dialog=function(){var d=new Dialog(360,140,"Print Formats");d.make_body([['HTML','Select'],['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats'],['Button','Go',function(){d.hide();_p.build(sel_val(cur_frm.print_sel),_p.go,d.widgets['No Letterhead'].checked);}]]);_p.dialog=d;d.onshow=function(){var c=d.widgets['Select'];if(c.cur_sel&&c.cur_sel.parentNode==c)
+_p.make_dialog=function(){var d=new Dialog(360,140,"Print Formats");d.make_body([['HTML','Select'],['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats'],['Button','Go',function(){_p.build(sel_val(cur_frm.print_sel),_p.go,d.widgets['No Letterhead'].checked);}]]);_p.dialog=d;d.onshow=function(){var c=d.widgets['Select'];if(c.cur_sel&&c.cur_sel.parentNode==c)
 c.removeChild(c.cur_sel);c.appendChild(cur_frm.print_sel);c.cur_sel=cur_frm.print_sel;}}
 _p.field_tab=function(layout_cell){var t=$a(layout_cell,'table','',{width:'100%'});var r=t.insertRow(0);this.r=r;r.insertCell(0);r.insertCell(1);r.cells[0].className='datalabelcell';r.cells[1].className='datainputcell';return r}
 _p.print_std_add_table=function(t,layout,pf_list,dt,no_letterhead){if(t.appendChild){layout.cur_cell.appendChild(t);}else{for(var ti=0;ti<t.length-1;ti++){layout.cur_cell.appendChild(t[ti]);layout.close_borders();pf_list[pf_list.length]='<div style="page-break-after: always;" class="page_break"></div>';layout=_p.add_layout(dt,no_letterhead);pf_list[pf_list.length]=layout;layout.addrow();layout.addcell();var div=$a(layout.cur_cell,'div');div.innerHTML='Continued from previous page...';div.style.padding='4px';}

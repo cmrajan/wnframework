@@ -594,6 +594,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 	div.style.marginTop = '8px';
 
 	var d = $a(div, 'div');
+	d.innerHTML = '<span>Show Query: </span>';
 	this.show_query = $a_input(d, 'checkbox');
 	this.show_query.checked = false;
 

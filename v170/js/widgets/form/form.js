@@ -2,6 +2,7 @@
 
 	+ this.parent (either FormContainer or Dialog)
  		+ this.wrapper
+ 			+ this.saved_wrapper
 			+ this.form_wrapper
 				+ this.head
 				+ this.tip_wrapper
@@ -262,8 +263,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// footer
 	this.setup_footer();
 		
-	// header
-	if(!this.meta.istable) this.frm_head = new _f.FrmHeader(this.head);
+	// header - no headers for tables and guests
+	if(!(this.meta.istable || user=='Guest')) this.frm_head = new _f.FrmHeader(this.head);
 	
 	// hide close btn for dialog rendering
 	if(this.frm_head && this.meta.in_dialog) $dh(this.frm_head.page_head.close_btn);
@@ -461,6 +462,9 @@ _f.Frm.prototype.setup = function() {
 	
 	// create area for print fomrat
 	this.setup_print_layout();
+
+	// thank you goes here (in case of Guest, don't refresh, just say thank you!)
+	this.saved_wrapper = $a(this.wrapper, 'div');
 	
 	// forms go in forms wrapper
 	this.form_wrapper = $a(this.wrapper, 'div');
@@ -910,6 +914,16 @@ _f.Frm.prototype.save = function(save_action, call_back) {
  	
 	
 	var ret_fn = function(r) {
+		if(user=='Guest' && !r.exc) {
+			// if user is guest, show a message after succesful saving
+			$dh(me.form_wrapper);
+			$ds(me.saved_wrapper);
+			me.saved_wrapper.innerHTML = 
+				'<div style="padding: 150px 16px; text-align: center; font-size: 14px;">' 
+				+ (cur_frm.message_after_save ? cur_frm.message_after_save : 'Your ' + cur_frm.doctype + ' has been sent. Thank you!') 
+				+ '</div>';
+			return; // no refresh
+		}
 		if(!me.meta.istable)
 			me.refresh();
 

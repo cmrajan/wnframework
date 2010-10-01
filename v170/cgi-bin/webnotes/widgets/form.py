@@ -213,6 +213,7 @@ def check_integrity(doc):
 def savedocs():
 	import webnotes.model.doclist
 
+	from webnotes.model.doc import check_perm
 	from webnotes.model.code import get_server_obj
 	from webnotes.model.code import run_server_obj
 	import webnotes.utils
@@ -233,6 +234,10 @@ def savedocs():
 
 	# check integrity
 	if not check_integrity(doc):
+		return
+	
+	if not check_perm(doc):
+		webnotes.msgprint("Not allowed to save")
 		return
 	
 	# validate links
