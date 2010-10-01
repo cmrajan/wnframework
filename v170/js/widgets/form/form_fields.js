@@ -90,6 +90,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 
 }
 
+// ======================================================================================
 
 _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsible) {
 	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '8px'});
@@ -133,6 +134,8 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsibl
 	}
 }
 
+// ======================================================================================
+
 _f.cur_sec_header = null;
 _f.SectionBreak.prototype.make_body = function() {
 	if((!this.perm[this.df.permlevel]) || (!this.perm[this.df.permlevel][READ]) || this.df.hidden) {
@@ -160,7 +163,10 @@ _f.SectionBreak.prototype.make_body = function() {
 				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
-			this.hide = function() { this.row.hide(); me.mytab.hide(); }
+			
+			this.hide = function() { 
+				me.row.hide(); me.mytab.hide(); 
+			}
 
 			this.make_row();		
 			
@@ -223,14 +229,21 @@ _f.SectionBreak.prototype.refresh = function(layout) {
 		this.df = get_field(this.doctype, fn, this.docname);
 
 	// hidden
-	if((this.frm.meta.section_style!='Tray')&&(this.frm.meta.section_style!='Tabbed')&&this.set_hidden!=this.df.hidden) {
+	if(this.set_hidden!=this.df.hidden) {
 		if(this.df.hidden) {
-			if(this.header)this.header.hide();
+			if(this.frm.meta.section_style=='Tabbed') {
+				$dh(this.mytab);
+			} else if(this.header)
+				this.header.hide();
+			
 			if(this.row)this.row.hide();
 		} else {
-			if(this.header)this.header.show();
-			if(this.expanded)
-				this.row.show();
+			if(this.frm.meta.section_style=='Tabbed') {
+				$di(this.mytab);
+			} else if(this.header)
+				this.header.show();
+
+			if(this.expanded)this.row.show();
 		}
 		this.set_hidden = this.df.hidden;
 	}
@@ -238,8 +251,6 @@ _f.SectionBreak.prototype.refresh = function(layout) {
 
 // Image field definition
 // ======================================================================================
-
-
 
 _f.ImageField = function() { this.images = {}; }
 _f.ImageField.prototype = new Field();
