@@ -186,6 +186,8 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.header = $a(w, 'div', '', {padding: '4px 8px', cursor:'pointer'});
 			this.header.innerHTML = me.df.label;
 			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
+			this.header.hide = function() { $dh(me.header); }
+			this.header.show = function() { $ds(me.header); }
 
 			this.header.onmouseover = function() {
 				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
