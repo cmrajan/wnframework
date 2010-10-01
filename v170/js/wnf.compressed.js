@@ -1023,8 +1023,9 @@ var setup_events=function(){addEvent('keyup',function(ev,target){for(var i in ke
 keypress_observers[i].notify_keypress(ev,ev.keyCode);}});addEvent('click',function(ev,target){for(var i=0;i<click_observers.length;i++){if(click_observers[i])
 click_observers[i].notify_click(ev,target);}});if(isIE){$op($i('dialog_back'),60);}}
 var callback=function(r,rt){if(r.exc)msgprint(r.ext);setup_globals(r);setup_history();setup_events();var a=new Body();page_body.run_startup_code();page_body.setup_sidebar_menu();for(var i=0;i<startup_list.length;i++){startup_list[i]();}
-$dh('startup_div');$ds('body_div');var t=to_open();if(t){historyChange(t);}else if(home_page){loadpage(home_page);}}
-if(keys(_startup_data).length){LocalDB.sync(_startup_data.docs);callback(_startup_data,'');if(_startup_data.server_messages)msgprint(_startup_data.server_messages);}else{if($i('startup_div'))
+$dh('startup_div');$ds('body_div');if(get_url_arg('embed')){newdoc(get_url_arg('embed'));return;}
+var t=to_open();if(t){historyChange(t);}else if(home_page){loadpage(home_page);}}
+if(keys(_startup_data).length&&_startup_data.docs){LocalDB.sync(_startup_data.docs);callback(_startup_data,'');if(_startup_data.server_messages)msgprint(_startup_data.server_messages);}else{if($i('startup_div'))
 $c('startup',{},callback,null,1);}}
 function to_open(){if(get_url_arg('page'))
 return get_url_arg('page');if(location.hash){return location.hash.substr(1);}}

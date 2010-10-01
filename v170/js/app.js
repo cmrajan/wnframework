@@ -79,14 +79,23 @@ function startup() {
 		$dh('startup_div');
 		$ds('body_div');
 
+		// show a new form on loading?
+		if(get_url_arg('embed')) {
+			newdoc(get_url_arg('embed'));
+			return;
+		}
+		
+		// open an existing page or record
 		var t = to_open();
 		if(t) {
 			historyChange(t);
 		} else if(home_page) {
+
+			// show home oage
 			loadpage(home_page);
 		}
 	}
-	if(keys(_startup_data).length) {
+	if(keys(_startup_data).length && _startup_data.docs) {
 		LocalDB.sync(_startup_data.docs);
 		callback(_startup_data, '');
 		
