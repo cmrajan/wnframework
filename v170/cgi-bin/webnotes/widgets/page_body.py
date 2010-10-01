@@ -168,8 +168,8 @@ def get():
 			sd = webnotes.session_cache.get()
 		except:
 			import webnotes.utils
-			sd = {'server_messsages': 'Error in session cachel loading', 'exc':webnotes.utils.getTraceback()}
-				
+			sd = {'exc':webnotes.utils.getTraceback()}
+		
 		# add debug messages
 		sd['server_messages'] = '\n--------------\n'.join(webnotes.message_log)
 		
