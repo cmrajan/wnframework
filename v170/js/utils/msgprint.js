@@ -1,5 +1,6 @@
 var msg_dialog;
 function msgprint(msg, issmall, callback) {
+	if(!msg) return;
 
 	if(issmall) { show_alert(msg); return; }
 

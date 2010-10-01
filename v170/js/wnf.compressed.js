@@ -211,7 +211,7 @@ function makeArgString(dict){var varList=[];for(key in dict){varList[varList.len
 return varList.join('&');}
 function open_url_post(URL,PARAMS){var temp=document.createElement("form");temp.action=URL;temp.method="POST";temp.style.display="none";for(var x in PARAMS){var opt=document.createElement("textarea");opt.name=x;opt.value=PARAMS[x];temp.appendChild(opt);}
 document.body.appendChild(temp);temp.submit();return temp;}
-var msg_dialog;function msgprint(msg,issmall,callback){if(issmall){show_alert(msg);return;}
+var msg_dialog;function msgprint(msg,issmall,callback){if(!msg)return;if(issmall){show_alert(msg);return;}
 if(msg.substr(0,8)=='__small:'){show_alert(msg.substr(8));return;}
 if(!msg_dialog){msg_dialog=new Dialog(400,200,"Message");msg_dialog.make_body([['HTML','Msg'],])
 msg_dialog.onhide=function(){msg_dialog.msg_area.innerHTML='';$dh(msg_dialog.msg_icon);if(msg_dialog.custom_onhide)msg_dialog.custom_onhide();}
