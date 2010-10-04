@@ -21,7 +21,7 @@ def generate_xml(conn, site_prefix):
 			site_map += '\n<url><loc>%s?page=Page/%s</loc><lastmod>%s</lastmod></url>' % (site_prefix, urllib.quote(r[0]), r[1].strftime('%Y-%m-%d'))
 		
 		# list of all Records that are viewable by guests (Blogs, Articles etc)
-		for dt in conn.sql("SELECT DISTINCT parent FROM `tabDocPerm` WHERE role='Guest' AND IFNULL(`read`,0) = 1 AND IFNULL(`permlevel`,0) = 0 LIMIT %s" % max_doctypes):
+		for dt in conn.sql("SELECT DISTINCT tabDocPerm.parent FROM `tabDocPerm`, tabDocType WHERE tabDocPerm.role='Guest' AND IFNULL(tabDocPerm.`read`,0) = 1 AND IFNULL(tabDocPerm.`permlevel`,0) = 0 AND tabDocType.name = tabDocPerm.parent and IFNULL(tabDocType.issingle,0) != 1 LIMIT %s" % max_doctypes):
 			
 			for d in conn.sql("SELECT name, modified FROM `tab%s` WHERE docstatus != 2 ORDER BY modified DESC LIMIT %s" % (dt[0], max_items)):
 			
