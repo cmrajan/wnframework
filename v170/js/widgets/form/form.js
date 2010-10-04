@@ -246,7 +246,7 @@ _f.Frm.prototype.setup_meta = function() {
 _f.Frm.prototype.setup_std_layout = function() {
 	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
 
-	if(this.meta.section_style=='Tray') {
+	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
 		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
 		var r = t.insertRow(0); var c = r.insertCell(0);
 		c.className='frm_tray_area';
@@ -273,7 +273,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 	this.setup_tips();
 	
 	// setup tabbed sections
-	if(this.meta.section_style=='Tabbed' && !(this.meta.istable))
+	if(this.meta.section_style=='Tabbed' && !(this.meta.istable) && !(get_url_arg('embed')))
 		this.setup_tabs();
 
 	// bg colour
@@ -302,7 +302,7 @@ _f.Frm.prototype.setup_fields_std = function() {
 
 	fl.sort(function(a,b) { return a.idx - b.idx});
 
-	if(fl[0]&&fl[0].fieldtype!="Section Break") {
+	if(fl[0]&&fl[0].fieldtype!="Section Break" || get_url_arg('embed')) {
 		this.layout.addrow(); // default section break
 		if(fl[0].fieldtype!="Column Break") {// without column too
 			var c = this.layout.addcell();
@@ -313,6 +313,8 @@ _f.Frm.prototype.setup_fields_std = function() {
 	var sec;
 	for(var i=0;i<fl.length;i++) {
 		var f=fl[i];
+		
+		if(get_url_arg('embed') && (in_list(['Section Break','Column Break'], f.fieldtype))) continue;
 		
 		var fn = f.fieldname?f.fieldname:f.label;
 		var fld = make_field(f, this.doctype, this.layout.cur_cell, this);
