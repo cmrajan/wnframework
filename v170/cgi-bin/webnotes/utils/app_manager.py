@@ -102,7 +102,7 @@ class AppManager:
 			print "---------------------------------------"
 			print "Target Account : "+app.ac_name
 			print "---------------------------------------"
-			app.connect(ac_name)
+			app.connect(app.ac_name)
 			app.sync_control_panel()
 			app.close()
 
