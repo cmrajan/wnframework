@@ -71,7 +71,7 @@ class AppManager:
 
 
 	# sync all the apps (app_list -> ac_names , mod_list -> modules, dt_list -> [doctypes,docname])
-	# ----------------------------------
+	# -----------------------------------------------------------------------------------------------
 	def sync_apps(self, app_list=[], mod_list = [], dt_list = []):
 		self.app_list, self.dt_list = [], []
 		self.load_app_list(app_list)
@@ -90,7 +90,20 @@ class AppManager:
 				app.close()
 			else:
 				app.sync(ac_name = app.ac_name)
-	
+
+
+	# sync control panel
+	# -------------------
+	def sync_cp(self, app_list=[]):
+		self.app_list = []
+		self.load_app_list(app_list)
+		print "Source Account : "+self.master
+		for app in self.app_list:
+			print "---------------------------------------"
+			print "Target Account : "+app.ac_name
+			print "---------------------------------------"
+			app.sync_control_panel()
+
 
 	# execute a script in all apps
 	# ----------------------------
