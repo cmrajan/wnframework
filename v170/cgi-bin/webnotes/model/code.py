@@ -13,7 +13,7 @@ def execute(code, doc=None, doclist=[]):
 
 	import webnotes
 
-	set = webnotes.conn.set
+#	set = webnotes.conn.set
 	sql = webnotes.conn.sql
 	get_value = webnotes.conn.get_value
 	in_transaction = webnotes.conn.in_transaction

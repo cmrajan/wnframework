@@ -10,7 +10,7 @@ db_password = 'ac_user09'
 
 # root
 root_login = 'root'
-root_password = 'webnotes'
+root_password = 'route'
 	
 # default mail server
 mail_server = 'localhost'
