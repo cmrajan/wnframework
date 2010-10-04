@@ -424,11 +424,11 @@ def ovr_module_def(doc_list, ovr, ignore, onupdate):
 		fld = ''
 		# if exists
 		if d.doc_type and d.doc_name:
-			fld = sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s and display_name = %s and parent=%s", (d.doc_type, d.doc_name, cstr(d.display_name), d.parent))
+			fld = sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s and ifnull(display_name,'') = %s and parent=%s", (d.doc_type, d.doc_name, cstr(d.display_name), d.parent))
 					
 		if (not fld) and d.doc_type and d.doc_name:
 			if prev_dt and prev_dn:
-				idx = sql("select idx from `tabModule Def Item` where doc_type = %s and doc_name = %s and display_name = %s and parent = %s",(prev_dt, prev_dn, cstr(prev_dis_name), d.parent))[0][0]
+				idx = sql("select idx from `tabModule Def Item` where doc_type = %s and doc_name = %s and ifnull(display_name,'') = %s and parent = %s",(prev_dt, prev_dn, cstr(prev_dis_name), d.parent))[0][0]
 			sql("update `tabModule Def Item` set idx = idx + 1 where parent=%s and idx > %s", (d.parent, cint(idx)))
 			# add field
 			nd = Document(fielddata = d.fields)
