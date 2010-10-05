@@ -225,11 +225,14 @@ function makeArgString(dict) {
 }
 
 // call a url as POST
-function open_url_post(URL, PARAMS) {
+function open_url_post(URL, PARAMS, new_window) {
 	var temp=document.createElement("form");
 	temp.action=URL;
 	temp.method="POST";
 	temp.style.display="none";
+	if(new_window){
+
+	}
 	for(var x in PARAMS) {
 		var opt=document.createElement("textarea");
 		opt.name=x;
