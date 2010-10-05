@@ -26,7 +26,9 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 	$ds(this.loading_div);
 	$dh(this.body);
 
-	this.page_head.main_head.innerHTML = get_doctype_label(dt) + ' List';
+	var l = get_doctype_label(dt).toLowerCase()
+	if(l.substr(-4) == 'list') this.page_head.main_head.innerHTML = get_doctype_label(dt);
+	else this.page_head.main_head.innerHTML = get_doctype_label(dt) + ' List';
 
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
