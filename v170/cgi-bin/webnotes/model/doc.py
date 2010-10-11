@@ -2,45 +2,47 @@ import webnotes
 import webnotes.model.meta
 
 from webnotes.utils import *
+import webnotes.db
 
 # actually should be "BaseDocType" deprecated. Only for v160
 class SuperDocType:
-	def __init__(self):
-		pass
-		
-	def __getattr__(self, name):
-		if self.__dict__.has_key(name):
-			return self.__dict__[name]
-		elif self.super and hasattr(self.super, name):
-			return getattr(self.super, name)
-		else:
-			raise AttributeError, 'BaseDocType Attribute Error'
+    def __init__(self):
+        pass
+    def __getattr__(self, name):
+        if self.__dict__.has_key(name):
+            return self.__dict__[name]
+        elif self.super and hasattr(self.super, name):
+            return getattr(self.super, name)
+        else:
+            raise AttributeError, 'BaseDocType Attribute Error'
 
 class Document:
-	def __init__(self, doctype = '', name = '', fielddata = {}):
-		if fielddata: 
-			self.fields = fielddata
-		else: 
-			self.fields = {}
-		
-		if not self.fields.has_key('name'):
-			self.fields['name']='' # required on save
-		if not self.fields.has_key('doctype'):
-			self.fields['doctype']='' # required on save			
-		if not self.fields.has_key('owner'):
-			self.fields['owner']='' # required on save			
-
-		if doctype:
-			self.fields['doctype'] = doctype
-		if name:
-			self.fields['name'] = name
-		self.__initialized = 1
-
-		if (doctype and name):
-			self.loadfromdb(doctype, name)
-
-	def __nonzero__(self):
-		return True
+    def __init__(self, doctype = '', name = '', fielddata = {}):
+        self.webnotes.conn = webnotes.db.Database(use_default = 1)
+        if fielddata:
+            self.fields = fielddata
+        else:
+            self.fields = {}
+        
+        if not self.fields.has_key('name'):
+            self.fields['name']='' # required on save
+        
+        if not self.fields.has_key('doctype'):
+            self.fields['doctype']='' # required on save
+        if not self.fields.has_key('owner'):
+            self.fields['owner']='' # required on save
+        
+        if doctype:
+            self.fields['doctype'] = doctype
+        if name:
+            self.fields['name'] = name
+            self.__initialized = 1
+            
+        if (doctype and name):
+            self.loadfromdb(doctype, name)
+            
+    def __nonzero__(self):
+        return True
 
 	def __str__(self):
 		return str(self.fields)
@@ -56,11 +58,11 @@ class Document:
 		if webnotes.model.meta.is_single(self.doctype):
 			self.loadsingle()
 		else:
-			dataset = webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
+			dataset = self.webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
 			if not dataset:
 				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name), 1)
 				raise Exception, '[WNF] %s %s does not exist' % (self.doctype, self.name)
-			self.load_values(dataset[0], webnotes.conn.get_description())
+			self.load_values(dataset[0], self.webnotes.conn.get_description())
 
 	# Load Fields from dataset
 	# ------------------------
@@ -68,20 +70,20 @@ class Document:
 	def load_values(self, data, description):
 		for i in range(len(description)):
 			v = data[i]
-			self.fields[description[i][0]] = webnotes.conn.convert_to_simple_type(v)
+			self.fields[description[i][0]] = self.webnotes.conn.convert_to_simple_type(v)
 
 	def merge_values(self, data, description):
 		for i in range(len(description)):
 			v = data[i]
 			if v: # only if value, over-write
-				self.fields[description[i][0]] = webnotes.conn.convert_to_simple_type(v)
+				self.fields[description[i][0]] = self.webnotes.conn.convert_to_simple_type(v)
 			
 	# Load Single Type
 	# ----------------
 
 	def loadsingle(self):
 		self.name = self.doctype
-		dataset = webnotes.conn.sql("select field, value from tabSingles where doctype='%s'" % self.doctype)
+		dataset = self.webnotes.conn.sql("select field, value from tabSingles where doctype='%s'" % self.doctype)
 		for d in dataset: self.fields[d[0]] = d[1]
 
 	# Setter
@@ -124,7 +126,7 @@ class Document:
 		if self.amended_from:
 			am_id = 1
 			am_prefix = self.amended_from
-			if webnotes.conn.sql('select amended_from from `tab%s` where name = "%s"' % (self.doctype, self.amended_from))[0][0] or '':
+			if self.webnotes.conn.sql('select amended_from from `tab%s` where name = "%s"' % (self.doctype, self.amended_from))[0][0] or '':
 				am_id = cint(self.amended_from.split('-')[-1]) + 1
 				am_prefix = '-'.join(self.amended_from.split('-')[:-1]) # except the last hyphen
 			
@@ -153,7 +155,7 @@ class Document:
 		if not self.owner:
 			self.owner = webnotes.session['user']
 
-		if webnotes.conn.sql('select name from `tab%s` where name=%s' % (self.doctype,'%s'), self.name):
+		if self.webnotes.conn.sql('select name from `tab%s` where name=%s' % (self.doctype,'%s'), self.name):
 			raise NameError, 'Name %s already exists' % self.name
 		
 		if not self.name:
@@ -169,7 +171,7 @@ class Document:
 			if f in self.name:
 				raise NameError, '%s not allowed in ID (name)' % f
 		
-		webnotes.conn.sql("""insert into `tab%s` (name, owner, creation, modified, modified_by) values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
+		self.webnotes.conn.sql("""insert into `tab%s` (name, owner, creation, modified, modified_by) values ('%s', '%s', '%s', '%s', '%s')""" % (self.doctype, self.name, webnotes.session['user'], now(), now(), webnotes.session['user']))
 
 
 	# Update Values
@@ -179,7 +181,7 @@ class Document:
 		update_str = ["(%s, 'modified', %s)",]
 		values = [self.doctype, now()]
 		
-		webnotes.conn.sql("delete from tabSingles where doctype='%s'" % self.doctype)
+		self.webnotes.conn.sql("delete from tabSingles where doctype='%s'" % self.doctype)
 		for f in self.fields.keys():
 			if not (f in ('modified', 'doctype', 'name', 'perm', 'localname', 'creation'))\
 				and (not f.startswith('__')): # fields not saved
@@ -197,7 +199,7 @@ class Document:
 					values.append(self.doctype)
 					values.append(f)
 					values.append(self.fields[f])
-		webnotes.conn.sql("insert into tabSingles(doctype, field, value) values %s" % (', '.join(update_str)), values)
+		self.webnotes.conn.sql("insert into tabSingles(doctype, field, value) values %s" % (', '.join(update_str)), values)
 
 	# Validate Links
 	# --------------
@@ -229,7 +231,7 @@ class Document:
 			dt = dt[5:]
 		if '\n' in dt:
 			dt = dt.split('\n')[0]
-		tmp = webnotes.conn.sql("""SELECT name FROM `tab%s` WHERE name = '%s' """ % (dt, dn))
+		tmp = self.webnotes.conn.sql("""SELECT name FROM `tab%s` WHERE name = '%s' """ % (dt, dn))
 		return tmp and tmp[0][0] or ''# match case
 	
 	def update_values(self, issingle, link_list, ignore_fields=0):
@@ -251,18 +253,18 @@ class Document:
 					if self.fields[f]==None:
 						update_str.append("`%s`=NULL" % f)
 						if ignore_fields:
-							try: r = webnotes.conn.sql("update `tab%s` set `%s`=NULL where name=%s" % (self.doctype, f, '%s'), self.name)
+							try: r = self.webnotes.conn.sql("update `tab%s` set `%s`=NULL where name=%s" % (self.doctype, f, '%s'), self.name)
 							except: pass
 					else:
 						values.append(self.fields[f])
 						update_str.append("`%s`=%s" % (f, '%s'))
 						if ignore_fields:
-							try: r = webnotes.conn.sql("update `tab%s` set `%s`=%s where name=%s" % (self.doctype, f, '%s', '%s'), (self.fields[f], self.name))
+							try: r = self.webnotes.conn.sql("update `tab%s` set `%s`=%s where name=%s" % (self.doctype, f, '%s', '%s'), (self.fields[f], self.name))
 							except: pass
 			if values:
 				if not ignore_fields:
 					# update all in one query
-					r = webnotes.conn.sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
+					r = self.webnotes.conn.sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
 
 	# Save values
 	# -----------
@@ -363,21 +365,21 @@ def make_autoname(key, doctype=''):
 # -----------------------
 
 def getseries(key, digits, doctype=''):
-	ttl = webnotes.conn.get_testing_tables()
+	ttl = self.webnotes.conn.get_testing_tables()
 
 	# series created ?
-	if webnotes.conn.sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
+	if self.webnotes.conn.sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
 
 		# yes, update it
-		webnotes.conn.sql("update tabSeries set current = current+1 where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		self.webnotes.conn.sql("update tabSeries set current = current+1 where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
 
 		# find the series counter
-		r = webnotes.conn.sql("select current from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		r = self.webnotes.conn.sql("select current from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
 		n = r[0][0]
 	else:
 	
 		# no, create it
-		webnotes.conn.sql("insert into tabSeries (name, current) values ('%s', 1)" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		self.webnotes.conn.sql("insert into tabSeries (name, current) values ('%s', 1)" % key, allow_testing = (doctype in ttl) and 0 or 1)
 		n = 1
 	return ('%0'+str(digits)+'d') % n
 
@@ -395,8 +397,8 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 	if parenttype: 
 		tmp = ' and parenttype="%s" ' % parenttype
 
-	dataset = webnotes.conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
-	desc = webnotes.conn.get_description()
+	dataset = self.webnotes.conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
+	desc = self.webnotes.conn.get_description()
 
 	l = []
 	
@@ -412,7 +414,7 @@ def check_perm(doc):
 	import webnotes
 	
 	# find roles with read access for this record at 0
-	rl = webnotes.conn.sql("select role, `match` from tabDocPerm where parent=%s and ifnull(`read`,0) = 1 and ifnull(permlevel,0)=0", doc.doctype)
+	rl = self.webnotes.conn.sql("select role, `match` from tabDocPerm where parent=%s and ifnull(`read`,0) = 1 and ifnull(permlevel,0)=0", doc.doctype)
 	
 	# check if roles match
 	if webnotes.user:
