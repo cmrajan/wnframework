@@ -680,7 +680,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 				}
 
 				// no values? atleast add key
-				if(!v.length) add_to_filter(t.df.fieldname, "", 1); 
+				if(!v.length) add_to_filter(t.df.fieldname, "", 1);
 			} else add_to_filter(t.df.fieldname, v);
 			
 			// if filter is not disabled

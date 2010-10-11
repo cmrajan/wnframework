@@ -15,7 +15,7 @@ function AutoSuggest(id, param) {
 	
 	// defaults	
 	var k, def = {
-		minchars:1, meth:"get", varname:"input", className:"autosuggest", timeout:2000
+		minchars:1, meth:"get", varname:"input", className:"autosuggest", timeout:4000
 		,delay:1000, offsety:-5, shownoresults: true, noresults: "No results!", maxheight: 250
 		,cache: false, maxentries: 25, fixed_options: false, xdelta: 0, ydelta: 5
 	}
@@ -159,7 +159,7 @@ AutoSuggest.prototype.find_nearest = function (key) {
 		}
 	}
 
-	this.clear_timer = window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()', 500);
+	this.clear_timer = window.setTimeout('if(cur_autosug)cur_autosug.clear_user_inp()', 3000);
 	
 	// begin at the top
 	for(var i = 0; i<st; i++) {

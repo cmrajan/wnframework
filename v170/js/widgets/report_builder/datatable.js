@@ -234,7 +234,10 @@ _r.DataTable.prototype.update_query = function(no_limit) {
   	
   	// no sorting if custom_query or get_query
   } else {
-	  this.query += NEWLINE 
+	if(!sel_val(this.sort_sel)) {
+		this.sort_sel.selectedIndex = 0; // select the first value (IE)
+	}
+	this.query += NEWLINE 
              + ' ORDER BY ' + sel_val(this.sort_sel)
              + ' ' + this.sort_order;
   }
