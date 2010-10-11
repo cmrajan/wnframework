@@ -30,87 +30,87 @@
 import re
 
 class Performance:
-  """Performance is the base class for determining the performance
-     according to some criterion (e.g., time, executed instruction,
-     etc.) of a Java execution.
-  """
-  # regular expression that check if an error occured during a run
-  # as well as the regex for the runtime in startup mode
-  re_exception  = re.compile("[Ee]xception")
-  re_error      = re.compile("Error")
-  re_deadlock   = re.compile("deadlock")
-  re_terminated = re.compile("terminated by") 
-  re_non_zero   = re.compile("non_zero_status")
-  re_stack      = re.compile("-- Stack --")
-  re_failed     = re.compile("FAILED")
-  re_not_valid  = re.compile("NOT VALID")
-
-  def acquire_command(self, commmand):
-    pass
-
-  def get_performance_data(self, trace_filename):
-    pass
-
-  def sweep_line_for_error(self, line):
-    """The sweep_line_for_error function will try to find selected regular 
-       expressions in the line that indicate an error or unexpected situation
-       occurred during the execution. If that is the case, the experiment
-       should be discarded.
+    """Performance is the base class for determining the performance
+        according to some criterion (e.g., time, executed instruction,
+        etc.) of a Java execution.
     """
-    if self.re_exception.search(line):
-      return True
-    if self.re_error.search(line):
-      return True
-    if self.re_deadlock.search(line):
-      return True
-    if self.re_terminated.search(line):
-      return True
-    if self.re_non_zero.search(line):
-      return True
-    if self.re_stack.search(line):
-      return True
-    if self.re_failed.search(line):
-      return True
-    if self.re_not_valid.search(line):
-      return True
+    # regular expression that check if an error occured during a run
+    # as well as the regex for the runtime in startup mode
+    re_exception  = re.compile("[Ee]xception")
+    re_error      = re.compile("Error")
+    re_deadlock   = re.compile("deadlock")
+    re_terminated = re.compile("terminated by") 
+    re_non_zero   = re.compile("non_zero_status")
+    re_stack      = re.compile("-- Stack --")
+    re_failed     = re.compile("FAILED")
+    re_not_valid  = re.compile("NOT VALID")
+
+    def acquire_command(self, commmand):
+        pass
+
+    def get_performance_data(self, trace_filename):
+        pass
+
+    def sweep_line_for_error(self, line):
+        """The sweep_line_for_error function will try to find selected regular 
+            expressions in the line that indicate an error or unexpected situation
+            occurred during the execution. If that is the case, the experiment
+            should be discarded.
+        """
+        if self.re_exception.search(line):
+            return True
+        if self.re_error.search(line):
+            return True
+        if self.re_deadlock.search(line):
+            return True
+        if self.re_terminated.search(line):
+            return True
+        if self.re_non_zero.search(line):
+            return True
+        if self.re_stack.search(line):
+            return True
+        if self.re_failed.search(line):
+            return True
+        if self.re_not_valid.search(line):
+            return True
   
-    return False
+        return False
 
 
 class TimePerformance(Performance):
   
-  re_realtime  = re.compile("^real")
+    re_realtime  = re.compile("^real")
 
-  def acquire_command(self, java_command):
-    return "/usr/bin/time -p %s"%(java_command)
+    def acquire_command(self, command):
+        return "/usr/bin/time -p %s"%(command)
 
-  def get_performance_data(self, trace_filename):
+    def get_performance_data(self, trace_filename):
 
-    f = file(trace_filename, 'r')
-    for line in f.readlines():
-      if self.sweep_line_for_error(line):
-        return None
-      if self.re_realtime.search(line):
-        return float(line.strip().split(" ")[-1])
+        f = file(trace_filename, 'r')
+        for line in f.readlines():
+            if self.sweep_line_for_error(line):
+                return None
+            if self.re_realtime.search(line):
+                return float(line.strip().split(" ")[-1])
 
 
 class PerfexPerformance(Performance):
-  re_perfctr_cycles       = re.compile("^event 0x00430076")
+    re_perfctr_cycles       = re.compile("^event 0x00430076")
 
-  def acquire_command(self, java_command):
-    return "/home/ageorges/bin/perfex -e 0x00430076 %s"%(java_command)
+    def acquire_command(self, java_command):
+        return "/home/ageorges/bin/perfex -e 0x00430076 %s"%(java_command)
 
-  def get_performance_data(self, trace_filename):
-    instruction = 0
-    cycles = 0
-    f = file(trace_filename, 'r')
-    for line in f.readlines():
-      if self.sweep_line_for_error(line):
-        return None
-      if self.re_perfctr_cycles.search(line):
-        cycles = float(line.strip().split(" ")[-1])
+    def get_performance_data(self, trace_filename):
+        instruction = 0
+        cycles = 0
+        f = file(trace_filename, 'r')
+        for line in f.readlines():
+            if self.sweep_line_for_error(line):
+                return None
+            if self.re_perfctr_cycles.search(line):
+                cycles = float(line.strip().split(" ")[-1])
 
-    return cycles
+        return cycles
 
 
 
