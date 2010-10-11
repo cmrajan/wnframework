@@ -12,6 +12,7 @@ res = webnotes.conn.sql("select name,module from tabDocType")
 module_res = webnotes.conn.sql("select name,doctype_list from `tabModule Def`")
 
 
+
 if not os.path.isdir(os.path.join(par_dir,'modules')):
     os.mkdir(os.path.join(par_dir,'modules'))
 
@@ -39,6 +40,7 @@ for each in res:
     server_res = webnotes.conn.sql("select server_code_core from tabDocType where `name` ='%s'" %each[0])
     
     client_res = webnotes.conn.sql("select client_script_core from tabDocType where name = '%s'" %each[0])
+    print each
     if server_res: 
         if each[1]: 
             py_file = open(os.path.join(par_dir,'modules',each[1],each[0],each[0]+'.py'),'w+')
@@ -46,40 +48,47 @@ for each in res:
         else:
             py_file = open(os.path.join(par_dir,'modules',each[0],str(each[0])+'.py'),'w+')
 
-            schema_file = open(os.path.join(par_dir,'modules',each[0],each[0]+'.schema'),'w+')
+            schema_file = open(os.path.join(par_dir,'modules',each[0],each[0]+'.csv'),'w+')
         
          
-        PP = pprint.PrettyPrinter(stream = schema_file)
+#        PP = pprint.PrettyPrinter(stream = schema_file)
         temp_doc = webnotes.model.doc.get("DocType",each[0]) 
         doc_count = 0
+        pop_keys = ['server_code','server_code_compiled','server_code_core','server_code_error','client_script','client_script_core']
         for each_doc in temp_doc:
             temp_fields = each_doc.fields 
             try:
-                temp_fields.pop('server_code')
-                temp_fields.pop('server_code_compiled')
-                temp_fields.pop('server_code_core')
-                temp_fields.pop('server_code_error')
+                for each in pop_keys:
+                    if temp_fields.has_key(each):
+                        temp_fields.pop(each)
             except:
                 continue
             finally:
-				if DEBUG:
-	                PP.pprint('No of Documents:%d'%len(temp_doc))
-    	            PP.pprint('Document No:%d'%doc_count)
-                PP.pprint(temp_fields)
-                PP.pprint('\n')
-                PP.pprint('_______________________________________________________')
-                doc_count += 1 
+#                PP.pprint(temp_fields) # PPrint is hard to read back from the file.going for csv instead.
+#                PP.pprint('\n')
+#                PP.pprint('_______________________________________________________')
+#                doc_count += 1 
+                
+#                schema_csv = csv.DictWriter(schema_file,temp_fields.keys())
+#                schema_csv.writerow(temp_fields)
+                schema_file.write(str(temp_fields))
+                schema_file.write("\n")
         
         
         py_file.write(str(server_res[0][0]))
         py_file.close()
         schema_file.close()
 
-    if client_res:
-        if each[1] and each[0]:
+    if client_res[0][0]:
+        #print client_res,each
+        print each,len(each)
+        if each[1] and each[0] and len(each) == 2:
+            #print each
             js_file = open(os.path.join(par_dir,'modules',each[1],each[0],each[0]+'.js'),'w+')
-        else:
+            js_file.write(str(client_res[0][0]))
+            js_file.close()
+        elif len(each) == 2:
             js_file = open(os.path.join(par_dir,'modules',each[0],str(each[0])+'.js'),'w+')
-        js_file.write(str(client_res[0][0]))
-        js_file.close()
+            js_file.write(str(client_res[0][0]))
+            js_file.close()
     
