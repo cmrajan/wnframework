@@ -3,11 +3,15 @@ import os
 import webnotes.db
 import pprint
 import webnotes.model.doc
+import json
 DEBUG = False
 
+JSE = json.JSONEncoder()
+JSD = json.JSONDecoder()
 
 par_dir = '/home/anand/workspace/wnframework/'  # Hardcoding because don't want to create it anywhere else.
 webnotes.conn = webnotes.db.Database(use_default = 1)
+webnotes.conn.use('s3u001')
 res = webnotes.conn.sql("select name,module from tabDocType")
 module_res = webnotes.conn.sql("select name,doctype_list from `tabModule Def`")
 
@@ -49,9 +53,7 @@ for each in res:
             py_file = open(os.path.join(par_dir,'modules',each[0],str(each[0])+'.py'),'w+')
 
             schema_file = open(os.path.join(par_dir,'modules',each[0],each[0]+'.csv'),'w+')
-        
-         
-#        PP = pprint.PrettyPrinter(stream = schema_file)
+#        schema_file.write("[")        
         temp_doc = webnotes.model.doc.get("DocType",each[0]) 
         doc_count = 0
         pop_keys = ['server_code','server_code_compiled','server_code_core','server_code_error','client_script','client_script_core']
@@ -64,26 +66,18 @@ for each in res:
             except:
                 continue
             finally:
-#                PP.pprint(temp_fields) # PPrint is hard to read back from the file.going for csv instead.
-#                PP.pprint('\n')
-#                PP.pprint('_______________________________________________________')
-#                doc_count += 1 
-                
-#                schema_csv = csv.DictWriter(schema_file,temp_fields.keys())
-#                schema_csv.writerow(temp_fields)
-                schema_file.write(str(temp_fields))
+                print "writing schema file"
+                schema_file.write(JSE.encode(temp_fields))
                 schema_file.write("\n")
-        
+#                schema_file.write("]")
         
         py_file.write(str(server_res[0][0]))
         py_file.close()
         schema_file.close()
 
     if client_res[0][0]:
-        #print client_res,each
         print each,len(each)
         if each[1] and each[0] and len(each) == 2:
-            #print each
             js_file = open(os.path.join(par_dir,'modules',each[1],each[0],each[0]+'.js'),'w+')
             js_file.write(str(client_res[0][0]))
             js_file.close()
