@@ -157,6 +157,7 @@ function Body() {
 		}
 		// show
 		me.cur_page = me.pages[label];
+		me.cur_page_label = label;
 		$(me.cur_page).fadeIn();
 	
 		// on show

@@ -608,7 +608,10 @@ _f.Frm.prototype.refresh = function(docname) {
 		if(this.docname != docname && !this.meta.in_dialog && !this.meta.istable) scroll(0, 0);
 		this.docname = docname;
 	}
-	if(!this.meta.istable) cur_frm = this;
+	if(!this.meta.istable) {
+		cur_frm = this;
+		this.parent.cur_frm = this;
+	}
 			
 	if(this.docname) { // document to show
 

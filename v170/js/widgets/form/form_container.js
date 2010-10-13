@@ -72,6 +72,11 @@ _f.FrmDialog = function() {
 		// if called from grid, refresh the row
 		if(_f.cur_grid)
 			_f.cur_grid.refresh_row(_f.cur_grid_ridx, me.dn);
+		
+		// set the new global cur_frm (if applicable)
+		if(page_body.cur_page_label = 'Forms') {
+			cur_frm = _f.frm_con.cur_frm;
+		}
 	}
 	this.dialog = d;
 }
