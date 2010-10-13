@@ -264,7 +264,9 @@ class CSVImport:
 						elif d[i] and f in link_list: fd[f] = self.check_select_link_data(row, col, f, d[i], l='Link')
 						
 						# Check Select Fields
-						elif d[i] and f in select_list: fd[f] = self.check_select_link_data(row, col, f, d[i], s= 'Select')
+						elif d[i] and f in select_list: 
+							if f!='naming_series':
+								fd[f] = self.check_select_link_data(row, col, f, d[i], s= 'Select')
 												
 						# Need To Perform Check For Other Data Type Too	
 						else:	fd[f] = d[i]
