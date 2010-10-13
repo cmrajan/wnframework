@@ -1,11 +1,15 @@
+code_fields_dict = {
+	'Page':[('script','js'), ('content','html'), ('style','css'),('static_content','html')]
+	,'DocType':[('server_code_core','py'), ('client_script_core','js')]
+	,'Search Criteria':[('report_script','js'), ('server_script','py'), ('custom_query','sql')]
+}
+
 # accept a module coming from a remote server
 # ==============================================================================
 def accept_module(super_doclist):
 	import webnotes
 	import webnotes.utils
 	
-	form = webnotes.form
-	cint = webnotes.utils.cint
 	msg, i = [], 0
 
 	for dl in super_doclist:
@@ -21,7 +25,6 @@ def accept_module(super_doclist):
 	# clear cache
 	webnotes.conn.sql("DELETE from __DocTypeCache")
 	webnotes.conn.sql("COMMIT")
-
 
 	return msg
 
@@ -51,14 +54,19 @@ def get_module_items(mod):
 	dl = [[e[0].strip(), e[1].strip()] for e in dl] # remove blanks
 	return dl
 
+
 # build a list of doclists of items in that module and send them
 # ==============================================================================
 
 def get_module():
+	if not module:
+		module = webnotes.form.getvalue('module')
+	webnotes.response['super_doclist'] = get_module_doclist(doclist)
+
+def get_module_doclist(module):
 	import webnotes
 	import webnotes.model.doc
 	
-	module = webnotes.form.getvalue('module')
 	item_list = get_module_items(module)
 	
 	# build the super_doclist
@@ -72,9 +80,164 @@ def get_module():
 			
 		# add to super
 		super_doclist.append([d.fields for d in dl])
-		
-	webnotes.response['super_doclist'] = super_doclist
+	
+	return super_doclist
 
+# export to files
+# ==============================================================================
+
+def export_to_files(module, record_list=()):	
+	# get the items
+	if record_list:
+		import webnotes.model.doc
+		module_doclist = []
+		for record in record_list:
+			module_doclist.append(webnotes.model.doc.get(record[0], record[1]))
+	else:
+		module_doclist = get_module_doclist(module)
+	
+	# write files
+	for doclist in module_doclist:
+		write_document_file(doclist, module)
+
+# ==============================================================================
+
+def create_folder(path):
+	import os
+	
+	try:
+		os.makedirs(path)
+	except Exception, e:
+		if e.args[0]==17: 
+			pass
+		else: 
+			raise e
+		
+# ==============================================================================
+
+def write_document_file(doclist, module):
+	import os
+	import webnotes
+	
+	try:
+		import json
+	except: # python 2.4
+		import simplejson as json
+	
+	# create the folder
+	folder = os.path.join(webnotes.get_index_path(), 'modules', module, doclist[0]['doctype'], doclist[0]['name'])
+	create_folder(folder)
+
+	# separate code files
+	separate_code_files(doclist, folder)
+	
+	# write the data file
+	txtfile = open(os.path.join(folder, doclist[0]['name']+'.txt'),'w+')
+	txtfile.write(str(doclist))
+	txtfile.close()
+
+# ==============================================================================
+
+def separate_code_files(doclist, folder):
+	import os
+
+	# code will be in the parent only
+	code_fields = code_fields_dict.get(doclist[0]['doctype'], [])
+	
+	for code_field in code_fields:
+		if doclist[0].get(code_field[0]):
+			fname = doclist[0]['name']
+			
+			# 2 htmls
+			if code_field[0]=='static_content':
+				fname+=' Static'
+			
+			# write the file
+			codefile = open(os.path.join(folder, fname+'.'+code_field[1]),'w+')
+			codefile.write(doclist[0][code_field[0]])
+			codefile.close()
+		
+			# clear it from the doclist
+			doclist[0][code_field[0]] = None
+
+# ==============================================================================
+
+def import_from_files(module, record_list=[]):
+	import os
+	import webnotes
+
+	module_doclist = []
+
+	# get the folder list
+	if record_list:
+		folder_list=[]
+		for record in record_list:
+			folder_list.append(os.path.join(webnotes.get_index_path(), module, record[0], record[1]))
+			
+	else:
+		folder_list = get_module_folders(module)
+
+	# build into doclist
+	for folder in folder_list:
+		# get the doclist
+		doclist = eval(open(os.path.join(folder, os.path.basename(folder)+'.txt'),'r').read())
+
+		# add code
+		add_code_from_files(doclist, folder)
+		
+		# add to the module "super" doclist
+		module_doclist.append(doclist)
+		
+	accept_module(module_doclist)
+	
+
+# ==============================================================================
+
+def add_code_from_files(doclist, folder):
+
+	# code will be in the parent only
+	code_fields = code_fields_dict.get(doclist[0]['doctype'], [])
+	
+	for code_field in code_fields:
+		# see if the file exists
+		
+		fname = os.path.join(folder, os.path.basename(folder)+code_field[1])
+		if code_field[0]=='static_content':
+			fname += ' Static'
+		
+		try:
+			code = open(fname,'r').read()
+		except Exception, e:
+			if e.args[0]==2:
+				pass
+			else:
+				raise e
+		
+		doclist[0][code_field[0]] = code
+		
+	
+# ==============================================================================
+
+def get_module_folders(module):
+	import os
+	import webnotes
+
+	doc_folder_list = []
+
+	# get all the types
+	type_dir_list = os.listdir(os.path.join(webnotes.get_index_path(), 'modules', module))
+	
+	for type_dir in type_dir_list:
+		if os.path.isdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir)):
+			
+			# get all items of this type
+			item_dir_list = os.listdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir))
+			
+			for item_dir in item_dir_list:
+				if os.path.isdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir)):
+					doc_folder_list.append(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir))
+					
+	return doc_folder_list
 
 # Import a record (with its chilren)
 # ==============================================================================
@@ -111,13 +274,13 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 				#		return getattr(tc, tc.override_transfer.get(doc.doctype))(doclist, ovr, ignore, onupdate)
 			
 				if doc.doctype == 'DocType':
-					return ovr_doctype(doclist, ovr, ignore, onupdate) 
+					return merge_doctype(doclist, ovr, ignore, onupdate) 
 
 				if doc.doctype == 'DocType Mapper':
-					return ovr_mapper(doclist, ovr, ignore, onupdate)
+					return merge_mapper(doclist, ovr, ignore, onupdate)
 
 				if doc.doctype == 'Module Def':
-					return ovr_module_def(doclist, ovr, ignore, onupdate)
+					return merge_module_def(doclist, ovr, ignore, onupdate)
 					
 			# check modified timestamp
 			# ------------------------
@@ -181,7 +344,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 # Transfer DocType
 # ==============================================================================
 
-def ovr_doctype(doc_list, ovr, ignore, onupdate):
+def merge_doctype(doc_list, ovr, ignore, onupdate):
 	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
@@ -279,7 +442,7 @@ def ovr_doctype(doc_list, ovr, ignore, onupdate):
 # Transfer Mapper
 # ==============================================================================
 
-def ovr_mapper(doc_list, ovr, ignore, onupdate):
+def merge_mapper(doc_list, ovr, ignore, onupdate):
 	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
@@ -402,7 +565,7 @@ def ovr_mapper(doc_list, ovr, ignore, onupdate):
 
 # Transfer Module Def
 # ============================================================
-def ovr_module_def(doc_list, ovr, ignore, onupdate):
+def merge_module_def(doc_list, ovr, ignore, onupdate):
 	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
