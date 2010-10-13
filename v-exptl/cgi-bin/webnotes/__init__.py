@@ -1,7 +1,17 @@
 # webnotes init (all shared variables come here)
+import logging
+import time
+import logging.handlers
+
+webnotes_logger = logging.getLogger('WNLogger')
+
+webnotes_logger.setLevel(logging.DEBUG)
+
+wnlog_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxByetes=30000,backupCount = 5)
+wnlog_handler.addHandler(wnlog_handler)
 
 version = 'v170'
-
+LOG_FILENAME = 'log/'+time
 auth_obj = None
 conn = None
 form = None
