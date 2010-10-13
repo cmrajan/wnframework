@@ -33,7 +33,10 @@ def execute(code, doc=None, doclist=[]):
 	# if doc
 	# -----------------
 	if doc:
-		d = DocType(doc, doclist)
+		if locals.has_key('DocList'):
+			d = DocType(doc, doclist)
+		else:
+			d = DocType(locals.get(doc.doctype.replace(' ',''))(doc, doclist))
 		return d
 		
 	if locals().get('page_html'):
