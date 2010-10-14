@@ -13,7 +13,8 @@ function Field() {	}
 
 Field.prototype.make_body = function() { 
 	var ischk = (this.df.fieldtype=='Check' ? 1 : 0);
-		
+	
+	// parent element
 	if(this.parent)
 		this.wrapper = $a(this.parent, 'div');
 	else
@@ -257,9 +258,8 @@ Field.prototype.run_trigger = function() {
 	if(this.df.reqd && !is_null(this.get_value()))
 		this.set_as_error(0);
 
-	//if(this.df.trigger=='Client') { - No longer mandatory
-	cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
-	//}
+	if(cur_frm.cscript[me.df.fieldname])
+		cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
 
 	cur_frm.refresh_dependency();
 	this.refresh_label_icon();
@@ -1083,6 +1083,7 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 	}
 	if(frm)
 		f.frm = frm;
+	if(f.init) f.init();
 	f.make_body();
 	return f;
 }

@@ -107,8 +107,18 @@ function $a_input(p, in_type, attributes, cs) {
 	return o;
 }
 
-function $dh(d) { if(d && d.substr)d=$i(d); if(d && d.style.display.toLowerCase() != 'none') d.style.display = 'none'; }
-function $ds(d) { if(d && d.substr)d=$i(d); if(d && d.style.display.toLowerCase() != 'block') d.style.display = 'block'; }
+function $dh(d) { 
+	if(d && d.substr)d=$i(d); 
+	if(d && d.style.display.toLowerCase() != 'none') d.style.display = 'none'; 
+}
+function $ds(d) { 
+	if(d && d.substr)d=$i(d); 
+	var t = 'block';
+	if(in_list(['span','img','button'], d.tagName.toLowerCase())) 
+		t = 'inline'
+	if(d && d.style.display.toLowerCase() != t) 
+	d.style.display = t; 
+}
 function $di(d) { if(d && d.substr)d=$i(d); if(d)d.style.display = 'inline'; }
 function $i(id) { 
 	if(!id) return null; 

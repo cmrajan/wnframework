@@ -128,8 +128,8 @@ me.set_section(me.cur_section[me.docname]);}}
 _f.Frm.prototype.refresh_footer=function(){if(this.editable&&!this.meta.in_dialog&&this.doc.docstatus==0&&!this.meta.istable&&this.get_doc_perms()[WRITE])
 $ds(this.footer);else
 $dh(this.footer);}
-_f.Frm.prototype.refresh_fields=function(){var me=this;for(fkey in me.fields){var f=me.fields[fkey];f.perm=me.perm;f.docname=me.docname;if(f.refresh)f.refresh();}
-me.cleanup_refresh(me);}
+_f.Frm.prototype.refresh_fields=function(){for(var i=0;i<this.fields.length;i++){var f=this.fields[i];f.perm=this.perm;f.docname=this.docname;if(f.refresh)f.refresh();}
+this.cleanup_refresh(this);}
 _f.Frm.prototype.cleanup_refresh=function(){var me=this;if(me.fields_dict['amended_from']){if(me.doc.amended_from){unhide_field('amended_from');unhide_field('amendment_date');}else{hide_field('amended_from');hide_field('amendment_date');}}
 if(me.fields_dict['trash_reason']){if(me.doc.trash_reason&&me.doc.docstatus==2){unhide_field('trash_reason');}else{hide_field('trash_reason');}}
 if(me.meta.autoname&&me.meta.autoname.substr(0,6)=='field:'&&!me.doc.__islocal){var fn=me.meta.autoname.substr(6);set_field_permlevel(fn,1);}}
@@ -210,7 +210,7 @@ _f.SectionBreak.prototype.make_simple_section=function(with_header,collapsible){
 if(with_header){if(collapsible){if(this.df.label){this.make_collapsible(head);}else if(!has_col){$y(head,{margin:'8px',borderBottom:'1px solid #AAA'});}}else{this.label=$a(head,'div','sectionHeading',{margin:'0px',padding:'8px',backgroundColor:'#EEE'});this.label.innerHTML=this.df.label?this.df.label:'';}}
 if(this.df.description){var d=$a(head,'div','',{margin:'0px',padding:'4px',backgroundColor:(with_header?'#EEE':''),color:'#444',fontSize:'14px'});if(with_header)$y(d,{paddingTop:'0px'});if(this.df.description.length>240){$($a(d,'div','comment')).html(replace_newlines(this.df.description.substr(0,240))+'...');$($a(d,'div','link_type',{fontSize:'11px'})).html('more').click(function(){msgprint(me.df.description)});}else{$($a(d,'div')).html(replace_newlines(this.df.description));}}}
 _f.cur_sec_header=null;_f.SectionBreak.prototype.make_body=function(){if((!this.perm[this.df.permlevel])||(!this.perm[this.df.permlevel][READ])||this.df.hidden){return;}
-var me=this;if(this.frm.meta.section_style=='Tabbed'){if(this.df.options!='Simple'){this.make_row();this.sec_id=this.frm.sections.length;this.frm.sections[this.sec_id]=this;this.frm.sections_by_label[me.df.label]=this;this.mytab=this.frm.tabs.add_tab(me.df.label,function(){me.frm.set_section(me.sec_id);});this.show=function(){this.row.show();me.mytab.set_selected();if(me.df.label&&me.df.trigger=='Client'&&(!me.in_filter))
+var me=this;if(this.frm.meta.section_style=='Tabbed'){if(this.df.options!='Simple'){this.make_row();this.sec_id=this.frm.sections.length;this.frm.sections[this.sec_id]=this;this.frm.sections_by_label[me.df.label]=this;this.mytab=this.frm.tabs.add_tab(me.df.label,function(){me.frm.set_section(me.sec_id);});this.show=function(){this.row.show();me.mytab.set_selected();if(me.df.label&&cur_frm.cscript[me.df.label]&&(!me.in_filter))
 cur_frm.runclientscript(me.df.label,me.doctype,me.docname);}
 this.hide=function(){me.row.hide();me.mytab.hide();}
 this.make_row();this.make_simple_section(0,0);if(!isIE)this.hide();}else{this.row=this.frm.layout.addsubrow();this.make_simple_section(1,1);}}else if(this.frm.meta.section_style=='Tray'){if(this.df.options!='Simple'){this.sec_id=this.frm.sections.length;this.frm.sections[this.sec_id]=this;this.frm.sections_by_label[me.df.label]=this;var w=$a(this.frm.tray_area,'div');this.header=$a(w,'div','',{padding:'4px 8px',cursor:'pointer'});this.header.innerHTML=me.df.label;this.header.onclick=function(){me.frm.set_section(me.sec_id);}
@@ -219,7 +219,7 @@ this.header.show=function(){$ds(me.header);}
 this.header.onmouseover=function(){if(_f.cur_sec_header!=this){$y(this,{backgroundColor:'#DDD'});}}
 this.header.onmouseout=function(){if(_f.cur_sec_header!=this){$y(this,{backgroundColor:'#FFF'});}}
 this.hide=function(){this.row.hide();$y(this.header,{backgroundColor:'#FFF',fontWeight:'normal',color:'#000'});}
-this.show=function(){this.row.show();$y(this.header,{backgroundColor:'#AAA',fontWeight:'bold',color:'#FFF'});_f.cur_sec_header=this.header;if(me.df.label&&me.df.trigger=='Client'&&(!me.in_filter))
+this.show=function(){this.row.show();$y(this.header,{backgroundColor:'#AAA',fontWeight:'bold',color:'#FFF'});_f.cur_sec_header=this.header;if(me.df.label&&cur_frm.cscript[me.df.label]&&(!me.in_filter))
 cur_frm.runclientscript(me.df.label,me.doctype,me.docname);}
 this.make_row();this.make_simple_section(1,0);if(!isIE)this.hide();}else{this.row=this.frm.layout.addsubrow();this.make_simple_section(1,1);}}else if(this.df){this.row=this.frm.layout.addrow();this.make_simple_section(1,1);}}
 _f.SectionBreak.prototype.refresh=function(layout){var fn=this.df.fieldname?this.df.fieldname:this.df.label;if(fn)
@@ -236,7 +236,10 @@ for(var dn in this.images)if(dn!=this.docname)$dh(this.images[dn]);var doc=local
 $w(img,allow_width+'px');}else{$ds(this.no_img);}}
 _f.ImageField.prototype.set_disp=function(val){}
 _f.ImageField.prototype.set=function(val){}
-_f.ButtonField=function(){};_f.ButtonField.prototype=new Field();_f.ButtonField.prototype.make_input=function(){var me=this;$y(this.input_area,{height:'30px',marginTop:'4px',marginBottom:'4px'});this.input=$a(this.input_area,'button');this.input.innerHTML=me.df.label;this.input.onclick=function(){this.disabled=true;if(me.df.trigger=='Client'&&(!me.in_filter)){cur_frm.runclientscript(me.df.label,me.doctype,me.docname);this.disabled=false;}else
+_f.ButtonField=function(){};_f.ButtonField.prototype=new Field();_f.ButtonField.prototype.init=function(){this.prev_button=null;if(cur_frm&&cur_frm.fields[cur_frm.fields.length-1].df.fieldtype=='Button'){this.make_body=function(){this.prev_button=cur_frm.fields[cur_frm.fields.length-1];if(!this.prev_button.prev_button){this.prev_button.button_area=$a(this.prev_button.input_area,'span');}
+this.wrapper=$a(this.prev_button.input_area,'span');this.input_area=$a(this.wrapper,'span');this.disp_area=$a(this.wrapper,'span');this.button_area=$a(this.input_area,'span');}}}
+_f.ButtonField.prototype.make_input=function(){var me=this;if(!this.prev_button){$y(this.input_area,{height:'30px',marginTop:'4px',marginBottom:'4px'});}
+if(!this.button_area)this.button_area=$a(this.input_area,'span');this.input=$a(this.button_area,'button','',{width:'160px'});if(this.prev_button)$y(this.input,{marginLeft:'8px'});this.input.innerHTML=me.df.label.substr(0,16)+((me.df.label.length>15)?'..':'');this.input.onclick=function(){this.disabled=true;if(cur_frm.cscript[me.df.label]&&(!me.in_filter)){cur_frm.runclientscript(me.df.label,me.doctype,me.docname);this.disabled=false;}else
 cur_frm.runscript(me.df.options,me);}
 $(this.input).button({icons:{primary:'ui-icon-circle-triangle-e'}});}
 _f.ButtonField.prototype.set=function(v){};_f.ButtonField.prototype.set_disp=function(val){}

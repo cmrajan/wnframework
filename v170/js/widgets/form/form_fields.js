@@ -160,7 +160,7 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.show = function() { 
 				this.row.show(); me.mytab.set_selected();
 				
-				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
+				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
 			
@@ -205,7 +205,7 @@ _f.SectionBreak.prototype.make_body = function() {
 				$y(this.header, { backgroundColor:'#AAA', fontWeight:'bold', color:'#FFF'} );
 				
 				_f.cur_sec_header = this.header;
-				if(me.df.label && me.df.trigger=='Client' && (!me.in_filter))
+				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
 	
@@ -319,16 +319,40 @@ _f.ImageField.prototype.set = function (val) { }
 
 _f.ButtonField = function() { };
 _f.ButtonField.prototype = new Field();
+_f.ButtonField.prototype.init = function() {
+	this.prev_button = null;
+	// if previous field is a button, add it to the same div!
+	if(cur_frm && cur_frm.fields[cur_frm.fields.length-1].df.fieldtype=='Button') {
+		this.make_body = function() {
+			this.prev_button = cur_frm.fields[cur_frm.fields.length-1];
+			if(!this.prev_button.prev_button) {
+				// first button, make the button area
+				this.prev_button.button_area = $a(this.prev_button.input_area, 'span');
+			}
+			this.wrapper = $a(this.prev_button.input_area, 'span');
+			this.input_area = $a(this.wrapper, 'span');
+			this.disp_area = $a(this.wrapper, 'span');
+			this.button_area = $a(this.input_area, 'span');
+		}
+	}
+}
 _f.ButtonField.prototype.make_input = function() { var me = this;
+	if(!this.prev_button) {
+		$y(this.input_area,{height:'30px', marginTop:'4px', marginBottom: '4px'});
+	}
 
-	//this.input_area.className = 'buttons';
-	$y(this.input_area,{height:'30px', marginTop:'4px', marginBottom: '4px'});
+	// make a button area for one button
+	if(!this.button_area) this.button_area = $a(this.input_area, 'span');
+	
+	// make the input
+	this.input = $a(this.button_area, 'button', '', {width:'160px'});
 
-	this.input = $a(this.input_area, 'button');
-	this.input.innerHTML = me.df.label;
+	if(this.prev_button) $y(this.input,{marginLeft:'8px'});
+	
+	this.input.innerHTML = me.df.label.substr(0,16) + ((me.df.label.length>15) ? '..' : '');
 	this.input.onclick = function() {
 		this.disabled = true;
-		if(me.df.trigger=='Client' && (!me.in_filter)) {
+		if(cur_frm.cscript[me.df.label] && (!me.in_filter)) {			
 			cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			this.disabled = false;
 		} else

@@ -711,17 +711,16 @@ _f.Frm.prototype.refresh_footer = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_fields = function() {
-	var me = this;
 	// set fields
-	for(fkey in me.fields) {
-		var f = me.fields[fkey];
-		f.perm = me.perm;
-		f.docname = me.docname;
+	for(var i=0; i<this.fields.length; i++) {
+		var f = this.fields[i];
+		f.perm = this.perm;
+		f.docname = this.docname;
 		if(f.refresh)f.refresh();
 	}
 
 	// cleanup activities after refresh
-	me.cleanup_refresh(me);
+	this.cleanup_refresh(this);
 }
 
 // --------------------------------------------------------------------------------------
