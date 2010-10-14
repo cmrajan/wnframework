@@ -925,7 +925,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 			$ds(me.saved_wrapper);
 			me.saved_wrapper.innerHTML = 
 				'<div style="padding: 150px 16px; text-align: center; font-size: 14px;">' 
-				+ (cur_frm.message_after_save ? cur_frm.message_after_save : 'Your ' + cur_frm.doctype + ' has been sent. Thank you!') 
+				+ (cur_frm.message_after_save ? cur_frm.message_after_save : 'Your information has been sent. Thank you!') 
 				+ '</div>';
 			return; // no refresh
 		}

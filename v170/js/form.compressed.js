@@ -154,7 +154,7 @@ if(save_action=='Cancel'){var reason=prompt('Reason for cancellation (mandatory)
 locals[this.doctype][this.docname].cancel_reason=reason;locals[this.doctype][this.docname].cancelled_on=dateutil.full_str();locals[this.doctype][this.docname].cancelled_by=user;}else{validated=true;validation_message='';this.runclientscript('validate',this.doctype,this.docname);if(!validated){if(validation_message)
 msgprint('Validation Error: '+validation_message);this.savingflag=false;return'Error';}}
 var ret_fn=function(r){if(user=='Guest'&&!r.exc){$dh(me.form_wrapper);$ds(me.saved_wrapper);me.saved_wrapper.innerHTML='<div style="padding: 150px 16px; text-align: center; font-size: 14px;">'
-+(cur_frm.message_after_save?cur_frm.message_after_save:'Your '+cur_frm.doctype+' has been sent. Thank you!')
++(cur_frm.message_after_save?cur_frm.message_after_save:'Your information has been sent. Thank you!')
 +'</div>';return;}
 if(!me.meta.istable)
 me.refresh();if(call_back){if(call_back=='home'){loadpage('_home');return;}
