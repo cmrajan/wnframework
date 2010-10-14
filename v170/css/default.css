@@ -1833,7 +1833,7 @@ height:0.7em;
 .custom_tooltip {
 	display: none;
 	position: absolute;
-	z-index : 999;
+	z-index : 9999;
 	
 	text-align:center;
 	background-color: #444;
@@ -1872,7 +1872,7 @@ height:0.7em;
 
 .tip_body {
   background-color:#ffd;
-  z-index = -1;
+  z-index : -1;
   border:0px solid #444;
   color:#000;
   padding:4px 6px;
