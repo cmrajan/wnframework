@@ -49,7 +49,6 @@ class Document:
 	# -------------
 
 	def loadfromdb(self, doctype = None, name = None):
-		print doctype,name
 
 		if name: self.name = name
 		if doctype: self.doctype = doctype
