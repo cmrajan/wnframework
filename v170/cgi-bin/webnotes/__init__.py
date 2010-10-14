@@ -41,6 +41,17 @@ def get_index_path():
 	import os
 	return os.sep.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:-2])
 
+def create_folder(path):
+	import os
+	
+	try:
+		os.makedirs(path)
+	except Exception, e:
+		if e.args[0]==17: 
+			pass
+		else: 
+			raise e
+
 def set_as_admin():
 	import os
 	if is_apache_user():

@@ -97,19 +97,6 @@ def export_to_files(module, record_list=()):
 
 # ==============================================================================
 
-def create_folder(path):
-	import os
-	
-	try:
-		os.makedirs(path)
-	except Exception, e:
-		if e.args[0]==17: 
-			pass
-		else: 
-			raise e
-		
-# ==============================================================================
-
 def write_document_file(doclist, module):
 	import os
 	import webnotes
@@ -131,14 +118,16 @@ def write_document_file(doclist, module):
 
 def separate_code_files(doclist, folder):
 	import os
-
+	import webnotes
 	# code will be in the parent only
-	code_fields = code_fields_dict.get(doclist[0]['doctype'], [])
+	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
 	
 	for code_field in code_fields:
 		if doclist[0].get(code_field[0]):
 			fname = doclist[0]['name']
-			
+#			fname.replace('/','-')  #Weirdly, doesn't work..using a hack instead.
+			temp = fname.rsplit('/')
+			fname = '-'.join(temp)
 			# 2 htmls
 			if code_field[0]=='static_content':
 				fname+=' Static'
@@ -156,7 +145,10 @@ def separate_code_files(doclist, folder):
 def import_from_files(module, record_list=[]):
 	import os
 	import webnotes
+	import fnmatch
 
+
+	doclist = []
 	module_doclist = []
 
 	# get the folder list
@@ -166,13 +158,18 @@ def import_from_files(module, record_list=[]):
 			folder_list.append(os.path.join(webnotes.get_index_path(), module, record[0], record[1]))
 			
 	else:
-		folder_list = get_module_folders(module)
+#		folder_list = get_module_folders(module)
+		get_lowest_file_path(os.path.join(webnotes.get_index_path(),'modules',module))
+		folder_list = low_folder_list
 
 	# build into doclist
 	for folder in folder_list:
 		# get the doclist
-		doclist = eval(open(os.path.join(folder, os.path.basename(folder)+'.txt'),'r').read())
-
+#		doclist = eval(open(os.path.join(folder, os.path.basename(folder)+'.txt'),'r').read())	
+		file_list = os.listdir(folder)
+		for each in file_list:
+			if fnmatch.fnmatch(each,'*.txt'):
+				doclist = eval(open(os.path.join(folder,each),'r').read())
 		# add code
 		add_code_from_files(doclist, folder)
 		
@@ -185,10 +182,11 @@ def import_from_files(module, record_list=[]):
 # ==============================================================================
 
 def add_code_from_files(doclist, folder):
-
+	import webnotes
+	import os
 	# code will be in the parent only
-	code_fields = code_fields_dict.get(doclist[0]['doctype'], [])
-	
+	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
+	code = ''	
 	for code_field in code_fields:
 		# see if the file exists
 		
@@ -226,9 +224,31 @@ def get_module_folders(module):
 			
 			for item_dir in item_dir_list:
 				if os.path.isdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir)):
-					doc_folder_list.append(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir))
+#					if item_dir != 'SRCH': #Hacky for the time being.	
+						doc_folder_list.append(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir))
 					
 	return doc_folder_list
+
+# =============================================================================
+
+low_folder_list = []
+# Get the deepmost folder with files in the given path tree....
+def get_lowest_file_path(path):
+	import os
+	global	low_folder_list 
+	folderlist = os.listdir(path)
+	for each in folderlist:
+		temp = os.path.join(path,each)
+
+		if os.path.isdir(temp):
+#			print temp	
+			get_lowest_file_path(temp)
+		else:
+	#		print "folder",os.path.dirname(temp)
+			low_folder_list.append(os.path.dirname(temp))
+	return low_folder_list
+
+
 
 # Import a record (with its chilren)
 # ==============================================================================
@@ -248,8 +268,6 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1, allow_transfer_control=1):
 	orig_modified = doc.modified
 
 	exists = webnotes.conn.exists(doc.doctype, doc.name)
-
-	print doc.name
 
 	if not webnotes.conn.in_transaction: 
 		sql("START TRANSACTION")
