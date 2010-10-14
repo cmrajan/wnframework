@@ -87,7 +87,7 @@ def export_to_files(module, record_list=()):
 		import webnotes.model.doc
 		module_doclist = []
 		for record in record_list:
-			module_doclist.append(webnotes.model.doc.get(record[0], record[1]))
+			module_doclist.append([d.fields for d in webnotes.model.doc.get(record[0], record[1])])
 	else:
 		module_doclist = get_module_doclist(module)
 	
@@ -114,10 +114,6 @@ def write_document_file(doclist, module):
 	import os
 	import webnotes
 	import re	
-	try:
-		import json
-	except: # python 2.4
-		import simplejson as json
 	
 	# create the folder
 	folder = os.path.join(webnotes.get_index_path(), 'modules', module, doclist[0]['doctype'], doclist[0]['name'])
