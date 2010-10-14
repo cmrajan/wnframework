@@ -1,8 +1,3 @@
-code_fields_dict = {
-	'Page':[('script','js'), ('content','html'), ('style','css'),('static_content','html')]
-	,'DocType':[('server_code_core','py'), ('client_script_core','js')]
-	,'Search Criteria':[('report_script','js'), ('server_script','py'), ('custom_query','sql')]
-}
 
 # accept a module coming from a remote server
 # ==============================================================================
@@ -118,7 +113,7 @@ def create_folder(path):
 def write_document_file(doclist, module):
 	import os
 	import webnotes
-	
+	import re	
 	try:
 		import json
 	except: # python 2.4
@@ -126,7 +121,7 @@ def write_document_file(doclist, module):
 	
 	# create the folder
 	folder = os.path.join(webnotes.get_index_path(), 'modules', module, doclist[0]['doctype'], doclist[0]['name'])
-	create_folder(folder)
+       	create_folder(folder)
 
 	# separate code files
 	separate_code_files(doclist, folder)
