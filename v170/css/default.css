@@ -1833,6 +1833,7 @@ height:0.7em;
 .custom_tooltip {
 	display: none;
 	position: absolute;
+	z-index : 999;
 	
 	text-align:center;
 	background-color: #444;
