@@ -125,7 +125,7 @@ var o=p.childNodes[0];}else{var o=$a(p,'input');for(key in attributes)
 o.setAttribute(key,attributes[key]);}
 if(cs)$y(o,cs);return o;}
 function $dh(d){if(d&&d.substr)d=$i(d);if(d&&d.style.display.toLowerCase()!='none')d.style.display='none';}
-function $ds(d){if(d&&d.substr)d=$i(d);var t='block';if(in_list(['span','img','button'],d.tagName.toLowerCase()))
+function $ds(d){if(d&&d.substr)d=$i(d);var t='block';if(d&&in_list(['span','img','button'],d.tagName.toLowerCase()))
 t='inline'
 if(d&&d.style.display.toLowerCase()!=t)
 d.style.display=t;}

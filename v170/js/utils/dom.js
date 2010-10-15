@@ -114,10 +114,10 @@ function $dh(d) {
 function $ds(d) { 
 	if(d && d.substr)d=$i(d); 
 	var t = 'block';
-	if(in_list(['span','img','button'], d.tagName.toLowerCase())) 
+	if(d && in_list(['span','img','button'], d.tagName.toLowerCase())) 
 		t = 'inline'
 	if(d && d.style.display.toLowerCase() != t) 
-	d.style.display = t; 
+		d.style.display = t; 
 }
 function $di(d) { if(d && d.substr)d=$i(d); if(d)d.style.display = 'inline'; }
 function $i(id) { 
