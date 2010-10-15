@@ -311,7 +311,7 @@ remove_space_holder = function(){
 // set user image
 var user_img = {}
 
-set_user_img = function(img,username, get_latest) {
+set_user_img = function(img, username, get_latest) {
 
 	function set_it() {
 		if(user_img[username]=='no_img_m')
