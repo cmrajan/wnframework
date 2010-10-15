@@ -322,7 +322,9 @@ _f.ButtonField.prototype = new Field();
 _f.ButtonField.prototype.init = function() {
 	this.prev_button = null;
 	// if previous field is a button, add it to the same div!
-	if(cur_frm && cur_frm.fields[cur_frm.fields.length-1].df.fieldtype=='Button') {
+	if(cur_frm && 
+		cur_frm.fields[cur_frm.fields.length-1] &&
+			cur_frm.fields[cur_frm.fields.length-1].df.fieldtype=='Button') {
 		this.make_body = function() {
 			this.prev_button = cur_frm.fields[cur_frm.fields.length-1];
 			if(!this.prev_button.prev_button) {
