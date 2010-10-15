@@ -261,7 +261,9 @@ class CSVImport:
 						if d[i] and f and f in date_list : fd[f] = self.parse_date(row, col, d[i])
 	
 						# Check Link Fields
-						elif d[i] and f in link_list: fd[f] = self.check_select_link_data(row, col, f, d[i], l='Link')
+						elif d[i] and f in link_list: 
+							if f!='naming_series':
+								fd[f] = self.check_select_link_data(row, col, f, d[i], l='Link')
 						
 						# Check Select Fields
 						elif d[i] and f in select_list: 
