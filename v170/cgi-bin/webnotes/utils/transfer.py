@@ -82,14 +82,15 @@ def get_module_doclist(module):
 # ==============================================================================
 
 def export_to_files(module, record_list=()):	
+	module_doclist =[]
 	# get the items
 	if record_list:
 		import webnotes.model.doc
-		module_doclist = []
 		for record in record_list:
 			module_doclist.append([d.fields for d in webnotes.model.doc.get(record[0], record[1])])
 	else:
-		module_doclist = get_module_doclist(module)
+		for d in module:
+			module_doclist +=get_module_doclist(d)
 	
 	# write files
 	for doclist in module_doclist:
@@ -103,14 +104,14 @@ def write_document_file(doclist, module):
 	import re	
 	
 	# create the folder
-	folder = os.path.join(webnotes.get_index_path(), 'modules', module, doclist[0]['doctype'], doclist[0]['name'])
-       	create_folder(folder)
+	folder = os.path.join(webnotes.get_index_path(), 'modules', module, doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
+	webnotes.create_folder(folder)
 
 	# separate code files
 	separate_code_files(doclist, folder)
 	
 	# write the data file
-	txtfile = open(os.path.join(folder, doclist[0]['name']+'.txt'),'w+')
+	txtfile = open(os.path.join(folder, doclist[0]['name'].replace('/', '-')+'.txt'),'w+')
 	txtfile.write(str(doclist))
 	txtfile.close()
 
