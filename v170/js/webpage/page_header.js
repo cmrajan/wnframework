@@ -44,18 +44,31 @@ function PageHeader(parent, main_text, sub_text) {
 
 	if(main_text) this.main_head.innerHTML = main_text;
 	if(sub_text) this.sub_head.innerHTML = sub_text;
+	
+	this.buttons = {};
 }
 
 PageHeader.prototype.add_button = function(label, fn, bold, icon, green) {
+	
+	// make the button
 	if(green)
 		var btn = $a($a(this.toolbar_area, 'span', 'green_buttons'),'button','',{fontSize:'11px'});
 	else
 		var btn = $a(this.toolbar_area,'button','',{fontSize:'11px'});
-	btn.innerHTML = label; 
+
+	// text and function
 	btn.onclick = fn;
+
+	// style
 	if(bold)$y(btn, {fontWeight: 'bold'});
-	$(btn).button({icons:{ primary: icon }});
+	$(btn).button({icons:{ primary: icon }, label:label});
+
+	// show toolbar
 	this.show_toolbar();
+		
+	// add to dict
+	this.buttons[label]=btn;
+
 	return btn;
 }
 

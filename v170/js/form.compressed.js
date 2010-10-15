@@ -15,7 +15,8 @@ loadpage('_home');return;}
 if(r.print_access){if(!_f.temp_access[doctype])
 _f.temp_access[doctype]={};_f.temp_access[doctype][opt_name]=1;}
 var meta=locals['DocType'][doctype];var in_dialog=false;if(meta.istable)meta.in_dialog=1;if(cint(meta.in_dialog)){var parent=_f.frm_dialog;in_dialog=true;}else{var parent=_f.frm_con;}
-var f=new _f.Frm(doctype,parent);f.in_dialog=in_dialog;if(onload)onload(r,rt);}
+var f=new _f.Frm(doctype,parent);f.in_dialog=in_dialog;if(r.no_of_comments)
+f.no_of_comments=r.no_of_comments;if(onload)onload(r,rt);}
 var is_new=0;if(opt_name&&locals[doctype]&&locals[doctype][opt_name]&&locals[doctype][opt_name].__islocal){is_new=1;}
 if(opt_name&&!is_new){var args={'name':opt_name,'doctype':doctype,'getdoctype':1,'user':user};if(get_url_arg('akey'))args['akey']=get_url_arg('akey');$c('webnotes.widgets.form.getdoc',args,callback);}else{$c('webnotes.widgets.form.getdoctype',args={'doctype':doctype},callback);}}
 _f.FrmHeader=function(parent){var me=this;this.bg_color='#FFF';this.wrapper=$a(parent,'div');this.page_head=new PageHeader(this.wrapper);}
@@ -33,10 +34,12 @@ this.page_head.add_button('Refresh',function(){cur_frm.reload_doc();},0,'ui-icon
 this.page_head.add_button('Print',function(){cur_frm.print_doc();},0,'ui-icon-print');if(!cur_frm.meta.allow_email)
 this.page_head.add_button('Email',function(){cur_frm.email_doc();},0,'ui-icon-mail-closed');if(in_list(profile.can_create,cur_frm.doctype)&&!cur_frm.meta.allow_copy)
 this.page_head.add_button('Copy',function(){cur_frm.copy_doc();},0,'ui-icon-copy');if(cur_frm.meta.allow_trash&&cint(cur_frm.doc.docstatus)!=2&&(!cur_frm.doc.__islocal)&&p[CANCEL])
-this.page_head.add_button('Trash',function(){cur_frm.savetrash()},0,'ui-icon-trash');}
+this.page_head.add_button('Trash',function(){cur_frm.savetrash()},0,'ui-icon-trash');this.comment_btn=this.page_head.add_button('Comments',function(){cur_frm.show_comments();},0,'ui-icon-comment');}
 _f.FrmHeader.prototype.show_toolbar=function(){$ds(this.wrapper);this.refresh();}
 _f.FrmHeader.prototype.hide_toolbar=function(){$dh(this.wrapper);}
-_f.FrmHeader.prototype.refresh_toolbar=function(){var m=cur_frm.meta;if(m.hide_heading){this.hide();}else{this.show();if(m.hide_toolbar){this.hide_toolbar();}else{this.show_toolbar();}}}
+_f.FrmHeader.prototype.refresh_toolbar=function(){var m=cur_frm.meta;if(m.hide_heading){this.hide();}else{this.show();if(m.hide_toolbar){this.hide_toolbar();}else{this.show_toolbar();}}
+this.refresh_comments();}
+_f.FrmHeader.prototype.refresh_comments=function(){if(!cur_frm.no_of_comments)cur_frm.no_of_comments=0;$(this.comment_btn).button('option','label','Comments ('+cur_frm.no_of_comments+')');}
 _f.FrmHeader.prototype.get_timestamp=function(doc){var scrub_date=function(d){if(d)t=d.split(' ');else return'';return dateutil.str_to_user(t[0])+' '+t[1];}
 return repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s</span>",{c_by:doc.owner,c_on:scrub_date(doc.creation?doc.creation:''),m_by:doc.modified_by?('/ Modified: '+doc.modified_by):'',m_on:doc.modified?('on '+scrub_date(doc.modified)):''});}
 _f.FrmHeader.prototype.get_status_tags=function(doc,f){var make_tag=function(label,col){var s=$a(null,'span','',{padding:'2px',backgroundColor:col,color:'#FFF',fontWeight:'bold',marginLeft:(f.meta.issingle?'0px':'8px'),fontSize:'11px'});s.innerHTML=label;return s;}
@@ -192,6 +195,8 @@ _f.set_value=function(dt,dn,fn,v){var d=locals[dt][dn];if(!d)
 msgprint('error:Trying to set a value for "'+dt+','+dn+'" which is not found');if(d[fn]!=v){d[fn]=v;d.__unsaved=1;var frm=frms[d.doctype];try{if(d.parent&&d.parenttype){locals[d.parenttype][d.parent].__unsaved=1;frm=frms[d.parenttype];}}catch(e){if(d.parent&&d.parenttype)
 errprint('Setting __unsaved error:'+d.name+','+d.parent+','+d.parenttype);}
 if(frm&&frm==cur_frm){frm.set_heading();}}}
+_f.Frm.prototype.show_comments=function(){if(!cur_frm.comments){cur_frm.comments=new Dialog(540,400,'Comments');cur_frm.comments.comment_body=$a(cur_frm.comments.body,'div','dialog_frm');$y(cur_frm.comments.body,{backgroundColor:'#EEE'});cur_frm.comments.list=new CommentList(cur_frm.comments.comment_body);}
+cur_frm.comments.list.dt=cur_frm.doctype;cur_frm.comments.list.dn=cur_frm.docname;cur_frm.comments.show();cur_frm.comments.list.run();}
 _f.ColumnBreak=function(){this.set_input=function(){};}
 _f.ColumnBreak.prototype.make_body=function(){if((!this.perm[this.df.permlevel])||(!this.perm[this.df.permlevel][READ])||this.df.hidden){return;}
 this.cell=this.frm.layout.addcell(this.df.width);$y(this.cell.wrapper,{padding:'8px'});_f.cur_col_break_width=this.df.width;var fn=this.df.fieldname?this.df.fieldname:this.df.label;if(this.df&&this.df.label){this.label=$a(this.cell.wrapper,'div','columnHeading');this.label.innerHTML=this.df.label;}}
@@ -465,3 +470,19 @@ if(cur_frm){if(n.substr)_hide_field(n,1);else{for(var i in n)_hide_field(n[i],1)
 unhide_field=function(n){function _hide_field(n,hidden){var df=get_field(cur_frm.doctype,n,cur_frm.docname);if(df)df.hidden=hidden;refresh_field(n);}
 if(cur_frm){if(n.substr)_hide_field(n,0);else{for(var i in n)_hide_field(n[i],0)}}}
 get_field_obj=function(fn){return cur_frm.fields_dict[fn];}
+CommentList=function(parent,dt,dn){this.input_area=$a(parent,'div','',{margin:'2px'});this.lst_area=$a(parent,'div','',{margin:'2px'});this.make_input();this.make_lst();this.dt;this.dn;}
+CommentList.prototype.run=function(){this.lst.run();}
+CommentList.prototype.make_input=function(){var me=this;this.input=$a(this.input_area,'textarea','',{height:'60px',width:'300px',fontSize:'14px'});this.btn=$a($a(this.input_area,'div','',{marginTop:'8px'}),'button')
+$(this.btn).html('Post').click(function(){me.add_comment();}).button();}
+CommentList.prototype.add_comment=function(){var me=this;var args={};args.comment=this.input.value;args.comment_by=user;args.comment_doctype=this.dt;args.comment_docname=this.dn;$c_obj('Widget Control','add_comment',docstring(args),function(r,rt){me.lst.run();me.input.value='';cur_frm.no_of_comments+=1;cur_frm.frm_head.refresh_comments();});}
+CommentList.prototype.make_lst=function(){if(!this.lst){var l=new Listing('Comments',1);var me=this;l.colwidths=['100%'];l.opts.hide_export=1;l.opts.hide_print=1;l.opts.hide_refresh=1;l.opts.no_border=1;l.opts.hide_rec_label=0;l.opts.show_calc=0;l.opts.round_corners=0;l.opts.alt_cell_style={};l.opts.cell_style={padding:'3px'};l.no_rec_message='No comments yet. Be the first one to comment!';l.get_query=function(){this.query=repl("select t1.name, t1.comment, t1.comment_by, t1.comment_to, t1.creation, t1.comment_doctype, t1.comment_docname, ifnull(concat_ws(' ',ifnull(t2.first_name,''),ifnull(t2.middle_name,''),ifnull(t2.last_name,'')),''), '', DAYOFMONTH(t1.creation), MONTHNAME(t1.creation), YEAR(t1.creation), hour(t1.creation), minute(t1.creation), second(t1.creation) from `tabComment Widget Record` t1, `tabProfile` t2 where t1.comment_doctype = '%(dt)s' and t1.comment_docname = '%(dn)s' and t1.comment_by = t2.name order by t1.creation desc",{dt:me.dt,dn:me.dn});this.query_max=repl("select count(name) from `tabComment Widget Record` where comment_doctype='%(dt)s' and comment_docname='%(dn)s'",{'dt':me.dt,'dn':me.dn});}
+l.show_cell=function(cell,ri,ci,d){new CommentItem(cell,ri,ci,d,me)}
+this.lst=l;this.lst.make(this.lst_area);}}
+CommentItem=function(cell,ri,ci,d,comment){this.comment=comment;$y(cell,{borderBottom:'1px solid #AAA',padding:'4px 0px'})
+var t=make_table(cell,1,3,'100%',['15%','65%','20%'],{padding:'4px'});this.img=$a($td(t,0,0),'img','',{width:'40px'});this.cmt_by=$a($td(t,0,0),'div');this.set_picture(d,ri);this.cmt_dtl=$a($td(t,0,1),'div','comment',{fontSize:'11px'});this.cmt=$a($td(t,0,1),'div','',{fontSize:'14px'});this.show_cmt($td(t,0,1),ri,ci,d);this.cmt_delete($td(t,0,2),ri,ci,d);}
+CommentItem.prototype.set_picture=function(d,ri){set_user_img(this.img,user)
+this.cmt_by.innerHTML=d[ri][7]?d[ri][7]:d[ri][2];}
+CommentItem.prototype.show_cmt=function(cell,ri,ci,d){if(d[ri][4]){hr=d[ri][12];min=d[ri][13];sec=d[ri][14];if(parseInt(hr)>12){time=(parseInt(hr)-12)+':'+min+' PM'}
+else{time=hr+':'+min+' AM'}}
+this.cmt_dtl.innerHTML='On '+d[ri][10].substring(0,3)+' '+d[ri][9]+', '+d[ri][11]+' at '+time;this.cmt.innerHTML=replace_newlines(d[ri][1]);}
+CommentItem.prototype.cmt_delete=function(cell,ri,ci,d){var me=this;if(d[ri][2]==user||d[ri][3]==user){del=$a(cell,'div','wn-icon ic-trash',{cursor:'pointer'});del.cmt_id=d[ri][0];del.onclick=function(){$c_obj('Widget Control','remove_comment',this.cmt_id,function(r,rt){cur_frm.no_of_comments=cur_frm.no_of_comments-1;cur_frm.frm_head.refresh_comments();me.comment.lst.run();});}}}

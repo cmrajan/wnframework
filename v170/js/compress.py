@@ -53,6 +53,7 @@ in_files_form = [
 	,'widgets/form/email.js'
 	,'widgets/form/attachments.js'
 	,'widgets/form/clientscriptAPI.js'
+	,'widgets/form/form_comments.js'
 ]
 
 out_file_form = 'form.compressed.js';

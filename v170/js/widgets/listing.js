@@ -28,6 +28,7 @@ function Listing(head_text, no_index, no_loading) {
 	this.keyword = 'records';
 	this.no_index = no_index;
 	this.underline = 1;
+	this.no_rec_message = 'No Result';
 	
 	// interfaces
 	// show_cell(cell, cell_id, data) - override cell display
@@ -448,7 +449,7 @@ Listing.prototype.set_rec_label = function(total, cur_page_len) {
 	else if(total==null)
 		this.rec_label.innerHTML = ''
 	else if(total==0)
-		this.rec_label.innerHTML = 'No Result'
+		this.rec_label.innerHTML = this.no_rec_message;
 }
 
 Listing.prototype.run = function(from_page) {

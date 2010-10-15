@@ -6,16 +6,33 @@ def getdoc():
 	import webnotes
 	
 	form = webnotes.form
+	doctype, docname = form.getvalue('doctype'), form.getvalue('name')
+
+	if not (doctype and docname):
+		raise Exception, 'doctype and name required!'
 	
 	doclist = []
-	if form.getvalue('doctype'):
-		doclist = load_single_doc(form.getvalue('doctype'), form.getvalue('name'), (form.getvalue('user') or webnotes.session['user']))
-
+	doclist = load_single_doc(doctype, docname, (form.getvalue('user') or webnotes.session['user']))
+	
+	# get comments
+	webnotes.response['no_of_comments'] = get_comments(doctype, docname)
+	
 	if form.getvalue('getdoctype'):
 		import webnotes.model.doctype
-		doclist += webnotes.model.doctype.get(form.getvalue('doctype'))
+		doclist += webnotes.model.doctype.get(doctype)
 
 	webnotes.response['docs'] = doclist
+
+def get_comments(doctype, docname):
+	try:
+		return int(webnotes.conn.sql("select count(*) from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s", (doctype, docname))[0][0])
+	except Exception, e:
+		if e.args[0]==17:
+			# no table
+			return -1
+		else:
+			raise e
+	
 
 #===========================================================================================
 
@@ -407,6 +424,8 @@ def get_fields():
 #===========================================================================================
 def validate_link():
 	import webnotes
+	import webnotes.utils
+	
 	value, options, fetch = webnotes.form.getvalue('value'), webnotes.form.getvalue('options'), webnotes.form.getvalue('fetch')
 
 	# no options, don't validate
@@ -418,6 +437,6 @@ def validate_link():
 	
 		# get fetch values
 		if fetch:
-			webnotes.response['fetch_values'] = [c for c in webnotes.conn.sql("select %s from `tab%s` where name=%s" % (fetch, options, '%s'), value)[0]]
+			webnotes.response['fetch_values'] = [webnotes.utils.parse_val(c) for c in webnotes.conn.sql("select %s from `tab%s` where name=%s" % (fetch, options, '%s'), value)[0]]
 	
 		webnotes.response['message'] = 'Ok'

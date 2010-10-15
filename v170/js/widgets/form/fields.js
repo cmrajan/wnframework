@@ -29,8 +29,9 @@ Field.prototype.make_body = function() {
 		this.label_span = $a($td(t,0,0+ischk), 'span', '', {marginRight:'4px', fontSize:'11px'})
 	
 		// help icon
-		this.help_icon = $a($td(t,0,1+ischk),'div','wn-icon ic-question',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
-		//this.help_icon.src = 'images/icons/help.gif';
+		//this.help_icon = $a($td(t,0,1+ischk),'div','wn-icon ic-question',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
+		this.help_icon = $a($td(t,0,1+ischk),'img','',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
+		this.help_icon.src = 'images/icons/help.gif';
 	
 		// error icon
 		this.label_icon = $a($td(t,0,2+ischk),'img','',{marginRight:'4px'}); $dh(this.label_icon);
@@ -258,7 +259,7 @@ Field.prototype.run_trigger = function() {
 	if(this.df.reqd && !is_null(this.get_value()))
 		this.set_as_error(0);
 
-	if(cur_frm.cscript[me.df.fieldname])
+	if(cur_frm.cscript[this.df.fieldname])
 		cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
 
 	cur_frm.refresh_dependency();

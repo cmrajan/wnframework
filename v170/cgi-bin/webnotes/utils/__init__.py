@@ -192,6 +192,8 @@ def replace_newlines(s):
 	return s.replace("\n","<br>")
 
 def parse_val(v):
+	import datetime
+	
 	try: import decimal # for decimal Python 2.5 (?)
 	except: pass
 

@@ -109,6 +109,7 @@ _f.add_frm = function(doctype, onload, opt_name) {
 			_f.temp_access[doctype][opt_name] = 1;	
 		}
 		
+		
 		// show fullpage or in Dialog?
 		var meta = locals['DocType'][doctype];
 		var in_dialog = false;
@@ -126,6 +127,10 @@ _f.add_frm = function(doctype, onload, opt_name) {
 		// create the object
 		var f = new _f.Frm(doctype, parent);
 		f.in_dialog = in_dialog;
+
+		// set # of comments
+		if(r.no_of_comments)
+			f.no_of_comments = r.no_of_comments;
 
 		if(onload)onload(r,rt);
 	}
