@@ -271,7 +271,7 @@ class CSVImport:
 								fd[f] = self.check_select_link_data(row, col, f, d[i], s= 'Select')
 							else:
 								exists = sql("select name from `tabNaming Series Options` where doc_type = %s", (self.dt_list[0]))
-								if exists and cstr(exists[0][0]) and d[i] in cstr(exists[0][0]).split(NEWLINE):
+								if exists and cstr(exists[0][0]) and d[i] in cstr(exists[0][0]).split('\n'):
 									fd[f] = d[i]
 								else:
 									self.msg.append('<div style="color: RED">At Row %s and Column %s : => Data "%s" in field [Series] Not Found in Naming Series</div>\n' % (row, col, d[i]))
