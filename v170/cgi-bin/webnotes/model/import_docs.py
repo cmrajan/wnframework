@@ -270,7 +270,7 @@ class CSVImport:
 							if f!='naming_series':
 								fd[f] = self.check_select_link_data(row, col, f, d[i], s= 'Select')
 							else:
-								exists = sql("select name from `tabNaming Series Options` where doc_type = %s and series_options = %s", (dt_list[0], d[i]))
+								exists = sql("select name from `tabNaming Series Options` where doc_type = %s and series_options = %s", (self.dt_list[0], d[i]))
 								if exists and cstr(exists[0][0]):
 									fd[f] = d[i]
 								else:
