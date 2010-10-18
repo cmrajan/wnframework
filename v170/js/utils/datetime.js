@@ -6,6 +6,10 @@ function same_day(d1, d2) {
 var month_list = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var month_last = {1:31,2:28,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}
 var month_list_full = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+var week_list = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var week_list_full = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
 function int_to_str(i, len) {
 	i = ''+i;
 	if(i.length<len)for(c=0;c<(len-i.length);c++)i='0'+i;
@@ -167,4 +171,50 @@ function time_to_hhmm(hh,mm,am) {
 	}
 	return hh + ':' + mm;
 }
+
+// get date
+get_date = function(date){	// date string from server in 'yyyy-mm-dd' format
+
+	var dict = {};
 	
+	var d = date.split('-');
+	dt = new Date(d[0],d[1]-1,d[2]);
+	
+	var today = get_today();
+	if(date == today){
+		dict.date = 'Today';
+	}
+	else{
+		dict.date = dt.getDate();
+	}
+	
+	dict.day = week_list[dt.getDay()];	
+	dict.day_full = week_list_full[dt.getDay()];
+
+	dict.month = month_list[dt.getMonth()];
+	dict.month_full = month_list_full[dt.getMonth()];
+
+	var year = dt.getFullYear();
+	dict.year = cstr(year).substr(2, cstr(year).length);
+	dict.year_full = cstr(year);
+
+	return dict;
+}
+
+// get time
+get_time = function(time){
+	var t = time.split(':');
+	
+	var hr = t[0];
+	var m = t[1];
+	
+	if(hr>12){
+		hr = hr-12;
+		return hr + ':' + m + ' PM';
+	}
+	else{
+		if(hr == 12)	return hr + ':' + m + ' PM';
+		return hr + ':' + m + ' AM';
+	}
+}
+
