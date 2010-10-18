@@ -63,7 +63,7 @@ var isIE=(iePos!=-1);var isIE6=(isIE&&is_major<=6);var isIE7=(isIE&&is_minor>=7)
 if(ffversion>=3)var isFF3=1;else if(ffversion>=2)var isFF2=1;else if(ffversion>=1)var isFF1=1;}
 var isSafari=navigator.userAgent.indexOf('Safari')!=-1?1:0;var isChrome=navigator.userAgent.indexOf('Chrome')!=-1?1:0;function same_day(d1,d2){if(d1.getFullYear()==d2.getFullYear()&&d1.getMonth()==d2.getMonth()&&d1.getDate()==d2.getDate())return true;else return false;}
 var month_list=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var month_last={1:31,2:28,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}
-var month_list_full=['January','February','March','April','May','June','July','August','September','October','November','December'];function int_to_str(i,len){i=''+i;if(i.length<len)for(c=0;c<(len-i.length);c++)i='0'+i;return i}
+var month_list_full=['January','February','March','April','May','June','July','August','September','October','November','December'];var week_list=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];var week_list_full=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];function int_to_str(i,len){i=''+i;if(i.length<len)for(c=0;c<(len-i.length);c++)i='0'+i;return i}
 function DateFn(){this.str_to_obj=function(d){if(!d)return new Date();if(d.search('-')!=-1){var t=d.split('-');return new Date(t[0],t[1]-1,t[2]);}else if(d.search('/')!=-1){var t=d.split('/');return new Date(t[0],t[1]-1,t[2]);}else{return new Date();}}
 this.obj_to_str=function(d){return d.getFullYear()+'-'+int_to_str(d.getMonth()+1,2)+'-'+int_to_str(d.getDate(),2);}
 this.obj_to_user=function(d){return dateutil.str_to_user(dateutil.obj_to_str(d));}
@@ -98,6 +98,11 @@ if(t.length!=2){show_alert('[set_time] Incorect time format');return;}
 if(cint(t[0])==0)var ret=['12',t[1],'AM'];else if(cint(t[0])<12)var ret=[cint(t[0])+'',t[1],'AM'];else if(cint(t[0])==12)var ret=['12',t[1],'PM'];else var ret=[(cint(t[0])-12)+'',t[1],'PM'];return ret;}
 function time_to_hhmm(hh,mm,am){if(am=='AM'&&hh=='12'){hh='00';}else if(am=='PM'&&hh!='12'){hh=cint(hh)+12;}
 return hh+':'+mm;}
+get_date=function(date){var dict={};var d=date.split('-');dt=new Date(d[0],d[1]-1,d[2]);var today=get_today();if(date==today){dict.date='Today';}
+else{dict.date=dt.getDate();}
+dict.day=week_list[dt.getDay()];dict.day_full=week_list_full[dt.getDay()];dict.month=month_list[dt.getMonth()];dict.month_full=month_list_full[dt.getMonth()];var year=dt.getFullYear();dict.year=cstr(year).substr(2,cstr(year).length);dict.year_full=cstr(year);return dict;}
+get_time=function(time){var t=time.split(':');var hr=t[0];var m=t[1];if(hr>12){hr=hr-12;return hr+':'+m+' PM';}
+else{if(hr==12)return hr+':'+m+' PM';return hr+':'+m+' AM';}}
 function addEvent(ev,fn){if(isIE){document.attachEvent('on'+ev,function(){fn(window.event,window.event.srcElement);});}else{document.addEventListener(ev,function(e){fn(e,e.target);},true);}}
 function set_opacity(ele,ieop){var op=ieop/100;if(ele.filters){try{ele.filters.item("DXImageTransform.Microsoft.Alpha").opacity=ieop;}catch(e){ele.style.filter='progid:DXImageTransform.Microsoft.Alpha(opacity='+ieop+')';}}else{ele.style.opacity=op;}}
 function empty_select(s){if(s.custom_select){s.empty();return;}
@@ -1152,7 +1157,7 @@ Calendar.DayViewUnit.prototype=new Calendar.ViewUnit();Calendar.DayViewUnit.prot
 Calendar.WeekViewUnit=function(parent){this.default_class="cal_week_unit";this.init(parent);}
 Calendar.WeekViewUnit.prototype=new Calendar.ViewUnit();Calendar.WeekViewUnit.prototype.onrefresh=function(){if(this.el.length<3)this.body.style.height='30px';else this.body.style.height='';}
 CustomTooltip=function(parent,tip_content,cs){this.tip=$a(null,'div','custom_tooltip',cs);this.tip.innerHTML=tip_content;$(this.tip).appendTo('body');this.parent=parent;$y(this.parent,{position:'relative'});this.set_param();this.onhover();}
-CustomTooltip.prototype.set_param=function(){this.parent.tip=this.tip;this.parent.width=$(this.tip).outerWidth();this.parent.height=$(this.tip).outerHeight();this.parent.parent_height=$(this.parent).outerHeight();this.parent.parent_width=$(this.parent).outerWidth();$(this.tip).remove();}
+CustomTooltip.prototype.set_param=function(){this.parent.tip=this.tip;this.parent.width=$(this.tip).outerWidth();this.parent.height=$(this.tip).outerHeight();var pw=$(this.parent).outerWidth();this.parent.parent_width=pw?pw:16;var ph=$(this.parent).outerHeight();this.parent.parent_height=ph?ph:16;$(this.tip).remove();}
 CustomTooltip.prototype.onhover=function(){$(this.parent).hover(function(e){this.screen_width=$(window).width();this.screen_bottom=$(window).scrollTop()+$(window).height();this.offset=$(this).offset();$(this.tip).appendTo(this)
 $y(this.tip,{width:this.width+'px'})
 if(this.offset.left+this.parent_width+this.width>this.screen_width){this.left=-this.width;}
