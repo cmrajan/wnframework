@@ -22,10 +22,19 @@ CustomTooltip.prototype.set_param = function(){
 
 	this.parent.tip = this.tip;
 	
+	// tip width
 	this.parent.width = $(this.tip).outerWidth();
+
+	// tip height
 	this.parent.height = $(this.tip).outerHeight();
-	this.parent.parent_height = $(this.parent).outerHeight();
-	this.parent.parent_width = $(this.parent).outerWidth();
+	
+	// parent width
+	var pw = $(this.parent).outerWidth();
+	this.parent.parent_width = pw ? pw : 16;	// if parent width set before rendering(i.e. 0px)
+
+	// parent height
+	var ph = $(this.parent).outerHeight();
+	this.parent.parent_height = ph ? ph : 16;	// if parent height set before rendering(i.e. 0px)
 
 	// remove tip from body
 	$(this.tip).remove();
