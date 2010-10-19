@@ -181,12 +181,12 @@ _f.Frm.prototype.set_heading = function() {
 // ======================================================================================
 
 _f.Frm.prototype.set_section = function(sec_id) {
-	if(!this.sections[sec_id] || !this.sections[sec_id].show) 
+	if(!this.sections[sec_id] || !this.sections[sec_id].expand) 
 		return; // Simple type
 	
 	if(this.sections[this.cur_section[this.docname]])
-		this.sections[this.cur_section[this.docname]].hide();
-	this.sections[sec_id].show();
+		this.sections[this.cur_section[this.docname]].collapse();
+	this.sections[sec_id].expand();
 	this.cur_section[this.docname] = sec_id;
 }
 
@@ -687,7 +687,7 @@ _f.Frm.prototype.refresh_tabs = function() {
 	var me = this;
 	if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed') {
 		for(var i in me.sections) {
-			me.sections[i].hide();
+			me.sections[i].collapse();
 		}
 		
 		me.set_section(me.cur_section[me.docname]);

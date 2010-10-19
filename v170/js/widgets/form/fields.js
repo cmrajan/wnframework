@@ -3,7 +3,11 @@
 // Fields are divided into 2 types
 // 1. Standard fields are loaded with the libarary
 // 2. Special fields are loaded with form.compressed.js
-
+//
+//
+// + wrapper
+// 		+ input_area
+//		+ display_area
 // ======================================================================================
 
 var no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image'];
@@ -56,7 +60,7 @@ Field.prototype.make_body = function() {
 		if(this.label_area) $dh(this.label_area);
 	} else {
 		this.input_area.className = 'input_area';
-		$y(this.wrapper,{marginBottom:'8px'})
+		$y(this.wrapper,{marginBottom:'4px'})
 	}
 
 	if(this.onmake)this.onmake();
@@ -162,7 +166,11 @@ Field.prototype.refresh_display = function() {
 				this.set_comment();
 				if(this.onmake_input) this.onmake_input();
 			}
-			$ds(this.wrapper);
+			
+			if(this.show) this.show()
+			else { $ds(this.wrapper); }
+			
+			// input or content
 			if(this.input) { // if there, show it!
 				$ds(this.input_area);
 				$dh(this.disp_area);
@@ -171,13 +179,21 @@ Field.prototype.refresh_display = function() {
 				$dh(this.input_area);
 				$ds(this.disp_area);
 			}
-		} else if(this.disp_status=='Read') { // read
-			$ds(this.wrapper);
+		} else if(this.disp_status=='Read') { 
+			
+			// read
+			if(this.show) this.show()
+			else $ds(this.wrapper);
+
 			$dh(this.input_area);
 			$ds(this.disp_area);
 			this.set_comment();
-		} else { // None
-			$dh(this.wrapper);
+
+		} else { 
+			
+			// None - hide all
+			if(this.hide) this.hide();
+			else $dh(this.wrapper);
 		}
 		this.set_status = this.disp_status;
 	}

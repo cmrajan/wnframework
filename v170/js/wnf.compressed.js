@@ -604,7 +604,7 @@ this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div'
 this.help_icon=$a($td(t,0,1+ischk),'img','',{cursor:'pointer',marginRight:'4px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a($td(t,0,2+ischk),'img','',{marginRight:'4px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})
 $dh(this.label_area);}
 if(ischk&&!this.in_grid){this.input_area=$a($td(t,0,0),'div');this.disp_area=$a($td(t,0,0),'div');}else{this.input_area=$a(this.wrapper,'div');this.disp_area=$a(this.wrapper,'div');}
-if(this.in_grid){if(this.label_area)$dh(this.label_area);}else{this.input_area.className='input_area';$y(this.wrapper,{marginBottom:'8px'})}
+if(this.in_grid){if(this.label_area)$dh(this.label_area);}else{this.input_area.className='input_area';$y(this.wrapper,{marginBottom:'4px'})}
 if(this.onmake)this.onmake();}
 Field.prototype.set_label=function(){if(this.with_label&&this.label_area&&this.label!=this.df.label){this.label_span.innerHTML=this.df.label;this.label=this.df.label;}}
 Field.prototype.set_comment=function(){var me=this;if(this.df.description){if(this.help_icon){$ds(this.help_icon);this.help_icon.title=me.df.description;$(this.help_icon).tooltip();}}else{if(this.help_icon)$dh(this.help_icon);}}
@@ -617,7 +617,10 @@ return ret;}
 Field.prototype.refresh_mandatory=function(){if(this.not_in_form)return;if(this.label_area){if(this.df.reqd){this.label_area.style.color="#d22";if(this.txt)$y(this.txt,{backgroundColor:"#FFFED7"});else if(this.input)$y(this.input,{backgroundColor:"#FFFED7"});}else{this.label_area.style.color="#222";if(this.txt)$y(this.txt,{backgroundColor:"#FFF"});else if(this.input)$y(this.input,{backgroundColor:"#FFF"});}}
 this.set_reqd=this.df.reqd;}
 Field.prototype.refresh_display=function(){if(!this.set_status||this.set_status!=this.disp_status){if(this.disp_status=='Write'){if(this.make_input&&(!this.input)){this.make_input();this.set_comment();if(this.onmake_input)this.onmake_input();}
-$ds(this.wrapper);if(this.input){$ds(this.input_area);$dh(this.disp_area);if(this.input.refresh)this.input.refresh();}else{$dh(this.input_area);$ds(this.disp_area);}}else if(this.disp_status=='Read'){$ds(this.wrapper);$dh(this.input_area);$ds(this.disp_area);this.set_comment();}else{$dh(this.wrapper);}
+if(this.show)this.show()
+else{$ds(this.wrapper);}
+if(this.input){$ds(this.input_area);$dh(this.disp_area);if(this.input.refresh)this.input.refresh();}else{$dh(this.input_area);$ds(this.disp_area);}}else if(this.disp_status=='Read'){if(this.show)this.show()
+else $ds(this.wrapper);$dh(this.input_area);$ds(this.disp_area);this.set_comment();}else{if(this.hide)this.hide();else $dh(this.wrapper);}
 this.set_status=this.disp_status;}}
 Field.prototype.refresh=function(){this.disp_status=this.get_status();if(this.in_grid&&this.table_refresh&&this.disp_status=='Write')
 {this.table_refresh();return;}

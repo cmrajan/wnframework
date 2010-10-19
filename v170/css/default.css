@@ -895,8 +895,8 @@ div.ann_body {
 	border-collapse: collapse;
 }
 
-.datalabelcell { padding: 4px 0px; width: 160px; vertical-align: top; }
-.datainputcell { padding: 4px 0px; }
+.datalabelcell { padding: 2px 0px; width: 160px; vertical-align: top; }
+.datainputcell { padding: 2px 0px; }
 
 .input_area input { width: 80%; font-size: 14px; margin: 0px; border: 1px solid #888; padding: 1px;  }
 .input_area select { width: 80%; font-size: 14px; }

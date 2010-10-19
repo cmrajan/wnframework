@@ -56,7 +56,7 @@ _f.SectionBreak.prototype.make_row = function() {
 _f.SectionBreak.prototype.make_collapsible = function(head) {
 	var me = this;
 
-	var t = make_table($a(head,'div','',{backgroundColor:'#EEE', padding:'0px 8px'}), 1,2, '100%', [null, '60px'], {verticalAlign:'middle'});
+	var t = make_table($a(head,'div','',{backgroundColor:'#EEE', padding:'4px 8px'}), 1,2, '100%', [null, '60px'], {verticalAlign:'middle'});
 	$y(t,{borderCollapse:'collapse'});
 		
 	this.label = $a($td(t,0,0), 'div', 'sectionHeading');
@@ -74,15 +74,17 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	}
 	this.exp_icon.expand = function() { 
 		$ds(me.row.body) 
+		$ds(me.row.header.head.desc_area);
 		//me.exp_icon.src = min_icon; 
 		me.exp_icon.className = 'wn-icon ic-rnd_br_up';
 	}
 	this.exp_icon.collapse = function() { 
 		$dh(me.row.body) 
+		$dh(me.row.header.head.desc_area);
 		//me.exp_icon.src = exp_icon; 
 		me.exp_icon.className = 'wn-icon ic-rnd_br_down';
 	}
-	$y(head,{padding:'2px', borderBottom:'1px solid #ccc', margin:'8px'});
+	$y(head,{padding:'2px', margin:'8px'});
 		
 	// callable functions
 	this.collapse = this.exp_icon.collapse;
@@ -94,6 +96,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 
 _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsible) {
 	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '8px'});
+	this.row.header.head = head;
 	var me = this;
 
 	// colour
@@ -123,13 +126,12 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsibl
 
 	// description
 	if(this.df.description) {
-		var d = $a(head, 'div', '', {margin:'0px', padding:'4px', backgroundColor: (with_header ? '#EEE' : ''), color:'#444', fontSize:'14px'});
-		if(with_header)$y(d,{paddingTop:'0px'});
+		head.desc_area = $a(head, 'div', '', {margin:'0px', padding:'8px', color:'#222', fontSize:'12px'});
 		if(this.df.description.length > 240) {
-			$($a(d, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
-			$($a(d, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
+			$($a(head.desc_area, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
+			$($a(head.desc_area, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
 		} else {
-			$($a(d, 'div')).html(replace_newlines(this.df.description));
+			$($a(head.desc_area, 'div')).html(replace_newlines(this.df.description));
 		}
 	}
 }
@@ -157,21 +159,21 @@ _f.SectionBreak.prototype.make_body = function() {
 			
 			this.mytab = this.frm.tabs.add_tab(me.df.label, function() { me.frm.set_section(me.sec_id);});
 			
-			this.show = function() { 
+			this.expand = function() { 
 				this.row.show(); me.mytab.set_selected();
 				
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 			}
 			
-			this.hide = function() { 
-				me.row.hide(); me.mytab.hide(); 
+			this.collapse = function() { 
+				me.row.hide(); me.mytab.hide();
 			}
 
 			this.make_row();		
 			
 			this.make_simple_section(0, 0);
-			if(!isIE) this.hide();
+			if(!isIE) this.collapse();
 		} else {
 			this.row = this.frm.layout.addsubrow();
 			this.make_simple_section(1, 1);
@@ -196,11 +198,11 @@ _f.SectionBreak.prototype.make_body = function() {
 				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
 			}
 			
-			this.hide = function() { 
+			this.collapse = function() { 
 				this.row.hide();
 				$y(this.header, { backgroundColor:'#FFF', fontWeight:'normal', color:'#000'} );
 			}
-			this.show = function() { 
+			this.expand = function() { 
 				this.row.show(); 
 				$y(this.header, { backgroundColor:'#AAA', fontWeight:'bold', color:'#FFF'} );
 				
@@ -211,7 +213,7 @@ _f.SectionBreak.prototype.make_body = function() {
 	
 			this.make_row();
 			this.make_simple_section(1, 0);
-			if(!isIE)this.hide();
+			if(!isIE)this.collpase();
 		} else {
 			this.row = this.frm.layout.addsubrow();
 			this.make_simple_section(1, 1);
@@ -322,19 +324,30 @@ _f.ButtonField.prototype = new Field();
 _f.ButtonField.prototype.init = function() {
 	this.prev_button = null;
 	// if previous field is a button, add it to the same div!
+	
+	// button-set structure
+	// + wrapper (1st button)
+	// 		+ input_area
+	//			+ button_area
+	//			+ button_area
+	//			+ button_area
+	
 	if(cur_frm && 
 		cur_frm.fields[cur_frm.fields.length-1] &&
 			cur_frm.fields[cur_frm.fields.length-1].df.fieldtype=='Button') {
+				
 		this.make_body = function() {
 			this.prev_button = cur_frm.fields[cur_frm.fields.length-1];
 			if(!this.prev_button.prev_button) {
 				// first button, make the button area
 				this.prev_button.button_area = $a(this.prev_button.input_area, 'span');
 			}
-			this.wrapper = $a(this.prev_button.input_area, 'span');
-			this.input_area = $a(this.wrapper, 'span');
-			this.disp_area = $a(this.wrapper, 'span');
-			this.button_area = $a(this.input_area, 'span');
+			this.wrapper = this.prev_button.wrapper;
+			this.input_area = this.prev_button.input_area;
+			this.disp_area = this.prev_button.disp_area;
+			
+			// all buttons in the same input_area
+			this.button_area = $a(this.prev_button.input_area, 'span');
 		}
 	}
 }
@@ -349,7 +362,7 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	// make the input
 	this.input = $a(this.button_area, 'button', '', {width:'160px'});
 
-	if(this.prev_button) $y(this.input,{marginLeft:'8px'});
+	$y(this.input,{marginRight:'8px'});
 	
 	this.input.innerHTML = me.df.label.substr(0,16) + ((me.df.label.length>15) ? '..' : '');
 	this.input.onclick = function() {
@@ -363,6 +376,15 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	
 	$(this.input).button({icons:{ primary: 'ui-icon-circle-triangle-e' }});
 }
+_f.ButtonField.prototype.hide = function() { 
+	$dh(this.button_area);
+};
+
+_f.ButtonField.prototype.show = function() { 
+	$ds(this.button_area);
+};
+
+
 _f.ButtonField.prototype.set = function(v) { }; // No Setter
 _f.ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly
 
