@@ -27,7 +27,7 @@ def get_comments(doctype, docname):
 	try:
 		return int(webnotes.conn.sql("select count(*) from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s", (doctype, docname))[0][0])
 	except Exception, e:
-		if e.args[0]==17:
+		if e.args[0]==1146:
 			# no table
 			return -1
 		else:
