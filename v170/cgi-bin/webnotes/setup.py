@@ -280,6 +280,17 @@ def create_account(ac_name, ac_type='Framework'):
 	
 	return "%s,%s" % (ac_name, newdb)
 
+
+
+def create_log_folder():
+        import os
+        
+        os.mkdir(os.path.join(webnotes.get_index_path(),'log'))
+
+        webnotes.LOG_FILENAME = os.path.join(get_index_path(),'log','wnframework.log')
+        open(webnotes.LOG_FILENAME,'w+').close()
+
+
 # Installation
 # -------------------------------------------------------------
 
@@ -297,4 +308,7 @@ if __name__=='__main__':
 		
 		print "Setting up Account..."
 		create_account_doctype()
+	
+		print "Creating log folder and file..."
+		create_log_folder()
 		
