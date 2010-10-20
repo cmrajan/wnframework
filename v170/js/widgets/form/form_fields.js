@@ -213,7 +213,7 @@ _f.SectionBreak.prototype.make_body = function() {
 	
 			this.make_row();
 			this.make_simple_section(1, 0);
-			if(!isIE)this.collpase();
+			if(!isIE)this.collapse();
 		} else {
 			this.row = this.frm.layout.addsubrow();
 			this.make_simple_section(1, 1);

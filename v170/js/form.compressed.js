@@ -226,7 +226,7 @@ this.header.onmouseout=function(){if(_f.cur_sec_header!=this){$y(this,{backgroun
 this.collapse=function(){this.row.hide();$y(this.header,{backgroundColor:'#FFF',fontWeight:'normal',color:'#000'});}
 this.expand=function(){this.row.show();$y(this.header,{backgroundColor:'#AAA',fontWeight:'bold',color:'#FFF'});_f.cur_sec_header=this.header;if(me.df.label&&cur_frm.cscript[me.df.label]&&(!me.in_filter))
 cur_frm.runclientscript(me.df.label,me.doctype,me.docname);}
-this.make_row();this.make_simple_section(1,0);if(!isIE)this.collpase();}else{this.row=this.frm.layout.addsubrow();this.make_simple_section(1,1);}}else if(this.df){this.row=this.frm.layout.addrow();this.make_simple_section(1,1);}}
+this.make_row();this.make_simple_section(1,0);if(!isIE)this.collapse();}else{this.row=this.frm.layout.addsubrow();this.make_simple_section(1,1);}}else if(this.df){this.row=this.frm.layout.addrow();this.make_simple_section(1,1);}}
 _f.SectionBreak.prototype.refresh=function(layout){var fn=this.df.fieldname?this.df.fieldname:this.df.label;if(fn)
 this.df=get_field(this.doctype,fn,this.docname);if(this.set_hidden!=this.df.hidden){if(this.df.hidden){if(this.frm.meta.section_style=='Tabbed'){$dh(this.mytab);}else if(this.header)
 this.header.hide();if(this.row)this.row.hide();}else{if(this.frm.meta.section_style=='Tabbed'){$di(this.mytab);}else if(this.header)
