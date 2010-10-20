@@ -3,6 +3,7 @@
 
 import MySQLdb
 from webnotes import defs
+from webnotes import webnotes_logger
 
 class Database:
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
@@ -91,10 +92,11 @@ class Database:
 		# replace 'tab' by 'test' if testing
 		if self.is_testing and allow_testing:
 			query = self.replace_tab_by_test(query)
-
+		
+		webnotes_logger.info('Checking transaction status')	
 		# in transaction validations
 		self.check_transaction_status(query)
-		
+			
 		# execute
 		if values!=():
 			self._cursor.execute(query, values)

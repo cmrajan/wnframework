@@ -6,6 +6,12 @@ code_fields_dict = {
 }
 
 
+import logging
+import logging.handlers
+import os
+
+
+
 version = 'v170'
 
 auth_obj = None
@@ -66,3 +72,14 @@ def set_as_admin():
 	session = {'user':'Administrator'}
 	import webnotes.profile
 	user = webnotes.profile.Profile('Administrator')
+
+
+
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s %(levelname)s %(message)s')
+LOG_FILENAME = os.path.join(get_index_path(),'log','wnframework.log')
+webnotes_logger = logging.getLogger('WNLogger')
+#webnotes_logger.setLevel(logging.DEBUG)
+wnlog_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxBytes=30000,backupCount = 5)
+webnotes_logger.addHandler(wnlog_handler)
+
+webnotes_logger.info('Starting WNFramework')
