@@ -83,7 +83,8 @@ this.setup_tabs();if(this.meta.colour)
 this.layout.wrapper.style.backgroundColor='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
 _f.Frm.prototype.setup_footer=function(){var me=this;this.footer=$a(this.form_wrapper,'div','',{backgroundColor:'#DDF',margin:'4px 0px'});this.footer.tab=make_table(this.footer,1,2,'100%',['50%','50%'],{padding:'4px'});this.footer.save_area=$a($td(this.footer.tab,0,0),'div','green_buttons');$y($td(this.footer.tab,0,1),{textAlign:'right'});var b=$a(this.footer.save_area,'button');b.innerHTML='Save';$(b).button({icons:{primary:'ui-icon-disk'}});b.onclick=function(){cur_frm.save('Save');}
 this.footer.show_save=function(){$ds(me.footer.save_area);}
-this.footer.hide_save=function(){$dh(me.footer.save_area);}}
+this.footer.hide_save=function(){$dh(me.footer.save_area);}
+if(this.meta.istable)$dh(this.footer);}
 _f.Frm.prototype.setup_fields_std=function(){var fl=fields_list[this.doctype];fl.sort(function(a,b){return a.idx-b.idx});if(fl[0]&&fl[0].fieldtype!="Section Break"||get_url_arg('embed')){this.layout.addrow();if(fl[0].fieldtype!="Column Break"){var c=this.layout.addcell();$y(c.wrapper,{padding:'8px'});}}
 var sec;for(var i=0;i<fl.length;i++){var f=fl[i];if(get_url_arg('embed')&&(in_list(['Section Break','Column Break'],f.fieldtype)))continue;var fn=f.fieldname?f.fieldname:f.label;var fld=make_field(f,this.doctype,this.layout.cur_cell,this);this.fields[this.fields.length]=fld;this.fields_dict[fn]=fld;if(this.meta.section_style!='Simple')
 fld.parent_section=sec;if(f.fieldtype=='Section Break'&&f.options!='Simple')
@@ -130,7 +131,7 @@ this.runclientscript('edit_status_changed');}
 if(!this.display)this.show_the_frm();if(!this.meta.in_dialog)page_body.change_to('Forms');}}
 _f.Frm.prototype.refresh_tabs=function(){var me=this;if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed'){for(var i in me.sections){me.sections[i].collapse();}
 me.set_section(me.cur_section[me.docname]);}}
-_f.Frm.prototype.refresh_footer=function(){if(this.editable&&!this.meta.in_dialog&&this.doc.docstatus==0&&!this.meta.istable&&this.get_doc_perms()[WRITE])
+_f.Frm.prototype.refresh_footer=function(){if(this.editable&&!this.meta.in_dialog&&this.doc.docstatus==0&&!this.meta.istable&&this.get_doc_perms()[WRITE]&&this.footer)
 this.footer.show_save();else
 this.footer.hide_save();}
 _f.Frm.prototype.refresh_fields=function(){for(var i=0;i<this.fields.length;i++){var f=this.fields[i];f.perm=this.perm;f.docname=this.docname;if(f.refresh)f.refresh();}

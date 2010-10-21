@@ -721,7 +721,7 @@ _f.Frm.prototype.refresh_tabs = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_footer = function() {
-	if(this.editable && !this.meta.in_dialog && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE]) 
+	if(this.editable && !this.meta.in_dialog && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE] && this.footer) 
 		this.footer.show_save();
 	else 
 		this.footer.hide_save();
