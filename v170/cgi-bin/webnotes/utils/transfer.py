@@ -615,7 +615,8 @@ def merge_module_def(doc_list, ovr, ignore, onupdate):
 		prev_dt = d.doc_type
 		prev_dn = d.doc_name
 		prev_dis_name = cstr(d.display_name)
-			
+	
+	cur_doc.widget_code = cstr(doc.widget_code)	
 	cur_doc.save(ignore_fields = ignore, check_links = 0)
 	
 	if onupdate:
