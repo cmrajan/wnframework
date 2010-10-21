@@ -317,7 +317,7 @@ div.frm_tip_box table {
 
 td.frm_tray_area {
 	width: 122px;
-	border-right: 3px solid #AAA;
+	border-right: 3px solid #AAF;
 }
 
 div.dialog_frm {
@@ -335,12 +335,6 @@ td.frm_tray_area {
 	width: 128px;
 }
 
-div.frm_tray_head {
-	background-color: #888;
-	color: #FFF;
-	padding: 4px;
-	font-weight: bold;
-}
 /*------------------*/
 
 .top_cell {
@@ -349,7 +343,7 @@ div.frm_tray_head {
 
 div.attach_area {
 	padding: 8px;
-	margin: 8px 0px;
+	margin: 8px;
 	background-color: #EEE;
 }
 

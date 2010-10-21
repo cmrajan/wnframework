@@ -54,7 +54,7 @@ PageHeader.prototype.add_button = function(label, fn, bold, icon, green) {
 	if(green)
 		var btn = $a($a(this.toolbar_area, 'span', 'green_buttons'),'button','',{fontSize:'11px'});
 	else
-		var btn = $a(this.toolbar_area,'button','',{fontSize:'11px'});
+		var btn = $a(this.toolbar_area,'button');
 
 	// text and function
 	btn.onclick = fn;

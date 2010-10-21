@@ -483,7 +483,7 @@ function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','',d
 if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;this.buttons={};}
 PageHeader.prototype.add_button=function(label,fn,bold,icon,green){if(green)
 var btn=$a($a(this.toolbar_area,'span','green_buttons'),'button','',{fontSize:'11px'});else
-var btn=$a(this.toolbar_area,'button','',{fontSize:'11px'});btn.onclick=fn;if(bold)$y(btn,{fontWeight:'bold'});$(btn).button({icons:{primary:icon},label:label});this.show_toolbar();this.buttons[label]=btn;return btn;}
+var btn=$a(this.toolbar_area,'button');btn.onclick=fn;if(bold)$y(btn,{fontWeight:'bold'});$(btn).button({icons:{primary:icon},label:label});this.show_toolbar();this.buttons[label]=btn;return btn;}
 PageHeader.prototype.show_toolbar=function(){$ds(this.toolbar_area);$dh(this.separator);}
 PageHeader.prototype.clear_toolbar=function(){this.toolbar_area.innerHTML='';}
 PageHeader.prototype.make_buttonset=function(){$(this.toolbar_area).buttonset();}

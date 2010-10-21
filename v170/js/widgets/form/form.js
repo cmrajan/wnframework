@@ -9,7 +9,7 @@
 				+ this.tab_wrapper
 				+ this.body
 					+ this.layout
-					+ this.footer
+				+ this.footer
 			+ this.print_wrapper
 				+ this.head
 */
@@ -198,6 +198,8 @@ _f.Frm.prototype.setup_tabs = function() {
 	$ds(this.tab_wrapper);
 	$y(this.tab_wrapper, {marginTop:'4px'});
 	this.tabs = new TabbedPage(this.tab_wrapper, 1);
+	
+	$y(this.body,{padding:'8px 16px'});
 }
 
 // TIPS
@@ -246,7 +248,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 		var r = t.insertRow(0); var c = r.insertCell(0);
 		c.className='frm_tray_area';
 		this.tray_area = c;
-		this.body = $a(r.insertCell(1), 'div', 'frm_body');
+		this.body = $a(r.insertCell(1), 'div', 'frm_body',{padding:'8px 16px'});
 	} else {
 		this.body = $a(this.form_wrapper, 'div', 'frm_body');
 	}
@@ -282,9 +284,16 @@ _f.Frm.prototype.setup_std_layout = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.setup_footer = function() {
-	this.footer = $a(this.body, 'div', 'green_buttons', {marginLeft:'8px'});
-	
-	var b = $a(this.footer,'button');
+	// footer toolbar
+	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:'#DDF', margin:'4px 0px'});
+	this.footer.tab = make_table(this.footer, 1, 2, '100%', ['50%', '50%'], {padding:'4px'});
+
+	// style	
+	$td(this.footer.tab, 0, 0).className = 'green_buttons';
+	$y($td(this.footer.tab, 0, 1), {textAlign:'right'});
+
+	// save buttom
+	var b = $a($td(this.footer.tab, 0, 0),'button');
 	b.innerHTML = 'Save';
 	$(b).button({icons:{ primary: 'ui-icon-disk' }});
 	b.onclick = function() { cur_frm.save('Save'); }

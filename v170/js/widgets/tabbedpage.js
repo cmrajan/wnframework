@@ -41,11 +41,9 @@ TabbedPage.prototype.add_tab = function(n, onshow) {
 	}
 	tab.onmouseover = function() { 
 		if(me.cur_tab!=this) $op(this, 60);
-		//this.className = 'box_tab_mouseover'; 
 	}
 	tab.onmouseout = function() {
 		$op(this, 100); 
-		//else this.className = 'box_tab_selected'; 
 	}
 	tab.onclick = function() { this.show(); }
 	this.tabs[n] = tab;
