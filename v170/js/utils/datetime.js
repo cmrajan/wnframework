@@ -174,6 +174,13 @@ function time_to_hhmm(hh,mm,am) {
 
 // get date
 get_date = function(date){	// date string from server in 'yyyy-mm-dd' format
+	
+	if(date == null || date == '') return null;
+	
+	if(date.search('-') == -1){
+		show_alert('Date should be in yyyy-mm-dd format');
+		return;
+	}
 
 	var dict = {};
 	
@@ -203,6 +210,14 @@ get_date = function(date){	// date string from server in 'yyyy-mm-dd' format
 
 // get time
 get_time = function(time){
+
+	if(time == null || time =='') return null;
+
+	if(time.search(':') == -1){
+		show_alert('Time should be in hh:mm:ss format');
+		return;
+	}
+
 	var t = time.split(':');
 	
 	var hr = t[0];
