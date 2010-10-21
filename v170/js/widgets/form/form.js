@@ -284,19 +284,34 @@ _f.Frm.prototype.setup_std_layout = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.setup_footer = function() {
+	var me = this;
+	
 	// footer toolbar
 	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:'#DDF', margin:'4px 0px'});
 	this.footer.tab = make_table(this.footer, 1, 2, '100%', ['50%', '50%'], {padding:'4px'});
 
 	// style	
-	$td(this.footer.tab, 0, 0).className = 'green_buttons';
+	this.footer.save_area = $a($td(this.footer.tab, 0, 0), 'div', 'green_buttons');
 	$y($td(this.footer.tab, 0, 1), {textAlign:'right'});
 
 	// save buttom
-	var b = $a($td(this.footer.tab, 0, 0),'button');
+	var b = $a(this.footer.save_area,'button');
 	b.innerHTML = 'Save';
 	$(b).button({icons:{ primary: 'ui-icon-disk' }});
 	b.onclick = function() { cur_frm.save('Save'); }
+	
+	// show / hide save
+	this.footer.show_save = function() {
+		$ds(me.footer.save_area);
+	}
+
+	this.footer.hide_save = function() {
+		$dh(me.footer.save_area);
+	}
+	
+	// no footer for table - form views
+	if(this.meta.istable) $dh(this.footer);
+
 }
 
 // --------------------------------------------------------------------------------------
@@ -707,9 +722,9 @@ _f.Frm.prototype.refresh_tabs = function() {
 
 _f.Frm.prototype.refresh_footer = function() {
 	if(this.editable && !this.meta.in_dialog && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE]) 
-		$ds(this.footer);
+		this.footer.show_save();
 	else 
-		$dh(this.footer);
+		this.footer.hide_save();
 }
 
 // --------------------------------------------------------------------------------------
