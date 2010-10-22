@@ -398,11 +398,11 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	if(!this.button_area) this.button_area = $a(this.input_area, 'span');
 	
 	// make the input
-	this.input = $a(this.button_area, 'button', '', {width:'160px'});
+	this.input = $a(this.button_area, 'button', '', {width:'170px'});
 
 	$y(this.input,{marginRight:'8px'});
 	
-	this.input.innerHTML = me.df.label.substr(0,16) + ((me.df.label.length>15) ? '..' : '');
+	this.input.innerHTML = me.df.label.substr(0,20) + ((me.df.label.length>20) ? '..' : '');
 	this.input.onclick = function() {
 		this.disabled = true;
 		if(cur_frm.cscript[me.df.label] && (!me.in_filter)) {			

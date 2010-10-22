@@ -160,7 +160,7 @@ _f.FileField = function(parent, at_id, frm, addlink) {
 	this.download_div = $a(main_area, 'div');
 
 	var div = $a(this.upload_div, 'div');
-	div.innerHTML = '<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:200px; height:200px; border:0px"></iframe>';
+	div.innerHTML = '<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:0px; height:0px; border:0px"></iframe>';
 
 	// upload form
 	var div = $a(this.upload_div,'div');
