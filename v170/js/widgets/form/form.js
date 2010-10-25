@@ -389,7 +389,7 @@ _f.Frm.prototype.setup_template_layout = function() {
 _f.Frm.prototype.add_custom_button = function(label, fn, icon) {
 	this.frm_head.page_head.add_button(label, fn, icon, 0, 0, 1);
 }
-_f.Frm.prototype.clear_custom_buttons = function(label, fn, icon) {
+_f.Frm.prototype.clear_custom_buttons = function() {
 	this.frm_head.page_head.clear_toolbar2();
 }
 
