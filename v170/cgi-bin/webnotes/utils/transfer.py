@@ -1,5 +1,4 @@
 transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','Search Criteria', 'Patch']
-import pdb
 # accept a module coming from a remote server
 # ==============================================================================
 def accept_module(super_doclist):
@@ -310,7 +309,6 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 
 	sql = webnotes.conn.sql
 	override = 0
-	pdb.set_trace()	
 	if not doclist:
 		return 'No Doclist'
 	doc = Document(fielddata = doclist[0])
