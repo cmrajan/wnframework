@@ -391,7 +391,7 @@ _f.ButtonField.prototype.init = function() {
 }
 _f.ButtonField.prototype.make_input = function() { var me = this;
 	if(!this.prev_button) {
-		$y(this.input_area,{height:'30px', marginTop:'4px', marginBottom: '4px'});
+		$y(this.input_area,{marginTop:'4px', marginBottom: '4px'});
 	}
 
 	// make a button area for one button
