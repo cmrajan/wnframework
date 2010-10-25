@@ -199,7 +199,7 @@ _f.Frm.prototype.setup_tabs = function() {
 	$y(this.tab_wrapper, {marginTop:'4px'});
 	this.tabs = new TabbedPage(this.tab_wrapper, 1);
 	
-	$y(this.body,{padding:'8px 16px'});
+	$y(this.body,{padding:'0px 16px'});
 }
 
 // TIPS
