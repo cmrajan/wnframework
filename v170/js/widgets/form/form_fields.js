@@ -51,7 +51,6 @@ _f.SectionBreak = function() {
 
 _f.SectionBreak.prototype.make_row = function() {
 	this.row = this.frm.layout.addrow();
-	this.row.footer = $a(this.row.wrapper, 'div');
 }
 
 _f.SectionBreak.prototype.make_collapsible = function(head) {
@@ -235,7 +234,7 @@ _f.SectionBreak.prototype.make_body = function() {
 // ======================================================================================
 
 _f.SectionBreak.prototype.add_section_button = function(sec_id, east_or_west) {
-	var btn = $a($td(this.frm.footer.tab, 0, 1), 'button','',{marginLeft:'4px'});
+	var btn = $a($td(this.frm.footer.tab, 0, 1), 'button','',{marginLeft:'4px', fontSize:'11px'});
 	btn.innerHTML = this.frm.sections[sec_id].df.label;
 	btn.sec_id = sec_id;
 	btn.onclick = function() {

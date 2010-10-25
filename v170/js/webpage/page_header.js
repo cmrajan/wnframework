@@ -17,6 +17,7 @@ var def_ph_style = {
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555' }
 	,toolbar_area: { margin:'0px', padding: '2px 4px', backgroundColor:'#DDF', display:'none'}
+	,toolbar_area2: { margin:'0px', padding: '2px 4px', backgroundColor:'#EEF', display:'none'}
 	,separator: { borderBottom:'2px solid #AAA' } // show this when there is no toolbar
 	,tag_area: { color:'#888', margin:'4px 0px', fontSize:'10px', textAlign:'right' }
 	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 
@@ -31,6 +32,7 @@ function PageHeader(parent, main_text, sub_text) {
 	this.main_head = $a($td(this.t1, 0, 0), 'div', '', def_ph_style.main_heading);
 	this.sub_head = $a($td(this.t1, 0, 0), 'div', '', def_ph_style.sub_heading);
 	this.toolbar_area = $a(this.wrapper, 'div', '', def_ph_style.toolbar_area);
+	this.toolbar_area2 = $a(this.wrapper, 'div', '', def_ph_style.toolbar_area2);
 	this.separator = $a(this.wrapper, 'div', '', def_ph_style.separator);
 	this.tag_area = $a(this.wrapper, 'div', '', def_ph_style.tag_area);
 
@@ -46,43 +48,59 @@ function PageHeader(parent, main_text, sub_text) {
 	if(sub_text) this.sub_head.innerHTML = sub_text;
 	
 	this.buttons = {};
+	this.buttons2 = {};
 }
 
-PageHeader.prototype.add_button = function(label, fn, bold, icon, green) {
+PageHeader.prototype.add_button = function(label, fn, bold, icon, green, toolbar2) {
+
+	var tb = this.toolbar_area;
+	
+	// set toolbar and no repeats
+	if(toolbar2) {
+		tb = this.toolbar_area2;
+		if(this.buttons2[label]) return;
+	} else {
+		if(this.buttons[label]) return;
+	}
 	
 	// make the button
 	if(green)
-		var btn = $a($a(this.toolbar_area, 'span', 'green_buttons'),'button','',{fontSize:'11px'});
+		var btn = $a($a(tb, 'span', 'green_buttons'),'button','',{fontSize:'11px'});
 	else
-		var btn = $a(this.toolbar_area,'button');
+		var btn = $a(tb,'button','',{fontSize:'11px'});
 
 	// text and function
 	btn.onclick = fn;
+	
+	// if not icon
+	if(!icon)icon='ui-icon-circle-triangle-e';
 
 	// style
 	if(bold)$y(btn, {fontWeight: 'bold'});
 	$(btn).button({icons:{ primary: icon }, label:label});
 
 	// show toolbar
-	this.show_toolbar();
+	this.show_toolbar(toolbar2);
 		
 	// add to dict
-	this.buttons[label]=btn;
-
+	if(toolbar2) {
+		this.buttons2[label]=btn;
+	} else {	
+		this.buttons[label]=btn;
+	}
+	
 	return btn;
 }
 
-PageHeader.prototype.show_toolbar = function() {
+PageHeader.prototype.show_toolbar = function(toolbar2) {
 	$ds(this.toolbar_area);
 	$dh(this.separator);
-	/*if(!isIE) {
-		$(this.toolbar_area)
-			.css('-moz-border-radius','5px')
-			.css('-webkit-border-radius','5px');
-	}*/
+	if(toolbar2) $ds(this.toolbar_area2);
 }
+
 PageHeader.prototype.clear_toolbar = function() {
 	this.toolbar_area.innerHTML = '';
+	this.buttons = {};
 }
 
 PageHeader.prototype.make_buttonset = function() {

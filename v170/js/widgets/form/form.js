@@ -295,7 +295,7 @@ _f.Frm.prototype.setup_footer = function() {
 	$y($td(this.footer.tab, 0, 1), {textAlign:'right'});
 
 	// save buttom
-	var b = $a(this.footer.save_area,'button');
+	var b = $a(this.footer.save_area,'button','',{fontSize:'11px'});
 	b.innerHTML = 'Save';
 	$(b).button({icons:{ primary: 'ui-icon-disk' }});
 	b.onclick = function() { cur_frm.save('Save'); }
@@ -385,6 +385,10 @@ _f.Frm.prototype.setup_template_layout = function() {
 	}
 }
 
+// --------------------------------------------------------------------------------------
+_f.Frm.prototype.add_custom_button = function(label, fn, icon) {
+	this.frm_head.page_head.add_button(label, fn, icon, 0, 0, 1);
+}
 
 // --------------------------------------------------------------------------------------
 
