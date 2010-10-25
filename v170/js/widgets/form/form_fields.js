@@ -204,11 +204,11 @@ _f.SectionBreak.prototype.make_body = function() {
 			// expand and collapse the section
 			this.collapse = function() { 
 				this.row.hide();
-				$y(this.header, { backgroundColor:'#FFF', fontWeight:'normal', color:'#000'} );
+				$y(this.header, { backgroundColor:'#FFF', fontWeight:'normal'} );
 			}
 			this.expand = function() { 
 				this.row.show(); 
-				$y(this.header, { backgroundColor:'#AAF', fontWeight:'bold', color:'#FFF'} );
+				$y(this.header, { backgroundColor:'#AAF', fontWeight:'bold'} );
 				
 				_f.cur_sec_header = this.header;
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
