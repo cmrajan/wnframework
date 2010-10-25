@@ -488,6 +488,7 @@ var btn=$a(tb,'button','',{fontSize:'11px'});btn.onclick=fn;if(!icon)icon='ui-ic
 return btn;}
 PageHeader.prototype.show_toolbar=function(toolbar2){$ds(this.toolbar_area);$dh(this.separator);if(toolbar2)$ds(this.toolbar_area2);}
 PageHeader.prototype.clear_toolbar=function(){this.toolbar_area.innerHTML='';this.buttons={};}
+PageHeader.prototype.clear_toolbar2=function(){this.toolbar_area2.innerHTML='';$dh(this.toolbar_area2);this.buttons2={};}
 PageHeader.prototype.make_buttonset=function(){$(this.toolbar_area).buttonset();}
 var cur_autosug;function hide_autosuggest(){if(cur_autosug)cur_autosug.clearSuggestions();}
 function AutoSuggest(id,param){this.fld=$i(id);if(!this.fld){return 0;alert('AutoSuggest: No ID');}

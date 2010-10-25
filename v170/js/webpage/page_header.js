@@ -103,6 +103,12 @@ PageHeader.prototype.clear_toolbar = function() {
 	this.buttons = {};
 }
 
+PageHeader.prototype.clear_toolbar2 = function() {
+	this.toolbar_area2.innerHTML = '';
+	$dh(this.toolbar_area2);	
+	this.buttons2 = {};
+}
+
 PageHeader.prototype.make_buttonset = function() {
 	$(this.toolbar_area).buttonset();
 }
