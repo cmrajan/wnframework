@@ -21,10 +21,14 @@ function setup_err_console() {
 	err_console.make_body([
 		['HTML', 'Error List'],
 		['Button', 'Ok'],
+		['Button', 'Send Error Report'],
 		['Button', 'Clear']
 	]);
 	err_console.widgets['Ok'].onclick = function() {
 		err_console.hide();
+	}
+	err_console.widgets['Send Error Report'].onclick = function() {
+		$c('webnotes.utils.send_error_report', {'err_msg': err_console.rows['Error List'].innerHTML});
 	}
 	err_console.widgets['Clear'].onclick = function() {
 		err_list = [];
