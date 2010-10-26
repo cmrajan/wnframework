@@ -28,7 +28,11 @@ function setup_err_console() {
 		err_console.hide();
 	}
 	err_console.widgets['Send Error Report'].onclick = function() {
-		$c('webnotes.utils.send_error_report', {'err_msg': err_console.rows['Error List'].innerHTML});
+		var call_back = function(r, rt){
+			err_console.hide();
+			msgprint("Error Report Sent")
+		}
+		$c('webnotes.utils.send_error_report', {'err_msg': err_console.rows['Error List'].innerHTML}, call_back);
 	}
 	err_console.widgets['Clear'].onclick = function() {
 		err_list = [];
