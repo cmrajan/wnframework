@@ -66,6 +66,18 @@ nav_obj.show_last_open = function() {
 }
 
 var _history_current;
+
+function history_get_name(t) {
+	var parts = [];
+	if(t.length>=3) {
+		// combine all else
+		for(var i=2; i<t.length; i++) {
+			parts.push(t[i]);
+		}
+	}
+	return parts.join('/')
+}
+
 function historyChange(newLocation, historyData) {
 	t = newLocation.split('/');
 
@@ -83,12 +95,19 @@ function historyChange(newLocation, historyData) {
 		}
 	}
 	
+	if(t[2])
+		var docname = history_get_name(t);
+	
 	if(t[0]=='Form') {
 		_history_current = newLocation;
-		loaddoc(t[1], t[2]);
+		if(docname.substr(0, 3)=='New') {
+			newdoc(t[1]);
+		} else {
+			loaddoc(t[1], docname);
+		}
 	} else if(t[0]=='Report') {
 		_history_current = newLocation;
-		loadreport(t[1], t[2]);
+		loadreport(t[1], docname);
 	} else if(t[0]=='Page') {
 		_history_current = newLocation;
 		loadpage(t[1]);
@@ -98,5 +117,5 @@ function historyChange(newLocation, historyData) {
 	} else if(t[0]=='DocBrowser') {
 		_history_current = newLocation;
 		loaddocbrowser(t[1]);
-	}
+	} 
 };
