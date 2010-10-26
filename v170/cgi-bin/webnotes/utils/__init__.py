@@ -316,3 +316,18 @@ def clear_recycle_bin():
 			sql("delete from `%s` where parent like 'old_parent:%%'" % t[0])
 
 	return "%s records deleted" % str(int(total_deleted))
+
+
+# Send Error Report
+# ------------------
+def send_error_report():
+	sql = webnotes.conn.sql
+	m = ''
+	acc_id = webnotes.conn.get_value('Control Panel',None,'account_id') or ''
+	if acc_id: m = 'Account Id : '+acc_id
+	form = webnotes.form
+	err_msg = '''
+		%s <br>
+		Err Msg : %s
+	''' % (m, form.getvalue('err_msg'))
+	sendmail([webnotes.conn.get_value('Control Panel',None,'support_email_id') or 'support@iwebnotes.com'], sender=webnotes.session['user'], msg=err_msg, subject='Error Report '+m)
