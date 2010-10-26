@@ -822,7 +822,6 @@ SelectField.prototype.with_label = 1;
 SelectField.prototype.make_input = function() { 
 	var me = this;
 	var opt=[];
-	
 	if(this.not_in_form && (!this.df.single_select)) {
 
 		// multiple select
@@ -832,7 +831,6 @@ SelectField.prototype.make_input = function() {
 		var lab = $a(this.input_area, 'div', {fontSize:'9px',color:'#999'});
 		lab.innerHTML = '(Use Ctrl+Click to select multiple or de-select)'
 	} else {
-
 		// Single select
 		this.input = new SelectWidget(this.input_area, [], '80%');	
 
