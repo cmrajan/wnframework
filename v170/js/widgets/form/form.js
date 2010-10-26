@@ -781,6 +781,7 @@ _f.Frm.prototype.cleanup_refresh = function() {
 
 _f.Frm.prototype.refresh_dependency = function() {
 	var me = this;
+	var doc = this.doc;
 
 	// build dependants' dictionary	
 	var dep_dict = {};
@@ -823,7 +824,9 @@ _f.Frm.prototype.refresh_dependency = function() {
 		f.guardian_has_value = true;
 		if(f.df.depends_on) {
 			var v = d[f.df.depends_on];
-			if(f.df.depends_on.substr(0,3)=='fn:') {
+			if(f.df.depends_on.substr(0,5)=='eval:') {
+				f.guardian_has_value = eval(f.df.depends_on.substr(5));
+			} else if(f.df.depends_on.substr(0,3)=='fn:') {
 				f.guardian_has_value = me.runclientscript(f.df.depends_on.substr(3), me.doctype, me.docname);
 			} else {
 				if(v || (v==0 && !v.substr)) { 
