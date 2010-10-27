@@ -231,7 +231,6 @@ _r.DataTable.prototype.update_query = function(no_limit) {
 
   // add sorting
   if((_r.rb_con.cur_rb && _r.rb_con.cur_rb.get_query) || (this.search_criteria && this.search_criteria.custom_query)) {
-  	//this.is_simple = 1;
   	// no sorting if custom_query or get_query
   } else {
 	if(!sel_val(this.sort_sel)) {

@@ -188,7 +188,7 @@ def runquery(q='', ret=0, from_export=0):
 		res = webnotes.conn.convert_to_lists(sql(q))
 		
 		# build colnames etc from metadata
-		colnames, coltypes, coloptions, colwidths = build_description_simple()
+		colnames, coltypes, coloptions, colwidths = [], [], [], []
 		
 	# CASE B: Standard Query
 	# -----------------------
