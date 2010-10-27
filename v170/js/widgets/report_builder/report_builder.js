@@ -611,7 +611,10 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		
 		if(sc) me.dt.search_criteria = sc;
 		else me.dt.search_criteria = null;
-		
+
+		// reset no_limit
+		me.dt.set_no_limit(0);
+
 		//load server script
 		if(sc && sc.server_script) me.dt.server_script = sc.server_script;
 		else me.dt.server_script = null;

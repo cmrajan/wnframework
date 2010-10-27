@@ -870,8 +870,7 @@ var err_console;var err_list=[];function errprint(t){err_list[err_list.length]=(
 function submit_error(e){if(isIE){var t='Explorer: '+e+'\n'+e.description;}else{var t='Mozilla: '+e.toString()+'\n'+e.message+'\nLine Number:'+e.lineNumber;}
 errprint(e+'\nLine Number:'+e.lineNumber+'\nStack:'+e.stack);}
 function setup_err_console(){err_console=new Dialog(640,480,'Error Console')
-err_console.make_body([['HTML','Error List'],['Button','Ok'],['Button','Send Error Report'],['Button','Clear']]);err_console.widgets['Ok'].onclick=function(){err_console.hide();}
-err_console.widgets['Send Error Report'].onclick=function(){var call_back=function(r,rt){err_console.hide();msgprint("Error Report Sent")}
+err_console.make_body([['HTML','Error List'],['Button','Clear'],['Button','Send Error Report']]);err_console.widgets['Send Error Report'].onclick=function(){var call_back=function(r,rt){err_console.hide();msgprint("Error Report Sent")}
 $c('webnotes.utils.send_error_report',{'err_msg':err_console.rows['Error List'].innerHTML},call_back);}
 err_console.widgets['Clear'].onclick=function(){err_list=[];err_console.rows['Error List'].innerHTML='';}
 err_console.onshow=function(){err_console.rows['Error List'].innerHTML='<div style="padding: 16px; height: 360px; width: 90%; overflow: auto;">'

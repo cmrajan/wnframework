@@ -130,6 +130,46 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 		res = out
 
 	return res, style, header_html, footer_html, page_template
+	
+# ====================================================================
+
+def build_description_simple():
+
+	import MySQLdb
+	colnames, coltypes, coloptions, colwidths = [], [], [], []
+
+	for m in webnotes.conn.get_description():
+		colnames.append(m[0])
+		if m[1] in MySQLdb.NUMBER:
+			coltypes.append('Currency')
+		elif m[1] in MySQLdb.DATE:
+			coltypes.append('Date')
+		else:
+			coltypes.append('Data')
+		coloptions.append('')
+		colwidths.append('100')
+	
+	return colnames, coltypes, coloptions, colwidths
+
+# ====================================================================
+
+def build_description_standard(meta, fl):
+
+	colnames, coltypes, coloptions, colwidths = [], [], [], []
+
+	for f in fl:
+		if meta.has_key(f[0]) and meta[f[0]].has_key(f[1]):
+			colnames.append(meta[f[0]][f[1]][0] or f[1])
+			coltypes.append(meta[f[0]][f[1]][1] or '')
+			coloptions.append(meta[f[0]][f[1]][2] or '')
+			colwidths.append(meta[f[0]][f[1]][3] or '100')
+		else:
+			colnames.append(f[1])
+			coltypes.append('')
+			coloptions.append('')
+			colwidths.append('100')
+
+	return colnames, coltypes, coloptions, colwidths
 
 # Entry Point - Run the query
 # ====================================================================
@@ -137,38 +177,30 @@ def exec_report(code, res, colnames=[], colwidths=[], coltypes=[], coloptions=[]
 def runquery(q='', ret=0, from_export=0):
 	import webnotes.utils
 	
-	colnames, coltypes, coloptions, colwidths = [], [], [], []
-
+	
+	# CASE A: Simple Query
+	# --------------------
 	if form.getvalue('simple_query') or form.getvalue('is_simple'):
 		q = form.getvalue('simple_query') or form.getvalue('query')
 		if q.split()[0].lower() != 'select':
 			raise Exception, 'Query must be a SELECT'
+					
 		res = webnotes.conn.convert_to_lists(sql(q))
+		
+		# build colnames etc from metadata
+		colnames, coltypes, coloptions, colwidths = build_description_simple()
+		
+	# CASE B: Standard Query
+	# -----------------------
 	else:
 		if not q: q = form.getvalue('query')
 
 		tl, fl= get_sql_tables(q), get_sql_fields(q)
 		meta = get_sql_meta(tl)
 		
-		for f in fl:
-			if meta.has_key(f[0]) and meta[f[0]].has_key(f[1]):
-				colnames.append(meta[f[0]][f[1]][0] or f[1])
-				coltypes.append(meta[f[0]][f[1]][1] or '')
-				coloptions.append(meta[f[0]][f[1]][2] or '')
-				colwidths.append(meta[f[0]][f[1]][3] or '100')
-			else:
-				colnames.append(f[1])
-				coltypes.append('')
-				coloptions.append('')
-				colwidths.append('100')
+		colnames, coltypes, coloptions, colwidths = build_description_standard(meta, fl)
 	
 		q = add_match_conditions(q, tl, webnotes.user.roles, webnotes.user.get_defaults())
-	
-		if session['data'].get('__testing'):
-			for dt in tl:
-				st = sql('select setup_test from `tabDocType` where name="%s"' % dt)
-				if st and st[0][0]:
-					q = q.replace('tab%s' % dt, 'test%s' % dt)
 		
 		# replace special variables
 		q = q.replace('__user', session['user'])
@@ -177,6 +209,7 @@ def runquery(q='', ret=0, from_export=0):
 		res = webnotes.conn.convert_to_lists(sql(q))
 		
 	# run server script
+	# -----------------
 	style, header_html, footer_html, page_template = '', '', '', ''
 	if form.has_key('sc_id') and form.getvalue('sc_id'):
 		from webnotes.model.doc import Document
