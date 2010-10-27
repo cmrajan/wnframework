@@ -33,6 +33,7 @@ function setup_err_console() {
 	err_console.widgets['Clear'].onclick = function() {
 		err_list = [];
 		err_console.rows['Error List'].innerHTML = '';
+		err_console.hide();
 	}
 	err_console.onshow = function() {
 		err_console.rows['Error List'].innerHTML = '<div style="padding: 16px; height: 360px; width: 90%; overflow: auto;">' 

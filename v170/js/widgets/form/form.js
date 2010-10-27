@@ -310,7 +310,7 @@ _f.Frm.prototype.setup_footer = function() {
 	}
 	
 	// no footer for table - form views
-	if(this.meta.istable) $dh(this.footer);
+	if(this.meta.istable || this.meta.hide_heading) $dh(this.footer);
 
 }
 

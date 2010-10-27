@@ -872,7 +872,7 @@ errprint(e+'\nLine Number:'+e.lineNumber+'\nStack:'+e.stack);}
 function setup_err_console(){err_console=new Dialog(640,480,'Error Console')
 err_console.make_body([['HTML','Error List'],['Button','Clear'],['Button','Send Error Report']]);err_console.widgets['Send Error Report'].onclick=function(){var call_back=function(r,rt){err_console.hide();msgprint("Error Report Sent")}
 $c('webnotes.utils.send_error_report',{'err_msg':err_console.rows['Error List'].innerHTML},call_back);}
-err_console.widgets['Clear'].onclick=function(){err_list=[];err_console.rows['Error List'].innerHTML='';}
+err_console.widgets['Clear'].onclick=function(){err_list=[];err_console.rows['Error List'].innerHTML='';err_console.hide();}
 err_console.onshow=function(){err_console.rows['Error List'].innerHTML='<div style="padding: 16px; height: 360px; width: 90%; overflow: auto;">'
 +err_list.join('<div style="height: 10px; margin-bottom: 10px; border-bottom: 1px solid #AAA"></div>')+'</div>';}}
 startup_list.push(setup_err_console);var about_dialog;function show_about(){if(!about_dialog){var d=new Dialog(360,480,'About')
