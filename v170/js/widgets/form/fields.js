@@ -928,6 +928,9 @@ SelectField.prototype.make_input = function() {
 			}
 			return l;
 		} else {
+			if(me.txt.options) {
+				return sel_val(me.txt);
+			}
 			return me.txt.value;
 		}
 	}

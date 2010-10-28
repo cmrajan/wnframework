@@ -724,16 +724,20 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 							cl[cl.length] = table_name(t.df.parent) + '.' + fn + ' LIKE "' + v + '%"';
 
 						} else if(t.df.fieldtype=='Select') {
-							// loop for multiple select
-							var tmp_cl = [];
-							for(var sel_i=0;sel_i < v.length; sel_i++) {
-								if(v[sel_i]) {
-									tmp_cl[tmp_cl.length] = table_name(t.df.parent) + '.' + fn + ' = "' + v[sel_i] + '"';
+							if(t.input.multiple) {
+								// loop for multiple select
+								var tmp_cl = [];
+								for(var sel_i=0;sel_i < v.length; sel_i++) {
+									if(v[sel_i]) {
+										tmp_cl[tmp_cl.length] = table_name(t.df.parent) + '.' + fn + ' = "' + v[sel_i] + '"';
+									}
 								}
+								
+								// join multiple select conditions by OR
+								if(tmp_cl.length)cl[cl.length] = '(' + tmp_cl.join(' OR ') + ')';
+							} else {
+								cl[cl.length] = table_name(t.df.parent) + '.' + fn + ' = "' + v + '"';
 							}
-							
-							// join multiple select conditions by OR
-							if(tmp_cl.length)cl[cl.length] = '(' + tmp_cl.join(' OR ') + ')';
 						} else {
 							var condition = '=';
 							if(t.sql_condition) condition = t.sql_condition;
