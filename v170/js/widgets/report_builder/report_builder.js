@@ -752,7 +752,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		if(me.get_query) {
 			// custom query method
 			this.query = me.get_query();
-
+			this.is_simple = 1;
 		} else {
 			// add docstatus conditions
 			if(docstatus_cl.length)

@@ -102,7 +102,7 @@ else if(t.df.label=='Submitted'){if(t.get_value())docstatus_cl[docstatus_cl.leng
 else if(t.df.label=='Cancelled'){if(t.get_value())docstatus_cl[docstatus_cl.length]=table_name(t.df.parent)+'.docstatus=2';else cl[cl.length]=table_name(t.df.parent)+'.docstatus!=2';}}else{var fn='`'+t.df.fieldname+'`';var v=t.get_value?t.get_value():'';if(v){if(in_list(['Data','Link','Small Text','Text'],t.df.fieldtype)){cl[cl.length]=table_name(t.df.parent)+'.'+fn+' LIKE "'+v+'%"';}else if(t.df.fieldtype=='Select'){var tmp_cl=[];for(var sel_i=0;sel_i<v.length;sel_i++){if(v[sel_i]){tmp_cl[tmp_cl.length]=table_name(t.df.parent)+'.'+fn+' = "'+v[sel_i]+'"';}}
 if(tmp_cl.length)cl[cl.length]='('+tmp_cl.join(' OR ')+')';}else{var condition='=';if(t.sql_condition)condition=t.sql_condition;cl[cl.length]=table_name(t.df.parent)+'.'+fn+condition+'"'+v+'"';}}}}}
 me.dt.filter_vals.user=user;me.dt.filter_vals.user_email=user_email;me.filter_vals=me.dt.filter_vals;this.is_simple=0;if(sc&&sc.custom_query){this.query=repl(sc.custom_query,me.dt.filter_vals);this.is_simple=1;return}
-if(me.get_query){this.query=me.get_query();}else{if(docstatus_cl.length)
+if(me.get_query){this.query=me.get_query();this.is_simple=1;}else{if(docstatus_cl.length)
 cl[cl.length]='('+docstatus_cl.join(' OR ')+')';if(sc&&sc.add_cond){var adv_cl=sc.add_cond.split('\n');for(var i=0;i<adv_cl.length;i++){cl[cl.length]=adv_cl[i];}}
 if(!fl.length){alert('You must select atleast one column to view');this.query='';return;}
 var tn=table_name(me.doctype);if(me.parent_dt){tn=tn+','+table_name(me.parent_dt);cl[cl.length]=table_name(me.doctype)+'.`parent` = '+table_name(me.parent_dt)+'.`name`';}
