@@ -114,6 +114,8 @@ this.query='SELECT '+fl.join(',')+' FROM '+tn+' WHERE '+cl.join('\n AND ');if(sc
 this.query=repl(this.query,me.dt.filter_vals)}
 if(me.show_query.checked){this.show_query=1;}
 if(me.current_loaded)this.rep_name=me.current_loaded;else this.rep_name=me.doctype;}}
+_r.ReportBuilder.prototype.get_filter=function(dt,label){return this.filter_fields_dict[dt+FILTER_SEP+label];}
+_r.ReportBuilder.prototype.set_filter_properties=function(dt,label,properties){var f=this.filter_fields_dict[dt+FILTER_SEP+label];for(key in properties){f.df[key]=properties[key];}}
 _r.ReportFilters=function(rb){this.rb=rb;this.first_page_filter=$a(rb.mytabs.tabs['Result'].tab_body,'div','finder_filter_area');this.filter_area=$a(rb.mytabs.tabs['More Filters'].tab_body,'div','finder_filter_area');this.filter_fields_area=$a(this.filter_area,'div');}
 _r.ReportFilters.prototype.refresh=function(){var fl=this.rb.filter_fields
 for(var i=0;i<fl.length;i++){var f=fl[i];if(f.df.filter_hide){$dh(f.wrapper);}else{$ds(f.wrapper);}

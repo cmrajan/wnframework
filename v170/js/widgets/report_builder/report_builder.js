@@ -816,6 +816,19 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 	}
 }
 
+// -------------------------------------------------------------------------------------
+
+_r.ReportBuilder.prototype.get_filter = function(dt, label) {
+	return this.filter_fields_dict[dt + FILTER_SEP + label];
+}
+
+_r.ReportBuilder.prototype.set_filter_properties = function(dt, label, properties) {
+	var f = this.filter_fields_dict[dt + FILTER_SEP + label];
+	for(key in properties) {
+		f.df[key]=properties[key];
+	}
+}
+
 // Report Filter
 // ===================================================================================
 
@@ -970,6 +983,8 @@ _r.ReportFilters.prototype.add_field = function(f, dt, in_primary) {
 	if(f.def_filter)
 		tmp.input.checked = true;
 }
+
+
 
 // Column Picker
 // ===================================================================================

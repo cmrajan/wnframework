@@ -11,21 +11,32 @@ Filters can be modified declaring the customize_filters method::
   report.customize_filters = function() {
     this.hide_all_filters();
 
-    // show these filters only
-    this.filter_fields_dict['GL Entry'+FILTER_SEP +'From Posting Date'].df.filter_hide = 0;
-    this.filter_fields_dict['GL Entry'+FILTER_SEP +'To Posting Date'].df.filter_hide = 0;
-    this.filter_fields_dict['GL Entry'+FILTER_SEP +'Account'].df.filter_hide = 0;
+    // show filters only and add defaults
+    this.set_filter_properties('GL Entry', 'From Posting Date', {filter_hide:0, report_default: sys_defaults.year_start_date});
+    this.set_filter_properties('GL Entry', 'To Posting Date', {filter_hide:0, report_default: dateutil.obj_to_str(new Date()) });
+    this.set_filter_properties('GL Entry', 'Account', {filter_hide:0, report_default: sys_defaults.company});
   
     // add new filters
     this.add_filter({fieldname:'aging_based_on', label:'Aging Based On', fieldtype:'Select', options:NEWLINE+'Transaction Date'+NEWLINE+'Aging Date'+NEWLINE+'Due Date',ignore : 1, parent:'Receivable Voucher', report_default:'Aging Date'});  
     this.add_filter({fieldname:'range_1', label:'Range 1', fieldtype:'Data', ignore : 1, parent:'GL Entry'});
 
-    // set default filters
-    this.filter_fields_dict['GL Entry'+FILTER_SEP +'From Posting Date'].df['report_default']=sys_defaults.year_start_date;
-    this.filter_fields_dict['GL Entry'+FILTER_SEP +'To Posting Date'].df['report_default']=dateutil.obj_to_str(new Date());
-    this.filter_fields_dict['GL Entry'+FILTER_SEP +'Company'].df['report_default']=sys_defaults.company;
   }
-  
+
+Setting Single Select
+---------------------
+
+Select fields are defaulted to multiple select, if you want to change this to single select, there are
+two options, while adding a new filter set the property single_select = 1, or for an existing filter, call
+set_as_single method on the filter::
+
+  report.customize_filters = function() {
+    // set exiting field as single
+    this.get_filter('Receivable Voucher', 'Type').set_as_single();
+
+    // add new single select field
+    this.add_filter({single_select:1, fieldname:'aging_based_on', label:'Aging Based On', fieldtype:'Select', options:NEWLINE+'Transaction Date'+NEWLINE+'Aging Date'+NEWLINE+'Due Date',ignore : 1, parent:'Receivable Voucher', report_default:'Aging Date'});  
+  }
+
 Remove Paging for a Report (Client)
 -----------------------------------
 

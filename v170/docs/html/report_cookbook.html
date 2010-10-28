@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Documentation" href="index.html" />
     <link rel="up" title="Writing Scripts" href="writing_scripts.html" />
-    <link rel="next" title="Page Cookbook" href="page_cookbook.html" />
+    <link rel="next" title="3. Server Side API" href="server_side_api.html" />
     <link rel="prev" title="Client Side Cookbook" href="client_side_cookbook.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="page_cookbook.html" title="Page Cookbook"
+          <a href="server_side_api.html" title="3. Server Side API"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="client_side_cookbook.html" title="Client Side Cookbook"
@@ -52,6 +52,7 @@
             <ul>
 <li><a class="reference external" href="">Report Cookbook</a><ul>
 <li><a class="reference external" href="#modify-report-filters-client">Modify Report Filters (Client)</a></li>
+<li><a class="reference external" href="#setting-single-select">Setting Single Select</a></li>
 <li><a class="reference external" href="#remove-paging-for-a-report-client">Remove Paging for a Report (Client)</a></li>
 <li><a class="reference external" href="#hide-column-picker-client">Hide Column Picker (Client)</a></li>
 <li><a class="reference external" href="#validate-fitler-values-server">Validate fitler values (Server)</a></li>
@@ -66,8 +67,8 @@
             <p class="topless"><a href="client_side_cookbook.html"
                                   title="previous chapter">Client Side Cookbook</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="page_cookbook.html"
-                                  title="next chapter">Page Cookbook</a></p>
+            <p class="topless"><a href="server_side_api.html"
+                                  title="next chapter">3. Server Side API</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/report_cookbook.txt"
@@ -103,19 +104,29 @@
 <div class="highlight-python"><pre>report.customize_filters = function() {
   this.hide_all_filters();
 
-  // show these filters only
-  this.filter_fields_dict['GL Entry'+FILTER_SEP +'From Posting Date'].df.filter_hide = 0;
-  this.filter_fields_dict['GL Entry'+FILTER_SEP +'To Posting Date'].df.filter_hide = 0;
-  this.filter_fields_dict['GL Entry'+FILTER_SEP +'Account'].df.filter_hide = 0;
+  // show filters only and add defaults
+  this.set_filter_properties('GL Entry', 'From Posting Date', {filter_hide:0, report_default: sys_defaults.year_start_date});
+  this.set_filter_properties('GL Entry', 'To Posting Date', {filter_hide:0, report_default: dateutil.obj_to_str(new Date()) });
+  this.set_filter_properties('GL Entry', 'Account', {filter_hide:0, report_default: sys_defaults.company});
 
   // add new filters
   this.add_filter({fieldname:'aging_based_on', label:'Aging Based On', fieldtype:'Select', options:NEWLINE+'Transaction Date'+NEWLINE+'Aging Date'+NEWLINE+'Due Date',ignore : 1, parent:'Receivable Voucher', report_default:'Aging Date'});
   this.add_filter({fieldname:'range_1', label:'Range 1', fieldtype:'Data', ignore : 1, parent:'GL Entry'});
 
-  // set default filters
-  this.filter_fields_dict['GL Entry'+FILTER_SEP +'From Posting Date'].df['report_default']=sys_defaults.year_start_date;
-  this.filter_fields_dict['GL Entry'+FILTER_SEP +'To Posting Date'].df['report_default']=dateutil.obj_to_str(new Date());
-  this.filter_fields_dict['GL Entry'+FILTER_SEP +'Company'].df['report_default']=sys_defaults.company;
+}</pre>
+</div>
+</div>
+<div class="section" id="setting-single-select">
+<h2>Setting Single Select<a class="headerlink" href="#setting-single-select" title="Permalink to this headline">¶</a></h2>
+<p>Select fields are defaulted to multiple select, if you want to change this to single select, there are
+two options, while adding a new filter set the property single_select = 1, or for an existing filter, call
+set_as_single method on the filter:</p>
+<div class="highlight-python"><pre>report.customize_filters = function() {
+  // set exiting field as single
+  this.get_filter('Receivable Voucher', 'Type').set_as_single();
+
+  // add new single select field
+  this.add_filter({single_select:1, fieldname:'aging_based_on', label:'Aging Based On', fieldtype:'Select', options:NEWLINE+'Transaction Date'+NEWLINE+'Aging Date'+NEWLINE+'Due Date',ignore : 1, parent:'Receivable Voucher', report_default:'Aging Date'});
 }</pre>
 </div>
 </div>
@@ -207,7 +218,7 @@ to the client</p>
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="page_cookbook.html" title="Page Cookbook"
+          <a href="server_side_api.html" title="3. Server Side API"
              >next</a> |</li>
         <li class="right" >
           <a href="client_side_cookbook.html" title="Client Side Cookbook"

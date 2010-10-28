@@ -50,8 +50,8 @@ Example::
      // add a new filter
      this.add_filter({fieldname:'show_group_balance', label:'Show Group Balance', fieldtype:'Select', options:NEWLINE+'Yes'+NEWLINE+'No',ignore : 1, parent:'Account'});
 
-     // add a "Company" filter
-     this.filter_fields_dict['Account'+FILTER_SEP +'Company'].df.filter_hide = 0;
+     // show a filter
+     this.set_filter_properties('Account','Company',{filter_hide: 0});
      
      // remove limts - show all records
      this.dt.set_no_limit(1);
@@ -205,9 +205,17 @@ Report Builder Class
    
       Set the value of a filter
       
+   .. function:: set_filter_properties(doctype, label, property_dict)
+   
+      Set field properties on a filter as specified in property dict
+      
    .. function:: add_filter(f)
    
       Add a filter in the by specifying the field properties in a dictionary.
+      
+   .. function:: get_filter(doctype, label)
+   
+      Returns the `Field` object of that filter
       
    .. function:: run()
    
