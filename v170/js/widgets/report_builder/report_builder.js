@@ -268,9 +268,6 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 	this.has_index = 1; this.has_headings = 1;
 
 	for(var i in this.fn_list) this[this.fn_list[i]] = null; // clear custom functions
-			
-	this.report_filters.refresh();	
-	this.column_picker.refresh();
 }
 
 // -------------------------------------------------------------------------------------
@@ -297,7 +294,7 @@ _r.ReportBuilder.prototype.set_filter = function(dt, label, value) {
 
 _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	this.clear_criteria();
-		
+	
 	if(!this.sc_dict[criteria_name]) {
 		alert(criteria_name + ' could not be loaded. Please Refresh and try again');
 	}
@@ -320,6 +317,7 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	// set fields
 	// ----------
 	this.column_picker.clear();
+
 	var cl = this.sc.columns.split(',');
 	for(var c=0;c<cl.length;c++) {
 		var key = cl[c].split('\1');
@@ -336,6 +334,8 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 			this.set_filter(key[0], key[1], fl[n]);
 		}
 	}
+
+	// refresh column picker
 	this.set_criteria_sel(criteria_name);
 }
 
@@ -558,11 +558,16 @@ _r.ReportBuilder.prototype.setup_doctype = function(onload) {
 
 _r.ReportBuilder.prototype.reset_report = function() {
 	this.clear_criteria();
+	
+	this.report_filters.refresh();
+	this.column_picker.refresh();
+	
 	this.set_filter(this.doctype, 'Saved', 1);
 	this.set_filter(this.doctype, 'Submitted', 1);
 	this.set_filter(this.doctype, 'Cancelled', 0);
 	
 	this.column_picker.set_defaults();
+
 	this.dt.clear_all();
 	
 	this.dt.sort_sel.value = 'ID';
@@ -1086,7 +1091,6 @@ _r.ReportColumnPicker.prototype.move = function(s, type, all) {
 // -------------------------------------------------------------------------------------
 
 _r.ReportColumnPicker.prototype.refresh = function() {
-	
 	// separate
 	var ul = []; var sl=[];
 	for(var i=0; i<this.all_fields.length; i++) {
@@ -1101,6 +1105,7 @@ _r.ReportColumnPicker.prototype.refresh = function() {
 			if(this.rb.dt) this.rb.dt.set_sort_option_disabled(o.df.label, 1);
 		}
 	}
+
 	
 	// sort by field idx
 	ul.sort(function(a,b){return (cint(a.df.idx)-cint(b.df.idx))});
@@ -1124,8 +1129,7 @@ _r.ReportColumnPicker.prototype.set_options = function(s, l) {
 
 	for(var i=0; i<l.length; i++) {
 		var v = l[i].df.parent + '.' + l[i].df.label;
-		var v_label = get_doctype_label(l[i].df.parent) + '.' + l[i].df.label;
-		
+		var v_label = get_doctype_label(l[i].df.parent) + '.' + l[i].df.label;		
 		var o = new Option (v_label, v, false, false);
 		o.field = l[i];
 		if(o.field.is_selected) o.selected = 1;

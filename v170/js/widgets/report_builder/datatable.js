@@ -211,7 +211,9 @@ _r.DataTable.prototype.set_sort_option_disabled = function(label, disabled) {
       try {
         s.add(this.disabled_options[label], s.options[s.options.length-1]);
       } catch(e) {
-      	s.add(this.disabled_options[label], s.options.length-1);
+      	try {
+      	  s.add(this.disabled_options[label], s.options.length-1);
+      	} catch (e) { }
       }
       this.disabled_options[label] = null;
     }
