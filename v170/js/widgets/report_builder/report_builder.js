@@ -683,12 +683,15 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			// add to "filter_values"
 			var v = t.get_value?t.get_value():'';
 			if(t.df.fieldtype=='Select') {
-				for(var sel_i=0;sel_i < v.length; sel_i++) { 
-					if(v[sel_i]) { add_to_filter(t.df.fieldname, v[sel_i], 1); }
+				if(t.input.multiple) {
+					for(var sel_i=0;sel_i < v.length; sel_i++) { 
+						if(v[sel_i]) { add_to_filter(t.df.fieldname, v[sel_i], 1); }
+					}
+					// no values? atleast add key
+					if(!v.length) add_to_filter(t.df.fieldname, "", 1);
+				} else {
+					add_to_filter(v);
 				}
-
-				// no values? atleast add key
-				if(!v.length) add_to_filter(t.df.fieldname, "", 1);
 			} else add_to_filter(t.df.fieldname, v);
 			
 			// if filter is not disabled

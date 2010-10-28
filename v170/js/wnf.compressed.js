@@ -729,11 +729,11 @@ _f.cur_grid_cell.grid.cell_deselect();}
 text_dialog=d;}
 TextField.prototype.table_refresh=function(){if(!this.text_dialog)
 make_text_dialog();text_dialog.set_title('Enter text for "'+this.df.label+'"');text_dialog.field=this;text_dialog.show();}
-function SelectField(){}SelectField.prototype=new Field();SelectField.prototype.with_label=1;SelectField.prototype.make_input=function(){var me=this;var opt=[];if(this.not_in_form&&(!this.df.single_select)){this.input=$a(this.input_area,'select');this.input.multiple=true;this.input.style.height='4em';this.txt=this.input;var lab=$a(this.input_area,'div',{fontSize:'9px',color:'#999'});lab.innerHTML='(Use Ctrl+Click to select multiple or de-select)'}else{this.input=new SelectWidget(this.input_area,[],'80%');this.txt=this.input.inp;if(this.input.custom_select){this.btn=this.input.btn;$y(this.input.wrapper,{marginLeft:'1px'});}
+function SelectField(){}SelectField.prototype=new Field();SelectField.prototype.with_label=1;SelectField.prototype.make_input=function(){var me=this;var opt=[];if(this.not_in_form&&(!this.df.single_select)){this.input=$a(this.input_area,'select');this.input.multiple=true;this.input.style.height='4em';this.txt=this.input;this.input.lab=$a(this.input_area,'div',{fontSize:'9px',color:'#999'});this.input.lab.innerHTML='(Use Ctrl+Click to select multiple or de-select)'}else{this.input=new SelectWidget(this.input_area,[],'80%');this.txt=this.input.inp;if(this.input.custom_select){this.btn=this.input.btn;$y(this.input.wrapper,{marginLeft:'1px'});}
 this.txt.field_object=this;this.txt.fieldname=this.df.fieldname;this.txt.onchange=function(){if(me.validate)
 me.validate();me.set(me.txt.value);if(isIE&&me.in_grid){$dh(_f.cur_grid_cell.grid.wrapper);$ds(_f.cur_grid_cell.grid.wrapper);}
 me.run_trigger();}}
-this.set_as_single=function(){this.input.multiple=false;this.input.style.height=null;}
+this.set_as_single=function(){this.input.multiple=false;this.input.style.height=null;$dh(this.input.lab)}
 this.refresh_options=function(options){if(options)
 me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];empty_select(this.input);add_sel_options(this.input,me.options_list);}
 this.onrefresh=function(){this.refresh_options();if(this.not_in_form){this.input.value='';return;}
