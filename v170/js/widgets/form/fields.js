@@ -870,7 +870,7 @@ SelectField.prototype.make_input = function() {
 	this.refresh_options = function(options) {
 		if(options)
 			me.df.options = options;
-			
+
 		me.options_list = me.df.options?me.df.options.split('\n'):[];
 		
 		// add options
@@ -889,8 +889,12 @@ SelectField.prototype.make_input = function() {
 		
 		if(_f.get_value)
 			var v = _f.get_value(this.doctype,this.docname,this.df.fieldname);
-		else 
-			var v=null;
+		else {
+			if(this.options_list)
+				var v = this.options_list[0];
+			else
+				var v = null;
+		}
 		this.input.set_input(v);
 	}
 	
@@ -898,7 +902,7 @@ SelectField.prototype.make_input = function() {
 		if(!v) {
 			if(!me.input.multiple) {
 				if(me.docname) { // if called from onload without docname being set on fields
-					if(me.df.options) {
+					if(me.options_list) {
 						me.set(me.options_list[0]);
 						me.txt.value = me.options_list[0];
 					} else {
