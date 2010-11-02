@@ -98,7 +98,7 @@ def clear_recycle_bin():
 			total_deleted += sql("select count(*) from `%s` where parent like 'old_parent:%%'" % t[0])[0][0]
 			sql("delete from `%s` where parent like 'old_parent:%%'" % t[0])
 
-	msgprint("%s records deleted" % str(int(total_deleted)))
+	webnotes.msgprint("%s records deleted" % str(int(total_deleted)))
 	
 	
 # Make Table Copy
