@@ -129,7 +129,7 @@ class Document:
 			
 			self.name = am_prefix + '-' + str(am_id)
 		
-		elif so and hasattr(so, 'autoname'):
+		elif so and autoname and hasattr(so, 'autoname'):
 			r = webnotes.model.code.run_server_obj(so, 'autoname')
 			if r:
 				return r
@@ -265,13 +265,13 @@ class Document:
 
 	# Save values
 	# -----------
-	def save(self, new=0, check_links=1, ignore_fields=0):	
+	def save(self, new=0, check_links=1, ignore_fields=0, autoname = 1):	
 		res = webnotes.model.meta.get_dt_values(self.doctype, 'autoname, issingle, istable, name_case', as_dict=1)
 		res = res and res[0] or {}
-
+		autoname = autoname and res.get('autoname')
 		# if required, make new
 		if new or (not new and self.fields.get('__islocal')) and (not res.get('issingle')):
-			r = self._makenew(res.get('autoname'), res.get('istable'), res.get('name_case'))
+			r = self._makenew(autoname, res.get('istable'), res.get('name_case'))
 			if r: 
 				return r
 		
@@ -409,7 +409,7 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 
 def check_perm(doc):
 	import webnotes
-	
+
 	# find roles with read access for this record at 0
 	rl = webnotes.conn.sql("select role, `match` from tabDocPerm where parent=%s and ifnull(`read`,0) = 1 and ifnull(permlevel,0)=0", doc.doctype)
 	
