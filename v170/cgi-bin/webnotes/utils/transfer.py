@@ -1,305 +1,6 @@
-transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','Search Criteria', 'Patch']
-# accept a module coming from a remote server
-# ==============================================================================
-def accept_module(super_doclist):
-	import webnotes
-	import webnotes.utils
-	msg, i = [], 0
-	
-	for dl in super_doclist:
-		msg.append(set_doc(dl, 1, 1, 1))
-	msg = '<br>'.join(msg)
-
-	if not webnotes.conn.in_transaction:
-		webnotes.conn.sql("START TRANSACTION")
-
-	# clear over-written records / deleted child records
-	webnotes.utils.clear_recycle_bin()
-	
-	# clear cache
-	webnotes.conn.sql("DELETE from __DocTypeCache")
-	webnotes.conn.sql("COMMIT")
-
-#	print msg
-
-# prepare a list of items in a module
-# ==============================================================================
-
-def get_module_items(mod):
-	import webnotes
-
-	# TDS Category and TDS Rate chart updates should go, if at all as Patches not here.
-	dl = []
-	for dt in transfer_types:
-		try:
-			dl2 = webnotes.conn.sql('select name from `tab%s` where module="%s"' % (dt,mod))
-			dl += [(dt+','+e[0]+',0') for e in dl2]
-		except:
-			pass
-	dl1 = webnotes.conn.sql('select doctype_list from `tabModule Def` where name=%s', mod)
-	dl1 = dl1 and dl1[0][0] or ''
-	if dl1:		
-		dl1 = dl1.split('\n')
-		dl += [t+',1' for t in dl1]
-	dl += ['Module Def,'+mod+',0']
-	# build finally
-	dl = [e.split(',') for e in dl]
-	dl = [[e[0].strip(), e[1].strip(), e[2]] for e in dl] # remove blanks
-	return dl
-
-
-# build a list of doclists of items in that module and send them
-# ==============================================================================
-
-def get_module():
-	if not module:
-		module = webnotes.form.getvalue('module')
-	webnotes.response['super_doclist'] = get_module_doclist(doclist)
-
-def get_module_doclist(module):
-	import webnotes
-	import webnotes.model.doc
-	item_list = get_module_items(module)
-	
-	# build the super_doclist
-	super_doclist = []
-	for i in item_list:
-		dl = webnotes.model.doc.get(i[0], i[1])
-		if i[2]=='1':
-			dl[0].module = module
-		# remove compiled code (if any)
-		if dl[0].server_code_compiled:
-			dl[0].server_code_compiled = None
-			
-		# add to super
-		super_doclist.append([d.fields for d in dl])
-		
-	return super_doclist
-
-# export to files
-# ==============================================================================
-
-def export_to_files(modules = [], record_list=[]):	
-	# Multiple doctype  and multiple modules export to be done
-	# for Module Def, right now using a hack..should consider table update in the next version
-	# all modules transfer not working, because source db not known
-	# get the items
-
-	import webnotes.model.doc
-	module_doclist =[]
-	if record_list:
-		for record in record_list:
-			module_doclist.append([d.fields for d in webnotes.model.doc.get(record[0], record[1])])
-		
-	if modules:
-		for m in modules:
-			module_doclist +=get_module_doclist(m)
-	# write files
-	for doclist in module_doclist:
-		write_document_file(doclist)
-
-# ==============================================================================
-
-def write_document_file(doclist):
-	import os
-	import webnotes
-	import re	
-
-	# create the folder
-	folder = os.path.join(webnotes.get_index_path(), 'modules', doclist[0].has_key('module') and doclist[0]['module'] or doclist[0]['name'], doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
-	
-	webnotes.create_folder(folder)
-
-	# separate code files
-	separate_code_files(doclist, folder)
-	
-	# write the data file
-	txtfile = open(os.path.join(folder, doclist[0]['name'].replace('/', '-')+'.txt'),'w+')
-	txtfile.write(str(doclist))
-	txtfile.close()
-
-# ==============================================================================
-
-def separate_code_files(doclist, folder):
-	import os
-	import webnotes
-	# code will be in the parent only
-	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
-	for code_field in code_fields:
-		if doclist[0].get(code_field[0]):
-			fname = doclist[0]['name']
-			fname = fname.replace('/','-')  #Weirdly, doesn't work..using a hack instead.
-			# 2 htmls
-			if code_field[0]=='static_content':
-				fname+=' Static'
-			# write the file
-			codefile = open(os.path.join(folder, fname+'.'+code_field[1]),'w+')
-			codefile.write(doclist[0][code_field[0]])
-			codefile.close()
-		
-			# clear it from the doclist
-			doclist[0][code_field[0]] = None
-
-# ==============================================================================
-
-def import_from_files(modules = [], record_list = []):
-	# Modify for module list
-	import os
-	import webnotes
-	import fnmatch
-
-	doclist = []
-	module_doclist = []
-	folder_list=[]
-	global low_folder_list
-	
-	# get the folder list
-	if record_list:
-		for record in record_list:
-			low_folder_list = []
-			low_folder_list = get_lowest_file_paths(os.path.join(webnotes.get_index_path(),'modules'))
-			
-			for each in low_folder_list: 
-				if fnmatch.fnmatch(each,'*'+record[0]+'*'+record[1].replace('/', '-')):
-					folder_list.append(each)
-	else:
-		sys_mod_ordered_list = ['Roles', 'System', 'Application Internal', 'Mapper', 'Settings']
-		if not modules:
-			modules = os.listdir(os.path.join(webnotes.get_index_path(), 'modules'))
-		
-		all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
-		for each in all_mod_ordered_list:
-			mod_path = os.path.join(webnotes.get_index_path(), 'modules', each)
-			temp = os.listdir(mod_path)
-			all_transfer_types =[t for t in transfer_types if t in temp] + list(set(temp).difference(transfer_types))
-			for d in all_transfer_types:
-				low_folder_list = []
-				low_folder_list = get_lowest_file_paths(os.path.join(webnotes.get_index_path(),'modules',each, d))	
-				folder_list+=low_folder_list
-	# build into doclist
-	for folder in folder_list:
-		# get the doclist
-		file_list = os.listdir(folder)
-		for each in file_list:
-
-			if fnmatch.fnmatch(each,'*.txt'):
-				doclist = eval(open(os.path.join(folder,each),'r').read())
-				# add code
-				module_doclist.append(add_code_from_files(doclist, folder))
-		
-	accept_module(module_doclist)
-	print execute_patches(modules,record_list)	
-	
-
-# ==============================================================================
-
-def add_code_from_files(doclist, folder):
-	import webnotes
-	import os
-	# code will be in the parent only
-	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
-	code = ''
-	for code_field in code_fields:
-		# see if the file exists
-		
-		fname = os.path.join(folder, os.path.basename(folder)+'.'+code_field[1])
-		if code_field[0]=='static_content':
-			fname += ' Static'
-		
-		try:
-			code = open(fname,'r').read()
-		except Exception, e:
-			if e.args[0]==2:
-				pass
-			else:
-				raise e
-		
-		doclist[0][code_field[0]] = code
-	return doclist
-
-
-		
-	
-# ==============================================================================
-
-def get_module_folders(module):
-	import os
-	import webnotes
-
-	doc_folder_list = []
-
-	# get all the types
-	type_dir_list = os.listdir(os.path.join(webnotes.get_index_path(), 'modules', module))
-	
-	for type_dir in type_dir_list:
-		if os.path.isdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir)):
-			
-			# get all items of this type
-			item_dir_list = os.listdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir))
-			
-			for item_dir in item_dir_list:
-				if os.path.isdir(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir)):
-#					if item_dir != 'SRCH': #Hacky for the time being.	
-						doc_folder_list.append(os.path.join(webnotes.get_index_path(), 'modules', module, type_dir, item_dir))
-					
-	return doc_folder_list
-
 # =============================================================================
-# Get the deepmost folder with files in the given path tree....
-def get_lowest_file_paths(path):
-	import os
-	folderlist = os.listdir(path)
-	for each in folderlist:
-		temp = os.path.join(path,each)
-
-		if os.path.isdir(temp):
-			get_lowest_file_paths(temp)
-		else:
-			if os.path.dirname(temp) not in low_folder_list:
-				low_folder_list.append(os.path.dirname(temp))
-	return low_folder_list
-
-# =============================================================================
-
-def execute_patches(modules,record_list):
-	import webnotes
-	from webnotes.model import code
-	import os
-	#Todo: Keep track of already run patches(table/file)
-	ret = {}
-	if not webnotes.conn.in_transaction:
-                webnotes.conn.sql("START TRANSACTION")
-
-	patch_list = [] 
-	if modules:
-		for each in modules:
-			patch_list += [[d[0], d[1]] for d in webnotes.conn.sql("select name, patch_code from `tabPatch` where module = %s and status = 'Ready'",each)]
-
-	if record_list:
-		for each in record_list:
-			if each[0] == 'Patch':
-				cd = webnotes.conn.sql("select name, patch_code from tabPatch where name = %s and status = 'Ready'", each[1])
-				if cd:
-					patch_list.append([each[1], cd]) 
-	print patch_list		
-	for d in patch_list:
-		print type(list(d[1][0])[1])
-		ret_msg = code.execute(list(d[1][0])[1])
-		print ret_msg
-		if ret_msg != 'Error':
-			print "No error"
-			webnotes.conn.sql("update tabPatch set status = 'Executed' where name = %s", d[1])
-		ret[d[1]] = ret_msg
-
-	webnotes.conn.sql("COMMIT")
-	return ret
-
-			
-	
-	
-
 # Import a record (with its chilren)
-# ==============================================================================
+# =============================================================================
 def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	import webnotes
 	from webnotes.model.doc import Document
@@ -314,7 +15,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	doc = Document(fielddata = doclist[0])
 	orig_modified = doc.modified
 	exists = webnotes.conn.exists(doc.doctype, doc.name)
-	#print doc.doctype, doc.name
+	print doc.doctype, doc.name
 	if not webnotes.conn.in_transaction: 
 		sql("START TRANSACTION")
 	
@@ -361,12 +62,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	# save main
 	check_links = 1	
 	if doc.doctype == 'Patch':
-		# Very hacky solution. Need to save patches without autoname. Better to modify doc._makenew to accept parameter
-		res = webnotes.model.meta.get_dt_values(doc.doctype,'autoname, issingle,istable, name_case',as_dict = 1)
-		res = res and res[0] or {}
-		doc._makenew(False,res.get('istable'),res.get('name_case'))
-		doc.update_values(res.get('issingle'),check_links and doc.make_link_list() or {}, ignore_fields = 1)
-		doc._clear_temp_fields()
+		doc.save(autoname = 0, new = 1, ignore_fields = ignore, check_links=0)
 	else:
 		doc.save(new = 1, ignore_fields = ignore, check_links=0)
 	
@@ -399,9 +95,9 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	return doc.name + ': Completed'
 
 
+# =============================================================================
 # Transfer DocType
-# ==============================================================================
-
+# =============================================================================
 def merge_doctype(doc_list, ovr, ignore, onupdate):
 	import webnotes
 	from webnotes.model.doc import Document
@@ -498,9 +194,11 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 		added_fields =	' Added Fields :'+ cstr(fld_lst)
 		
 	return doc.name + (' Upgraded: %s fields added' % added)+added_fields
-
+	
+	
+# =============================================================================
 # Transfer Mapper
-# ==============================================================================
+# =============================================================================
 
 def merge_mapper(doc_list, ovr, ignore, onupdate):
 	import webnotes
@@ -622,9 +320,9 @@ def merge_mapper(doc_list, ovr, ignore, onupdate):
 		added_fields =	' Added Fields:'+ cstr(fld_lst)
 	return doc.name + ('Upgraded: %s fields added' % added)+added_fields
 
-
+# =============================================================================
 # Transfer Module Def
-# ============================================================
+# =============================================================================
 def merge_module_def(doc_list, ovr, ignore, onupdate):
 	import webnotes
 	from webnotes.model.doc import Document
@@ -683,3 +381,61 @@ def merge_module_def(doc_list, ovr, ignore, onupdate):
 	else:
 		added_fields =	' Added Fields:'+ cstr(fld_lst)
 	return doc.name + ('Upgraded: %s fields added' % added)+added_fields
+	
+	
+# =============================================================================
+# Execute Patches
+# =============================================================================
+def execute_patches(modules,record_list):
+	import webnotes
+	from webnotes.model import code
+	
+	ret = {}
+	patch_list, ret = get_patch_list(modules, record_list, ret)
+	
+	for d in patch_list:
+		try:
+			if not webnotes.conn.in_transaction:
+				webnotes.conn.sql("START TRANSACTION")
+			print 'Patch: ' + d[0]
+			ret_msg = code.execute(d[1])
+			webnotes.conn.sql("update tabPatch set status = 'Executed' where name = %s", d[0])
+			webnotes.conn.sql("COMMIT")
+		except Exception, e:
+			ret_msg = e
+		finally:
+			ret[d[0]] = ret_msg
+
+	return ret
+
+
+# =============================================================================
+# Get patch list
+# =============================================================================
+def get_patch_list(modules, record_list, ret):
+	import webnotes
+	patch_list = [] 
+	if modules:
+		for each in modules:
+			patch_list += [[d[0], d[1]] for d in webnotes.conn.sql("select name, patch_code from `tabPatch` where module = %s and status = 'Ready'",each)]
+
+	if record_list:
+		for each in record_list:
+			if each[0] == 'Patch':
+				cd = webnotes.conn.sql("select patch_code from tabPatch where name = %s and status = 'Ready'", each[1])
+				if cd:
+					patch_list.append([each[1], cd[0][0]]) 
+				else:
+					ret[each[1]] = 'Patch is not ready'
+					
+	return patch_list, ret
+	
+	
+# =============================================================================
+# Sync control panel
+# =============================================================================
+def sync_control_panel(startup_code, startup_css):
+	webnotes.conn.sql("start transaction")
+	webnotes.conn.set_value('Control Panel', None, 'startup_code', startup_code)
+	webnotes.conn.set_value('Control Panel', None, 'startup_css', startup_css)
+	webnotes.conn.sql("commit")
