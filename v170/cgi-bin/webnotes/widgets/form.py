@@ -230,7 +230,6 @@ def check_integrity(doc):
 def savedocs():
 	import webnotes.model.doclist
 
-	from webnotes.model.doc import check_perm
 	from webnotes.model.code import get_server_obj
 	from webnotes.model.code import run_server_obj
 	import webnotes.utils
@@ -253,8 +252,8 @@ def savedocs():
 	if not check_integrity(doc):
 		return
 	
-	if not check_perm(doc):
-		webnotes.msgprint("Not allowed to save")
+	if not doc.check_perm(verbose=1):
+		webnotes.msgprint("Not enough permission to save %s" % doc.doctype)
 		return
 	
 	# validate links
@@ -401,7 +400,8 @@ def get_print_format():
 
 def remove_attach():
 	fid = webnotes.form.getvalue('fid')
-	webnotes.conn.sql('delete from `tabFile Data` where name="%s"' % fid)
+	import webnotes.utils.file_manager
+	webnotes.utils.file_manager.delete_file(fid)
 
 # Get Fields - Counterpart to $c_get_fields
 #===========================================================================================
