@@ -324,7 +324,7 @@ class App:
 		val = self.master_conn.get_value(dt, dn, fieldname)
 		
 		# set
-		self.conn.set_value(dt, dn, fieldnamem val)
+		self.conn.set_value(dt, dn, fieldname, val)
 
 	# get the list from master
 	# ----------------------------------
