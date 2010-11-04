@@ -98,7 +98,7 @@ class AppManager:
 			elif field_list:
 				app.connect(app.ac_name)
 
-				for d in self.field_list:
+				for d in field_list:
 					app.sync_field(d[0], d[1], d[2])
 				
 				# Clear cache
