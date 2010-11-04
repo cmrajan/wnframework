@@ -33,7 +33,8 @@ class _DocType:
 		is_modified = 0
 		
 		# doctype modified
-		modified = webnotes.model.meta.get_dt_values(self.name, 'modified')[0][0]
+		modified = webnotes.model.meta.get_dt_values(self.name, 'modified')
+		modified = modified and modified[0][0] or None
 
 		# cache modified
 		cache_modified = webnotes.conn.sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
