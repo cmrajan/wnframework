@@ -403,8 +403,8 @@ def execute_patches(modules,record_list):
 			webnotes.conn.sql("COMMIT")
 		except Exception, e:
 			ret_msg = e
-		finally:
-			ret[d[0]] = ret_msg
+		#finally: #Only works on python 2.5+
+		ret[d[0]] = ret_msg
 
 	return ret
 
