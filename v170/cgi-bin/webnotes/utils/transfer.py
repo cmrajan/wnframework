@@ -62,7 +62,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	# save main
 	check_links = 1	
 	if doc.doctype == 'Patch':
-		doc.save(autoname = 0, new = 1, ignore_fields = ignore, check_links=0)
+		doc.save(make_autoname = 0, new = 1, ignore_fields = ignore, check_links=0)
 	else:
 		doc.save(new = 1, ignore_fields = ignore, check_links=0)
 	
