@@ -70,9 +70,15 @@ class AppManager:
 			
 
 
-	# sync all the apps (app_list -> ac_names , mod_list -> modules, dt_list -> [doctypes,docname])
+	# sync all the apps 
+	#
+	# app_list -> ac_names
+	# mod_list -> modules
+	# dt_list -> [doctypes,docname]
+	# field_list -> [doctype, docname, fieldname]
+	# 
 	# -----------------------------------------------------------------------------------------------
-	def sync_apps(self, app_list=[], mod_list = [], dt_list = []):
+	def sync_apps(self, app_list=[], mod_list = [], dt_list = [], field_list=[]):
 		self.app_list, self.dt_list = [], []
 		self.load_app_list(app_list)
 		print "Source Account : "+self.master
@@ -87,7 +93,17 @@ class AppManager:
 					app.sync_doc(d[0], d[1])
 				# Clear cache
 				app.clear_cache()
+				app.clear_recycle_bin()
 				app.close()
+			elif field_list:
+				app.connect(app.ac_name)
+
+				for d in self.field_list:
+					app.sync_field(d[0], d[1], d[2])
+				
+				# Clear cache
+				app.clear_cache()
+				app.close()				
 			else:
 				app.sync(ac_name = app.ac_name)
 
@@ -232,17 +248,24 @@ class App:
 		self.sync_records('TDS Rate Chart')
 		self.sync_control_panel()
 		self.clear_cache()
+		self.clear_recycle_bin()
 		self.close()
 
 
 	# Clear Cache
 	# ------------
 	def clear_cache(self):
-		import webnotes.utils
 		self.conn.sql("start transaction")
 		self.conn.sql("delete from __DocTypeCache")
 		self.conn.sql("delete from __SessionCache")
+		self.conn.sql("commit")
+
+	# clear recycle bin
+	# ----------------------------------
+	def clear_recycle_bin(self):
+		import webnotes.utils
 		webnotes.conn = self.conn
+		self.conn.sql("start transaction")
 		webnotes.utils.clear_recycle_bin()
 		self.conn.sql("commit")
 		
@@ -294,6 +317,14 @@ class App:
 		webnotes.conn = self.conn
 		print transfer.set_doc([d.fields for d in doclist], ovr = 1)
 	
+	# sync a particular field
+	# ----------------------------------
+	def sync_field(self, dt, dn, fieldname):
+		# get
+		val = self.master_conn.get_value(dt, dn, fieldname)
+		
+		# set
+		self.conn.set_value(dt, dn, fieldnamem val)
 
 	# get the list from master
 	# ----------------------------------
