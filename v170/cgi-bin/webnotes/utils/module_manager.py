@@ -180,7 +180,7 @@ def get_folder_paths(modules, record_list):
 				for each in low_folder_list: 
 					if fnmatch.fnmatch(each,'*'+record[0]+'*'+record[1].replace('/', '-')):
 						folder_list.append(each)
-		elif modules:
+		if modules:
 			# system modules will be transferred in a predefined order and before all other modules
 			sys_mod_ordered_list = ['Roles', 'System', 'Application Internal', 'Mapper', 'Settings']
 			all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
@@ -310,3 +310,16 @@ def sync_control_panel():
 		doclist = eval(open(os.path.join(cp_path, 'Control Panel.txt'),'r').read())
 		transfer.sync_control_panel(doclist[0].startup_code, doclist[0].startup_css)
 		return "Control Panel Synced!!!"
+
+
+#==============================================================================
+#Return module names present in File System
+#==============================================================================
+def get_modules_from_filesystem():
+	mod_list = []
+	for each in get_folder_paths():
+		a = each.split('/')
+		mod_list.append([a.index('modules'):len(a)-a.index('modules')])
+	return mod_list
+
+

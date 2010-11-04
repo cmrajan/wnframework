@@ -67,10 +67,11 @@ class AccountsManager(object):
 				account.connect()
 				webnotes.conn = account.conn
 				print module_manager.sync_control_panel()
-			except Exception, e:
-				raise e
-			finally:
 				account.close()
+			except Exception, e:
+				account.close()
+				raise e
+			#finally:
 
 
 			
@@ -89,10 +90,11 @@ class AccountsManager(object):
 			try:
 				account.connect()
 				print transfer.execute_patches([], record_list)
-			except Exception, e:
-				raise e
-			finally:
 				account.close()
+			except Exception, e:
+				account.close()
+				raise e
+			#finally:
 
 
 
@@ -146,9 +148,9 @@ class AccountsManager(object):
 					except:
 						print "Database "+db+" not found"
 						pass
-					finally:
-						root_conn.sql('drop user "%s"@"localhost"' % (db))
-						print "User"+db+"deleted"
+					#finally:
+					root_conn.sql('drop user "%s"@"localhost"' % (db))
+					print "User"+db+"deleted"
 
 			acc_conn.sql("START TRANSACTION")
 			acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
@@ -212,8 +214,8 @@ class Account(object):
 		except Exception,e:
 			print webnotes.utils.getTraceback()
 			print e
-		finally:
-			self.close()
+		#finally:
+		self.close()
 		
 				
 	# Clear Cache
