@@ -310,10 +310,7 @@ class Document:
 			r = self._makenew(res.get('autoname'), res.get('istable'), res.get('name_case'), make_autoname)
 			if r: 
 				return r
-		
-		# validate matches
-		self._validate_match()
-		
+				
 		# save the values
 		self._update_values(res.get('issingle'), check_links and self.make_link_list() or {}, ignore_fields)
 		self._clear_temp_fields()
