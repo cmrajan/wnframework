@@ -187,7 +187,7 @@ class Document:
 	# Insert
 	# ---------------------------------------------------------------------------
 	
-	def _makenew(self, autoname, istable, case='', make_autoname):
+	def _makenew(self, autoname, istable, case='', make_autoname=1):
 		# set owner
 		if not self.owner: self.owner = webnotes.session['user']
 		
