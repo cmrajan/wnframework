@@ -97,7 +97,7 @@ function time_to_ampm(v){if(!v){var d=new Date();var t=[d.getHours(),cint(d.getM
 if(t.length!=2){show_alert('[set_time] Incorect time format');return;}
 if(cint(t[0])==0)var ret=['12',t[1],'AM'];else if(cint(t[0])<12)var ret=[cint(t[0])+'',t[1],'AM'];else if(cint(t[0])==12)var ret=['12',t[1],'PM'];else var ret=[(cint(t[0])-12)+'',t[1],'PM'];return ret;}
 function time_to_hhmm(hh,mm,am){if(am=='AM'&&hh=='12'){hh='00';}else if(am=='PM'&&hh!='12'){hh=cint(hh)+12;}
-return hh+':'+mm;}
+return hh+':'+mm;} 
 get_date=function(date){if(date==null||date=='')return null;if(date.search('-')==-1){show_alert('Date should be in yyyy-mm-dd format');return;}
 var dict={};var d=date.split('-');dt=new Date(d[0],d[1]-1,d[2]);var today=get_today();if(date==today){dict.date='Today';}
 else{dict.date=dt.getDate();}

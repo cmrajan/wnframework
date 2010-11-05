@@ -8,10 +8,10 @@ DocBrowser = function() {
 
 	this.body = $a(this.wrapper, 'div');
 
-	var h = $a(this.body, 'div','',{marginBottom:'8px'});
+	var h = $a(this.body, 'div');
 	this.page_head = new PageHeader(h, 'List');
 
-	this.list_wrapper = $a(this.body, 'div');
+	this.list_wrapper = $a(this.body, 'div', '', {margin:'16px'});
 	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
@@ -20,15 +20,13 @@ DocBrowser = function() {
 DocBrowser.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
-	if(this.cur_list) 
-		$dh(this.cur_list);
+	if(this.cur_list) $dh(this.cur_list);
 		
 	$ds(this.loading_div);
 	$dh(this.body);
 
 	var l = get_doctype_label(dt).toLowerCase()
-	if(l.substr(-4) == 'list') this.page_head.main_head.innerHTML = get_doctype_label(dt);
-	else this.page_head.main_head.innerHTML = get_doctype_label(dt) + ' List';
+	this.page_head.main_head.innerHTML = (l.substr(-4) == 'list') ? get_doctype_label(dt) : (get_doctype_label(dt) + ' List')
 
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
