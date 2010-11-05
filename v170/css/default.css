@@ -72,6 +72,16 @@ div#head_div { background-color: #FFF; }
 
 #head_banner { background-color: #FFF; }
 
+
+/* Page head */
+
+div.page_head_wrapper {
+	background-color: #EEE;
+	background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(#DDD));
+	background: -moz-linear-gradient(top, #EEE, #DDD);
+	margin-bottom: 16px;	
+}
+
 /******** Menus - menu.js ************/
 
 ul.menu_toolbar {

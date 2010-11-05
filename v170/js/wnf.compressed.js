@@ -97,7 +97,7 @@ function time_to_ampm(v){if(!v){var d=new Date();var t=[d.getHours(),cint(d.getM
 if(t.length!=2){show_alert('[set_time] Incorect time format');return;}
 if(cint(t[0])==0)var ret=['12',t[1],'AM'];else if(cint(t[0])<12)var ret=[cint(t[0])+'',t[1],'AM'];else if(cint(t[0])==12)var ret=['12',t[1],'PM'];else var ret=[(cint(t[0])-12)+'',t[1],'PM'];return ret;}
 function time_to_hhmm(hh,mm,am){if(am=='AM'&&hh=='12'){hh='00';}else if(am=='PM'&&hh!='12'){hh=cint(hh)+12;}
-return hh+':'+mm;} 
+return hh+':'+mm;}
 get_date=function(date){if(date==null||date=='')return null;if(date.search('-')==-1){show_alert('Date should be in yyyy-mm-dd format');return;}
 var dict={};var d=date.split('-');dt=new Date(d[0],d[1]-1,d[2]);var today=get_today();if(date==today){dict.date='Today';}
 else{dict.date=dt.getDate();}
@@ -481,7 +481,7 @@ this.tabs[n]=tab;return tab;}
 TabbedPage.prototype.disable_tab=function(n){if(this.cur_tab==this.tabs[n])this.tabs[n].hide();$dh(this.tabs[n])}
 TabbedPage.prototype.enable_tab=function(n){$di(this.tabs[n])}
 var def_ph_style={wrapper:{marginBottom:'16px',backgroundColor:'#EEE'},main_heading:{fontSize:'22px',fontWeight:'bold',marginBottom:'8px',padding:'4px'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#555',display:'none'},toolbar_area:{margin:'0px',display:'none'},toolbar_area2:{margin:'0px',display:'none'},separator:{borderBottom:'2px solid #AAA',display:'none'},tag_area:{color:'#888',fontSize:'10px',textAlign:'right',padding:'2px'},close_btn:{cursor:'pointer',width:'64px',cssFloat:'right',height:'24px',background:"url('images/ui/close_btn.gif') center no-repeat"}}
-function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','',def_ph_style.wrapper);this.t1=make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor),1,2,'100%',[null,'100px'],{padding:'2px'});$y(this.t1,{borderCollapse:'collapse'})
+function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','page_head_wrapper');this.t1=make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor),1,2,'100%',[null,'100px'],{padding:'2px'});$y(this.t1,{borderCollapse:'collapse'})
 this.lhs=$td(this.t1,0,0);this.main_head=$a(this.lhs,'div','',def_ph_style.main_heading);this.sub_head=$a(this.lhs,'div','',def_ph_style.sub_heading);this.toolbar_area=$a(this.lhs,'div','',def_ph_style.toolbar_area);this.toolbar_area2=$a(this.lhs,'div','',def_ph_style.toolbar_area2);this.separator=$a(this.wrapper,'div','',def_ph_style.separator);this.tag_area=$a(this.wrapper,'div','',def_ph_style.tag_area);$y($td(this.t1,0,1),{textAlign:'right'});this.close_btn=$a($td(this.t1,0,1),'button','',{fontSize:'11px'});this.close_btn.innerHTML='Close';$(this.close_btn).button({icons:{primary:'ui-icon-closethick'}});this.close_btn.onclick=function(){nav_obj.show_last_open();}
 if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;this.buttons={};this.buttons2={};}
 PageHeader.prototype.add_button=function(label,fn,bold,icon,green,toolbar2){var tb=this.toolbar_area;if(toolbar2){tb=this.toolbar_area2;if(this.buttons2[label])return;}else{if(this.buttons[label])return;}

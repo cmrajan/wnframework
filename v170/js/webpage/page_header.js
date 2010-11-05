@@ -27,7 +27,7 @@ var def_ph_style = {
 
 function PageHeader(parent, main_text, sub_text) {
 
-	this.wrapper = $a(parent,'div','',def_ph_style.wrapper);
+	this.wrapper = $a(parent,'div','page_head_wrapper');
 	this.t1 = make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor), 1, 2, '100%', [null, '100px'], {padding: '2px'});
 	$y(this.t1, {borderCollapse:'collapse'})
 	this.lhs = $td(this.t1, 0, 0);

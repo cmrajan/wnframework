@@ -60,7 +60,9 @@ _f.Frm = function(doctype, parent) {
 	this.parent = parent;
 	this.attachments = {};
 	this.tinymce_id_list = [];
-	
+	this.tray_bg = '#DDE3EA';
+	this.tray_mo = '#B5C3D6';
+	this.tray_fg = '#8392AC';
 	// comments
 	this.last_comments = {};
 	this.n_comments = {};
@@ -70,7 +72,7 @@ _f.Frm = function(doctype, parent) {
 	this.setup_meta(doctype);
 	
 	// notify on rename
-	rename_observers.push(this);	
+	rename_observers.push(this);
 }
 
 // ======================================================================================
@@ -243,11 +245,14 @@ _f.Frm.prototype.setup_meta = function() {
 _f.Frm.prototype.setup_std_layout = function() {
 	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
 
+	// only tray
+	if(this.meta.section_style=='Tabbed') this.meta.section_style='Tray';
+
+	// build the sidebar
 	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
 		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
 		var r = t.insertRow(0); var c = r.insertCell(0);
-		c.className='frm_tray_area';
-		$y(c,{backgroundColor:def_ph_style.wrapper.backgroundColor, borderTop:'1px solid ' + def_ph_style.wrapper.backgroundColor})
+		$y(c,{backgroundColor: this.tray_bg, borderTop:'1px solid ' + this.tray_fg, borderBottom:'1px solid ' + this.tray_fg, width: '122px'})
 		this.tray_area = c;
 		var c1 = r.insertCell(1);
 		$y(c1, {border:'1px solid #AAA', borderRight:'0px'});

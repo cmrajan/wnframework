@@ -194,20 +194,20 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.header.show = function() { $ds(me.header); }
 
 			this.header.onmouseover = function() {
-				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
+				if(_f.cur_sec_header != this) { $y(this, {backgroundColor: me.frm.tray_mo}); }
 			}
 			this.header.onmouseout = function() {
-				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:def_ph_style.wrapper.backgroundColor}); }
+				if(_f.cur_sec_header != this) { $y(this, {backgroundColor: me.frm.tray_bg}); }
 			}
 			
 			// expand and collapse the section
 			this.collapse = function() { 
 				this.row.hide();
-				$y(this.header, { backgroundColor:def_ph_style.wrapper.backgroundColor, fontWeight:'normal', color:'#000'} );
+				$y(this.header, { backgroundColor: me.frm.tray_bg, fontWeight:'normal', color:'#000'} );
 			}
 			this.expand = function() { 
 				this.row.show(); 
-				$y(this.header, { backgroundColor:'#777', fontWeight:'bold', color:'#FFF'} );
+				$y(this.header, { backgroundColor:  me.frm.tray_fg, fontWeight:'bold', color:'#FFF'} );
 				
 				_f.cur_sec_header = this.header;
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
