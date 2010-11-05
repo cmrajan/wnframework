@@ -4,7 +4,7 @@ DocBrowser = function() {
 	this.cur_list = null;
 
 	this.my_page = page_body.add_page('DocBrowser');
-	this.wrapper = $a(this.my_page,'div','',{margin:'8px'});
+	this.wrapper = $a(this.my_page,'div');
 
 	this.body = $a(this.wrapper, 'div');
 

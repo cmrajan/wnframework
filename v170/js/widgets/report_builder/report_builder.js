@@ -7,7 +7,6 @@ _r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
 	
 	$dh(this.wrapper);
-	$y(this.wrapper, {margin:'4px'});
 	
 	var me = this;
 	this.rb_dict = {};
