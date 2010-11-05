@@ -117,7 +117,7 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
 	this.mytabs = new TabbedPage(this.tab_wrapper);
 	
-	$y(this.mytabs.label_wrapper,{backgroundColor:'#EEE'})
+	$y(this.mytabs.label_wrapper,{backgroundColor:def_ph_style.wrapper.backgroundColor})
 	this.mytabs.add_tab('Result');
 	this.mytabs.add_tab('More Filters');
 	this.mytabs.add_tab('Select Columns');

@@ -196,7 +196,7 @@ _f.Frm.prototype.set_section = function(sec_id) {
 _f.Frm.prototype.setup_tabs = function() {
 	var me = this;
 	$ds(this.tab_wrapper);
-	$y(this.tab_wrapper, {backgroundColor:'#EEE'});
+	$y(this.tab_wrapper, {backgroundColor:def_ph_style.wrapper.backgroundColor});
 	this.tabs = new TabbedPage(this.tab_wrapper, 1);
 	
 	$y(this.body,{padding:'0px 16px'});
@@ -247,6 +247,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
 		var r = t.insertRow(0); var c = r.insertCell(0);
 		c.className='frm_tray_area';
+		$y(c,{backgroundColor:def_ph_style.wrapper.backgroundColor})
 		this.tray_area = c;
 		this.body = $a(r.insertCell(1), 'div', 'frm_body',{padding:'8px 16px'});
 	} else {

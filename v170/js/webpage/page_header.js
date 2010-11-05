@@ -13,7 +13,7 @@
 */
 
 var def_ph_style = {
-	wrapper: {marginBottom:'16px', backgroundColor:'#EEE'}
+	wrapper: {marginBottom:'16px', backgroundColor:'#FFF'}
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px', padding: '4px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555', display:'none' }
 	,toolbar_area: { margin:'0px', display:'none'}
@@ -23,12 +23,13 @@ var def_ph_style = {
 	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 
 		background:"url('images/ui/close_btn.gif') center no-repeat"
 	}
+	,toolbar_bg: {backgroundColor:'#FFF'}
 }
 
 function PageHeader(parent, main_text, sub_text) {
 
 	this.wrapper = $a(parent,'div','',def_ph_style.wrapper);
-	this.t1 = make_table($a(this.wrapper,'div','',{backgroundColor:'#CCC'}), 1, 2, '100%', [null, '100px'], {padding: '2px'});
+	this.t1 = make_table($a(this.wrapper,'div','',def_ph_style.toolbar_bg), 1, 2, '100%', [null, '100px'], {padding: '2px'});
 	this.main_head = $a(this.wrapper, 'div', '', def_ph_style.main_heading);
 	this.sub_head = $a(this.wrapper, 'div', '', def_ph_style.sub_heading);
 	this.toolbar_area = $a($td(this.t1, 0, 0), 'div', '', def_ph_style.toolbar_area);

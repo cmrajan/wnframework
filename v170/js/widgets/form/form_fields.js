@@ -197,13 +197,13 @@ _f.SectionBreak.prototype.make_body = function() {
 				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
 			}
 			this.header.onmouseout = function() {
-				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#EEE'}); }
+				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:def_ph_style.wrapper.backgroundColor}); }
 			}
 			
 			// expand and collapse the section
 			this.collapse = function() { 
 				this.row.hide();
-				$y(this.header, { backgroundColor:'#EEE', fontWeight:'normal', color:'#000'} );
+				$y(this.header, { backgroundColor:def_ph_style.wrapper.backgroundColor, fontWeight:'normal', color:'#000'} );
 			}
 			this.expand = function() { 
 				this.row.show(); 

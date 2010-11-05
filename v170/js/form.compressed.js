@@ -73,13 +73,14 @@ _f.Frm.prototype.set_heading=function(){if(!this.meta.istable&&this.frm_head)thi
 _f.Frm.prototype.set_section=function(sec_id){if(!this.sections[sec_id]||!this.sections[sec_id].expand)
 return;if(this.sections[this.cur_section[this.docname]])
 this.sections[this.cur_section[this.docname]].collapse();this.sections[sec_id].expand();this.cur_section[this.docname]=sec_id;}
-_f.Frm.prototype.setup_tabs=function(){var me=this;$ds(this.tab_wrapper);$y(this.tab_wrapper,{backgroundColor:'#EEE'});this.tabs=new TabbedPage(this.tab_wrapper,1);$y(this.body,{padding:'0px 16px'});}
+_f.Frm.prototype.setup_tabs=function(){var me=this;$ds(this.tab_wrapper);$y(this.tab_wrapper,{backgroundColor:def_ph_style.wrapper.backgroundColor});this.tabs=new TabbedPage(this.tab_wrapper,1);$y(this.body,{padding:'0px 16px'});}
 _f.Frm.prototype.setup_tips=function(){var me=this;this.tip_box=$a(this.tip_wrapper,'div','frm_tip_box');var tab=$a(this.tip_box,'table');var r=tab.insertRow(0);var c0=r.insertCell(0);this.c1=r.insertCell(1);this.img=$a(c0,'img');this.img.setAttribute('src','images/icons/lightbulb.gif');c0.style.width='24px';this.set_tip=function(t,icon){me.c1.innerHTML='<div style="margin-bottom: 8px;">'+t+'</div>';$ds(me.tip_box);if(icon)this.img.setAttribute('src','images/icons/'+icon);}
 this.append_tip=function(t){me.c1.innerHTML+='<div style="margin-bottom: 8px;">'+t+'</div>';$ds(me.tip_box);}
 this.clear_tip=function(){me.c1.innerHTML='';$dh(me.tip_box);}
 $dh(this.tip_box);}
 _f.Frm.prototype.setup_meta=function(){this.meta=get_local('DocType',this.doctype);this.perm=get_perm(this.doctype);this.setup_print();}
-_f.Frm.prototype.setup_std_layout=function(){this.tab_wrapper=$a(this.form_wrapper,'div');$dh(this.tab_wrapper);if(this.meta.section_style=='Tray'&&!get_url_arg('embed')){var t=$a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});var r=t.insertRow(0);var c=r.insertCell(0);c.className='frm_tray_area';this.tray_area=c;this.body=$a(r.insertCell(1),'div','frm_body',{padding:'8px 16px'});}else{this.body=$a(this.form_wrapper,'div','frm_body');}
+_f.Frm.prototype.setup_std_layout=function(){this.tab_wrapper=$a(this.form_wrapper,'div');$dh(this.tab_wrapper);if(this.meta.section_style=='Tray'&&!get_url_arg('embed')){var t=$a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});var r=t.insertRow(0);var c=r.insertCell(0);c.className='frm_tray_area';$y(c,{backgroundColor:def_ph_style.wrapper.backgroundColor})
+this.tray_area=c;this.body=$a(r.insertCell(1),'div','frm_body',{padding:'8px 16px'});}else{this.body=$a(this.form_wrapper,'div','frm_body');}
 this.layout=new Layout(this.body,'100%');this.setup_footer();if(!(this.meta.istable||user=='Guest'))this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable)&&!(get_url_arg('embed')))
 this.setup_tabs();if(this.meta.colour)
 this.layout.wrapper.style.backgroundColor='#'+this.meta.colour.split(':')[1];this.setup_fields_std();}
@@ -229,8 +230,8 @@ this.make_row();this.make_simple_section(0,0);if(!isIE)this.collapse();}else{thi
 this.header.hide=function(){$dh(me.header);}
 this.header.show=function(){$ds(me.header);}
 this.header.onmouseover=function(){if(_f.cur_sec_header!=this){$y(this,{backgroundColor:'#DDD'});}}
-this.header.onmouseout=function(){if(_f.cur_sec_header!=this){$y(this,{backgroundColor:'#EEE'});}}
-this.collapse=function(){this.row.hide();$y(this.header,{backgroundColor:'#EEE',fontWeight:'normal',color:'#000'});}
+this.header.onmouseout=function(){if(_f.cur_sec_header!=this){$y(this,{backgroundColor:def_ph_style.wrapper.backgroundColor});}}
+this.collapse=function(){this.row.hide();$y(this.header,{backgroundColor:def_ph_style.wrapper.backgroundColor,fontWeight:'normal',color:'#000'});}
 this.expand=function(){this.row.show();$y(this.header,{backgroundColor:'#777',fontWeight:'bold',color:'#FFF'});_f.cur_sec_header=this.header;if(me.df.label&&cur_frm.cscript[me.df.label]&&(!me.in_filter))
 cur_frm.runclientscript(me.df.label,me.doctype,me.docname);this.refresh_footer();}
 this.make_row();this.make_simple_section(1,0);if(!isIE)this.collapse();}else{this.row=this.frm.layout.addsubrow();this.make_simple_section(1,1);}}else if(this.df){this.row=this.frm.layout.addrow();this.make_simple_section(1,1);}}
