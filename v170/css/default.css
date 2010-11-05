@@ -75,11 +75,19 @@ div#head_div { background-color: #FFF; }
 
 /* Page head */
 
-div.page_head_wrapper {
+div.page_header {
 	background-color: #EEE;
 	background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(#DDD));
 	background: -moz-linear-gradient(top, #EEE, #DDD);
-	margin-bottom: 16px;	
+	margin-bottom: 16px;
+	border-bottom: 1px solid #AAA;
+}
+
+div.page_footer {
+	background-color: #EEE;
+	background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(#DDD));
+	background: -moz-linear-gradient(top, #EEE, #DDD);
+	border-top: 1px solid #AAA;
 }
 
 /******** Menus - menu.js ************/
@@ -332,7 +340,6 @@ div.dialog_frm {
 	height: 300px;
 	overflow: auto;
 	margin: 10px;
-	padding: 10px;
 	background-color: #FFF;
 	border: 1px solid #CCC;
 }
@@ -719,9 +726,6 @@ div.report_tab_wrapper table td div, div.report_head_wrapper table td div {
 div.finder_wrapper {
 }
 
-div.finder_tab_area {
-}
-
 div.finder_body_area {
 	margin: 16px;
 }
@@ -740,18 +744,6 @@ div.finder_advanced_area textarea {
 
 div.finder_filter_area {
 	position: relative;
-	padding: 12px;
-	padding-top: 6px;
-	background-color: #DDF;
-	margin:16px;
-	
-	background: -webkit-gradient(linear, left top, left bottom, from(#EEF), to(#CCF));
-	background: -moz-linear-gradient(top, #EEF, #CCF);
-	
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;	
-	
-	border: 1px solid #DDF;
 }
 
 div.filter_head {
@@ -773,18 +765,6 @@ table.filter_tab td {
 }
 
 div.finder_picker_area {
-	margin: 16px;
-	padding: 16px;
-	padding-top: 6px;
-	background-color: #FFD;
-	
-	background: -webkit-gradient(linear, left top, left bottom, from(#FFD), to(#FFB));
-	background: -moz-linear-gradient(top, #FFD, #FFB);
-	
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;	
-	
-	border: 1px solid #FFB;	
 	
 }
 div.builder_field {
@@ -820,12 +800,6 @@ table.builder_tab td {
 	width: 33%;
 	padding: 2px;
 }
-
-
-div.finder_dt_area {
-	padding: 16px;
-}
-
 
 /*****/
 
@@ -898,9 +872,9 @@ div.ann_body {
 .datalabelcell { padding: 2px 0px; width: 160px; vertical-align: top; }
 .datainputcell { padding: 2px 0px; }
 
-.input_area input { width: 80%; font-size: 14px; margin: 0px; border: 1px solid #888; padding: 1px;  }
-.input_area select { width: 80%; font-size: 14px; }
-.input_area textarea { width: 90%; font-size: 14px; }
+.input_area input { width: 80%; font-size: 12px; margin: 0px; border: 1px solid #888; padding: 1px;  }
+.input_area select { width: 80%; font-size: 12px; }
+.input_area textarea { width: 90%; font-size: 12px; }
 
 .disp_area { width: 80%; border: 1px solid #CCC; padding: 2px; font-size: 14px; background-color: #EEE; }
 .disp_area_no_val { width: 80%; border: 1px solid #CCC; padding: 2px; height: 14px; background-color: #EEE; }

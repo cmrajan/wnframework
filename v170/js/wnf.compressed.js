@@ -480,8 +480,20 @@ tab.onclick=function(){this.show();}
 this.tabs[n]=tab;return tab;}
 TabbedPage.prototype.disable_tab=function(n){if(this.cur_tab==this.tabs[n])this.tabs[n].hide();$dh(this.tabs[n])}
 TabbedPage.prototype.enable_tab=function(n){$di(this.tabs[n])}
+function TrayPage(parent,height){var me=this;this.tray_bg='#DDE3EA';this.tray_mo='#B5C3D6';this.tray_fg='#8392AC';this.body_style={margin:'16px'}
+this.cur_item=null;this.items={};this.tab=make_table($a(parent,'div'),1,2,'100%',['122px',null]);$y($td(this.tab,0,0),{backgroundColor:this.tray_bg,borderRight:'1px solid '+this.tray_fg,width:'122px'});this.body=$a($td(this.tab,0,1),'div');if(height){$y(this.body,{height:height,overflow:'auto'});}
+this.add_item=function(label,onclick,no_body,with_heading){this.items[label]=new TrayItem(me,label,onclick,no_body,with_heading);return this.items[label];}}
+function TrayItem(tray,label,onclick,no_body,with_heading){this.label=label;this.onclick=onclick;var me=this;this.ldiv=$a($td(tray.tab,0,0),'div','',{padding:'6px 8px',cursor:'pointer'});if(!no_body){this.wrapper=$a(tray.body,'div','',tray.body_style);if(with_heading){this.header=$a(this.wrapper,'div','sectionHeading',{marginBottom:'16px',paddingBottom:'0px'});this.header.innerHTML=label;}
+this.body=$a(this.wrapper,'div');$dh(this.wrapper);}
+$(this.ldiv).html(label).hover(function(){if(tray.cur_item.label!=this.innerHTML)$y(this,{backgroundColor:tray.tray_mo})},function(){if(tray.cur_item.label!=this.innerHTML)$y(this,{backgroundColor:tray.tray_bg})}).click(function(){me.expand();})
+this.expand=function(){if(tray.cur_item)tray.cur_item.collapse();if(me.wrapper)$ds(me.wrapper);if(me.onclick)me.onclick(me.label);me.show_as_expanded();}
+this.show_as_expanded=function(){$y(me.ldiv,{backgroundColor:tray.tray_fg,color:'#FFF',fontWeight:'bold'})
+tray.cur_item=me;}
+this.collapse=function(){if(me.wrapper)$dh(me.wrapper);$y(me.ldiv,{backgroundColor:tray.tray_bg,color:'#000',fontWeight:'normal'})}
+this.hide=function(){me.collapse();$dh(me.ldiv);}
+this.show=function(){$ds(me.ldiv);}}
 var def_ph_style={wrapper:{marginBottom:'16px',backgroundColor:'#EEE'},main_heading:{fontSize:'22px',fontWeight:'bold',marginBottom:'8px',padding:'4px'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#555',display:'none'},toolbar_area:{margin:'0px',display:'none'},toolbar_area2:{margin:'0px',display:'none'},separator:{borderBottom:'2px solid #AAA',display:'none'},tag_area:{color:'#888',fontSize:'10px',textAlign:'right',padding:'2px'},close_btn:{cursor:'pointer',width:'64px',cssFloat:'right',height:'24px',background:"url('images/ui/close_btn.gif') center no-repeat"}}
-function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','page_head_wrapper');this.t1=make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor),1,2,'100%',[null,'100px'],{padding:'2px'});$y(this.t1,{borderCollapse:'collapse'})
+function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','page_header');this.t1=make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor),1,2,'100%',[null,'100px'],{padding:'2px'});$y(this.t1,{borderCollapse:'collapse'})
 this.lhs=$td(this.t1,0,0);this.main_head=$a(this.lhs,'div','',def_ph_style.main_heading);this.sub_head=$a(this.lhs,'div','',def_ph_style.sub_heading);this.toolbar_area=$a(this.lhs,'div','',def_ph_style.toolbar_area);this.toolbar_area2=$a(this.lhs,'div','',def_ph_style.toolbar_area2);this.separator=$a(this.wrapper,'div','',def_ph_style.separator);this.tag_area=$a(this.wrapper,'div','',def_ph_style.tag_area);$y($td(this.t1,0,1),{textAlign:'right'});this.close_btn=$a($td(this.t1,0,1),'button','',{fontSize:'11px'});this.close_btn.innerHTML='Close';$(this.close_btn).button({icons:{primary:'ui-icon-closethick'}});this.close_btn.onclick=function(){nav_obj.show_last_open();}
 if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;this.buttons={};this.buttons2={};}
 PageHeader.prototype.add_button=function(label,fn,bold,icon,green,toolbar2){var tb=this.toolbar_area;if(toolbar2){tb=this.toolbar_area2;if(this.buttons2[label])return;}else{if(this.buttons[label])return;}

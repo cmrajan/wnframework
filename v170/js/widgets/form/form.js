@@ -60,9 +60,7 @@ _f.Frm = function(doctype, parent) {
 	this.parent = parent;
 	this.attachments = {};
 	this.tinymce_id_list = [];
-	this.tray_bg = '#DDE3EA';
-	this.tray_mo = '#B5C3D6';
-	this.tray_fg = '#8392AC';
+
 	// comments
 	this.last_comments = {};
 	this.n_comments = {};
@@ -250,13 +248,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 
 	// build the sidebar
 	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
-		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
-		var r = t.insertRow(0); var c = r.insertCell(0);
-		$y(c,{backgroundColor: this.tray_bg, borderTop:'1px solid ' + this.tray_fg, borderBottom:'1px solid ' + this.tray_fg, width: '122px'})
-		this.tray_area = c;
-		var c1 = r.insertCell(1);
-		$y(c1, {border:'1px solid #AAA', borderRight:'0px'});
-		this.body = $a(c1, 'div', 'frm_body',{padding:'8px 16px'});
+		this.tray = new TrayPage(this.form_wrapper, cint(screen.height * 0.55) + 'px');
+		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px'});		
 	} else {
 		this.body = $a(this.form_wrapper, 'div', 'frm_body');
 	}
@@ -295,7 +288,7 @@ _f.Frm.prototype.setup_footer = function() {
 	var me = this;
 	
 	// footer toolbar
-	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:def_ph_style.wrapper.backgroundColor, margin:'0px'});
+	this.footer = $a(this.form_wrapper, 'div', 'page_footer');
 	this.footer.tab = make_table(this.footer, 1, 2, '100%', ['50%', '50%'], {padding:'4px'});
 
 	// style	
@@ -318,7 +311,7 @@ _f.Frm.prototype.setup_footer = function() {
 	}
 	
 	// no footer for table - form views
-	if(this.meta.istable || this.meta.hide_heading) $dh(this.footer);
+	if(this.meta.istable || this.meta.hide_heading || this.meta.in_dialog) $dh(this.footer);
 
 }
 

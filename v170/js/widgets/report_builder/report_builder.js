@@ -5,25 +5,32 @@
 
 _r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
-	
+	var head_div = $a(this.wrapper, 'div');	
+	this.rb_area = $a(this.wrapper, 'div');
+	this.footer = $a(this.wrapper, 'div', 'page_footer', {padding: '2px'});
+		
 	$dh(this.wrapper);
 	
 	var me = this;
 	this.rb_dict = {};
 
 	// tool bar
-
-	var div = $a(this.wrapper, 'div');	
-	this.page_head = new PageHeader(div);
+	this.page_head = new PageHeader(head_div);
 	$y(this.page_head.wrapper, {marginBottom:'0px'});
+
 
 	// buttons
 
-	var runbtn = this.page_head.add_button('Run', function() { if(me.cur_rb){
-		me.cur_rb.dt.start_rec = 1;
-		me.cur_rb.dt.run();} 
-	}, 1, 'ui-icon-circle-triangle-e', 1);
-
+	var run_fn = function() { 
+		if(me.cur_rb){
+			me.cur_rb.dt.start_rec = 1;
+			me.cur_rb.dt.run();
+		} 
+	}
+	
+	var runbtn = this.page_head.add_button('Run', run_fn, 1, 'ui-icon-circle-triangle-e', 1);
+	var runbtn2 = $a($a(this.footer,'div','green_buttons'), 'button');
+	$(runbtn2).html('Run').click(run_fn).button({icons:{primary:'ui-icon-circle-triangle-e'}})
 
 	// new
 	if(has_common(['Administrator', 'System Manager'], user_roles)) {
@@ -45,14 +52,14 @@ _r.ReportContainer = function() {
 	}
 	
 	
-	this.rb_area = $a(this.wrapper, 'div');
+
 
 	// set a type
 	this.set_dt = function(dt, onload) {
 		my_onload = function(f) {
 			if(!f.forbidden) {
 				me.cur_rb = f;
-				me.cur_rb.mytabs.tabs['Result'].show();
+				me.cur_rb.mytabs.items['Result'].expand();
 	
 				if(onload)onload(f);	
 			}
@@ -115,12 +122,11 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 
 _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
-	this.mytabs = new TabbedPage(this.tab_wrapper);
+	this.mytabs = new TrayPage(this.tab_wrapper, cint(screen.height * 0.55) + 'px');
 	
-	$y(this.mytabs.label_wrapper,{backgroundColor:def_ph_style.wrapper.backgroundColor})
-	this.mytabs.add_tab('Result');
-	this.mytabs.add_tab('More Filters');
-	this.mytabs.add_tab('Select Columns');
+	this.mytabs.add_item('Result', null, null, 1);
+	this.mytabs.add_item('More Filters', null, null, 1);
+	this.mytabs.add_item('Select Columns', null, null, 1);
 	
 }
 
@@ -584,22 +590,19 @@ _r.ReportBuilder.prototype.reset_report = function() {
 _r.ReportBuilder.prototype.make_datatable = function() {
 	var me = this;
 	
-	this.dt_area = $a(this.mytabs.tabs['Result'].tab_body, 'div', 'finder_dt_area');
+	this.dt_area = $a(this.mytabs.items['Result'].body, 'div');
 
-	var clear_area = $a(this.mytabs.tabs['Result'].tab_body, 'div');
+	var clear_area = $a(this.mytabs.items['Result'].body, 'div');
 	clear_area.style.marginTop = '8px';
 	clear_area.style.textAlign = 'right';
 	
-	this.clear_btn = $a(clear_area, 'button');
+	this.clear_btn = $a($a(clear_area, 'span'), 'button');
 	this.clear_btn.innerHTML = 'Clear Settings';
 	this.clear_btn.onclick = function() {
 		me.reset_report();
 	}
 
-	var div = $a(this.mytabs.tabs['Result'].tab_body, 'div');
-	div.style.marginTop = '8px';
-
-	var d = $a(div, 'div');
+	var d = $a(clear_area, 'span', '', {marginLeft:'16px'});
 	d.innerHTML = '<span>Show Query: </span>';
 	this.show_query = $a_input(d, 'checkbox');
 	this.show_query.checked = false;
@@ -844,8 +847,8 @@ _r.ReportFilters = function(rb) {
 	this.rb = rb;
 
 	// filters broken into - primary - in searchfields and others
-	this.first_page_filter = $a(rb.mytabs.tabs['Result'].tab_body, 'div', 'finder_filter_area');
-	this.filter_area = $a(rb.mytabs.tabs['More Filters'].tab_body, 'div', 'finder_filter_area');
+	this.first_page_filter = $a(rb.mytabs.items['Result'].body, 'div', 'finder_filter_area');
+	this.filter_area = $a(rb.mytabs.items['More Filters'].body, 'div', 'finder_filter_area');
 	
 	// filter fields area
 	this.filter_fields_area = $a(this.filter_area,'div');
@@ -999,7 +1002,7 @@ _r.ReportFilters.prototype.add_field = function(f, dt, in_primary) {
 
 _r.ReportColumnPicker = function(rb) {
 	this.rb = rb;
-	this.picker_area = $a(this.rb.mytabs.tabs['Select Columns'].tab_body, 'div', 'finder_picker_area');
+	this.picker_area = $a(this.rb.mytabs.items['Select Columns'].body, 'div', 'finder_picker_area');
 	
 	this.all_fields = [];
 	this.sel_idx = 0;

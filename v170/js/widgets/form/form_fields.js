@@ -185,36 +185,22 @@ _f.SectionBreak.prototype.make_body = function() {
 		if(this.df.options!='Simple') {
 			this.add_to_sections();
 			
-			// tray header
-			var w=$a(this.frm.tray_area, 'div');
-			this.header = $a(w, 'div', '', {padding: '6px 8px', cursor:'pointer', textDecoration:'underline'});
-			this.header.innerHTML = me.df.label;
-			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
-			this.header.hide = function() { $dh(me.header); }
-			this.header.show = function() { $ds(me.header); }
-
-			this.header.onmouseover = function() {
-				if(_f.cur_sec_header != this) { $y(this, {backgroundColor: me.frm.tray_mo}); }
-			}
-			this.header.onmouseout = function() {
-				if(_f.cur_sec_header != this) { $y(this, {backgroundColor: me.frm.tray_bg}); }
-			}
+			this.tray_item = this.frm.tray.add_item(this.df.label, function() { me.frm.set_section(me.sec_id); }, 1);
 			
 			// expand and collapse the section
 			this.collapse = function() { 
-				this.row.hide();
-				$y(this.header, { backgroundColor: me.frm.tray_bg, fontWeight:'normal', color:'#000'} );
+				me.row.hide();
+				me.tray_item.collapse();
 			}
-			this.expand = function() { 
-				this.row.show(); 
-				$y(this.header, { backgroundColor:  me.frm.tray_fg, fontWeight:'bold', color:'#FFF'} );
+			this.expand = function() {
+				me.row.show(); 
+				me.tray_item.show_as_expanded();
 				
 				_f.cur_sec_header = this.header;
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 
 				this.refresh_footer();
-						
 			}
 	
 			this.make_row();
@@ -274,15 +260,15 @@ _f.SectionBreak.prototype.refresh = function(layout) {
 		if(this.df.hidden) {
 			if(this.frm.meta.section_style=='Tabbed') {
 				$dh(this.mytab);
-			} else if(this.header)
-				this.header.hide();
+			} else if(this.tray_item)
+				this.tray_item.hide();
 			
 			if(this.row)this.row.hide();
 		} else {
 			if(this.frm.meta.section_style=='Tabbed') {
 				$di(this.mytab);
-			} else if(this.header)
-				this.header.show();
+			} else if(this.tray_item)
+				this.tray_item.show();
 
 			if(this.expanded)this.row.show();
 		}

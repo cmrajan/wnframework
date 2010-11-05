@@ -57,7 +57,7 @@ _r.DataTable = function(html_fieldname, dt, repname, hide_toolbar) {
   if(!hide_toolbar) this.make_toolbar(parent);
 
   this.wrapper = $a(parent, 'div', 'report_tab');
-  $h(this.wrapper, cint(screen.height * 0.6) + 'px');
+  $h(this.wrapper, cint(screen.height * 0.35) + 'px');
 
   this.wrapper.onscroll = function() {_r.scroll_head(this); }
   
@@ -272,7 +272,7 @@ _r.DataTable.prototype.run = function() {
   	  msgprint("This is a very large report and cannot be shown in the browser as it is likely to make your browser very slow.<br><br>Please click on 'Export' to open in a spreadsheet");
   	  return;
   	}
-  	_r.rb_con.cur_rb.mytabs.tabs['Result'].show();
+  	_r.rb_con.cur_rb.mytabs.items['Result'].expand();
   }
   
   var me = this;
