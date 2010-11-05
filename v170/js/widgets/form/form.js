@@ -249,7 +249,9 @@ _f.Frm.prototype.setup_std_layout = function() {
 		c.className='frm_tray_area';
 		$y(c,{backgroundColor:def_ph_style.wrapper.backgroundColor})
 		this.tray_area = c;
-		this.body = $a(r.insertCell(1), 'div', 'frm_body',{padding:'8px 16px'});
+		var c1 = r.insertCell(1);
+		$y(c1, {border:'1px solid #AAA', borderRight:'0px'});
+		this.body = $a(c1, 'div', 'frm_body',{padding:'8px 16px'});
 	} else {
 		this.body = $a(this.form_wrapper, 'div', 'frm_body');
 	}
