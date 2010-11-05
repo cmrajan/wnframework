@@ -9,6 +9,7 @@ _f.FormGrid = function(field) {
 	this.col_break_width = cint(this.field.col_break_width);
 	if(!this.col_break_width) this.col_break_width = 100;
 	
+	$y(field.parent,{marginTop:'8px'});
 	this.init(field.parent, field.df.width);
 	this.setup();
 }

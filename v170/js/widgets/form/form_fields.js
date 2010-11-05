@@ -434,7 +434,7 @@ _f.TableField.prototype.make_body = function() {
 	if(this.perm[this.df.permlevel] && this.perm[this.df.permlevel][READ]) {
 		// add comment area
 		if(this.df.description) {
-			this.comment_area = $a(this.parent, 'div', 'comment', {padding:'8px'});
+			this.comment_area = $a(this.parent, 'div', 'comment', {padding:'0px 8px 8px 8px'});
 			this.comment_area.innerHTML = this.df.description;
 		}
 		this.grid = new _f.FormGrid(this);
