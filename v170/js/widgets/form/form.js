@@ -288,7 +288,7 @@ _f.Frm.prototype.setup_footer = function() {
 	var me = this;
 	
 	// footer toolbar
-	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:'#EEE', margin:'0px'});
+	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:def_ph_style.wrapper.backgroundColor, margin:'0px'});
 	this.footer.tab = make_table(this.footer, 1, 2, '100%', ['50%', '50%'], {padding:'4px'});
 
 	// style	

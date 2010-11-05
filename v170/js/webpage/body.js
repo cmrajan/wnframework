@@ -16,7 +16,7 @@ function Body() {
 	this.left_sidebar = null;
 	this.right_sidebar = null;
 	var me = this;
-	page_body = this;
+	page_body = this;	
 
 	this.no_of_columns = function() {
 		var n = 1;
@@ -143,6 +143,7 @@ function Body() {
 		if(onhide)
 			c.onhide = onhide;
 		this.pages[label] = c;
+		this.cur_page = c;
 		$dh(c);
 		return c;
 	}

@@ -1,6 +1,6 @@
 _f.FrmHeader = function(parent) {
 	var me = this;
-	this.wrapper = $a(parent, 'div', '', {backgroundColor:'#EEE'});
+	this.wrapper = $a(parent, 'div', '', {backgroundColor:def_ph_style.wrapper.backgroundColor});
 	this.page_head = new PageHeader(this.wrapper);
 	$y(this.page_head.wrapper, {marginBottom:'0px'});
 	
