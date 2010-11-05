@@ -16,6 +16,7 @@ _r.ReportContainer = function() {
 
 	var div = $a(this.wrapper, 'div');	
 	this.page_head = new PageHeader(div);
+	$y(this.page_head.wrapper, {marginBottom:'0px'});
 
 	// buttons
 
@@ -117,6 +118,7 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
 	this.mytabs = new TabbedPage(this.tab_wrapper);
 	
+	$y(this.mytabs.label_wrapper,{backgroundColor:'#EEE'})
 	this.mytabs.add_tab('Result');
 	this.mytabs.add_tab('More Filters');
 	this.mytabs.add_tab('Select Columns');

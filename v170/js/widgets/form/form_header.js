@@ -1,8 +1,21 @@
 _f.FrmHeader = function(parent) {
 	var me = this;
-	this.bg_color = '#FFF';
-	this.wrapper = $a(parent, 'div');
+	this.wrapper = $a(parent, 'div', '', {backgroundColor:'#EEE'});
 	this.page_head = new PageHeader(this.wrapper);
+	$y(this.page_head.wrapper, {marginBottom:'0px'});
+	
+	// doctype
+	this.dt_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', fontWeight:'bold', marginRight:'8px'})
+	
+	// name
+	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', fontWeight:'normal', marginRight:'8px'})
+
+	// timestamp
+	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline'});
+	this.timestamp_area.innerHTML = 'more info';
+	
+	// status
+	this.status_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer'})
 }
 _f.FrmHeader.prototype.show = function() {  $ds(this.wrapper); }
 _f.FrmHeader.prototype.hide = function() {  $dh(this.wrapper); }
@@ -117,7 +130,7 @@ _f.FrmHeader.prototype.get_timestamp = function(doc) {
 	return repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s</span>", 
 		{c_by:doc.owner
 		,c_on:scrub_date(doc.creation ? doc.creation:'')
-		,m_by:doc.modified_by?('/ Modified: '+doc.modified_by):''
+		,m_by:doc.modified_by?('<br> Modified: '+doc.modified_by):''
 		,m_on:doc.modified ? ('on '+scrub_date(doc.modified)) : ''} );
 }
 
@@ -177,12 +190,12 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	var ph = this.page_head;
 	
 	// main title
-	ph.main_head.innerHTML = get_doctype_label(f.doctype);
+	this.dt_area.innerHTML = get_doctype_label(f.doctype);
 	
 	// sub title
-	ph.sub_head.innerHTML = '';
+	this.dn_area.innerHTML = '';
 	if(!f.meta.issingle)
-		ph.sub_head.innerHTML = f.docname;
+		this.dn_area.innerHTML = f.docname;
 
 	// get the doc
 	var doc = locals[f.doctype][f.docname];
@@ -191,13 +204,14 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	var sl = this.get_status_tags(doc, f)
 
 	// add the tags
-	var t = ph.tag_area;
+	var t = this.status_area;
 	t.innerHTML = '';
-	ph.sub_head.appendChild(sl[0]);
-	if(sl[1])ph.sub_head.appendChild(sl[1]);
+	t.appendChild(sl[0]);
+	if(sl[1])t.appendChild(sl[1]);
 
 	// timestamp
-	var ts = $a(null, 'span', '', {fontSize:'11px'});
-	ts.innerHTML = this.get_timestamp(doc);	
-	t.appendChild(ts);
+	//var ts = $a(null, 'span', '', {fontSize:'11px'});
+	new CustomTooltip(this.timestamp_area, this.get_timestamp(doc));
+	//ph.tag_area.innerHTML = '';
+	//ph.tag_area.appendChild(ts);
 }

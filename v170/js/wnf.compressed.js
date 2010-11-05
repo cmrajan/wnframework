@@ -113,7 +113,7 @@ function sel_val(s){if(s.custom_select){return s.inp.value?s.inp.value:'';}
 if(s.inp)s=s.inp;try{if(s.selectedIndex<s.options.length)return s.options[s.selectedIndex].value;else return'';}catch(err){return'';}}
 function add_sel_options(s,list,sel_val,o_style){if(s.custom_select){s.set_options(list)
 if(sel_val)s.inp.value=sel_val;return;}
-if(s.inp)s=s.inp;for(var i in list){var o=new Option(list[i],list[i],false,(list[i]==sel_val?true:false));if(o_style)$y(o,o_style);s.options[s.options.length]=o}}
+if(s.inp)s=s.inp;for(var i=0;i<list.length;i++){var o=new Option(list[i],list[i],false,(list[i]==sel_val?true:false));if(o_style)$y(o,o_style);s.options[s.options.length]=o;}}
 function cint(v,def){v=v+'';v=lstrip(v,['0',]);v=parseInt(v);if(isNaN(v))v=def?def:0;return v;}
 function validate_email(id){if(strip(id).search("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")==-1)return 0;else return 1;}
 function d2h(d){return d.toString(16);}
@@ -469,19 +469,19 @@ this.width=width;this.layout=layout;var cidx=layoutRow.row.cells.length;this.cel
 this.cell.style.width=width;var h=$a(this.cell,'div','',{padding:(layout.with_border?'0px 8px':'0px')});this.wrapper=$a(this.cell,'div','',{padding:(layout.with_border?'8px':'8px 0px')});layout.cur_cell=this.wrapper;layout.cur_cell.header=h;}
 LayoutCell.prototype.show=function(){$ds(this.wrapper);}
 LayoutCell.prototype.hide=function(){$dh(this.wrapper);}
-function TabbedPage(parent,only_labels){this.tabs={};this.cur_tab=null;var lw=$a(parent,'div','box_label_wrapper');var lb=$a(lw,'div','box_label_body');this.label_area=$a(lb,'ul','box_tabs');if(!only_labels)this.body_area=$a(parent,'div');else this.body_area=null;}
-TabbedPage.prototype.add_tab=function(n,onshow){var tab=$a(this.label_area,'li');tab.label=$a(tab,'a');tab.label.innerHTML=n;if(this.body_area){tab.tab_body=$a(this.body_area,'div','box_tabs_body');$dh(tab.tab_body);}else{tab.tab_body=null;}
+function TabbedPage(parent,only_labels){this.tabs={};this.cur_tab=null;this.label_wrapper=$a(parent,'div','box_label_wrapper');this.label_body=$a(this.label_wrapper,'div','box_label_body');this.label_area=$a(this.label_body,'ul','box_tabs');if(!only_labels)this.body_area=$a(parent,'div','',{backgroundColor:'#FFF'});else this.body_area=null;}
+TabbedPage.prototype.add_tab=function(n,onshow){var tab=$a(this.label_area,'li');tab.label=$a(tab,'a');tab.label.innerHTML=n;if(this.body_area){tab.tab_body=$a(this.body_area,'div');$dh(tab.tab_body);}else{tab.tab_body=null;}
 tab.onshow=onshow;var me=this;tab.hide=function(){if(this.tab_body)$dh(this.tab_body);this.className='';hide_autosuggest();}
 tab.set_selected=function(){if(me.cur_tab)me.cur_tab.hide();this.className='box_tab_selected';$op(this,100);me.cur_tab=this;}
 tab.show=function(arg){this.set_selected();if(this.tab_body)$ds(this.tab_body);if(this.onshow)this.onshow(arg);}
-tab.onmouseover=function(){if(me.cur_tab!=this)$op(this,60);}
-tab.onmouseout=function(){$op(this,100);}
+tab.onmouseover=function(){if(me.cur_tab!=this)this.className='box_tab_mouseover';}
+tab.onmouseout=function(){if(me.cur_tab!=this)this.className=''}
 tab.onclick=function(){this.show();}
 this.tabs[n]=tab;return tab;}
 TabbedPage.prototype.disable_tab=function(n){if(this.cur_tab==this.tabs[n])this.tabs[n].hide();$dh(this.tabs[n])}
 TabbedPage.prototype.enable_tab=function(n){$di(this.tabs[n])}
-var def_ph_style={wrapper:{marginBottom:'16px'},main_heading:{fontSize:'22px',fontWeight:'bold',marginBottom:'8px'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#555'},toolbar_area:{margin:'0px',padding:'2px 4px',backgroundColor:'#DDF',display:'none'},toolbar_area2:{margin:'0px',padding:'2px 4px',backgroundColor:'#EEF',display:'none'},separator:{borderBottom:'2px solid #AAA'},tag_area:{color:'#888',margin:'4px 0px',fontSize:'10px',textAlign:'right'},close_btn:{cursor:'pointer',width:'64px',cssFloat:'right',height:'24px',background:"url('images/ui/close_btn.gif') center no-repeat"}}
-function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','',def_ph_style.wrapper);this.t1=make_table(this.wrapper,1,2,'100%',[null,'100px']);this.main_head=$a($td(this.t1,0,0),'div','',def_ph_style.main_heading);this.sub_head=$a($td(this.t1,0,0),'div','',def_ph_style.sub_heading);this.toolbar_area=$a(this.wrapper,'div','',def_ph_style.toolbar_area);this.toolbar_area2=$a(this.wrapper,'div','',def_ph_style.toolbar_area2);this.separator=$a(this.wrapper,'div','',def_ph_style.separator);this.tag_area=$a(this.wrapper,'div','',def_ph_style.tag_area);$y($td(this.t1,0,1),{textAlign:'right'});this.close_btn=$a($td(this.t1,0,1),'button','',{fontSize:'11px'});this.close_btn.innerHTML='Close';$(this.close_btn).button({icons:{primary:'ui-icon-closethick'}});this.close_btn.onclick=function(){nav_obj.show_last_open();}
+var def_ph_style={wrapper:{marginBottom:'16px',backgroundColor:'#EEE'},main_heading:{fontSize:'22px',fontWeight:'bold',marginBottom:'8px',padding:'4px'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#555',display:'none'},toolbar_area:{margin:'0px',display:'none'},toolbar_area2:{margin:'0px',display:'none'},separator:{borderBottom:'2px solid #AAA'},tag_area:{color:'#888',fontSize:'10px',textAlign:'right',padding:'2px'},close_btn:{cursor:'pointer',width:'64px',cssFloat:'right',height:'24px',background:"url('images/ui/close_btn.gif') center no-repeat"}}
+function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','',def_ph_style.wrapper);this.t1=make_table($a(this.wrapper,'div','',{backgroundColor:'#CCC'}),1,2,'100%',[null,'100px'],{padding:'2px'});this.main_head=$a(this.wrapper,'div','',def_ph_style.main_heading);this.sub_head=$a(this.wrapper,'div','',def_ph_style.sub_heading);this.toolbar_area=$a($td(this.t1,0,0),'div','',def_ph_style.toolbar_area);this.toolbar_area2=$a($td(this.t1,0,0),'div','',def_ph_style.toolbar_area2);this.separator=$a(this.wrapper,'div','',def_ph_style.separator);this.tag_area=$a(this.wrapper,'div','',def_ph_style.tag_area);$y($td(this.t1,0,1),{textAlign:'right'});this.close_btn=$a($td(this.t1,0,1),'button','',{fontSize:'11px'});this.close_btn.innerHTML='Close';$(this.close_btn).button({icons:{primary:'ui-icon-closethick'}});this.close_btn.onclick=function(){nav_obj.show_last_open();}
 if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;this.buttons={};this.buttons2={};}
 PageHeader.prototype.add_button=function(label,fn,bold,icon,green,toolbar2){var tb=this.toolbar_area;if(toolbar2){tb=this.toolbar_area2;if(this.buttons2[label])return;}else{if(this.buttons[label])return;}
 if(green)

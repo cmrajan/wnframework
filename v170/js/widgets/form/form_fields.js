@@ -117,7 +117,7 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsibl
 				$y(head,{margin:'8px', borderBottom:'1px solid #AAA'});
 			}
 		} else {
-			this.label = $a(head, 'div', 'sectionHeading', { margin:'0px', padding: '8px', backgroundColor: '#EEE'});
+			this.label = $a(head, 'div', 'sectionHeading', { margin:'0px'});
 			this.label.innerHTML = this.df.label?this.df.label:'';
 		}
 	}
@@ -187,7 +187,7 @@ _f.SectionBreak.prototype.make_body = function() {
 			
 			// tray header
 			var w=$a(this.frm.tray_area, 'div');
-			this.header = $a(w, 'div', '', {padding: '4px 8px', cursor:'pointer'});
+			this.header = $a(w, 'div', '', {padding: '6px 8px', cursor:'pointer', textDecoration:'underline'});
 			this.header.innerHTML = me.df.label;
 			this.header.onclick = function() { me.frm.set_section(me.sec_id); }
 			this.header.hide = function() { $dh(me.header); }
@@ -197,17 +197,17 @@ _f.SectionBreak.prototype.make_body = function() {
 				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#DDD'}); }
 			}
 			this.header.onmouseout = function() {
-				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#FFF'}); }
+				if(_f.cur_sec_header != this) { $y(this, {backgroundColor:'#EEE'}); }
 			}
 			
 			// expand and collapse the section
 			this.collapse = function() { 
 				this.row.hide();
-				$y(this.header, { backgroundColor:'#FFF', fontWeight:'normal'} );
+				$y(this.header, { backgroundColor:'#EEE', fontWeight:'normal', color:'#000'} );
 			}
 			this.expand = function() { 
 				this.row.show(); 
-				$y(this.header, { backgroundColor:'#AAF', fontWeight:'bold'} );
+				$y(this.header, { backgroundColor:'#777', fontWeight:'bold', color:'#FFF'} );
 				
 				_f.cur_sec_header = this.header;
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))

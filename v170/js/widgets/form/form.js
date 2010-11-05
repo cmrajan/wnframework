@@ -196,7 +196,7 @@ _f.Frm.prototype.set_section = function(sec_id) {
 _f.Frm.prototype.setup_tabs = function() {
 	var me = this;
 	$ds(this.tab_wrapper);
-	$y(this.tab_wrapper, {marginTop:'4px'});
+	$y(this.tab_wrapper, {backgroundColor:'#EEE'});
 	this.tabs = new TabbedPage(this.tab_wrapper, 1);
 	
 	$y(this.body,{padding:'0px 16px'});
@@ -287,7 +287,7 @@ _f.Frm.prototype.setup_footer = function() {
 	var me = this;
 	
 	// footer toolbar
-	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:'#DDF', margin:'4px 0px'});
+	this.footer = $a(this.form_wrapper, 'div', '', {backgroundColor:'#EEE', margin:'0px'});
 	this.footer.tab = make_table(this.footer, 1, 2, '100%', ['50%', '50%'], {padding:'4px'});
 
 	// style	

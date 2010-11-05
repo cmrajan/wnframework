@@ -50,10 +50,10 @@ function add_sel_options(s, list, sel_val, o_style) {
 		return;
 	}
 	if(s.inp)s = s.inp;
-	for(var i in list){
+	for(var i=0; i<list.length; i++) {
 		var o = new Option(list[i], list[i], false, (list[i]==sel_val? true : false));
 		if(o_style) $y(o, o_style);
-		s.options[s.options.length] = o				
+		s.options[s.options.length] = o;	
 	}
 }
 

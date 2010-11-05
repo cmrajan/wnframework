@@ -4,10 +4,10 @@ function TabbedPage(parent, only_labels) {
 	this.tabs = {};
 	this.cur_tab = null;
 
-	var lw = $a(parent, 'div','box_label_wrapper'); // for border
-	var lb = $a(lw, 'div', 'box_label_body'); // for height
-	this.label_area = $a(lb, 'ul', 'box_tabs');
-	if(!only_labels)this.body_area = $a(parent, 'div');
+	this.label_wrapper = $a(parent, 'div','box_label_wrapper'); // for border
+	this.label_body = $a(this.label_wrapper, 'div', 'box_label_body'); // for height
+	this.label_area = $a(this.label_body, 'ul', 'box_tabs');
+	if(!only_labels)this.body_area = $a(parent, 'div', '', {backgroundColor:'#FFF'});
 	else this.body_area = null;
 }
 
@@ -18,7 +18,7 @@ TabbedPage.prototype.add_tab = function(n, onshow) {
 	tab.label.innerHTML = n;
 	
 	if(this.body_area){
-		tab.tab_body = $a(this.body_area, 'div', 'box_tabs_body');
+		tab.tab_body = $a(this.body_area, 'div');
 		$dh(tab.tab_body);
 	} else { tab.tab_body = null; }
 	tab.onshow = onshow;
@@ -40,10 +40,10 @@ TabbedPage.prototype.add_tab = function(n, onshow) {
 		if(this.onshow)this.onshow(arg); 
 	}
 	tab.onmouseover = function() { 
-		if(me.cur_tab!=this) $op(this, 60);
+		if(me.cur_tab!=this) this.className = 'box_tab_mouseover';
 	}
 	tab.onmouseout = function() {
-		$op(this, 100); 
+		if(me.cur_tab!=this) this.className = ''
 	}
 	tab.onclick = function() { this.show(); }
 	this.tabs[n] = tab;
