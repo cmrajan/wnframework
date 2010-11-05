@@ -1037,7 +1037,7 @@ this.setup_page_areas();this.setup_header_footer();if(user=='Guest')user_default
 if(this.cp.page_width)$y(this.wrapper,{width:cint(this.cp.page_width)+'px'});}
 this.pages={};this.cur_page=null;this.add_page=function(label,onshow,onhide){var c=$a(this.center.body,'div');if(onshow)
 c.onshow=onshow;if(onhide)
-c.onhide=onhide;this.pages[label]=c;this.cur_page=c;$dh(c);return c;}
+c.onhide=onhide;this.pages[label]=c;$dh(c);return c;}
 this.change_to=function(label){$dh(this.center.loading);if(me.cur_page&&me.pages[label]!=me.cur_page){if(me.cur_page.onhide)
 me.cur_page.onhide();$dh(me.cur_page);}
 me.cur_page=me.pages[label];me.cur_page_label=label;$(me.cur_page).fadeIn();if(me.cur_page.onshow)

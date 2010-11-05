@@ -143,7 +143,6 @@ function Body() {
 		if(onhide)
 			c.onhide = onhide;
 		this.pages[label] = c;
-		this.cur_page = c;
 		$dh(c);
 		return c;
 	}
