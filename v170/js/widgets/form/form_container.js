@@ -4,7 +4,6 @@ _f.FrmContainer = function() {
 	
 	// create hidden
 	$dh(this.wrapper);
-	$y(this.wrapper,{margin:'4px'});
 
 	this.body = $a(this.wrapper,'div');
 		
