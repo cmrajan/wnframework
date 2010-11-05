@@ -247,7 +247,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 		var t = $a(this.form_wrapper,'table','',{tableLayout:'fixed',width:'100%',borderCollapse:'collapse'});
 		var r = t.insertRow(0); var c = r.insertCell(0);
 		c.className='frm_tray_area';
-		$y(c,{backgroundColor:def_ph_style.wrapper.backgroundColor})
+		$y(c,{backgroundColor:def_ph_style.wrapper.backgroundColor, borderTop:'1px solid ' + def_ph_style.wrapper.backgroundColor})
 		this.tray_area = c;
 		var c1 = r.insertCell(1);
 		$y(c1, {border:'1px solid #AAA', borderRight:'0px'});
