@@ -13,7 +13,7 @@
 */
 
 var def_ph_style = {
-	wrapper: {marginBottom:'16px', backgroundColor:'#DDD'}
+	wrapper: {marginBottom:'16px', backgroundColor:'#EEE'}
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px', padding: '4px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555', display:'none' }
 	,toolbar_area: { margin:'0px', display:'none'}
