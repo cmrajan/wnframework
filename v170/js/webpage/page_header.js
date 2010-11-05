@@ -29,6 +29,7 @@ function PageHeader(parent, main_text, sub_text) {
 
 	this.wrapper = $a(parent,'div','',def_ph_style.wrapper);
 	this.t1 = make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor), 1, 2, '100%', [null, '100px'], {padding: '2px'});
+	$y(this.t1, {borderCollapse:'collapse'})
 	this.lhs = $td(this.t1, 0, 0);
 	
 	this.main_head = $a(this.lhs, 'div', '', def_ph_style.main_heading);
