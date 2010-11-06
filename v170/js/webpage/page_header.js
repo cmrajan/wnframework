@@ -16,8 +16,8 @@ var def_ph_style = {
 	wrapper: {marginBottom:'16px', backgroundColor:'#EEE'}
 	,main_heading: { fontSize:'22px', fontWeight:'bold', marginBottom:'8px', padding: '4px'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555', display:'none' }
-	,toolbar_area: { margin:'0px', display:'none'}
-	,toolbar_area2: { margin:'0px', display:'none'}
+	,toolbar_area: { margin:'0px', marginLeft:'4px', display:'none'}
+	,toolbar_area2: { margin:'0px', marginLeft:'4px', display:'none'}
 	,separator: { borderBottom:'2px solid #AAA', display: 'none' } // show this when there is no toolbar
 	,tag_area: { color:'#888', fontSize:'10px', textAlign:'right', padding: '2px'}
 	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 

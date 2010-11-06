@@ -124,7 +124,7 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsibl
 
 	// description
 	if(this.df.description) {
-		head.desc_area = $a(head, 'div', '', {margin:'0px', padding:'8px', color:'#222', fontSize:'12px'});
+		head.desc_area = $a(head, 'div', '', {margin:'0px', padding:'8px 0px', color:'#222', fontSize:'12px'});
 		if(this.df.description.length > 240) {
 			$($a(head.desc_area, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
 			$($a(head.desc_area, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });

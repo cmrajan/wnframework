@@ -10,6 +10,7 @@ DocBrowser = function() {
 
 	var h = $a(this.body, 'div');
 	this.page_head = new PageHeader(h, 'List');
+	this.new_button = this.page_head.add_button('New', function() { newdoc(me.cur_dt) }, 1, 'ui-icon-plus-thk', 1)
 	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
@@ -19,13 +20,22 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
 	if(this.cur_list) $dh(this.cur_list);
-		
+	
 	$ds(this.loading_div);
 	$dh(this.body);
 
-	var l = get_doctype_label(dt).toLowerCase()
-	this.page_head.main_head.innerHTML = (l.substr(-4) == 'list') ? get_doctype_label(dt) : (get_doctype_label(dt) + ' List')
+	var l = get_doctype_label(dt)
 
+	// page heading
+	this.page_head.main_head.innerHTML = (l.toLowerCase().substr(-4) == 'list') ? l : (l + ' List')
+
+	// button label
+	this.page_head.clear_toolbar();
+	if(in_list(profile.can_create,dt)) {
+		var new_button = this.page_head.add_button('New ' + l, function() { newdoc(this.dt) }, 1, 'ui-icon-plus', 1)
+		this.dt = dt
+	}
+	
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
 			// has something
@@ -48,7 +58,6 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 	}
 
 	$c_obj('Menu Control', 'has_result', dt, callback);
-
 	
 	page_body.change_to('DocBrowser');
 }
@@ -90,14 +99,6 @@ DocBrowser.prototype.make_new = function(dt, label, field_list) {
 				
 	// make a new wrapper
 	var w = $a(this.wrapper, 'div', '', {margin:'16px'});
-		
-	// new button
-	if(in_list(profile.can_create,dt)) {
-		var d = $a($a(w,'div','green_buttons',{marginBottom:'16px'}),'button');
-		d.dt = dt;
-		$(d).html('+ New ' + label).css('font-size','13px').css('font-weight','bold').button().click( function() { newdoc(this.dt); } );
-	}
-
 
 	// make the list
 	me.make_the_list(dt, w);

@@ -314,15 +314,11 @@ div.frm_body {
 }
 
 div.frm_tip_box {
-	margin: 8px 0px;
+	margin: 0px;
 	padding: 8px;
 	background-color: #FFC;
 	display: none;
 	font-size: 11px;
-
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-
 	border: 1px solid #FFB;
 }
 
