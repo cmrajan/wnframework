@@ -62,10 +62,12 @@ function Body() {
 	
 	this.setup_header_footer = function() {		
 		// header
-		var hh = this.cp.header_height ? (cint(this.cp.header_height) + 'px') : '40px';
-		$y(this.header, {height:hh, borderBottom:'1px solid #CCC'}); 
-		if(this.cp.client_name)this.banner_area.innerHTML = this.cp.client_name;
-
+		if(cint(this.cp.header_height)) {
+			var hh = this.cp.header_height ? (cint(this.cp.header_height) + 'px') : '0px';
+			$y(this.header, {height:hh, borderBottom:'1px solid #CCC'}); 
+			if(this.cp.client_name)this.banner_area.innerHTML = this.cp.client_name;
+		}
+		
 		// footer
 		var fh = this.cp.footer_height ? (cint(this.cp.footer_height) + 'px') : '0px';
 		$y(this.footer, {height:fh}); 
@@ -116,11 +118,7 @@ function Body() {
 		if(user=='Guest') user_defaults.hide_webnotes_toolbar = 1;
 		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
 			this.wntoolbar = new WNToolbar(this.wntoolbar_area);
-			if(isIE) {
-				$y(this.wrapper, {marginTop:'32px'});
-			} else {
-				$y(this.wrapper, {marginTop:'48px'});
-			}
+			$y(this.wrapper, {marginTop: this.wntoolbar.wrapper.offsetHeight + 'px'});
 		}
 		
 		// page width

@@ -60,8 +60,9 @@ TabbedPage.prototype.enable_tab = function(n) {
 
 // =================================================================================
 
-function TrayPage(parent, height) {
+function TrayPage(parent, height, width) {
 	var me = this;
+	if(!width) width='122px';
 	
 	this.tray_bg = '#DDE3EA';
 	this.tray_mo = '#B5C3D6';
@@ -71,7 +72,7 @@ function TrayPage(parent, height) {
 	this.cur_item = null;
 	
 	this.items = {};
-	this.tab = make_table($a(parent, 'div'), 1, 2, '100%', ['122px', null]);
+	this.tab = make_table($a(parent, 'div'), 1, 2, '100%', [width, null]);
 	
 	// tray style
 	$y($td(this.tab, 0, 0),{
