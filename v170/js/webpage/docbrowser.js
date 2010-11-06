@@ -1,4 +1,4 @@
-DocBrowser = function() {
+DocBrowserPage = function() {
 	this.lists = {};
 	this.dt_details = {};
 	this.cur_list = null;
@@ -12,16 +12,14 @@ DocBrowser = function() {
 	this.page_head = new PageHeader(h, 'List');
 	this.new_button = this.page_head.add_button('New', function() { newdoc(me.cur_dt) }, 1, 'ui-icon-plus-thk', 1)
 	
-	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
-	this.loading_div.innerHTML = 'Loading...';
 }
 
-DocBrowser.prototype.show = function(dt, label, field_list) {
+DocBrowserPage.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
-	if(this.cur_list) $dh(this.cur_list);
+	if(this.cur_list) $dh(this.cur_list.wrapper);
 	
-	$ds(this.loading_div);
+	add_space_holder(this.wrapper);
 	$dh(this.body);
 
 	var l = get_doctype_label(dt)
@@ -37,24 +35,20 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 	}
 	
 	var callback = function(r, rt) {
-		if(r.message == 'Yes') {
-			// has something
-			var l = me.lists[dt];
+		remove_space_holder();
+		$ds(me.body);
 
-			if(l) {
-				$ds(l);
-				me.cur_list = l;
-				set_title(l._label);
-				$dh(me.loading_div);
-				$ds(me.body);
-
-				$dh(me.no_result_area);
-			} else {
-				me.make(dt, label, field_list);
-			}
-		} else {
-			me.show_no_result(dt);
+		if(!me.lists[dt]) {
+			me.lists[dt] = new DocBrowser(me.body, dt, label, field_list);
 		}
+
+		if(r.message == 'Yes') {
+			me.lists[dt].show();
+		} else {
+			me.lists[dt].show_no_result();			
+		}
+
+		me.cur_list = me.lists[dt];
 	}
 
 	$c_obj('Menu Control', 'has_result', dt, callback);
@@ -62,56 +56,56 @@ DocBrowser.prototype.show = function(dt, label, field_list) {
 	page_body.change_to('DocBrowser');
 }
 
-DocBrowser.prototype.make = function(dt, label, field_list) {
+DocBrowser = function(parent, dt, label, field_list) {	
 	var me = this;
-	label = label ? label : dt;
+	this.label = label ? label : dt;
+
+	this.wrapper = $a(parent, 'div', '', {margin:'16px'});
+
+	// areas
+	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
+	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
+	this.loading_div.innerHTML = 'Loading...';
+	this.body = $a(this.wrapper, 'div');
 
 	var callback = function(r,rt) { 
-		me.dt_details[dt] = r.message; 
+		me.dt_details = r.message; 
 		
 		// call make_new
 		if(r.message) {
 			me.make_new(dt, label, r.message.field_list);
-			$dh(me.loading_div);
-			$ds(me.body);
-			$dh(me.no_result_area);
 		}
 	}
 
 	$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + cstr(field_list), callback);
 	
 }
-
-DocBrowser.prototype.show_no_result = function(dt) {
-	if(!this.no_result_area) {
-		this.no_result_area = $a(this.body, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
-	}
+DocBrowser.prototype.show = function(dt) {
+	$ds(this.wrapper);
 	$dh(this.loading_div);
 	$ds(this.body);
-	
+	$dh(this.no_result_area);
+	set_title(get_doctype_label(this.label));
+}
+
+DocBrowser.prototype.show_no_result = function(dt) {
+	$ds(this.wrapper);
+	$dh(this.loading_div);
+	$ds(this.body);	
 	$ds(this.no_result_area);
 	this.no_result_area.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(dt)});
+	set_title(get_doctype_label(this.label));
 }
 
 DocBrowser.prototype.make_new = function(dt, label, field_list) {
-	var me = this;
-	var label = get_doctype_label(label);
-				
-	// make a new wrapper
-	var w = $a(this.wrapper, 'div', '', {margin:'16px'});
-
 	// make the list
-	me.make_the_list(dt, w);
-	me.lists[dt] = w;
-
-	me.cur_list = w;
-	me.cur_list._label = label;		
+	this.make_the_list(dt, this.wrapper);
 }
 	
 DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	var me = this;
 	var lst = new Listing(dt);
-	lst.cl = me.dt_details[dt].columns;
+	lst.cl = me.dt_details.columns;
 	lst.dt = dt;
 
 	lst.opts = {
@@ -143,7 +137,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		q.table = repl('`tab%(dt)s`', {dt:this.dt});
 	
 		for(var i=0;i<this.cl.length;i++) fl.push(q.table+'.`'+this.cl[i][0]+'`')
-		if(me.dt_details[dt].submittable)
+		if(me.dt_details.submittable)
 			fl.push(q.table + '.docstatus');			
 		q.fields = fl.join(', ');
 		q.conds = q.table + '.docstatus < 2 ';
@@ -166,7 +160,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	lst.make(wrapper);
 
 	// add the filters
-	var sf = me.dt_details[dt].filters;
+	var sf = me.dt_details.filters;
 	for(var i=0;i< sf.length;i++) {
 		var fname = sf[i][0]; var label = sf[i][1]; var ftype = sf[i][2]; var fopts = sf[i][3];
 
@@ -179,7 +173,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	}
 	
 	// customize ID field - for submittable doctypes
-	if(me.dt_details[dt].submittable) {
+	if(me.dt_details.submittable) {
 		lst.show_cell = function(cell,ri,ci,d) {
 			if (ci==0){
 				// link

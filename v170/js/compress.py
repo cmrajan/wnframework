@@ -28,6 +28,7 @@ in_files_main = [
        ,'webpage/about.js'
        ,'webpage/loaders.js'
        ,'webpage/page.js'
+       ,'webpage/docbrowser.js'
        ,'model/local_data.js'
        ,'model/doclist.js'
        ,'webpage/body.js'

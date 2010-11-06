@@ -259,17 +259,11 @@ function loadscript(src, call_back) {
 // Load DocBrowser
 // -------------------------------------------------------------------------------
 
+var doc_browser_page;
 function loaddocbrowser(dt, label, fields) {
 	dt = get_label_doctype(dt);
-	
-	var show = function() {
-		doc_browser.show(dt, label, fields);
-		nav_obj.open_notify('DocBrowser',dt,'');
-	}
-	
-	if(doc_browser) 
-		show();
-	else
-		new_widget('DocBrowser', function(b) { doc_browser = b; show(); });
-		
+	if(!doc_browser_page)
+		doc_browser_page = new DocBrowserPage();
+	doc_browser_page.show(dt, label, fields);
+	nav_obj.open_notify('DocBrowser',dt,'');
 }

@@ -54,16 +54,10 @@ var widget_files = {
 	,'Calendar':'widgets/calendar.js'
 	,'Recommendation':'widgets/recommend.js'
 	,'RatingWidget':'widgets/rating.js'
-	,'SidebarMenu':'webpage/sidebar_menu.js'
-	,'DocBrowser':'webpage/docbrowser.js'
 }
 
 var Recommendation;
 var RatingWidget;
-var SidebarMenu;
-var sidebar_menu;
-var DocBrowser;
-var doc_browser;
 
 // API globals
 var frms={};
