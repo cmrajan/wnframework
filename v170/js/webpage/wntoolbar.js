@@ -10,11 +10,9 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', backgroundColor:'#222', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
+		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
 		if(!isIE) {
-			// gradient
-			$y(this.wrapper, {background: '-webkit-gradient(linear, left top, left bottom, from(#444), to(#000))'});
-			$y(this.wrapper, {background: '-moz-linear-gradient(top, #444, #000)'});
+			set_gradient(this.wrapper, '#666', '#000');
 		}
 
 		if(isIE6) {

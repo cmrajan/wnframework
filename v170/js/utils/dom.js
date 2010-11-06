@@ -22,6 +22,17 @@ function set_opacity(ele, ieop) {
 	}
 }
 
+// set gradient
+function set_gradient(ele, from, to) {
+	// gradient
+	if(isIE) {
+		$y(ele, {backgroundColor: '#' + cint(cint(from.substr(1)) - cint(to.substr(1)) / 2)});
+	} else {
+		$y(ele, {background: '-webkit-gradient(linear, left top, left bottom, from('+from+'), to('+to+'))'});
+		$y(ele, {background: '-moz-linear-gradient(top, '+from+', '+to+')'});		
+	}
+}
+
 // Dom
 
 function empty_select(s) {
