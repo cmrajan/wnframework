@@ -171,6 +171,14 @@ if(isIE6) {
 	}
 }
 window.onload = function() { startup() }
+var resize_observers = []
+window.onresize = function() {
+	var ht = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight;
+	ht = ht - (page_body.wntoolbar ? page_body.wntoolbar.wrapper.clientHeight : 0);
+	for(var i=0; i< resize_observers.length; i++){
+		resize_observers[i](ht);
+	}
+}
 
 // set custom tooltip
 set_custom_tooltip = function(parent,tip_content,cs){
