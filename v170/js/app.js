@@ -171,13 +171,19 @@ if(isIE6) {
 	}
 }
 window.onload = function() { startup() }
+
 var resize_observers = []
 window.onresize = function() {
-	var ht = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight;
-	ht = ht - (page_body.wntoolbar ? page_body.wntoolbar.wrapper.clientHeight : 0);
+	var ht = get_window_height();
 	for(var i=0; i< resize_observers.length; i++){
 		resize_observers[i](ht);
 	}
+}
+
+get_window_height = function() {
+	var ht = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight;
+	ht = ht - (page_body.wntoolbar ? page_body.wntoolbar.wrapper.clientHeight : 0);
+	return ht;	
 }
 
 // set custom tooltip

@@ -1108,7 +1108,8 @@ startup_list.push(setup_calendar);if(isIE6){var scroll_list=[]
 window.onscroll=function(){for(var i=0;i<scroll_list.length;i++){scroll_list[i]();}}}
 window.onload=function(){startup()}
 var resize_observers=[]
-window.onresize=function(){var ht=window.innerHeight?window.innerHeight:document.documentElement.clientHeight?document.documentElement.clientHeight:document.body.clientHeight;ht=ht-(page_body.wntoolbar?page_body.wntoolbar.wrapper.clientHeight:0);for(var i=0;i<resize_observers.length;i++){resize_observers[i](ht);}}
+window.onresize=function(){var ht=get_window_height();for(var i=0;i<resize_observers.length;i++){resize_observers[i](ht);}}
+get_window_height=function(){var ht=window.innerHeight?window.innerHeight:document.documentElement.clientHeight?document.documentElement.clientHeight:document.body.clientHeight;ht=ht-(page_body.wntoolbar?page_body.wntoolbar.wrapper.clientHeight:0);return ht;}
 set_custom_tooltip=function(parent,tip_content,cs){new CustomTooltip(parent,tip_content,cs);}
 var tinyMCE_GZ={settings:{themes:'',plugins:'',languages:'',disk_cache:true,page_name:'tiny_mce_gzip.cgi',debug:false,suffix:''},init:function(s,cb,sc){var t=this,n,i,nl=document.getElementsByTagName('script');for(n in s)
 t.settings[n]=s[n];s=t.settings;for(i=0;i<nl.length;i++){n=nl[i];if(n.src&&n.src.indexOf('tiny_mce')!=-1)
