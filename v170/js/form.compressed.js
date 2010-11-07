@@ -79,7 +79,7 @@ this.append_tip=function(t){me.c1.innerHTML+='<div style="margin-bottom: 8px;">'
 this.clear_tip=function(){me.c1.innerHTML='';$dh(me.tip_box);}
 $dh(this.tip_box);}
 _f.Frm.prototype.setup_meta=function(){this.meta=get_local('DocType',this.doctype);this.perm=get_perm(this.doctype);this.setup_print();}
-_f.set_frm_height=function(){if(!cur_frm.meta.in_dialog&&cur_frm.tray&&!get_url_arg('embed')){var headerh=cur_frm.frm_head.page_head.wrapper.clientHeight;var footerh=cur_frm.footer.clientHeight;$y(cur_frm.tray.body,{height:get_window_height()-headerh-footerh+'px',overflow:'auto'});}}
+_f.set_frm_height=function(){if(!cur_frm.meta.in_dialog&&cur_frm.tray&&!get_url_arg('embed')){var headerh=cur_frm.frm_head.page_head.wrapper.offsetHeight;var footerh=cur_frm.footer.offsetHeight;$y(cur_frm.tray.body,{height:get_window_height()-headerh-footerh+'px',overflow:'auto'});}}
 _f.Frm.prototype.setup_std_layout=function(){this.tab_wrapper=$a(this.form_wrapper,'div');$dh(this.tab_wrapper);if(this.meta.section_style=='Tabbed')this.meta.section_style='Tray';if(this.meta.section_style=='Tray'&&!get_url_arg('embed')){this.tray=new TrayPage(this.form_wrapper);this.body=$a(this.tray.body,'div','frm_body',{margin:'16px'});}else{this.body=$a(this.form_wrapper,'div','frm_body');}
 this.layout=new Layout(this.body,'100%');this.setup_footer();if(!(this.meta.istable||user=='Guest'))this.frm_head=new _f.FrmHeader(this.head);if(this.frm_head&&this.meta.in_dialog)$dh(this.frm_head.page_head.close_btn);this.setup_tips();if(this.meta.section_style=='Tabbed'&&!(this.meta.istable)&&!(get_url_arg('embed')))
 this.setup_tabs();if(this.meta.colour)

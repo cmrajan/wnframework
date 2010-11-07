@@ -132,8 +132,8 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 
 _r.set_rb_height = function() {
 	if(_r.rb_con.cur_rb) {
-		var headerh = _r.rb_con.page_head.wrapper.clientHeight;
-		var footerh = _r.rb_con.footer.clientHeight;
+		var headerh = _r.rb_con.page_head.wrapper.offsetHeight;
+		var footerh = _r.rb_con.footer.offsetHeight;
 		$y(_r.rb_con.cur_rb.mytabs.body, { height: get_window_height() - headerh - footerh + 'px', overflow:'auto' });
 	}
 }
