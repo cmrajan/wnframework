@@ -431,6 +431,7 @@ _f.Frm.prototype.setup_print_layout = function() {
 	if(this.meta.read_only_onload) {
 		this.print_wrapper = $a(this.wrapper, 'div');
 		this.print_head = $a(this.print_wrapper, 'div');
+		set_gradient(this.print_head, '#EEE', '#DDD');
 		this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
 		
 		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '2px'});
