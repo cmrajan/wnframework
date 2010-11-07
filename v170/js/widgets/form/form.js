@@ -239,6 +239,13 @@ _f.Frm.prototype.setup_meta = function() {
 	this.perm = get_perm(this.doctype); // for create
 	this.setup_print();
 }
+_f.set_frm_height = function() {
+	if(!cur_frm.meta.in_dialog && cur_frm.tray && !get_url_arg('embed')) {
+		var headerh = cur_frm.frm_head.page_head.wrapper.clientHeight;
+		var footerh = cur_frm.footer.clientHeight;
+		$y(cur_frm.tray.body, { height: get_window_height() - headerh - footerh + 'px', overflow:'auto' });
+	}
+}
 
 _f.Frm.prototype.setup_std_layout = function() {
 	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
@@ -248,8 +255,8 @@ _f.Frm.prototype.setup_std_layout = function() {
 
 	// build the sidebar
 	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
-		this.tray = new TrayPage(this.form_wrapper, cint(screen.height * 0.55) + 'px');
-		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px'});		
+		this.tray = new TrayPage(this.form_wrapper);
+		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px'});
 	} else {
 		this.body = $a(this.form_wrapper, 'div', 'frm_body');
 	}
@@ -280,6 +287,11 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 	// create fields
 	this.setup_fields_std();
+	
+	// set height
+	setTimeout(_f.set_frm_height, 100);
+	if(resize_observers.indexOf(_f.set_frm_height == -1))
+		resize_observers.push(_f.set_frm_height)
 }
 
 // --------------------------------------------------------------------------------------
@@ -712,6 +724,7 @@ _f.Frm.prototype.refresh = function(docname) {
 		if(!this.meta.in_dialog) page_body.change_to('Forms');
 
 	} 
+	setTimeout(_f.set_frm_height, 100);
 }
 
 // --------------------------------------------------------------------------------------

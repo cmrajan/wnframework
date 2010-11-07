@@ -182,8 +182,10 @@ window.onresize = function() {
 
 get_window_height = function() {
 	var ht = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight;
-	ht = ht - (page_body.wntoolbar ? page_body.wntoolbar.wrapper.clientHeight : 0);
-	return ht;	
+	var toolbarh = page_body.wntoolbar ? page_body.wntoolbar.wrapper.clientHeight : 0
+	var bannerh = page_body.banner_head ? page_body.banner_head.clientHeight : 0
+	ht = ht - bannerh - toolbarh - 2;
+	return ht;
 }
 
 // set custom tooltip

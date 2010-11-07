@@ -18,7 +18,6 @@ _r.ReportContainer = function() {
 	this.page_head = new PageHeader(head_div);
 	$y(this.page_head.wrapper, {marginBottom:'0px'});
 
-
 	// buttons
 
 	var run_fn = function() { 
@@ -50,9 +49,6 @@ _r.ReportContainer = function() {
 		};
 		var advancedbtn = this.page_head.add_button('Advanced Settings', fn);
 	}
-	
-	
-
 
 	// set a type
 	this.set_dt = function(dt, onload) {
@@ -60,7 +56,7 @@ _r.ReportContainer = function() {
 			if(!f.forbidden) {
 				me.cur_rb = f;
 				me.cur_rb.mytabs.items['Result'].expand();
-	
+				setTimeout(_r.set_rb_height, 100);
 				if(onload)onload(f);	
 			}
 		}
@@ -122,12 +118,24 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 
 _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
-	this.mytabs = new TrayPage(this.tab_wrapper, cint(screen.height * 0.55) + 'px');
+	this.mytabs = new TrayPage(this.tab_wrapper);
 	
 	this.mytabs.add_item('Result', null, null, 1);
 	this.mytabs.add_item('More Filters', null, null, 1);
 	this.mytabs.add_item('Select Columns', null, null, 1);
-	
+
+	if(resize_observers.indexOf(_r.set_rb_height == -1))
+		resize_observers.push(_r.set_rb_height)
+}
+
+// -------------------------------------------------------------------------------------
+
+_r.set_rb_height = function() {
+	if(_r.rb_con.cur_rb) {
+		var headerh = _r.rb_con.page_head.wrapper.clientHeight;
+		var footerh = _r.rb_con.footer.clientHeight;
+		$y(_r.rb_con.cur_rb.mytabs.body, { height: get_window_height() - headerh - footerh + 'px', overflow:'auto' });
+	}
 }
 
 // -------------------------------------------------------------------------------------
