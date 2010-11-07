@@ -953,7 +953,7 @@ try{if(pscript['onload_'+page_name])pscript['onload_'+page_name](menuitem);}catc
 page_body.change_to(page_name);return p;}
 function refresh_page(page_name){var fn=function(r,rt){render_page(page_name)}
 $c('webnotes.widgets.page.getpage',{'name':page_name},fn);}
-DocBrowserPage=function(){this.lists={};this.dt_details={};this.cur_list=null;this.my_page=page_body.add_page('DocBrowser');this.wrapper=$a(this.my_page,'div');this.body=$a(this.wrapper,'div');var h=$a(this.body,'div');this.page_head=new PageHeader(h,'List');this.new_button=this.page_head.add_button('New',function(){newdoc(me.cur_dt)},1,'ui-icon-plus-thk',1)}
+DocBrowserPage=function(){this.lists={};this.dt_details={};this.cur_list=null;this.my_page=page_body.add_page('DocBrowser');this.wrapper=$a(this.my_page,'div');var h=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div','',{margin:'16px'});this.page_head=new PageHeader(h,'List');this.new_button=this.page_head.add_button('New',function(){newdoc(me.cur_dt)},1,'ui-icon-plus-thk',1)}
 DocBrowserPage.prototype.show=function(dt,label,field_list){var me=this;if(this.cur_list)$dh(this.cur_list.wrapper);add_space_holder(this.wrapper);$dh(this.body);var l=get_doctype_label(dt)
 this.page_head.main_head.innerHTML=(l.toLowerCase().substr(-4)=='list')?l:(l+' List')
 this.page_head.clear_toolbar();if(in_list(profile.can_create,dt)){var new_button=this.page_head.add_button('New '+l,function(){newdoc(this.dt)},1,'ui-icon-plus',1)
@@ -962,11 +962,11 @@ var callback=function(r,rt){remove_space_holder();$ds(me.body);if(!me.lists[dt])
 if(r.message=='Yes'){me.lists[dt].show();}else{me.lists[dt].show_no_result();}
 me.cur_list=me.lists[dt];}
 $c_obj('Menu Control','has_result',dt,callback);page_body.change_to('DocBrowser');}
-DocBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.wrapper=$a(parent,'div','',{margin:'16px'});this.no_result_area=$a(this.wrapper,'div','',{margin:'160px auto',width:'480px',padding:'16px',backgroundColor:'#DDF',fontSize:'14px',border:'1px solid #AAF',textAlign:'center'})
+DocBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.wrapper=$a(parent,'div');this.no_result_area=$a(this.wrapper,'div','',{margin:'160px auto',width:'480px',padding:'16px',backgroundColor:'#DDF',fontSize:'14px',border:'1px solid #AAF',textAlign:'center'})
 this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center',fontSize:'14px',color:'#888',display:'none'});this.loading_div.innerHTML='Loading...';this.body=$a(this.wrapper,'div');var callback=function(r,rt){me.dt_details=r.message;if(r.message){me.make_new(dt,label,r.message.field_list);}}
 $c_obj('Menu Control','get_dt_details',dt+'~~~'+cstr(field_list),callback);}
-DocBrowser.prototype.show=function(dt){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$dh(this.no_result_area);set_title(get_doctype_label(this.label));}
-DocBrowser.prototype.show_no_result=function(dt){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$ds(this.no_result_area);this.no_result_area.innerHTML=repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s',{dt:get_doctype_label(dt)});set_title(get_doctype_label(this.label));}
+DocBrowser.prototype.show=function(){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$dh(this.no_result_area);set_title(get_doctype_label(this.label));}
+DocBrowser.prototype.show_no_result=function(){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$ds(this.no_result_area);this.no_result_area.innerHTML=repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s',{dt:get_doctype_label(dt)});set_title(get_doctype_label(this.label));}
 DocBrowser.prototype.make_new=function(dt,label,field_list){this.make_the_list(dt,this.wrapper);}
 DocBrowser.prototype.make_the_list=function(dt,wrapper){var me=this;var lst=new Listing(dt);lst.cl=me.dt_details.columns;lst.dt=dt;lst.opts={cell_style:{padding:'3px 2px',borderBottom:'1px dashed #CCC'},alt_cell_style:{backgroundColor:'#FFFFFF'},head_style:{overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},head_main_style:{padding:'0px'},hide_export:1,hide_print:1,hide_refresh:0,hide_rec_label:0,show_calc:0,show_empty_tab:0,show_no_records_label:1,show_bottom_paging:0,round_corners:0,no_border:1,show_new:0,show_report:1}
 if(user_defaults.hide_report_builder)lst.opts.show_report=0;lst.is_std_query=1;lst.get_query=function(){q={};var fl=[];q.table=repl('`tab%(dt)s`',{dt:this.dt});for(var i=0;i<this.cl.length;i++)fl.push(q.table+'.`'+this.cl[i][0]+'`')

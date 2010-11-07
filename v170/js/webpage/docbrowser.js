@@ -6,9 +6,10 @@ DocBrowserPage = function() {
 	this.my_page = page_body.add_page('DocBrowser');
 	this.wrapper = $a(this.my_page,'div');
 
-	this.body = $a(this.wrapper, 'div');
+	var h = $a(this.wrapper, 'div');
 
-	var h = $a(this.body, 'div');
+	this.body = $a(this.wrapper, 'div', '', {margin:'16px'});
+
 	this.page_head = new PageHeader(h, 'List');
 	this.new_button = this.page_head.add_button('New', function() { newdoc(me.cur_dt) }, 1, 'ui-icon-plus-thk', 1)
 	
@@ -60,7 +61,7 @@ DocBrowser = function(parent, dt, label, field_list) {
 	var me = this;
 	this.label = label ? label : dt;
 
-	this.wrapper = $a(parent, 'div', '', {margin:'16px'});
+	this.wrapper = $a(parent, 'div');
 
 	// areas
 	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
@@ -80,7 +81,7 @@ DocBrowser = function(parent, dt, label, field_list) {
 	$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + cstr(field_list), callback);
 	
 }
-DocBrowser.prototype.show = function(dt) {
+DocBrowser.prototype.show = function() {
 	$ds(this.wrapper);
 	$dh(this.loading_div);
 	$ds(this.body);
@@ -88,7 +89,7 @@ DocBrowser.prototype.show = function(dt) {
 	set_title(get_doctype_label(this.label));
 }
 
-DocBrowser.prototype.show_no_result = function(dt) {
+DocBrowser.prototype.show_no_result = function() {
 	$ds(this.wrapper);
 	$dh(this.loading_div);
 	$ds(this.body);	
