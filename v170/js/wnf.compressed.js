@@ -947,10 +947,10 @@ this.cont.innerHTML=content;if(page_name==home_page)
 pages['_home']=this;return this;}
 function render_page(page_name,menuitem){if(!page_name)return;if((!locals['Page'])||(!locals['Page'][page_name])){loadpage('_home');return;}
 var pdoc=locals['Page'][page_name];if(pdoc.style)set_style(pdoc.style)
-var p=new Page(page_name,pdoc._Page__content?pdoc._Page__content:pdoc.content);var script=pdoc.__script?pdoc.__script:pdoc.script;p.doc=pdoc;page_body.cur_page=p.cont;if(script)
+var p=new Page(page_name,pdoc._Page__content?pdoc._Page__content:pdoc.content);var script=pdoc.__script?pdoc.__script:pdoc.script;p.doc=pdoc;if(script)
 try{eval(script);}catch(e){submit_error(e);}
-try{if(pscript['onload_'+page_name])pscript['onload_'+page_name](menuitem);}catch(e){submit_error(e);}
-page_body.change_to(page_name);return p;}
+page_body.change_to(page_name);try{if(pscript['onload_'+page_name])pscript['onload_'+page_name]();}catch(e){submit_error(e);}
+return p;}
 function refresh_page(page_name){var fn=function(r,rt){render_page(page_name)}
 $c('webnotes.widgets.page.getpage',{'name':page_name},fn);}
 DocBrowserPage=function(){this.lists={};this.dt_details={};this.cur_list=null;this.my_page=page_body.add_page('DocBrowser');this.wrapper=$a(this.my_page,'div');var h=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div','',{margin:'16px'});this.page_head=new PageHeader(h,'List');this.new_button=this.page_head.add_button('New',function(){newdoc(me.cur_dt)},1,'ui-icon-plus-thk',1)}

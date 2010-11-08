@@ -43,19 +43,16 @@ function render_page(page_name, menuitem) {
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
 	p.doc = pdoc;
 
-	// set cur_page ref for script
-	page_body.cur_page = p.cont;
-	
 	if(script)
 		try { eval(script); } catch(e) { submit_error(e); }		
 
-	// run onload
-	try {
-		if(pscript['onload_'+page_name]) pscript['onload_'+page_name](menuitem); // onload
-	} catch(e) { submit_error(e); }
-
 	// change
 	page_body.change_to(page_name);	
+	
+	// run onload
+	try {
+		if(pscript['onload_'+page_name]) pscript['onload_'+page_name](); // onload
+	} catch(e) { submit_error(e); }
 		
 	return p;
 }
