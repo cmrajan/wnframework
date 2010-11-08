@@ -290,8 +290,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 	// set height
 	setTimeout(_f.set_frm_height, 100);
-	if(resize_observers.indexOf(_f.set_frm_height == -1))
-		resize_observers.push(_f.set_frm_height)
+	set_resize_observer(_f.set_frm_height)
 }
 
 // --------------------------------------------------------------------------------------

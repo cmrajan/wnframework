@@ -12,7 +12,7 @@ function WNToolbar(parent) {
 	this.setup = function() {
 		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
 		if(!isIE) {
-			set_gradient(this.wrapper, '#666', '#000');
+			set_gradient(this.wrapper, '#444', '#000');
 		}
 
 		if(isIE6) {
