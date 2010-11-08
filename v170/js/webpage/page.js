@@ -42,6 +42,9 @@ function render_page(page_name, menuitem) {
 	// script
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
 	p.doc = pdoc;
+
+	// set cur_page ref for script
+	page_body.cur_page = p.cont;
 	
 	if(script)
 		try { eval(script); } catch(e) { submit_error(e); }		
