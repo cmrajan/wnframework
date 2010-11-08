@@ -124,6 +124,8 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 	this.mytabs.add_item('More Filters', null, null, 1);
 	this.mytabs.add_item('Select Columns', null, null, 1);
 	
+	this.mytabs.tabs = this.mytabs.items;
+
 	set_resize_observer(_r.set_rb_height);
 }
 

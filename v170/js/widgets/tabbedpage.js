@@ -72,6 +72,7 @@ function TrayPage(parent, height, width) {
 	this.cur_item = null;
 	
 	this.items = {};
+	this.tabs = this.items // for tabs
 	this.tab = make_table($a(parent, 'div'), 1, 2, '100%', [width, null]);
 	
 	// tray style
@@ -106,6 +107,7 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 			this.header.innerHTML = label;
 		}
 		this.body = $a(this.wrapper, 'div');
+		this.tab_body = this.body; // for sync with tabs
 		
 		$dh(this.wrapper);
 	}
