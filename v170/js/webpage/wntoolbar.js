@@ -246,16 +246,17 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
-		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px', textAlign:'right'});
-		var t = make_table(w, 1, 5, null, [], {padding: '2px 4px', borderLeft:'1px solid #CCC', fontSize:'11px'});
+		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px', textAlign:'right', verticalAlign:'middle'});
+		var t = make_table(w, 1, 6, null, [], {padding: '2px 6px', fontSize:'11px'});
 		$y(t,{cssFloat:'right', color:'#FFF'});
-		$y($td(t,0,0),{border:'0px'});
 		$td(t,0,0).innerHTML = user_fullname;
 		$td(t,0,1).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';
 		$td(t,0,2).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';
 		$td(t,0,3).innerHTML = '<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';
 		$td(t,0,4).innerHTML = '<span style="cursor: pointer;" onclick="logout()">Logout</span>';
 		this.menu_table_right = t;
+		$y($td(t,0,5), {width:'18px'});
+		this.spinner = $a($td(t,0,5),'img','',{display:'none'}); this.spinner.src = 'images/ui/spinner.gif';
 	}
 
 	this.download_backup = function() {

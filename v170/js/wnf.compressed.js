@@ -819,7 +819,7 @@ this.setup_search=function(){me.menu.add_top_menu('Search',function(){me.search_
 me.search_dialog=d;me.search_sel=new SelectWidget(d.widgets['Select'],[],'120px');me.search_sel.inp.value='Select...';me.open_quick_search=function(){me.search_dialog.hide();var v=sel_val(me.search_sel);if(v)selector.set_search(v);me.search_sel.disabled=1;selector.show();}
 var nl=profile.can_read.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.search_sel.set_options(nl.sort());me.search_sel.onchange=function(){me.open_quick_search();}
 makeselector();}
-this.setup_logout=function(){var w=$a($td(this.body_tab,0,1),'div','',{paddingTop:'2px',textAlign:'right'});var t=make_table(w,1,5,null,[],{padding:'2px 4px',borderLeft:'1px solid #CCC',fontSize:'11px'});$y(t,{cssFloat:'right',color:'#FFF'});$y($td(t,0,0),{border:'0px'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;}
+this.setup_logout=function(){var w=$a($td(this.body_tab,0,1),'div','',{paddingTop:'2px',textAlign:'right',verticalAlign:'middle'});var t=make_table(w,1,6,null,[],{padding:'2px 6px',fontSize:'11px'});$y(t,{cssFloat:'right',color:'#FFF'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;$y($td(t,0,5),{width:'18px'});this.spinner=$a($td(t,0,5),'img','',{display:'none'});this.spinner.src='images/ui/spinner.gif';}
 this.download_backup=function(){$c('webnotes.utils.backups.get_backup',{},function(r,rt){});}
 this.enter_testing=function(){about_dialog.hide();if(is_testing){end_testing();return;}
 var a=prompt('Type in the password','');if(a=='start testing'){$c('start_test',args={},function(){$ds('testing_div');is_testing=true;$i('testing_mode_link').innerHTML='End Testing';});}else{msgprint('Sorry, only administrators are allowed use the testing mode.');}}
@@ -872,11 +872,8 @@ l.onclick=function(){loaddoc(this.dt,this.link_name);d.hide();}
 var cl=[]
 for(var j=1;j<r.values[i].length;j++)cl.push(r.values[i][j]);var c=$a(div,'div','comment',{marginTop:'2px'});c.innerHTML=cl.join(', ');}}
 selector=d;}
-var _loading_div;function set_loading(){if(!_loading_div){_loading_div=$a(popup_cont,'div','loading_div');var t=make_table(_loading_div,1,2,'90px',[null,null],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});$a($td(t,0,0),'img').src="images/ui/loading.gif";$td(t,0,1).innerHTML='Loading...'
-if(!isIE)$y($td(t,0,0),{paddingTop:'2px'});}
-var d=_loading_div;if(!d)return;if(isIE6){d.style.top=(get_scroll_top()+10)+'px';scroll_list.push(function(){_loading_div.style.top=(get_scroll_top()+10)+'px';})}else{$y(d,{position:'fixed',top:'10px'});}
-$ds(d);pending_req++;}
-function hide_loading(){var d=_loading_div;if(!d)return;pending_req--;if(!pending_req){$dh(d);if(isIE6){document.body.onscroll=null;}}}
+var _loading_div;function set_loading(){$ds(page_body.wntoolbar.spinner);pending_req++;}
+function hide_loading(){var d=page_body.wntoolbar.spinner;if(!d)return;pending_req--;if(!pending_req){$dh(d);}}
 var fcount=0;var frozen=0;var dialog_message;var dialog_back;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 if(!dialog_back){dialog_back=$a($i('body_div'),'div','dialog_back');if(isIE)dialog_back.style['filter']='alpha(opacity=60)';}
