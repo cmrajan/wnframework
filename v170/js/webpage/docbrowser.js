@@ -11,7 +11,7 @@ DocBrowserPage = function() {
 	this.body = $a(this.wrapper, 'div', '', {margin:'16px'});
 
 	this.page_head = new PageHeader(h, 'List');
-	this.new_button = this.page_head.add_button('New', function() { newdoc(me.cur_dt) }, 1, 'ui-icon-plus-thk', 1)
+	this.new_button = this.page_head.add_button('New', function() { newdoc(me.cur_dt) }, 1, 'ui-icon-plus', 1)
 	
 }
 

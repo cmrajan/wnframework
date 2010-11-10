@@ -936,8 +936,9 @@ div.notice {
 
 /**** CALENDAR ****/
 	
-div.cal_wrapper { margin: 16px; }
+div.cal_wrapper { }
 div.cal_body {
+	margin: 16px;
 	height: 400px;
 	background-color: #DDD;
 	position: relative;
@@ -985,10 +986,7 @@ div.cal_view_body_plain {
 }
 
 div.cal_month_head {
-	width: 100%;
-	height: 15%;
-	position: relative;
-	border-bottom: 1px solid #DDD;
+	margin: 4px;
 }
 
 div.cal_month_body {

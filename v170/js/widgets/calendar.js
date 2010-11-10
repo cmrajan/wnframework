@@ -8,17 +8,13 @@ Calendar=function() {
 }
 
 Calendar.prototype.init=function (parent) {
-/* 	var tmp = $a(parent, 'div', 'standard_title');
-	tmp.innerHTML = 'Calendar';
-	tmp.style.margin = '8px 0px 0px 16px';*/
-
-	var tmp = $a(parent,'div');
-	new PageHeader(tmp,'Calendar')
 
 	this.wrapper = $a(parent, 'div', 'cal_wrapper');
+	this.page_head = new PageHeader(this.wrapper,'Calendar')
  	this.body = $a(this.wrapper, 'div', 'cal_body');
 
- 	this.createheader();
+ 	this.make_head_buttons();
+ 	this.make_header();
  	
 	this.todays_date = new Date();
 	this.selected_date = this.todays_date;
@@ -40,52 +36,123 @@ Calendar.prototype.rename_notify = function(dt, old_name, new_name) {
 		this.has_event[old_name] = false;	
 }
 
-Calendar.prototype.make_btn = function(text, w, onclick, left) {
+//------------------------------------------------------
+
+Calendar.prototype.make_header = function() {
 	var me = this;
-	var b = $a(this.body, 'div', 'cal_button');
-	b.style.top = '90%';
-	if(left)b.style.left = left + 'px';
-	if(w)$w(b, w + 'px');
-	b.innerHTML = text;
-	b.onclick = function(){
-		onclick();
-		if(isIE) { $dh(_c.calendar.wrapper); setTimeout('$ds(_c.calendar.wrapper);',100); } 
+	
+	this.view_header = $a(this.body, 'div', 'cal_month_head', {paddingTop:'8px'});
+	var tab = make_table(this.view_header, 1, 3, '50%', ['30px', null, '30px'], {verticalAlign:'middle'});
+	$y(tab, {margin:'auto'});
+	
+	var lbtn = $a($td(tab, 0, 0),'button');
+	$(lbtn).click(function() { me.cur_view.prev() }).html('Prev').button({icons:{primary:'ui-icon-triangle-1-w'}, text:false})
+
+	var rbtn = $a($td(tab, 0, 2),'button');
+	$(rbtn).click(function() { me.cur_view.next() }).html('Next').button({icons:{primary:'ui-icon-triangle-1-e'}, text:false})
+	
+	$y($td(tab, 0, 1), {fontSize:'16px', textAlign:'center'})
+	this.view_title = $td(tab, 0, 1);
+
+}
+//------------------------------------------------------
+
+Calendar.prototype.make_head_buttons = function() {
+	var me = this;
+
+	this.page_head.add_button('New Event', function() { me.add_event(); }, 0, 'ui-icon-plus', 1);
+ 	this.page_head.add_button('Month View', function() { me.refresh('Month'); }, 0, 'ui-icon-calculator');
+	this.page_head.add_button('Weekly View',function() { me.refresh('Week'); }, 0, 'ui-icon-note');
+ 	this.page_head.add_button('Daily View', function() { me.refresh('Day'); }, 0, 'ui-icon-calendar');
+
+}
+//------------------------------------------------------
+
+Calendar.prototype.show_event = function(ev, cal_ev) {
+	var me = this;
+	if(!this.event_dialog) {
+		var d = new Dialog(400, 400, 'Calendar Event');
+		d.make_body([
+			['HTML','Heading']
+			,['Text','Description']
+			,['Check', 'Public Event']
+			,['Check', 'Cancel Event']
+			,['HTML', 'Event Link']
+			,['Button', 'Save']
+		])
+		
+		// show the event when the dialog opens
+		d.onshow = function() {
+			// heading
+			var c = me.selected_date;
+			var tmp = time_to_ampm(this.ev.event_hour);
+			tmp = tmp[0]+':'+tmp[1]+' '+tmp[2];
+			
+			this.widgets['Heading'].innerHTML = 
+				'<div style="text-align: center; padding:4px; font-size: 14px">'
+				+ _c.calendar.weekdays[c.getDay()] + ', ' + c.getDate() + ' ' + month_list_full[c.getMonth()] + ' ' + c.getFullYear() 
+				+ ' - <b>'+tmp+'</b></div>';
+			
+			// set
+			this.widgets['Description'].value = cstr(this.ev.description);
+			
+			this.widgets['Public Event'].checked = false;
+			this.widgets['Cancel Event'].checked = false;
+
+			if(this.ev.event_type=='Public')
+				this.widgets['Public Event'].checked = true;
+			
+			this.widgets['Event Link'].innerHTML = '';
+
+			// link
+			var div = $a(this.widgets['Event Link'], 'div', 'link_type', {margin:'4px 0px'});
+			div.onclick = function() { me.event_dialog.hide(); loaddoc('Event', me.event_dialog.ev.name); }
+			div.innerHTML = 'View Event details, add or edit participants';
+				
+		}
+		
+		// event save
+		d.widgets['Save'].onclick = function() {
+			var d = me.event_dialog;
+			
+			// save values
+			d.ev.description = d.widgets['Description'].value;
+			if(d.widgets['Cancel Event'].checked) d.ev.event_type='Cancelled';
+			else if(d.widgets['Public Event'].checked) d.ev.event_type='Public';
+			
+			me.event_dialog.hide();
+			
+			// if new event
+			if(d.cal_ev)
+				var cal_ev = d.cal_ev;
+			else 
+				var cal_ev = me.set_event(d.ev);
+
+			cal_ev.save();
+			if(me.cur_view)me.cur_view.refresh();			
+		}
+		this.event_dialog = d;
 	}
-	b.onmouseover = function() { this.className = 'cal_button cal_button_hover'; }
-	b.onmouseout = function() { this.className = 'cal_button'; }
-	return b;
+	this.event_dialog.ev = ev;
+	this.event_dialog.cal_ev = cal_ev ? cal_ev : null;
+	this.event_dialog.show();
+	
 }
 
-Calendar.prototype.createheader = function() {
-	var me = this;
-
-	this.make_btn('&larr;', 40, function() { me.cur_view.prev(); }, 20 );
- 	this.make_btn('Month', 60, function() { me.refresh('Month'); }, 60);
-	this.make_btn('Week', 60, function() { me.refresh('Week'); }, 120);
- 	this.make_btn('Day', 60, function() { me.refresh('Day'); }, 180);
-	this.make_btn('&rarr;', 40, function() { me.cur_view.next(); }, 240 );
-	var evb = this.make_btn('+ Add Event', 80, function() { me.add_event(); } );
-	evb.style.right = '5%';
-
-}
+//------------------------------------------------------
 
 Calendar.prototype.add_event = function() {
-	var tx = prompt('New Event:', '');
-	
-	if(!tx)return;
-	
+		
 	var ev = LocalDB.create('Event');
 	ev = locals['Event'][ev];
 	
-	ev.description = tx;
 	ev.event_date = dateutil.obj_to_str(this.selected_date);
 	ev.event_hour = this.selected_hour+':00';
 	ev.event_type = 'Private';
-	
-	var cal_ev = this.set_event(ev);
-	cal_ev.save();
-	if(this.cur_view)this.cur_view.refresh();
+
+	this.show_event(ev);
 }
+//------------------------------------------------------
 
 Calendar.prototype.get_month_events = function(call_back) {
 	// ret fn
@@ -107,6 +174,7 @@ Calendar.prototype.get_month_events = function(call_back) {
 			f);	
 	}
 }
+//------------------------------------------------------
 
 Calendar.prototype.get_daily_event_list=function(day) {
 	var el = [];
@@ -121,6 +189,7 @@ Calendar.prototype.get_daily_event_list=function(day) {
 	}
 	else return [];
 }
+//------------------------------------------------------
 
 Calendar.prototype.set_event = function(ev) {
 	var dt = dateutil.str_to_obj(ev.event_date);
@@ -135,13 +204,14 @@ Calendar.prototype.set_event = function(ev) {
 	
 	var l = this.events[y][m][d][cint(ev.event_hour)];
 	
-	var cal_ev = new Calendar.CalEvent(ev);
+	var cal_ev = new Calendar.CalEvent(ev, this);
 	l[l.length] = cal_ev;
 	
 	this.has_event[ev.name] = true;
 	
 	return cal_ev;
 }
+//------------------------------------------------------
 
 Calendar.prototype.refresh = function(viewtype){//Sets the viewtype of the Calendar and Calls the View class based on the viewtype
  	if(viewtype)
@@ -158,29 +228,27 @@ Calendar.prototype.refresh = function(viewtype){//Sets the viewtype of the Calen
  	}
 }
 
-//.......................................................................
+//------------------------------------------------------
 
-Calendar.CalEvent= function(doc) {
+Calendar.CalEvent= function(doc, cal) {
 	this.body = document.createElement('div');
 	var v = locals['Event'][doc.name].description;
 	if(v==null)v='';
 	this.body.innerHTML = v;
 
-	this.docname = doc.name;
+	this.doc = doc;
 	var me = this;
 
-	//this.body.onmouseover = function() {this.className = me.my_class + ' cal_event_hover';}
-	//this.body.onmouseout = function() {this.className = me.my_class;}
 	this.body.onclick = function() {
-		if(me.docname) {
-			loaddoc('Event', me.docname);
+		if(me.doc.name) {
+			cal.show_event(me.doc, me);
 		}
 	}
 }
 
 Calendar.CalEvent.prototype.show = function(vu) {
 
-	var t = locals['Event'][this.docname].event_type;
+	var t = this.doc.event_type;
 	this.my_class = 'cal_event cal_event_'+ t;
 	
 	if(this.body.parentNode)
@@ -188,7 +256,7 @@ Calendar.CalEvent.prototype.show = function(vu) {
 	vu.body.appendChild(this.body);
 	
 	// refresh
-	var v = locals['Event'][this.docname].description;
+	var v = this.doc.description;
 	if(v==null)v='';
 	this.body.innerHTML = v;
 	this.body.className = this.my_class;
@@ -196,8 +264,8 @@ Calendar.CalEvent.prototype.show = function(vu) {
 
 Calendar.CalEvent.prototype.save = function() {
 	var me = this;
-	save_doclist('Event', me.docname, 'Save', function(r) { 
-		me.docname = r.docname; 
+	save_doclist('Event', me.doc.name, 'Save', function(r) { 
+		me.doc = locals['Event'][r.docname];
 		_c.calendar.has_event[r.docname] = true;
 	} );
 }
@@ -246,9 +314,8 @@ Calendar.MonthView = function(cal) { this.init(cal); this.monthstep = 1; this.ro
 Calendar.MonthView.prototype=new Calendar.View();
 Calendar.MonthView.prototype.create_table = function() {
 
+	// create head
 	var hw = $a(this.body, 'div', 'cal_month_head');
-
-	this.month_name= $a(hw, 'div', 'cal_month_name');
 
 	// create headers
 	this.headtable = $a(hw, 'table', 'cal_month_headtable');
@@ -289,7 +356,7 @@ Calendar.MonthView.prototype.refresh = function() {
 	// set day headers
  	var d = new Date(cur_year, cur_month, day);
 
-	this.month_name.innerHTML = month_list_full[cur_month] + ' ' + cur_year;
+	this.cal.view_title.innerHTML = month_list_full[cur_month] + ' ' + cur_year;
 
  	for(var i=0;i<6;i++) {
  		if((i<5) || cur_month==d.getMonth()) { // if this month
@@ -325,10 +392,6 @@ Calendar.MonthView.prototype.refresh = function() {
 Calendar.DayView=function(cal){ this.init(cal); this.daystep = 1; }
 Calendar.DayView.prototype=new Calendar.View();
 Calendar.DayView.prototype.create_table = function() {
-	// create head
-	this.head = $a(this.body, 'div', 'cal_month_head');
-	
-	this.month_name= $a(this.head, 'div', 'cal_month_name');
 
 	// create body
 	var bw = $a(this.body, 'div', 'cal_day_body');
@@ -361,7 +424,7 @@ Calendar.DayView.prototype.refresh = function() {
 	// fill other days
 	var me=this;
 
-	this.month_name.innerHTML = _c.calendar.weekdays[c.getDay()] + ', ' + c.getDate() + ' ' + month_list_full[c.getMonth()] + ' ' + c.getFullYear();
+	this.cal.view_title.innerHTML = _c.calendar.weekdays[c.getDay()] + ', ' + c.getDate() + ' ' + month_list_full[c.getMonth()] + ' ' + c.getFullYear();
 
 	// headers
 	var d = c;
@@ -384,8 +447,6 @@ Calendar.WeekView.prototype.create_table = function() {
 
 	// create head
 	var hw = $a(this.body, 'div', 'cal_month_head');
-
-	this.month_name= $a(hw, 'div', 'cal_month_name');
 
 	// day headers
 	this.headtable = $a(hw, 'table', 'cal_month_headtable');
@@ -427,7 +488,7 @@ Calendar.WeekView.prototype.refresh = function() {
 	// fill other days
 	var me=this;
 
-	this.month_name.innerHTML = month_list_full[c.getMonth()] + ' ' + c.getFullYear();
+	this.cal.view_title.innerHTML = month_list_full[c.getMonth()] + ' ' + c.getFullYear();
 
 	// headers
 	var d = new Date(c.getFullYear(), c.getMonth(), c.getDate() - c.getDay());
@@ -450,7 +511,7 @@ Calendar.WeekView.prototype.refresh = function() {
 	 this.refresh_units();
 }
 
-//........................................................................
+//------------------------------------------------------.
 
 Calendar.ViewUnit = function() {}
 Calendar.ViewUnit.prototype.init = function(parent) {
