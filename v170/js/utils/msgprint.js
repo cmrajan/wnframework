@@ -11,7 +11,7 @@ function msgprint(msg, issmall, callback) {
 	}
 
 	if(!msg_dialog) {
-		msg_dialog = new Dialog(400, 200, "Message");
+		msg_dialog = new Dialog(500, 200, "Message");
 		msg_dialog.make_body([['HTML','Msg'],])
 		msg_dialog.onhide = function() {
 			msg_dialog.msg_area.innerHTML = '';
@@ -42,6 +42,11 @@ function msgprint(msg, issmall, callback) {
 		msg_dialog.msg_icon.src = 'images/icons/accept.gif'; $di(msg_dialog.msg_icon); msg = msg.substr(3);
 	}
 
+	if(msg.length > 1000) {
+		$y(m, {height:'200px', width:'400px', overflow:'auto'})
+	} else {
+		$y(m, {height:'', width:''})
+	}
 	m.innerHTML = replace_newlines(msg);
 	
 	msg_dialog.custom_onhide = callback;
