@@ -873,8 +873,9 @@ l.onclick=function(){loaddoc(this.dt,this.link_name);d.hide();}
 var cl=[]
 for(var j=1;j<r.values[i].length;j++)cl.push(r.values[i][j]);var c=$a(div,'div','comment',{marginTop:'2px'});c.innerHTML=cl.join(', ');}}
 selector=d;}
-var _loading_div;function set_loading(){$ds(page_body.wntoolbar.spinner);pending_req++;}
-function hide_loading(){var d=page_body.wntoolbar.spinner;if(!d)return;pending_req--;if(!pending_req){$dh(d);}}
+var _loading_div;function set_loading(){if(page_body.wntoolbar)$ds(page_body.wntoolbar.spinner);pending_req++;}
+function hide_loading(){pending_req--;if(page_body.wntoolbar)
+var d=page_body.wntoolbar.spinner;if(!d)return;if(!pending_req){$dh(d);}}
 var fcount=0;var frozen=0;var dialog_message;var dialog_back;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 if(!dialog_back){dialog_back=$a($i('body_div'),'div','dialog_back');if(isIE)dialog_back.style['filter']='alpha(opacity=60)';}

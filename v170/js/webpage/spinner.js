@@ -20,14 +20,15 @@ function set_loading() {
 		$y(d, {position: 'fixed', top: '10px'});
 	} */
 
-	$ds(page_body.wntoolbar.spinner);
+	if(page_body.wntoolbar)$ds(page_body.wntoolbar.spinner);
 	pending_req++;
 }
 
 function hide_loading() {
-	var d = page_body.wntoolbar.spinner;
-	if(!d)return;
 	pending_req--;
+	if(page_body.wntoolbar)
+		var d = page_body.wntoolbar.spinner;
+	if(!d)return;
 	if(!pending_req){
 		$dh(d);
 		/*if(isIE6) {
