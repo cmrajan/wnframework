@@ -47,14 +47,16 @@ def save_file(fname, content):
 	f = Document('File Data')
 	f.file_name = fname
 	f.save(1)
-	fid = f.name.replace('/','-')
 	
-	write_file(fid, content)
+	write_file(f.name, content)
 
 # -------------------------------------------------------
 
 def write_file(fid, content):
 	import webnotes, os
+
+	# no slashes
+	fid = fid.replace('/','-')
 
 	# save to a folder (not accessible to public)
 	folder = webnotes.get_files_path()
@@ -99,10 +101,11 @@ def get_file(fname):
 		fname = fname and fname[0][0]
 		fname = fname.split('\n')[0].split(',')[1]
 	
-	# from file-data
+	# from file-data - get the name from ID
 	file_id = fname
 	ret = webnotes.conn.sql("select file_name from `tabFile Data` where name=%s limit 1", fname)
 	if not ret:
+		# by name
 		ret = webnotes.conn.sql("select file_name, name from `tabFile Data` where file_name=%s limit 1", fname)
 		file_id = ret[0][1]
 		
