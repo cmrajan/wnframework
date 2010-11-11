@@ -295,7 +295,7 @@ class Document:
 			if values:
 				if not ignore_fields:
 					# update all in one query
-					webnotes.errprint(values)
+					#webnotes.errprint(values)
 					r = webnotes.conn.sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
 
 	# Save values
