@@ -19,6 +19,7 @@ try:
 	import webnotes
 	import webnotes.auth
 	import webnotes.utils
+	import webnotes.utils.file_manager
 	import webnotes.db
 	
 	form = cgi.FieldStorage()
@@ -38,7 +39,7 @@ try:
 		webnotes.conn.use(res[0][0])
 	
 	# get file
-	res = webnotes.utils.get_file(n)
+	res = webnotes.utils.file_manager.get_file(n)
 	
 	fname = res[0]
 	if hasattr(res[1], 'tostring'):
