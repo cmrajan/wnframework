@@ -41,8 +41,20 @@ def is_apache_user():
 
 def get_index_path():
 	import os
-	return os.sep.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:-2])
+	return os.sep.join(os.path.dirname(os.path.abspath(__file__)).split(os.sep)[:-2])
 
+def get_files_path():
+	global auth_obj
+	import defs, os
+
+	if not auth_obj:
+		raise Exception, 'You must login first'
+
+	if defs.files_path:
+		return os.path.join(defs.files_path, auth_obj.account_id)
+	else:
+		return os.path.join(get_index_path(), 'user_files', auth_obj.account_id)
+	
 def create_folder(path):
 	import os
 	

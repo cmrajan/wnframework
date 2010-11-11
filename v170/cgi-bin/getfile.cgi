@@ -40,29 +40,31 @@ try:
 	# get file
 	res = webnotes.utils.get_file(n)
 	
-	fname = res[0][0]
-	if hasattr(res[0][1], 'tostring'):
-		fcontent = res[0][1].tostring()
+	fname = res[0]
+	if hasattr(res[1], 'tostring'):
+		fcontent = res[1].tostring()
 	else: 
-		fcontent = res[0][1]
-	fmodified = res[0][2]
+		fcontent = res[1]
 
 	if form.getvalue('thumbnail'):
 		tn = webnotes.utils.cint(form.getvalue('thumbnail'))
-		from PIL import Image
-		import cStringIO
-		
-		fobj = cStringIO.StringIO(fcontent)
-		image = Image.open(fobj)
-		image.thumbnail((tn,tn*2), Image.ANTIALIAS)
-		outfile = cStringIO.StringIO()
-
-		if image.mode != "RGB":
-			image = image.convert("RGB")
-
-		image.save(outfile, 'JPEG')
-		outfile.seek(0)
-		fcontent = outfile.read()
+		try:
+			from PIL import Image
+			import cStringIO
+			
+			fobj = cStringIO.StringIO(fcontent)
+			image = Image.open(fobj)
+			image.thumbnail((tn,tn*2), Image.ANTIALIAS)
+			outfile = cStringIO.StringIO()
+	
+			if image.mode != "RGB":
+				image = image.convert("RGB")
+	
+			image.save(outfile, 'JPEG')
+			outfile.seek(0)
+			fcontent = outfile.read()
+		except:
+			pass
 
 	import mimetypes
 	print "Content-Type: %s" % (mimetypes.guess_type(fname)[0] or 'application/unknown')

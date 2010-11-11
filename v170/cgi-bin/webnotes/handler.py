@@ -6,8 +6,6 @@ import webnotes.utils
 form = webnotes.form
 cookies = Cookie.SimpleCookie()
 
-out = webnotes.response
-
 sql = None
 session = None
 errdoc = ''
@@ -29,8 +27,8 @@ def startup():
 
 def cleanup_docs():
 	import webnotes.model.doclist
-	if out.get('docs') and type(out['docs'])!=dict:
-		out['docs'] = webnotes.model.doclist.compress(out['docs'])
+	if webnotes.response.get('docs') and type(webnotes.response['docs'])!=dict:
+		webnotes.response['docs'] = webnotes.model.doclist.compress(webnotes.response['docs'])
 
 def runserverobj():
 	import webnotes.widgets.form
@@ -59,7 +57,7 @@ def dt_map():
 	dm = get_obj('DocType Mapper', from_doctype +'-' + to_doctype)
 	doclist = dm.dt_map(from_doctype, to_doctype, from_docname, Document(fielddata = dt_list[0]), [], from_to_list)
 	
-	out['docs'] = doclist
+	webnotes.response['docs'] = doclist
 
 # Load Month Events
 # ------------------------------------------------------------------------------------
@@ -99,36 +97,8 @@ def get_template():
 # ------------------------------------------------------------------------------------
 
 def uploadfile():
-	form = webnotes.form
-	from webnotes.model.doc import Document
-
-	dt = form.getvalue('doctype')
-	dn = form.getvalue('docname')
-	at_id = form.getvalue('at_id')
-	
-	webnotes.response['type'] = 'iframe'
-	
-	if 'filedata' in form:
-		i = form['filedata']
-      
-		# create File Data record
-		f = Document('File Data')
-		f.blob_content = i.file.read()
-		f.file_name = i.filename
-		if '\\' in f.file_name:
-			f.file_name = f.file_name.split('\\')[-1]
-		if '/' in f.file_name:
-			f.file_name = f.file_name.split('/')[-1]
-		f.save(1)
-
-		webnotes.response['result'] = """
-		<script type='text/javascript'>
-			window.parent._f.file_upload_done('%s', '%s', '%s', '%s', '%s');
-			window.parent.frms['%s'].show_doc('%s');
-		</script>""" % (dt, dn, f.name, f.file_name.replace("'", "\\'"), at_id, dt, dn)
-	else:
-		webnotes.response['result'] = """
-		<script type='text/javascript'>msgprint("No file")</script>"""
+	import webnotes.utils.file_manager
+	webnotes.utils.file_manager.upload()	
 	
 # File upload (from scripts)
 # ------------------------------------------------------------------------------------
@@ -152,15 +122,17 @@ def upload_many():
 # File download
 # ------------------------------------------------------------------------------------
 def get_file():
+	import webnotes.utils.file_manager
 
-	res = webnotes.utils.get_file(form.getvalue('fname'))
+	res = webnotes.utils.file_manager.get_file(form.getvalue('fname'))
 	if res:
 		webnotes.response['type'] = 'download'
-		webnotes.response['filename'] = res[0][0]
-		if hasattr(res[0][1], 'tostring'):
-			webnotes.response['filecontent'] = res[0][1].tostring()
+		webnotes.response['filename'] = res[0]
+		
+		if hasattr(res[1], 'tostring'):
+			webnotes.response['filecontent'] = res[1].tostring()
 		else: 
-			webnotes.response['filecontent'] = res[0][1]
+			webnotes.response['filecontent'] = res[1]
 	else:
 		webnotes.msgprint('[get_file] Unknown file name')
 		
@@ -226,8 +198,8 @@ def init_acc_mgmt(form,session):
 
 	res = sql('SELECT name from tabDocType')	
 	res = [r[0] for r in res]
-	out['dt_list'] = res	
-	out['acc_list'] = []
+	webnotes.response['dt_list'] = res	
+	webnotes.response['acc_list'] = []
 
 	db_name = incookies.get('dbx', server.db_name)
 	if not db_name:
@@ -239,7 +211,7 @@ def init_acc_mgmt(form,session):
 	if 'tabAccount' in tab_list:
 		try:
 			res = server.sql_accounts('select ac_name from tabAccount')
-			out['acc_list'] = [i[0] for i in res]
+			webnotes.response['acc_list'] = [i[0] for i in res]
 	
 			ac_name = server.sql_accounts('select ac_name from tabAccount where db_name="%s"' % db_name)
 			ac_name = ac_name and ac_name[0][0] or db_name
@@ -248,23 +220,23 @@ def init_acc_mgmt(form,session):
 	else:
 		ac_name = 'accounts'
 
-	out['account_id'] = db_name
-	out['acc'] = ac_name
-	out['user'] = session['user']
+	webnotes.response['account_id'] = db_name
+	webnotes.response['acc'] = ac_name
+	webnotes.response['user'] = session['user']
 
 def get_modules(form, session):
 	if form.has_key('ac_name') and form.getvalue('ac_name'):
 		server.use_account(ac_name = form.getvalue('ac_name'))
 
 	res = sql("select name from `tabModule Def`")
-	out['mod_list'] = [i[0] for i in res]
+	webnotes.response['mod_list'] = [i[0] for i in res]
 
 def get_dt_version(form, session):
 	if form.has_key('dn'):
 		try:
-			out['message'] = sql("select version from tabDocType where name=%s", form.getvalue('dn'))[0][0]
+			webnotes.response['message'] = sql("select version from tabDocType where name=%s", form.getvalue('dn'))[0][0]
 		except:
-			out['message'] = 0
+			webnotes.response['message'] = 0
 
 def get_module_doctypes(src, mod):
 	if src:
@@ -292,7 +264,7 @@ def export_module(form,session):
 	for d in dt_list:
 		l += str(d.fields) + ",\n"
 	
-	out['export_data'] = l + ']'
+	webnotes.response['export_data'] = l + ']'
 
 def import_docs(form, session):
 	if form.getvalue('tar'):
@@ -308,9 +280,9 @@ def backupdb(form, session):
 
 	server.backup_db(db_name)
 
-	out['type'] = 'download'
-	out['filename'] = db_name+'.tar.gz'
-	out['filecontent'] = open('../backups/' + db_name+'.tar.gz','rb').read()
+	webnotes.response['type'] = 'download'
+	webnotes.response['filename'] = db_name+'.tar.gz'
+	webnotes.response['filecontent'] = open('../backups/' + db_name+'.tar.gz','rb').read()
 
 # Execution Starts Here
 # ---------------------------------------------------------------------
@@ -344,7 +316,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	
 	sql("START TRANSACTION")
 	try:
-		out['message'] = webnotes.model.code.get_obj('Profile Control').prelogin(form) or ''
+		webnotes.response['message'] = webnotes.model.code.get_obj('Profile Control').prelogin(form) or ''
 		sql("COMMIT")
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
@@ -356,7 +328,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 else:
 
 	try:
-		webnotes.auth_obj = webnotes.auth.Authentication(form, cookies, out)
+		webnotes.auth_obj = webnotes.auth.Authentication(form, cookies, webnotes.response)
 	
 		if webnotes.conn:
 			sql = webnotes.conn.sql
@@ -432,25 +404,39 @@ def compressBuf(buf):
 	zfile.close()
 	return zbuf.getvalue()
 
-if out.get('type')=='csv':
+# CSV
+# -------------------------------------------------------------------
+
+if webnotes.response.get('type')=='csv':
 	print "Content-Type: text/csv"
-	print "Content-Disposition: attachment; filename="+out['doctype'].replace(' ', '_')+".csv"
+	print "Content-Disposition: attachment; filename="+webnotes.response['doctype'].replace(' ', '_')+".csv"
 	print
-	print out['result']
-elif out.get('type')=='iframe':
+	print webnotes.response['result']
+
+# IFRAME
+# -------------------------------------------------------------------
+
+elif webnotes.response.get('type')=='iframe':
 	print "Content-Type: text/html"
 	print
-	if out.get('result'):
-		print out['result']
+	if webnotes.response.get('result'):
+		print webnotes.response['result']
 	if webnotes.debug_log:
 		print '''<script type='text/javascript'>alert("%s");</script>''' % ('-------'.join(webnotes.debug_log).replace('"', '').replace('\n',''))
 
-elif out.get('type')=='download':
+# file
+# -------------------------------------------------------------------
+
+elif webnotes.response.get('type')=='download':
 	import mimetypes
-	print "Content-Type: %s" % (mimetypes.guess_type(out['filename'])[0] or 'application/unknown')
-	print "Content-Disposition: filename="+out['filename'].replace(' ', '_')
+	print "Content-Type: %s" % (mimetypes.guess_type(webnotes.response['filename'])[0] or 'application/unknown')
+	print "Content-Disposition: filename="+webnotes.response['filename'].replace(' ', '_')
 	print
-	print out['filecontent']
+	print webnotes.response['filecontent']
+
+# JSON
+# -------------------------------------------------------------------
+
 else:
 	if webnotes.debug_log:
 		save_log = 1
@@ -464,14 +450,14 @@ else:
 			t = t + '\nName: ' + errdoc
 		if errmethod: 
 			t = t + '\nMethod: ' + errmethod
-		out['exc'] = '<pre>'+t.replace('\n','<br>')+'</pre>'
+		webnotes.response['exc'] = '<pre>'+t.replace('\n','<br>')+'</pre>'
 
 		if save_log: # don't save validation errors
 			try:  save_log(t, 'Server')
 			except: pass
 
 	if webnotes.message_log:
-		out['server_messages'] = '\n----------------\n'.join(webnotes.message_log)
+		webnotes.response['server_messages'] = '\n----------------\n'.join(webnotes.message_log)
 
 	cleanup_docs()
 	
@@ -483,9 +469,9 @@ else:
 		import simplejson as json
 	
 	try:
-		str_out = json.dumps(out)
+		str_out = json.dumps(webnotes.response)
 	except:
-		str_out = str(out).replace(', None', ', ""')
+		str_out = str(webnotes.response).replace(', None', ', ""')
 	
 	if acceptsGzip and len(str_out)>512:
 		out_buf = compressBuf(str_out)

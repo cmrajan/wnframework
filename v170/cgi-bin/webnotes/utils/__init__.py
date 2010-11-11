@@ -268,28 +268,6 @@ def set_default(key, val):
 		d.defvalue = val
 		d.save()
 
-# Get File
-# -------------------
-
-def get_file(fname):
-	in_fname = fname
-	if webnotes.conn.exists('File',fname):
-		fname = webnotes.conn.sql("select file_list from tabFile where name=%s", fname)
-		fname = fname and fname[0][0]
-		fname = fname.split('\n')[0].split(',')[1]
-		try:
-			if not in_transaction:
-				webnotes.conn.sql("start transaction")
-			webnotes.conn.sql('update tabFile set `downloaded`=ifnull(`downloaded`,0)+1 where name=%s', in_fname)
-			webnotes.conn.sql("commit")
-		except: pass
-		
-	ret = webnotes.conn.sql("select file_name, `blob_content`, modified from `tabFile Data` where name=%s limit 1", fname)
-	if ret: 
-		return ret
-	else: 
-		return webnotes.conn.sql("select file_name, `blob_content`, modified from `tabFile Data` where file_name=%s limit 1", fname)
-
 # Clear recycle bin
 # -----------------
 
