@@ -26,7 +26,7 @@ try:
 	n = form.getvalue('name')
 
 	# authenticate
-	auth_obj = webnotes.auth.Authentication(form, {}, [])
+	webnotes.auth_obj = webnotes.auth.Authentication(form, {}, [])
 	
 	# login to a particular account (if specified)
 	if form.getvalue('acx'):
