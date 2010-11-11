@@ -129,6 +129,10 @@ def convert_to_files(verbose=0):
 		blob = webnotes.conn.sql("select blob_content from `tabFile Data` where name=%s", f[0])[0][0]
 		
 		if blob:
+
+			if hasattr(blob, 'tostring'):
+				blob = blob.tostring()
+
 			# write the file
 			write_file(f[0], blob)
 						
