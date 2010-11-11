@@ -50,6 +50,8 @@ def save_file(fname, content):
 	
 	write_file(f.name, content)
 
+	return f.name
+
 # -------------------------------------------------------
 
 def write_file(fid, content):
@@ -68,9 +70,7 @@ def write_file(fid, content):
 	file = open(os.path.join(folder, fid),'w+')
 	file.write(content)
 	file.close()
-	
-	return f.name
-	
+		
 # -------------------------------------------------------
 
 def delete_file(file_id):
