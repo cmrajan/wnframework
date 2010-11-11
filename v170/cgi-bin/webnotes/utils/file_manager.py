@@ -123,7 +123,7 @@ def convert_to_files(verbose=0):
 	fl = webnotes.conn.sql("select name from `tabFile Data`")
 	for f in fl:
 		# get the blob
-		blob = webnotes.conn.sql("select blob_content from `tabFile Data` where name=%s" % f[0])[0][0]
+		blob = webnotes.conn.sql("select blob_content from `tabFile Data` where name=%s", f[0])[0][0]
 		
 		if blob:
 			# write the file
