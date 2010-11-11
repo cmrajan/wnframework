@@ -939,16 +939,16 @@ div.notice {
 div.cal_wrapper { }
 div.cal_body {
 	margin: 16px;
-	height: 400px;
 	background-color: #DDD;
 	position: relative;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;	
 }
 
 div.cal_head {
-	left: 5%;
-	width: 90%;
-	height: 10%;
-	position: relative;
+	margin: 16px;
+	margin-bottom: 0px;
 }
 div.cal_head div {
 	font-size: 18px;
@@ -956,42 +956,18 @@ div.cal_head div {
 	padding-top: 8px;
 }
 
-div.cal_button {
-	position: absolute;
-	top: 0px;
-	background-color: #EEE;
-	border: 1px solid #AAA;
-	font-size: 11px;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	cursor: pointer;
-	text-align: center;
-}
-
-div.cal_button_hover {
-	background-color: #DDD;
-}
-
 div.cal_view_body {
-	position: absolute;
-	width: 96%;
-	height: 90%;
-	left: 2%;
+	margin: 16px;
 }
 
 div.cal_view_body_plain {
-	position: relative;
-	width: 96%;
-	left: 2%;
+	margin: 16px;
 }
 
 div.cal_month_head {
-	margin: 4px;
 }
 
 div.cal_month_body {
-	width: 100%;
-	height: 80%;
 	border-top: 1px solid #888;
 }
 

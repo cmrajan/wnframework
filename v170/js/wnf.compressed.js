@@ -1131,9 +1131,12 @@ eval(co,w);else
 eval.call(w,co);}else
 w.execScript(co);}};Calendar=function(){this.views=[];this.events={};this.has_event={};this.weekdays=new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat");}
 Calendar.prototype.init=function(parent){this.wrapper=$a(parent,'div','cal_wrapper');this.page_head=new PageHeader(this.wrapper,'Calendar')
-this.body=$a(this.wrapper,'div','cal_body');this.make_head_buttons();this.make_header();this.todays_date=new Date();this.selected_date=this.todays_date;this.selected_hour=8;this.views['Month']=new Calendar.MonthView(this);this.views['Week']=new Calendar.WeekView(this);this.views['Day']=new Calendar.DayView(this);this.cur_view=this.views['Day'];this.views['Day'].show();}
+this.body=$a(this.wrapper,'div','cal_body');this.make_head_buttons();this.make_header();this.todays_date=new Date();this.selected_date=this.todays_date;this.selected_hour=8;this.views['Month']=new Calendar.MonthView(this);this.views['Week']=new Calendar.WeekView(this);this.views['Day']=new Calendar.DayView(this);this.cur_view=this.views['Day'];this.views['Day'].show();setTimeout(_c.set_height,100);set_resize_observer(_c.set_height);}
 Calendar.prototype.rename_notify=function(dt,old_name,new_name){if(dt='Event'&&this.has_event[old_name])
 this.has_event[old_name]=false;}
+_c.set_height=function(){var cal_body_h=get_window_height()-_c.calendar.page_head.wrapper.offsetHeight-32;var cal_view_body_h=cal_body_h-_c.calendar.view_header.offsetHeight-32;var header_h=_c.calendar.cur_view.head_wrapper?_c.calendar.cur_view.head_wrapper.offsetHeight:0;var cal_view_main_h=cal_view_body_h-header_h;$y(_c.calendar.body,{height:cal_body_h+'px'})
+$y(_c.calendar.cur_view.body,{height:cal_view_body_h+'px'})
+$y(_c.calendar.cur_view.main,{height:cal_view_main_h+'px',overflow:'auto'})}
 Calendar.prototype.make_header=function(){var me=this;this.view_header=$a(this.body,'div','cal_month_head',{paddingTop:'8px'});var tab=make_table(this.view_header,1,3,'50%',['30px',null,'30px'],{verticalAlign:'middle'});$y(tab,{margin:'auto'});var lbtn=$a($td(tab,0,0),'button');$(lbtn).click(function(){me.cur_view.prev()}).html('Prev').button({icons:{primary:'ui-icon-triangle-1-w'},text:false})
 var rbtn=$a($td(tab,0,2),'button');$(rbtn).click(function(){me.cur_view.next()}).html('Next').button({icons:{primary:'ui-icon-triangle-1-e'},text:false})
 $y($td(tab,0,1),{fontSize:'16px',textAlign:'center'})
@@ -1162,7 +1165,8 @@ else return[];}
 Calendar.prototype.set_event=function(ev){var dt=dateutil.str_to_obj(ev.event_date);var m=dt.getMonth();var d=dt.getDate();var y=dt.getFullYear();if(!this.events[y])this.events[y]=[];if(!this.events[y][m])this.events[y][m]=[];if(!this.events[y][m][d])this.events[y][m][d]=[];if(!this.events[y][m][d][cint(cint(ev.event_hour))])this.events[y][m][d][cint(ev.event_hour)]=[];var l=this.events[y][m][d][cint(ev.event_hour)];var cal_ev=new Calendar.CalEvent(ev,this);l[l.length]=cal_ev;this.has_event[ev.name]=true;return cal_ev;}
 Calendar.prototype.refresh=function(viewtype){if(viewtype)
 this.viewtype=viewtype;if(this.cur_view.viewtype!=this.viewtype){this.cur_view.hide();this.cur_view=this.views[this.viewtype];this.cur_view.in_home=false;this.cur_view.show();}
-else{this.cur_view.refresh(this);}}
+else{this.cur_view.refresh(this);}
+_c.set_height();}
 Calendar.CalEvent=function(doc,cal){this.body=document.createElement('div');var v=locals['Event'][doc.name].description;if(v==null)v='';this.body.innerHTML=v;this.doc=doc;var me=this;this.body.onclick=function(){if(me.doc.name){cal.show_event(me.doc,me);}}}
 Calendar.CalEvent.prototype.show=function(vu){var t=this.doc.event_type;this.my_class='cal_event cal_event_'+t;if(this.body.parentNode)
 this.body.parentNode.removeChild(this.body);vu.body.appendChild(this.body);var v=this.doc.description;if(v==null)v='';this.body.innerHTML=v;this.body.className=this.my_class;}
@@ -1180,8 +1184,8 @@ Calendar.View.prototype.refresh_units_main=function(){for(var r in this.table.ro
 for(var c in this.table.rows[r].cells)
 if(this.table.rows[r].cells[c].viewunit)this.table.rows[r].cells[c].viewunit.refresh();}
 Calendar.MonthView=function(cal){this.init(cal);this.monthstep=1;this.rows=5;this.cells=7;}
-Calendar.MonthView.prototype=new Calendar.View();Calendar.MonthView.prototype.create_table=function(){var hw=$a(this.body,'div','cal_month_head');this.headtable=$a(hw,'table','cal_month_headtable');var r=this.headtable.insertRow(0);for(var j=0;j<7;j++){var cell=r.insertCell(j);cell.innerHTML=_c.calendar.weekdays[j];$w(cell,(100/7)+'%');}
-var bw=$a(this.body,'div','cal_month_body');this.table=$a(bw,'table','cal_month_table');var me=this;for(var i=0;i<5;i++){var r=this.table.insertRow(i);for(var j=0;j<7;j++){var cell=r.insertCell(j);cell.viewunit=new Calendar.MonthViewUnit(cell);}}}
+Calendar.MonthView.prototype=new Calendar.View();Calendar.MonthView.prototype.create_table=function(){this.head_wrapper=$a(this.body,'div','cal_month_head');this.headtable=$a(this.head_wrapper,'table','cal_month_headtable');var r=this.headtable.insertRow(0);for(var j=0;j<7;j++){var cell=r.insertCell(j);cell.innerHTML=_c.calendar.weekdays[j];$w(cell,(100/7)+'%');}
+this.main=$a(this.body,'div','cal_month_body');this.table=$a(this.main,'table','cal_month_table');var me=this;for(var i=0;i<5;i++){var r=this.table.insertRow(i);for(var j=0;j<7;j++){var cell=r.insertCell(j);cell.viewunit=new Calendar.MonthViewUnit(cell);}}}
 Calendar.MonthView.prototype.refresh=function(){var c=this.cal.selected_date;var me=this;var cur_row=0;var cur_month=c.getMonth();var cur_year=c.getFullYear();var d=new Date(cur_year,cur_month,1);var day=1-d.getDay();var d=new Date(cur_year,cur_month,day);this.cal.view_title.innerHTML=month_list_full[cur_month]+' '+cur_year;for(var i=0;i<6;i++){if((i<5)||cur_month==d.getMonth()){for(var j=0;j<7;j++){var cell=this.table.rows[cur_row].cells[j];if((i<5)||cur_month==d.getMonth()){cell.viewunit.day=d;cell.viewunit.hour=8;if(cur_month==d.getMonth()){cell.viewunit.is_disabled=false;if(same_day(this.cal.todays_date,d))
 cell.viewunit.is_today=true;else
 cell.viewunit.is_today=false;}else{cell.viewunit.is_disabled=true;}}
@@ -1189,12 +1193,12 @@ day++;d=new Date(cur_year,cur_month,day);}}
 cur_row++;if(cur_row==5){cur_row=0;}}
 this.refresh_units();}
 Calendar.DayView=function(cal){this.init(cal);this.daystep=1;}
-Calendar.DayView.prototype=new Calendar.View();Calendar.DayView.prototype.create_table=function(){var bw=$a(this.body,'div','cal_day_body');this.table=$a(bw,'table','cal_day_table');var me=this;for(var i=0;i<12;i++){var r=this.table.insertRow(i);for(var j=0;j<2;j++){var cell=r.insertCell(j);if(j==0){var tmp=time_to_ampm((i*2)+':00');cell.innerHTML=tmp[0]+':'+tmp[1]+' '+tmp[2];$w(cell,'10%');}else{cell.viewunit=new Calendar.DayViewUnit(cell);cell.viewunit.hour=i*2;$w(cell,'90%');if((i>=4)&&(i<=10)){cell.viewunit.is_daytime=true;}}}}}
+Calendar.DayView.prototype=new Calendar.View();Calendar.DayView.prototype.create_table=function(){this.main=$a(this.body,'div','cal_day_body');this.table=$a(this.main,'table','cal_day_table');var me=this;for(var i=0;i<12;i++){var r=this.table.insertRow(i);for(var j=0;j<2;j++){var cell=r.insertCell(j);if(j==0){var tmp=time_to_ampm((i*2)+':00');cell.innerHTML=tmp[0]+':'+tmp[1]+' '+tmp[2];$w(cell,'10%');}else{cell.viewunit=new Calendar.DayViewUnit(cell);cell.viewunit.hour=i*2;$w(cell,'90%');if((i>=4)&&(i<=10)){cell.viewunit.is_daytime=true;}}}}}
 Calendar.DayView.prototype.refresh=function(){var c=this.cal.selected_date;var me=this;this.cal.view_title.innerHTML=_c.calendar.weekdays[c.getDay()]+', '+c.getDate()+' '+month_list_full[c.getMonth()]+' '+c.getFullYear();var d=c;for(var i=0;i<12;i++){var cell=this.table.rows[i].cells[1];if(same_day(this.cal.todays_date,d))cell.viewunit.is_today=true;else cell.viewunit.is_today=false;cell.viewunit.day=d;}
 this.refresh_units();}
 Calendar.WeekView=function(cal){this.init(cal);this.daystep=7;}
-Calendar.WeekView.prototype=new Calendar.View();Calendar.WeekView.prototype.create_table=function(){var hw=$a(this.body,'div','cal_month_head');this.headtable=$a(hw,'table','cal_month_headtable');var r=this.headtable.insertRow(0);for(var j=0;j<8;j++){var cell=r.insertCell(j);$w(cell,(100/8)+'%');}
-var bw=$a(this.body,'div','cal_week_body');this.table=$a(bw,'table','cal_week_table');var me=this;for(var i=0;i<12;i++){var r=this.table.insertRow(i);for(var j=0;j<8;j++){var cell=r.insertCell(j);if(j==0){var tmp=time_to_ampm((i*2)+':00');cell.innerHTML=tmp[0]+':'+tmp[1]+' '+tmp[2];$w(cell,'10%');}else{cell.viewunit=new Calendar.WeekViewUnit(cell);cell.viewunit.hour=i*2;if((i>=4)&&(i<=10)){cell.viewunit.is_daytime=true;}}}}}
+Calendar.WeekView.prototype=new Calendar.View();Calendar.WeekView.prototype.create_table=function(){this.head_wrapper=$a(this.body,'div','cal_month_head');this.headtable=$a(this.head_wrapper,'table','cal_month_headtable');var r=this.headtable.insertRow(0);for(var j=0;j<8;j++){var cell=r.insertCell(j);$w(cell,(100/8)+'%');}
+this.main=$a(this.body,'div','cal_week_body');this.table=$a(this.main,'table','cal_week_table');var me=this;for(var i=0;i<12;i++){var r=this.table.insertRow(i);for(var j=0;j<8;j++){var cell=r.insertCell(j);if(j==0){var tmp=time_to_ampm((i*2)+':00');cell.innerHTML=tmp[0]+':'+tmp[1]+' '+tmp[2];$w(cell,'10%');}else{cell.viewunit=new Calendar.WeekViewUnit(cell);cell.viewunit.hour=i*2;if((i>=4)&&(i<=10)){cell.viewunit.is_daytime=true;}}}}}
 Calendar.WeekView.prototype.refresh=function(){var c=this.cal.selected_date;var me=this;this.cal.view_title.innerHTML=month_list_full[c.getMonth()]+' '+c.getFullYear();var d=new Date(c.getFullYear(),c.getMonth(),c.getDate()-c.getDay());for(var k=1;k<8;k++){this.headtable.rows[0].cells[k].innerHTML=_c.calendar.weekdays[d.getDay()]+' '+d.getDate();for(var i=0;i<12;i++){var cell=this.table.rows[i].cells[k];if(same_day(this.cal.todays_date,d))cell.viewunit.is_today=true;else cell.viewunit.is_today=false;cell.viewunit.day=d;}
 d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);}
 this.refresh_units();}

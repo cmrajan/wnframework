@@ -28,12 +28,28 @@ Calendar.prototype.init=function (parent) {
 	// Month view as initial
 	this.cur_view = this.views['Day'];
 	this.views['Day'].show();
+
+ 	setTimeout(_c.set_height, 100);
+ 	set_resize_observer(_c.set_height);	
 }
 
 Calendar.prototype.rename_notify = function(dt, old_name, new_name) {
 	// calendar
 	if(dt = 'Event' && this.has_event[old_name])
 		this.has_event[old_name] = false;	
+}
+
+_c.set_height = function() {
+	// calculate heights
+	var cal_body_h = get_window_height() - _c.calendar.page_head.wrapper.offsetHeight - 32;
+	var cal_view_body_h = cal_body_h - _c.calendar.view_header.offsetHeight - 32;
+	var header_h = _c.calendar.cur_view.head_wrapper ? _c.calendar.cur_view.head_wrapper.offsetHeight : 0;
+	var cal_view_main_h = cal_view_body_h - header_h;
+	
+	// set heights
+	$y(_c.calendar.body, {height:cal_body_h + 'px'})
+	$y(_c.calendar.cur_view.body, {height:cal_view_body_h + 'px'})
+	$y(_c.calendar.cur_view.main, {height:cal_view_main_h + 'px', overflow:'auto'})
 }
 
 //------------------------------------------------------
@@ -226,6 +242,7 @@ Calendar.prototype.refresh = function(viewtype){//Sets the viewtype of the Calen
  	else{
  		this.cur_view.refresh(this);
  	}
+ 	_c.set_height();
 }
 
 //------------------------------------------------------
@@ -279,6 +296,7 @@ Calendar.View.prototype.init=function(cal) {
  	this.create_table();
 }
 
+
 Calendar.View.prototype.show=function() { 
 	this.get_events(); this.refresh(); this.body.style.display = 'block'; 
 }
@@ -315,18 +333,18 @@ Calendar.MonthView.prototype=new Calendar.View();
 Calendar.MonthView.prototype.create_table = function() {
 
 	// create head
-	var hw = $a(this.body, 'div', 'cal_month_head');
+	this.head_wrapper = $a(this.body, 'div', 'cal_month_head');
 
 	// create headers
-	this.headtable = $a(hw, 'table', 'cal_month_headtable');
+	this.headtable = $a(this.head_wrapper, 'table', 'cal_month_headtable');
 	var r = this.headtable.insertRow(0);
 	for(var j=0;j<7;j++) {
  		var cell = r.insertCell(j);
 		cell.innerHTML = _c.calendar.weekdays[j]; $w(cell, (100 / 7) + '%');
  	}
 
-	var bw = $a(this.body, 'div', 'cal_month_body');
-	this.table = $a(bw, 'table', 'cal_month_table');
+	this.main = $a(this.body, 'div', 'cal_month_body');
+	this.table = $a(this.main, 'table', 'cal_month_table');
 	var me = this;
 
 	// create body
@@ -387,6 +405,7 @@ Calendar.MonthView.prototype.refresh = function() {
  		if(cur_row == 5) {cur_row = 0;} // back to top
 	}
 	this.refresh_units();
+	
 }
  // ................. Daily View..........................
 Calendar.DayView=function(cal){ this.init(cal); this.daystep = 1; }
@@ -394,8 +413,8 @@ Calendar.DayView.prototype=new Calendar.View();
 Calendar.DayView.prototype.create_table = function() {
 
 	// create body
-	var bw = $a(this.body, 'div', 'cal_day_body');
-	this.table = $a(bw, 'table', 'cal_day_table');
+	this.main = $a(this.body, 'div', 'cal_day_body');
+	this.table = $a(this.main, 'table', 'cal_day_table');
 	var me = this;
 	
  	for(var i=0;i<12;i++) {
@@ -446,10 +465,10 @@ Calendar.WeekView.prototype=new Calendar.View();
 Calendar.WeekView.prototype.create_table = function() {
 
 	// create head
-	var hw = $a(this.body, 'div', 'cal_month_head');
+	this.head_wrapper = $a(this.body, 'div', 'cal_month_head');
 
 	// day headers
-	this.headtable = $a(hw, 'table', 'cal_month_headtable');
+	this.headtable = $a(this.head_wrapper, 'table', 'cal_month_headtable');
 	var r = this.headtable.insertRow(0);
 	for(var j=0;j<8;j++) {
  		var cell = r.insertCell(j);
@@ -459,8 +478,8 @@ Calendar.WeekView.prototype.create_table = function() {
  	// hour header
 
 	// create body
-	var bw = $a(this.body, 'div', 'cal_week_body');
-	this.table = $a(bw, 'table', 'cal_week_table');
+	this.main = $a(this.body, 'div', 'cal_week_body');
+	this.table = $a(this.main, 'table', 'cal_week_table');
 	var me = this;
 	
  	for(var i=0;i<12;i++) {
