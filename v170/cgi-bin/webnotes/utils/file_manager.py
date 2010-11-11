@@ -116,7 +116,9 @@ def get_file(fname):
 # Conversion Patch
 # -------------------------------------------------------
 
-def convert_to_files():
+def convert_to_files(verbose=0):
+	import webnotes
+	
 	# nfiles
 	fl = sql("select name from `tabFile Data`")
 	for f in fl:
@@ -126,8 +128,8 @@ def convert_to_files():
 		if blob:
 			# write the file
 			write_file(f[0], blob)
-			
-			# remove the blob
-			sql("update `tabFile Data` set blob_content=NULL where name=%s" % f[0])
+						
+			if verbose:
+				webnotes.msgprint('%s updated' % f[0])
 
 # -------------------------------------------------------
