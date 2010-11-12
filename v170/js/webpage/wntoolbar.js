@@ -212,11 +212,17 @@ function WNToolbar(parent) {
 		var d = new Dialog(240, 140, "Quick Search");
 		d.make_body(
 			[['HTML','Select']
-			,['Button','Go', function() { me.search_dialog.hide(); me.open_quick_search(); }]]);
+			,['Button','Go', function() { me.open_quick_search(); }]]);
 		d.onshow = function(){
 			me.search_sel.inp.focus();	
 		}
 		me.search_dialog = d;
+		
+		// enter key
+		keypress_observers.push({notify_keypress: function(ev, keycode) { 
+			if(keycode==13 && me.search_dialog.display) me.open_quick_search();	
+		}});
+		
 		
 		// select
 		me.search_sel = new SelectWidget(d.widgets['Select'], [], '120px');

@@ -71,22 +71,23 @@ def write_file(fid, content):
 	file.write(content)
 	file.close()
 		
-# -------------------------------------------------------
 
-def delete_file(file_id):
+# -------------------------------------------------------
+def get_file_system_name(fname):
+	# get system name from File Data table
+	import webnotes
+	return webnotes.conn.sql("select name, file_name from `tabFile Data` where name=%s or file_name=%s", (fname, fname))
+
+# -------------------------------------------------------
+def delete_file(fname):
 	import webnotes, os
 	
-	# delete fileid
-	f = webnotes.conn.sql("select file_name from `tabFile Data` where name=%s", file_id)
+	for f in get_file_system_name(fname):
+		webnotes.conn.sql("delete from `tabFile Data` where name=%s", f[0])
 	
-	if not f:
-		webnotes.msgprint("Wrong File ID")
-		return
-	
-	webnotes.conn.sql("delete from `tabFile Data` where name=%s", file_id)
-	
-	# delete file
-	os.remove(os.path.join(webnotes.get_files_path(), file_id))
+		# delete file
+		file_id = f[0].replace('/','-')
+		os.remove(os.path.join(webnotes.get_files_path(), file_id))
 
 # Get File
 # -------------------------------------------------------
@@ -101,20 +102,14 @@ def get_file(fname):
 		fname = fname and fname[0][0]
 		fname = fname.split('\n')[0].split(',')[1]
 	
-	# from file-data - get the name from ID
-	file_id = fname
-	ret = webnotes.conn.sql("select file_name from `tabFile Data` where name=%s limit 1", fname)
-	if not ret:
-		# by name
-		ret = webnotes.conn.sql("select file_name, name from `tabFile Data` where file_name=%s limit 1", fname)
-		file_id = ret[0][1]
+	f = get_file_system_name(fname)[0]
 		
 	# read the file
 	import os
 	
-	file_id = file_id.replace('/','-')
+	file_id = f[0].replace('/','-')
 	file = open(os.path.join(webnotes.get_files_path(), file_id), 'r')
-	return [ret[0][0], file.read()]
+	return [f[1], file.read()]
 
 # Conversion Patch
 # -------------------------------------------------------
