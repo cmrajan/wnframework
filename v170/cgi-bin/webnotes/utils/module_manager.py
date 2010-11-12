@@ -316,10 +316,8 @@ def sync_control_panel():
 #Return module names present in File System
 #==============================================================================
 def get_modules_from_filesystem():
-	mod_list = []
-	for each in get_folder_paths():
-		a = each.split('/')
-		mod_list.append([a.index('modules'):len(a)-a.index('modules')])
-	return mod_list
+	import os
+	modules = os.listdir(os.path.join(webnotes.get_index_path(), 'modules'))
+	return modules
 
 
