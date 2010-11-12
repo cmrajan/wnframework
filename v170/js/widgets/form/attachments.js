@@ -137,16 +137,20 @@ _f.FileField = function(parent, at_id, frm, addlink) {
 	this.remove = function() {
 		var yn = confirm("The document will be saved after the attachment is deleted for the changes to be permanent. Proceed?")
 		if(yn) {
-			me.wrapper.style.display = 'none';
+			var callback = function(r, rt) {
+				me.wrapper.style.display = 'none';
+				delete frm.attachments[frm.docname][me.at_id];
+				frm.sync_attachments(frm.docname);
+				var ret = frm.save('Save');
+				if(ret=='Error')
+					msgprint("error:The document was not saved. To make the removal permanent, you must save the document before closing.");
+			}
+				
 			var fid = frm.attachments[frm.docname][me.at_id].fileid;
 			if(fid) {
-				$c('webnotes.widgets.form.remove_attach', args = {'fid': fid}, function(r,rt) { } );
+				$c('webnotes.widgets.form.remove_attach', args = {'fid': fid}, callback );
 			}
 	
-			delete frm.attachments[frm.docname][me.at_id];
-			frm.sync_attachments(frm.docname);
-			var ret = frm.save('Save');
-			if(ret=='Error')msgprint("error:The document was not saved. To make the attachment permanent, you must save the document before closing.");
 		}
 	}
 	

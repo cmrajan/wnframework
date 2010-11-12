@@ -912,7 +912,7 @@ _f.Frm.prototype.edit_doc = function() {
 
 
 _f.Frm.prototype.show_doc = function(dn) {
-	this.show(dn);
+	this.refresh(dn);
 }
 
 // ======================================================================================

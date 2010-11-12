@@ -1,7 +1,5 @@
 def upload():
 	import webnotes
-	import webnotes.utils
-	
 	form = webnotes.form
 
 	# get record details
@@ -9,7 +7,27 @@ def upload():
 	dn = form.getvalue('docname')
 	at_id = form.getvalue('at_id')
 
+	# save
+	fid, fname = save_uploaded()
+	
+	if fid:
+		# refesh the form!
+		webnotes.response['result'] = """
+<script type='text/javascript'>
+window.parent._f.file_upload_done('%s', '%s', '%s', '%s', '%s');
+window.parent.frms['%s'].show_doc('%s');
+</script>
+			""" % (dt, dn, fid, fname.replace("'", "\\'"), at_id, dt, dn)
+
+# -------------------------------------------------------
+
+def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js_fail=''):
+	import webnotes
+	import webnotes.utils
+	
 	webnotes.response['type'] = 'iframe'
+
+	form, fid, fname = webnotes.form, None, None
 
 	try:
 		# has attachment?
@@ -24,19 +42,17 @@ def upload():
 				fname = fname.split('/')[-1]
 	
 			# get the file id
-			fileid = save_file(fname, i.file.read())
+			fid = save_file(fname, i.file.read())
 			
 			# okay
-			webnotes.response['result'] = """
-			<script type='text/javascript'>
-				window.parent._f.file_upload_done('%s', '%s', '%s', '%s', '%s');
-				window.parent.frms['%s'].show_doc('%s');
-			</script>""" % (dt, dn, fileid, fname.replace("'", "\\'"), at_id, dt, dn)
+			webnotes.response['result'] = """<script type='text/javascript'>%s</script>""" % js_okay
 		else:
-			webnotes.response['result'] = """<script type='text/javascript'>window.parent.msgprint("No file")</script>"""	
+			webnotes.response['result'] = """<script type='text/javascript'>window.parent.msgprint("No file"); %s</script>""" % js_fail
 			
 	except Exception, e:
-		webnotes.response['result'] = """<script type='text/javascript'>window.parent.msgprint("%s")</script>""" % webnotes.utils.getTraceback().replace('\n','<br>').replace('"', '\\"')	
+		webnotes.response['result'] = """<script type='text/javascript'>window.parent.msgprint("%s"); window.parent.errprint("%s"); %s</script>""" % (str(e), webnotes.utils.getTraceback().replace('\n','<br>').replace('"', '\\"'), js_fail)
+	
+	return fid, fname
 
 # -------------------------------------------------------
 
@@ -55,7 +71,15 @@ def save_file(fname, content):
 # -------------------------------------------------------
 
 def write_file(fid, content):
-	import webnotes, os
+	import webnotes, os, webnotes.defs
+
+	# test size
+	max_file_size = 1000000
+	if hasattr(webnotes.defs, 'max_file_size'):
+		max_file_size = webnotes.defs.max_file_size
+
+	if len(content) > max_file_size:
+		raise Exception, 'Maximum File Limit (%s MB) Crossed' % (int(max_file_size / 1000000))
 
 	# no slashes
 	fid = fid.replace('/','-')
@@ -79,15 +103,17 @@ def get_file_system_name(fname):
 	return webnotes.conn.sql("select name, file_name from `tabFile Data` where name=%s or file_name=%s", (fname, fname))
 
 # -------------------------------------------------------
-def delete_file(fname):
+def delete_file(fname, verbose=0):
 	import webnotes, os
-	
+		
 	for f in get_file_system_name(fname):
 		webnotes.conn.sql("delete from `tabFile Data` where name=%s", f[0])
 	
 		# delete file
 		file_id = f[0].replace('/','-')
 		os.remove(os.path.join(webnotes.get_files_path(), file_id))
+		
+		if verbose: webnotes.msgprint('Deleted %s (%s)' % (fname, file_id))
 
 # Get File
 # -------------------------------------------------------

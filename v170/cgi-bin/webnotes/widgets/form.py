@@ -399,9 +399,11 @@ def get_print_format():
 #===========================================================================================
 
 def remove_attach():
-	fid = webnotes.form.getvalue('fid')
+	import webnotes
 	import webnotes.utils.file_manager
-	webnotes.utils.file_manager.delete_file(fid)
+	
+	fid = webnotes.form.getvalue('fid')
+	webnotes.utils.file_manager.delete_file(fid, verbose=1)
 
 # Get Fields - Counterpart to $c_get_fields
 #===========================================================================================
