@@ -36,7 +36,7 @@ function PageHeader(parent, main_text, sub_text) {
 	this.sub_head = $a(this.lhs, 'div', '', def_ph_style.sub_heading);
 
 	this.toolbar_area = $a(this.lhs, 'div', '', def_ph_style.toolbar_area);
-	this.toolbar_area2 = $a(this.lhs, 'div', '', def_ph_style.toolbar_area2);
+	this.toolbar_area2 = $a(this.lhs, 'div', 'blue_buttons', def_ph_style.toolbar_area2);
 	this.separator = $a(this.wrapper, 'div', '', def_ph_style.separator);
 	this.tag_area = $a(this.wrapper, 'div', '', def_ph_style.tag_area);
 
