@@ -227,6 +227,8 @@ def check_integrity(doc):
 			
 	return 1
 
+#===========================================================================================
+
 def savedocs():
 	import webnotes.model.doclist
 

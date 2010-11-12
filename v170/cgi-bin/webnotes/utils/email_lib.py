@@ -184,6 +184,7 @@ def send_form():
 	if recipients:
 		recipients = recipients.replace(';', ',')
 		recipients = recipients.split(',')
+		update_contacts(recipients)
 
 		if not sendfrom:
 			sendfrom = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
@@ -204,3 +205,15 @@ def send_form():
 
 		email.send()
 	webnotes.msgprint('Sent')
+
+# Add to Contacts
+# ---------------
+
+def update_contacts(recipients):
+	for r in recipients:
+		d = Document('Contact')
+		d.email_id = r
+		try:
+			d.save(1)
+		except:
+			pass

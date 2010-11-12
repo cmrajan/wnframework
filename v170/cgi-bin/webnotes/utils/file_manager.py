@@ -33,16 +33,9 @@ def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js
 		# has attachment?
 		if 'filedata' in form:
 			i = form['filedata']
-			
-			# scrub file name
-			fname = i.filename
-			if '\\' in fname:
-				fname = fname.split('\\')[-1]
-			if '/' in fname:
-				fname = fname.split('/')[-1]
 	
 			# get the file id
-			fid = save_file(fname, i.file.read())
+			fid = save_file(i.filename, i.file.read())
 			
 			# okay
 			webnotes.response['result'] = """<script type='text/javascript'>%s</script>""" % js_okay
@@ -59,6 +52,12 @@ def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js
 def save_file(fname, content):
 	from webnotes.model.doc import Document
 
+	# some browsers return the full path
+	if '\\' in fname:
+		fname = fname.split('\\')[-1]
+	if '/' in fname:
+		fname = fname.split('/')[-1]
+		
 	# generate the ID (?)
 	f = Document('File Data')
 	f.file_name = fname

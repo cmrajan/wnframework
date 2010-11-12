@@ -51,6 +51,12 @@ _f.FrmHeader.prototype.refresh= function() {
 	// Submit
 	if(cint(cur_frm.doc.docstatus)==0 && p[SUBMIT] && (!cur_frm.doc.__islocal))
 		this.page_head.add_button('Submit', function() { cur_frm.savesubmit(); }, 0, 'ui-icon-locked');
+
+	// Update after sumit
+	if(cint(cur_frm.doc.docstatus)==1 && p[SUBMIT]) {
+		this.update_btn = this.page_head.add_button('Update', function() { cur_frm.saveupdate(); }, 1, 'ui-icon-disk', 1);
+		if(!cur_frm.doc.__unsaved) $dh(this.update_btn);
+	}
 	
 	// Cancel
 	if(cint(cur_frm.doc.docstatus)==1  && p[CANCEL])
@@ -151,6 +157,7 @@ _f.FrmHeader.prototype.get_status_tags = function(doc, f) {
 
 	} else if(doc.__unsaved) {
 		label = 'Not Saved'; col = '#F81';
+		if(doc.docstatus==1 && this.update_btn) $ds(this.update_btn);
 
 	} else if(cint(doc.docstatus)==0) {
 		label = 'Saved'; col = '#0A1';

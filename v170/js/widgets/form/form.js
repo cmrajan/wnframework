@@ -1168,6 +1168,10 @@ _f.Frm.prototype.savedoc = function(save_action, onsave, onerr) {
 	save_doclist(this.doctype, this.docname, save_action, onsave, onerr);
 }
 
+_f.Frm.prototype.saveupdate = function() {
+	this.save('Update');
+}
+
 _f.Frm.prototype.savesubmit = function() {
 	var answer = confirm("Permanently Submit "+this.docname+"?");
 	if(answer) this.save('Submit');
