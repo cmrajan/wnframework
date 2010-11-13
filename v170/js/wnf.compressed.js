@@ -708,7 +708,7 @@ $ds(me.btn2);else
 $dh(me.btn2);}
 var opts={script:'',json:true,maxresults:10,link_field:me};this.as=new AutoSuggest(me.txt,opts);}
 LinkField.prototype.set_onchange=function(){var me=this;me.txt.onchange=function(){if(_last_link_value)return
-if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]){me.set(me.txt.value);return;}}
+if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[me.doctype][me.docname][me.df.fieldname]){me.set(me.txt.value);return;}}
 if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value;setTimeout('_last_link_value=null',500);if(_f.cur_grid_cell)
 _f.cur_grid_cell.grid.cell_deselect();if(!me.txt.value){me.run_trigger();return;}
 var fetch='';if(cur_frm.fetch_dict[me.df.fieldname])

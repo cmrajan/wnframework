@@ -589,7 +589,7 @@ LinkField.prototype.set_onchange = function() {
 		
 		// same value, do nothing
 		if(cur_frm) {
-			if(me.txt.value == locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]) { 
+			if(me.txt.value == locals[me.doctype][me.docname][me.df.fieldname]) { 
 				me.set(me.txt.value); // one more time, grid bug?
 				return; 
 			}
