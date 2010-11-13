@@ -247,6 +247,6 @@ d.widgets['Sum'].value=fmt_money(sum);d.widgets['Average'].value=fmt_money(sum/t
 d.onshow=function(){var cl=[];for(var i in _r.calc_dialog.colnames){if(in_list(['Currency','Int','Float'],_r.calc_dialog.coltypes[i]))
 cl.push(_r.calc_dialog.colnames[i]);}
 if(!cl.length){this.hide();alert("No Numeric Column");return;}
-var s=this.widgets['Column'];empty_select(s);add_sel_options(s,cl);s.inp.value=cl[0];this.set_calc();}
+var s=this.widgets['Column'];empty_select(s);add_sel_options(s,cl);if(s.inp)s.inp.value=cl[0];else s.value=cl[0];this.set_calc();}
 _r.calc_dialog=d;}
 _r.calc_dialog.datatab=tab;_r.calc_dialog.colnames=colnames;_r.calc_dialog.coltypes=coltypes;_r.calc_dialog.show();}

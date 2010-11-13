@@ -56,7 +56,8 @@ _r.show_calc = function(tab, colnames, coltypes, add_idx) {
 			var s = this.widgets['Column'];
 			empty_select(s);
 			add_sel_options(s, cl);
-			s.inp.value = cl[0];
+			if(s.inp)s.inp.value = cl[0];
+			else s.value = cl[0];
 			this.set_calc();
 		}
 		_r.calc_dialog = d;
