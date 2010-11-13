@@ -599,8 +599,13 @@ LinkField.prototype.set_onchange = function() {
 			// still setting value
 		} else {
 			me.set(me.txt.value);
+			
 			_last_link_value = me.txt.value;
-			setTimeout('_last_link_value=null', 100);
+			setTimeout('_last_link_value=null', 500);
+			
+			// deselect cell if in grid
+			if(_f.cur_grid_cell)
+				_f.cur_grid_cell.grid.cell_deselect();
 			
 			// run trigger if value is cleared
 			if(!me.txt.value) {

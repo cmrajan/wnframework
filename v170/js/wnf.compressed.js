@@ -709,7 +709,8 @@ $dh(me.btn2);}
 var opts={script:'',json:true,maxresults:10,link_field:me};this.as=new AutoSuggest(me.txt,opts);}
 LinkField.prototype.set_onchange=function(){var me=this;me.txt.onchange=function(){if(_last_link_value)return
 if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[cur_frm.doctype][cur_frm.docname][me.df.fieldname]){me.set(me.txt.value);return;}}
-if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value;setTimeout('_last_link_value=null',100);if(!me.txt.value){me.run_trigger();return;}
+if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value;setTimeout('_last_link_value=null',500);if(_f.cur_grid_cell)
+_f.cur_grid_cell.grid.cell_deselect();if(!me.txt.value){me.run_trigger();return;}
 var fetch='';if(cur_frm.fetch_dict[me.df.fieldname])
 fetch=cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');$c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options,'fetch':fetch},function(r,rt){if(selector&&selector.display)return;if(r.message=='Ok'){me.run_trigger();if(r.fetch_values)me.set_fetch_values(r.fetch_values);}else{var astr='';if(in_list(profile.can_create,me.df.options))astr=repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s',{dt:me.df.options,dtl:get_doctype_label(me.df.options)})
 msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s',{val:me.txt.value,dt:get_doctype_label(me.df.options),add:astr}));me.txt.value='';me.set('');}});}}}
