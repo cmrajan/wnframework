@@ -58,8 +58,8 @@ class Authentication:
 		webnotes.conn = self.conn
 		
 		# called from login
-		if form.get('cmd')=='login':
-			if form.get('acx'):
+		if self.form.get('cmd')=='login':
+			if self.form.get('acx'):
 				self.set_db(form.get('acx'))
 				webnotes.conn = self.conn
 			
@@ -78,7 +78,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or form.get('sid') or form.get('ac_name'):
+		if self.login_flag or self.form.get('sid') or self.form.get('ac_name'):
 			self.set_cookies()
 			self.set_remember_me()
 		
