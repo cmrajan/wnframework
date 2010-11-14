@@ -94,7 +94,7 @@ def get_letter_heads():
 		if e.args[0]==1146:
 			return {}
 		else:
-			raise Exception
+			raise Exception, e
 			
 # build it
 # ==================================================

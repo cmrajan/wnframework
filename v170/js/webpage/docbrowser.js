@@ -60,6 +60,7 @@ DocBrowserPage.prototype.show = function(dt, label, field_list) {
 DocBrowser = function(parent, dt, label, field_list) {	
 	var me = this;
 	this.label = label ? label : dt;
+	this.dt = dt;
 
 	this.wrapper = $a(parent, 'div');
 
@@ -94,7 +95,7 @@ DocBrowser.prototype.show_no_result = function() {
 	$dh(this.loading_div);
 	$ds(this.body);	
 	$ds(this.no_result_area);
-	this.no_result_area.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(dt)});
+	this.no_result_area.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(this.dt)});
 	set_title(get_doctype_label(this.label));
 }
 
