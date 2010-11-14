@@ -95,8 +95,11 @@ _p.add_layout = function(dt, no_letterhead) {
 	// add letter head
 	var cp = locals['Control Panel']['Control Panel'];
 	l.addrow();
-	if(cp.letter_head && !no_letterhead) {
-		l.cur_row.header.innerHTML = cp.letter_head;
+	if(!no_letterhead) {
+		if(cur_frm.doc.letter_head)
+			l.cur_row.header.innerHTML = _p.letter_heads[cur_frm.doc.letter_head];
+		else if(cp.letter_head)
+			l.cur_row.header.innerHTML = cp.letter_head;
 	}
 	
 	return l;

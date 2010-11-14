@@ -1080,7 +1080,7 @@ me.cur_page.onhide();$dh(me.cur_page);}
 me.cur_page=me.pages[label];me.cur_page_label=label;$(me.cur_page).fadeIn();if(me.cur_page.onshow)
 me.cur_page.onshow(me.cur_page);}
 this.setup();}
-var popup_cont;var session={};function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);popup_cont=$a(document.getElementsByTagName('body')[0],'div');var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;sys_defaults=r.sysdefaults;session.rt=profile.can_read;if(r.ipinfo)session.ipinfo=r.ipinfo;session.dt_labels=r.dt_labels;session.rev_dt_labels={}
+var popup_cont;var session={};function startup(){dhtmlHistory.initialize();dhtmlHistory.addListener(historyChange);popup_cont=$a(document.getElementsByTagName('body')[0],'div');var setup_globals=function(r){profile=r.profile;user=r.profile.name;user_fullname=profile.first_name+(r.profile.last_name?(' '+r.profile.last_name):'');user_defaults=profile.defaults;user_roles=profile.roles;user_email=profile.email;profile.start_items=r.start_items;account_name=r.account_name;home_page=r.home_page;_p.letter_heads=r.letter_heads;sys_defaults=r.sysdefaults;session.rt=profile.can_read;if(r.ipinfo)session.ipinfo=r.ipinfo;session.dt_labels=r.dt_labels;session.rev_dt_labels={}
 if(r.dt_labels){for(key in r.dt_labels)session.rev_dt_labels[r.dt_labels[key]]=key;}}
 var setup_history=function(r){rename_observers.push(nav_obj);}
 var setup_events=function(){addEvent('keyup',function(ev,target){for(var i in keypress_observers){if(keypress_observers[i])
@@ -1112,7 +1112,7 @@ var resize_observers=[]
 function set_resize_observer(fn){if(resize_observers.indexOf(fn)==-1)resize_observers.push(fn);}
 window.onresize=function(){var ht=get_window_height();for(var i=0;i<resize_observers.length;i++){resize_observers[i](ht);}}
 get_window_height=function(){var ht=window.innerHeight?window.innerHeight:document.documentElement.offsetHeight?document.documentElement.offsetHeight:document.body.offsetHeight;var toolbarh=page_body.wntoolbar?page_body.wntoolbar.wrapper.offsetHeight:0
-var bannerh=page_body.banner_head?page_body.banner_head.offsetHeight:0
+var bannerh=page_body.banner_area?page_body.banner_area.offsetHeight:0
 var footerh=page_body.footer?page_body.footer.offsetHeight:0
 ht=ht-bannerh-toolbarh-footerh;return ht;}
 set_custom_tooltip=function(parent,tip_content,cs){new CustomTooltip(parent,tip_content,cs);}

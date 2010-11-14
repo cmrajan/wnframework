@@ -82,6 +82,20 @@ def dump(sd, country):
 
 	webnotes.conn.sql("insert into `__SessionCache` (user, country, cache) VALUES (%s, %s, %s)", (webnotes.session['user'], country, str(sd)))
 
+def get_letter_heads():
+	import webnotes
+	try:
+		lh = {}
+		ret = webnotes.conn.sql("select name, content from `tabLetter Head` where ifnull(disabled,0)=0")
+		for r in ret:
+			lh[r[0]] = r[1]
+		return lh
+	except Exception, e:
+		if e.args[0]==1146:
+			return {}
+		else:
+			raise Exception
+			
 # build it
 # ==================================================
 
@@ -116,6 +130,7 @@ def build():
 	sd['sysdefaults'] = webnotes.utils.get_defaults()
 	sd['n_online'] = int(sql("SELECT COUNT(DISTINCT user) FROM tabSessions")[0][0] or 0)
 	sd['docs'] = doclist
+	sd['letter_heads'] = get_letter_heads()
 	sd['home_page'] = home_page or ''
 	sd['start_items'] = webnotes.widgets.menus.get_menu_items()
 	if webnotes.session['data'].get('ipinfo'):
