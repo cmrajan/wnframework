@@ -39,7 +39,7 @@ import defs
 class Authentication:
 	def __init__(self, form, out_cookies, out):
 
-		self.form = self.set_form(form)
+		self.form = self.scrub_form(form)
 		self.cookies = self.set_in_cookies()
 		self.account = None
 		self.account_id = None
@@ -98,7 +98,7 @@ class Authentication:
 	# Convert form to a dict, if cgi storage
 	# =================================================================================
 
-	self.scrub_form(self, form):
+	def scrub_form(self, form):
 		if hasattr(form, 'getvalue'):
 			f = {}
 			for each in form.keys():
