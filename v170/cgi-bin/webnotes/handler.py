@@ -4,6 +4,7 @@ import webnotes.defs
 import webnotes.utils
 
 form = webnotes.form
+form_dict = webnotes.form_dict
 cookies = Cookie.SimpleCookie()
 
 sql = None
@@ -46,13 +47,13 @@ def dt_map():
 	from webnotes.model.code import get_obj
 	from webnotes.model.doc import Document
 	
-	form = webnotes.form
+	form_dict = webnotes.form_dict
 	
-	dt_list = webnotes.model.doclist.expand(form.getvalue('docs'))
-	from_doctype = form.getvalue('from_doctype')
-	to_doctype = form.getvalue('to_doctype')
-	from_docname = form.getvalue('from_docname')
-	from_to_list = form.getvalue('from_to_list')
+	dt_list = webnotes.model.doclist.expand(form_dict.get('docs'))
+	from_doctype = form_dict.get('from_doctype')
+	to_doctype = form_dict.get('to_doctype')
+	from_docname = form_dict.get('from_docname')
+	from_to_list = form_dict.get('from_to_list')
 	
 	dm = get_obj('DocType Mapper', from_doctype +'-' + to_doctype)
 	doclist = dm.dt_map(from_doctype, to_doctype, from_docname, Document(fielddata = dt_list[0]), [], from_to_list)
@@ -145,8 +146,8 @@ def get_graph():
 	f = StringIO.StringIO()
 
 	# call the object
-	obj = server.get_obj(form.getvalue('dt'))
-	plt = server.run_server_obj(obj, form.getvalue('method'), form.getvalue('arg'))
+	obj = server.get_obj(form_dict.get('dt'))
+	plt = server.run_server_obj(obj, form_dict.get('method'), form_dict.get('arg'))
 	plt.savefig(f)
 
 	# stream out
@@ -158,10 +159,10 @@ def get_graph():
 # ------------------------------------------------------------------------------------
 
 def reset_password():
-	form = webnotes.form
+	form_dict = webnotes.form_dict
 	
-	act = form.getvalue('account', '')
-	user = form.getvalue('user', '')
+	act = form_dict.get('account', '')
+	user = form_dict.get('user', '')
 	if act:
 		webnotes.conn.set_db(act)
 
@@ -175,13 +176,13 @@ def reset_password():
 # Testing
 # ------------------------------------------------------------------------------------
 
-def start_test(form,session):
+def start_test(form_dict,session):
 	webnotes.session['data']['__testing'] = 1
 
-def end_test(form,session):
+def end_test(form_dict,session):
 	webnotes.session['data']['__testing'] = 0
 
-def setup_test(form, session):
+def setup_test(form_dict, session):
 	sql = webnotes.conn.sql
 	names = webnotes.conn.get_testing_tables()
 	for n in names:
@@ -194,7 +195,7 @@ def setup_test(form, session):
 # Module Exchange
 # ---------------
 
-def init_acc_mgmt(form,session):
+def init_acc_mgmt(form_dict,session):
 
 	res = sql('SELECT name from tabDocType')	
 	res = [r[0] for r in res]
@@ -224,17 +225,17 @@ def init_acc_mgmt(form,session):
 	webnotes.response['acc'] = ac_name
 	webnotes.response['user'] = session['user']
 
-def get_modules(form, session):
-	if form.has_key('ac_name') and form.getvalue('ac_name'):
-		server.use_account(ac_name = form.getvalue('ac_name'))
+def get_modules(form_dict, session):
+	if form_dict.has_key('ac_name') and form_dict.get('ac_name'):
+		server.use_account(ac_name = form_dict.get('ac_name'))
 
 	res = sql("select name from `tabModule Def`")
 	webnotes.response['mod_list'] = [i[0] for i in res]
 
-def get_dt_version(form, session):
-	if form.has_key('dn'):
+def get_dt_version(form_dict, session):
+	if form_dict.has_key('dn'):
 		try:
-			webnotes.response['message'] = sql("select version from tabDocType where name=%s", form.getvalue('dn'))[0][0]
+			webnotes.response['message'] = sql("select version from tabDocType where name=%s", form_dict.get('dn'))[0][0]
 		except:
 			webnotes.response['message'] = 0
 
@@ -257,8 +258,8 @@ def get_module_doctypes(src, mod):
 
 	return doc_list
 
-def export_module(form,session):
-	dt_list = get_module_doctypes(form.getvalue('src'), form.getvalue('mod'))
+def export_module(form_dict,session):
+	dt_list = get_module_doctypes(form_dict.get('src'), form_dict.get('mod'))
 	
 	l = '['
 	for d in dt_list:
@@ -266,17 +267,17 @@ def export_module(form,session):
 	
 	webnotes.response['export_data'] = l + ']'
 
-def import_docs(form, session):
-	if form.getvalue('tar'):
-		server.use_account(ac_name = form.getvalue('tar'))
-	webnotes.msgprint(server.import_docs(eval(form.getvalue('data'))))
+def import_docs(form_dict, session):
+	if form_dict.get('tar'):
+		server.use_account(ac_name = form_dict.get('tar'))
+	webnotes.msgprint(server.import_docs(eval(form_dict.get('data'))))
 
 # -------------
 # Create Backup
 # -------------
 
-def backupdb(form, session):
-	db_name = server.decrypt(form.getvalue('db_name'))
+def backupdb(form_dict, session):
+	db_name = server.decrypt(form_dict.get('db_name'))
 
 	server.backup_db(db_name)
 
@@ -293,7 +294,7 @@ import webnotes.db
 # reset password
 # ---------------------------------------------------------------------
 
-if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
+if form_dict.has_key('cmd') and (form_dict.get('cmd')=='reset_password'):
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql = webnotes.conn.sql
 	sql("START TRANSACTION")
@@ -307,7 +308,7 @@ if form.has_key('cmd') and (form.getvalue('cmd')=='reset_password'):
 # pre-login access - for registration etc.
 # ---------------------------------------------------------------------
 
-elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
+elif form_dict.has_key('cmd') and (form_dict.get('cmd')=='prelogin'):
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	sql = webnotes.conn.sql
 	webnotes.session = {'user':'Administrator'}
@@ -316,7 +317,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 	
 	sql("START TRANSACTION")
 	try:
-		webnotes.response['message'] = webnotes.model.code.get_obj('Profile Control').prelogin(form) or ''
+		webnotes.response['message'] = webnotes.model.code.get_obj('Profile Control').prelogin(form_dict) or ''
 		sql("COMMIT")
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
@@ -328,7 +329,7 @@ elif form.has_key('cmd') and (form.getvalue('cmd')=='prelogin'):
 else:
 
 	try:
-		webnotes.auth_obj = webnotes.auth.Authentication(form, cookies, webnotes.response)
+		webnotes.auth_obj = webnotes.auth.Authentication(form_dict, cookies, webnotes.response)
 	
 		if webnotes.conn:
 			sql = webnotes.conn.sql
@@ -339,13 +340,13 @@ else:
 			# runserverobj (if Guest access)
 		
 			# get command cmd
-			cmd = form.has_key('cmd') and form.getvalue('cmd') or ''
-			read_only = form.has_key('_read_only') and form.getvalue('_read_only') or None
+			cmd = form_dict.has_key('cmd') and form_dict.get('cmd') or ''
+			read_only = form_dict.has_key('_read_only') and form_dict.get('_read_only') or None
 
 			# load module
 			if webnotes.session['user'] == 'Guest':
-				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoctype','logout','webnotes.widgets.page.getpage','get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form.savedocs']:
-					webnotes.msgprint('Guest not allowed to perform this action')
+				if cmd not in ['runserverobj', 'webnotes.widgets.form_dict.getdoc','webnotes.widgets.form_dict.getdoctype','logout','webnotes.widgets.page.getpage','get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form_dict.savedocs']:
+					webnotes.msgprint('Guest not allowed to perform_dict this action')
 					raise Exception
 
 			module = ''
