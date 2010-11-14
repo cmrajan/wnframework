@@ -23,6 +23,7 @@ try:
 	import webnotes.db
 	
 	form = cgi.FieldStorage()
+	
 	n = form.getvalue('name')
 
 	# authenticate

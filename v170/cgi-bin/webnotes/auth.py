@@ -39,7 +39,7 @@ import defs
 class Authentication:
 	def __init__(self, form, out_cookies, out):
 
-		self.form = form
+		self.form = self.set_form(form)
 		self.cookies = self.set_in_cookies()
 		self.account = None
 		self.account_id = None
@@ -94,6 +94,17 @@ class Authentication:
 		# clear defs password - for security
 		#defs.db_password = ''
 	
+
+	# Convert form to a dict, if cgi storage
+	# =================================================================================
+
+	self.scrub_form(self, form):
+		if hasattr(form, 'getvalue'):
+			f = {}
+			for each in form.keys():
+				f[each] = form.getvalue(each)
+		return form
+
 	# Load Domain and IP
 	# =================================================================================
 
