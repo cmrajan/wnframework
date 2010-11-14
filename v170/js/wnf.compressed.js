@@ -968,7 +968,7 @@ this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center'
 $c_obj('Menu Control','get_dt_details',dt+'~~~'+cstr(field_list),callback);}
 DocBrowser.prototype.show=function(){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$dh(this.no_result_area);set_title(get_doctype_label(this.label));}
 DocBrowser.prototype.show_no_result=function(){$ds(this.wrapper);$dh(this.loading_div);$dh(this.body);$ds(this.no_result_area);this.no_result_area.innerHTML=repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s',{dt:get_doctype_label(this.dt)});set_title(get_doctype_label(this.label));}
-DocBrowser.prototype.make_new=function(dt,label,field_list){this.make_the_list(dt,this.wrapper);}
+DocBrowser.prototype.make_new=function(dt,label,field_list){this.make_the_list(dt,this.body);}
 DocBrowser.prototype.make_the_list=function(dt,wrapper){var me=this;var lst=new Listing(dt);lst.cl=me.dt_details.columns;lst.dt=dt;lst.opts={cell_style:{padding:'3px 2px',borderBottom:'1px dashed #CCC'},alt_cell_style:{backgroundColor:'#FFFFFF'},head_style:{overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},head_main_style:{padding:'0px'},hide_export:1,hide_print:1,hide_refresh:0,hide_rec_label:0,show_calc:0,show_empty_tab:0,show_no_records_label:1,show_bottom_paging:0,round_corners:0,no_border:1,show_new:0,show_report:1}
 if(user_defaults.hide_report_builder)lst.opts.show_report=0;lst.is_std_query=1;lst.get_query=function(){q={};var fl=[];q.table=repl('`tab%(dt)s`',{dt:this.dt});for(var i=0;i<this.cl.length;i++)fl.push(q.table+'.`'+this.cl[i][0]+'`')
 if(me.dt_details.submittable)

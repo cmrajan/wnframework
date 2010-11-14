@@ -101,7 +101,7 @@ DocBrowser.prototype.show_no_result = function() {
 
 DocBrowser.prototype.make_new = function(dt, label, field_list) {
 	// make the list
-	this.make_the_list(dt, this.wrapper);
+	this.make_the_list(dt, this.body);
 }
 	
 DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
