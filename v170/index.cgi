@@ -17,7 +17,9 @@ try:
 
 	import webnotes
 	webnotes.form = cgi.FieldStorage()
-
+	for each in webnotes.form.keys():
+		webnotes.form_dict[each] = webnotes.form.getvalue(each)
+		
 	if webnotes.form.getvalue('cmd'):
 		# AJAX Call
 		import webnotes.handler
@@ -29,7 +31,7 @@ try:
 		import Cookie
 
 		webnotes.cookies = Cookie.SimpleCookie()
-		auth_obj = webnotes.auth.Authentication(webnotes.form, webnotes.cookies, {})
+		auth_obj = webnotes.auth.Authentication(webnotes.form_dict, webnotes.cookies, {})
 	
 		print "Content-Type: text/html"
 

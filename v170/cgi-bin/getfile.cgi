@@ -23,11 +23,15 @@ try:
 	import webnotes.db
 	
 	form = cgi.FieldStorage()
+	form_dict = {}
+	
+	for each in form.keys():
+		form_dict[each] = form.getvalue(each)	
 	
 	n = form.getvalue('name')
 
 	# authenticate
-	webnotes.auth_obj = webnotes.auth.Authentication(form, {}, [])
+	webnotes.auth_obj = webnotes.auth.Authentication(webnotes.form_dict, {}, [])
 	
 	# login to a particular account (if specified)
 	if form.getvalue('acx'):

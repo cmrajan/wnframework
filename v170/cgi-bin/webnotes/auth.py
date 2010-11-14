@@ -39,7 +39,7 @@ import defs
 class Authentication:
 	def __init__(self, form, out_cookies, out):
 
-		self.form = self.scrub_form(form)
+		self.form = form
 		self.cookies = self.set_in_cookies()
 		self.account = None
 		self.account_id = None
@@ -58,8 +58,8 @@ class Authentication:
 		webnotes.conn = self.conn
 		
 		# called from login
-		if self.form.get('cmd')=='login':
-			if self.form.get('acx'):
+		if form.get('cmd')=='login':
+			if form.get('acx'):
 				self.set_db(form.get('acx'))
 				webnotes.conn = self.conn
 			
@@ -78,7 +78,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or self.form.get('sid') or self.form.get('ac_name'):
+		if self.login_flag or form.get('sid') or form.get('ac_name'):
 			self.set_cookies()
 			self.set_remember_me()
 		
@@ -94,23 +94,10 @@ class Authentication:
 		# clear defs password - for security
 		#defs.db_password = ''
 	
-
-	# Convert form to a dict, if cgi storage
-	# =================================================================================
-
-	def scrub_form(self, form):
-		if hasattr(form, 'getvalue'):
-			f = {}
-			for each in form.keys():
-				f[each] = form.getvalue(each)
-			return f
-		else:
-			return form
-
 	# Load Domain and IP
 	# =================================================================================
 
-	def get_env(self):
+	def get_env(self): 
 		import os
 		self.domain = os.environ.get('HTTP_HOST')
 		if self.domain.startswith('www.'):
