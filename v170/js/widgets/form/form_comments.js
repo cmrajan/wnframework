@@ -1,9 +1,9 @@
 // Comment Listing
 // ===============
 CommentList = function(parent, dt, dn) {
-  $y(parent, {margin:'8px'});
-  this.input_area = $a(parent, 'div', '', {margin:'2px'});
-  this.lst_area = $a(parent, 'div', '', {margin:'2px'});
+  this.wrapper = $a(parent, 'div', '', {margin:'16px'});
+  this.input_area = $a(this.wrapper, 'div', '', {margin:'2px'});
+  this.lst_area = $a(this.wrapper, 'div', '', {margin:'2px'});
   
   this.make_input();
   this.make_lst();
