@@ -195,7 +195,7 @@ def setup_test(form_dict, session):
 # Module Exchange
 # ---------------
 
-def init_acc_mgmt(form_dict,session):
+def init_acc_mgmt(session):
 
 	res = sql('SELECT name from tabDocType')	
 	res = [r[0] for r in res]
@@ -345,8 +345,8 @@ else:
 
 			# load module
 			if webnotes.session['user'] == 'Guest':
-				if cmd not in ['runserverobj', 'webnotes.widgets.form_dict.getdoc','webnotes.widgets.form_dict.getdoctype','logout','webnotes.widgets.page.getpage','get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form_dict.savedocs']:
-					webnotes.msgprint('Guest not allowed to perform_dict this action')
+				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoctype','logout','webnotes.widgets.page.getpage','get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form.savedocs']:
+					webnotes.msgprint('Guest not allowed to perform this action')
 					raise Exception
 
 			module = ''
