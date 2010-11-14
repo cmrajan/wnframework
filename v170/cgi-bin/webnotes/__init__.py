@@ -9,7 +9,7 @@ code_fields_dict = {
 
 
 version = 'v170'
-
+form_dict = {}
 auth_obj = None
 conn = None
 form = None
@@ -18,6 +18,7 @@ user = None
 is_testing = None
 incoming_cookies = {}
 add_cookies = {}
+cookies = {}
 
 # for applications
 app_conn = None
