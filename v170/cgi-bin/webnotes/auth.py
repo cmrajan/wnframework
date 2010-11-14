@@ -103,7 +103,9 @@ class Authentication:
 			f = {}
 			for each in form.keys():
 				f[each] = form.getvalue(each)
-		return form
+			return f
+		else:
+			return form
 
 	# Load Domain and IP
 	# =================================================================================
