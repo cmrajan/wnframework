@@ -466,6 +466,7 @@ Listing.prototype.run = function(from_page) {
 	
 	// callback
 	var call_back = function(r,rt) {
+		page_body.set_status('Done');
 		// show results
 		me.clear_tab();
 		me.max_len = r.n_values;
@@ -512,6 +513,7 @@ Listing.prototype.run = function(from_page) {
 		if(this.is_std_query) args.query = q;
 		else args.simple_query = q;
 		$c('webnotes.widgets.query_builder.runquery', args, call_back, null, this.no_loading);
+		page_body.set_status('Running Query...');
 	}
 }
 

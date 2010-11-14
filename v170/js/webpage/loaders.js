@@ -85,11 +85,13 @@ function loaddoc(doctype, name, onload, menuitem) {
 		// case C - only frm loaded
 		} else {
 			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user}, show_doc, null, null);	// onload
+			page_body.set_status('Loading Document...');
 		}
 	}
 				
 	var show_doc = function(r,rt) {
 		if(locals[doctype] && locals[doctype][name]) {
+			page_body.set_status('Done');
 			var frm = frms[doctype];
 
 			// menu item
@@ -196,6 +198,7 @@ function loadpage(page_name, call_back, menuitem) {
 	if(page_name=='_home')
 		page_name = home_page;
 	var fn = function(r,rt) {
+		page_body.set_status('Done');
 		if(page_body.pages[page_name]) {
 			// loaded
 			var p = page_body.pages[page_name]
@@ -232,8 +235,10 @@ function loadpage(page_name, call_back, menuitem) {
 	
 	if(get_local('Page', page_name) || page_body.pages[page_name]) 
 		fn();
-	else 
+	else {
+		page_body.set_status('Loading Page...');
 		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn );
+	}
 }
 
 // Load Script

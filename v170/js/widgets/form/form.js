@@ -1003,8 +1003,11 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 		var doclist = compress_doclist(make_doclist(this.doctype, this.docname));
 		// send to run
 		if(callingfield)callingfield.input.disabled = true;
+
+		page_body.set_status('Working...')
 		$c('runserverobj', {'docs':doclist, 'method':scriptname }, 
 			function(r, rtxt) { 
+				page_body.set_status('Done')
 				// run refresh
 				if(onrefresh)
 					onrefresh(r,rtxt);
@@ -1131,6 +1134,7 @@ _f.Frm.prototype.reload_doc = function() {
 	}
 
 	var ret_fn = function(r, rtxt) {
+		page_body.set_status('Done')
 		// n tweets and last comment
 		if(r.n_comments) this.n_comments[me] = r.n_comments;
 		if(r.last_comment) this.last_comments[me] = r.last_comment;
@@ -1139,6 +1143,7 @@ _f.Frm.prototype.reload_doc = function() {
 		me.refresh();
 	}
 
+	page_body.set_status('Reloading...')
 	if(me.doc.__islocal) { 
 		// reload only doctype
 		$c('webnotes.widgets.form.getdoctype', {'doctype':me.doctype }, ret_fn, null, null, 'Refreshing ' + me.doctype + '...');

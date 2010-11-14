@@ -15,6 +15,7 @@
 function Body() { 
 	this.left_sidebar = null;
 	this.right_sidebar = null;
+	this.status_area = null;
 	var me = this;
 	page_body = this;	
 
@@ -161,6 +162,11 @@ function Body() {
 		// on show
 		if(me.cur_page.onshow)
 			me.cur_page.onshow(me.cur_page);
+	}
+
+	this.set_status = function(txt) {
+		if(this.status_area)
+			this.status_area.innerHTML = txt;
 	}
 	
 	this.setup();

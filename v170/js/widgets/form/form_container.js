@@ -96,6 +96,8 @@ _f.add_frm = function(doctype, onload, opt_name) {
 
 	// Load Doctype from server
 	var callback = function(r,rt) {
+		page_body.set_status('Done')
+
 		if(!locals['DocType'][doctype]) {
 			if(r.exc) { msgprint("Did not load " + doctype, 1); }
 			loadpage('_home');
@@ -145,9 +147,11 @@ _f.add_frm = function(doctype, onload, opt_name) {
 		var args = {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user};
 		if(get_url_arg('akey')) args['akey'] = get_url_arg('akey');
 		$c('webnotes.widgets.form.getdoc', args, callback);
+		page_body.set_status('Loading Document...')
 	} else {
 		// get doctype only
 		$c('webnotes.widgets.form.getdoctype', args={'doctype':doctype}, callback);
+		page_body.set_status('Loading Document...')
 	}
 }
 
