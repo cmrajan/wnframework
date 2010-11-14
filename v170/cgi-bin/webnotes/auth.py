@@ -50,7 +50,7 @@ class Authentication:
 		self.user_id = None
 		self.cp = None
 		self.session = {'data':{}}
-		
+	
 		self.get_env()
 		self.set_db()
 		
@@ -58,18 +58,17 @@ class Authentication:
 		webnotes.conn = self.conn
 		
 		# called from login
-		if form.getvalue('cmd')=='login':
-			if form.getvalue('acx'):
-				self.set_db(form.getvalue('acx'))
+		if form.get('cmd')=='login':
+			if form.get('acx'):
+				self.set_db(form.get('acx'))
 				webnotes.conn = self.conn
 			
 			self.login()
 			self.login_flag = 1
-			webnotes.add_cookies['uid'] = form.getvalue('usr')
 		
 		else:
 			# authenticated user
-			if not self.load_session(self.form.getvalue('sid') or self.cookies.get('sid')):
+			if not self.load_session(self.form.get('sid') or self.cookies.get('sid')):
 			
 				# no ? login as guest
 				self.login(as_guest = True)
@@ -79,7 +78,7 @@ class Authentication:
 			raise Exception, "Authentication Failed"
 
 		# if just logged in
-		if self.login_flag or form.getvalue('sid') or form.getvalue('ac_name'):
+		if self.login_flag or form.get('sid') or form.get('ac_name'):
 			self.set_cookies()
 			self.set_remember_me()
 		
@@ -120,7 +119,7 @@ class Authentication:
 		
 		# database_id (account_id) is given --- not for login
 		# ---------------------------------------------------
-		if not (ac_name or self.form.getvalue('ac_name')) and self.cookies.get('account_id'):
+		if not (ac_name or self.form.get('ac_name')) and self.cookies.get('account_id'):
 			self.account_id = self.cookies.get('account_id')
 			self.conn = webnotes.db.Database(user = self.account_id)
 			self.conn.use(self.account_id)
@@ -129,7 +128,7 @@ class Authentication:
 		# account id is given
 		# -------------------
 		if not ac_name:
-			ac_name = self.form.getvalue('ac_name') or self.cookies.get('ac_name')
+			ac_name = self.form.get('ac_name') or self.cookies.get('ac_name')
 		
 		c = webnotes.db.Database(use_default=1)
 		if ac_name:
@@ -204,7 +203,7 @@ class Authentication:
 				raise Exception, "No Guest Access"
 			self.user_id = res[0][0]
 		else:
-			self.user_id = self.check_password(self.form.getvalue('usr'), self.form.getvalue('pwd'))
+			self.user_id = self.check_password(self.form.get('usr'), self.form.get('pwd'))
 		
 		# yes allowed to create session
 		if self.user_id:
@@ -334,7 +333,7 @@ class Authentication:
 	# =================================================================================
 
 	def set_remember_me(self):
-		if webnotes.utils.cint(self.form.getvalue('remember_me')):
+		if webnotes.utils.cint(self.form.get('remember_me')):
 			remember_days = self.conn.get_value('Control Panel',None,'remember_for_days') or 7
 			import datetime
 			self.out_cookies['remember_me'] = 1
