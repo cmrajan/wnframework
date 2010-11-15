@@ -210,10 +210,15 @@ def send_form():
 # ---------------
 
 def update_contacts(recipients):
+	import webnotes
+	from webnotes.model.doc import Document
+	
 	for r in recipients:
-		d = Document('Contact')
-		d.email_id = r
 		try:
-			d.save(1)
-		except:
-			pass
+			if not webnotes.conn.sql("select email_id from tabContact where email_id=%s"):
+				d = Document('Contact')
+				d.email_id = r
+				d.save(1)
+		except Exception, e:
+			if e.args[0]==1146: pass # no table
+			else: raise e
