@@ -165,7 +165,7 @@ _f.Frm.prototype.email_doc = function() {
 		$dh(_e.dialog.rows['Send With Attachments']);
 	}
 
-	_e.dialog.widgets['Subject'].value = this.meta.name + ': ' + this.docname;
+	_e.dialog.widgets['Subject'].value = get_doctype_label(this.meta.name) + ': ' + this.docname;
 	_e.dialog.show();
 }
 
