@@ -569,6 +569,11 @@ _f.Frm.prototype.show_the_frm = function() {
 }
 
 // --------------------------------------------------------------------------------------
+_f.Frm.prototype.set_print_heading = function(txt) {
+	this.pformat[cur_frm.docname] = txt;
+}
+
+// --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.defocus_rest = function() {
 	// deselect others

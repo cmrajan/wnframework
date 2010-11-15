@@ -117,6 +117,7 @@ if(this.wrapper&&this.wrapper.style.display.toLowerCase()=='none'){$ds(this.wrap
 if(this.meta.in_dialog&&!this.parent.dialog.display){if(!this.meta.istable)
 this.parent.table_form=false;this.parent.dialog.show();}
 this.parent.last_displayed=this;}
+_f.Frm.prototype.set_print_heading=function(txt){this.pformat[cur_frm.docname]=txt;}
 _f.Frm.prototype.defocus_rest=function(){mclose();if(_f.cur_grid_cell)_f.cur_grid_cell.grid.cell_deselect();cur_page=null;}
 _f.Frm.prototype.get_doc_perms=function(){var p=[0,0,0,0,0,0];for(var i=0;i<this.perm.length;i++){if(this.perm[i]){if(this.perm[i][READ])p[READ]=1;if(this.perm[i][WRITE])p[WRITE]=1;if(this.perm[i][SUBMIT])p[SUBMIT]=1;if(this.perm[i][CANCEL])p[CANCEL]=1;if(this.perm[i][AMEND])p[AMEND]=1;}}
 return p;}
@@ -384,7 +385,7 @@ _p.add_layout=function(dt,no_letterhead){var l=new Layout();if(locals['DocType']
 l.cur_row.header.innerHTML=_p.letter_heads[cur_frm.doc.letter_head];else if(cp.letter_head)
 l.cur_row.header.innerHTML=cp.letter_head;}
 return l;}
-_p.print_std=function(no_letterhead){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];var layout=_p.add_layout(dt,no_letterhead);pf_list[pf_list.length]=layout;var h1=$a(layout.cur_row.header,'h1','',{fontSize:'22px',marginBottom:'8px'});h1.innerHTML=cur_frm.pformat.print_heading?cur_frm.pformat.print_heading:get_doctype_label(dt);var h2=$a(layout.cur_row.header,'div','',{fontSize:'16px',color:'#888',marginBottom:'8px',paddingBottom:'8px',borderBottom:(layout.with_border?'0px':'1px solid #000')});h2.innerHTML=cur_frm.pformat.print_subheading?cur_frm.pformat.print_subheading:dn;var fl=getchildren('DocField',dt,'fields','DocType');if(fl[0]&&fl[0].fieldtype!="Section Break"){layout.addrow();if(fl[0].fieldtype!="Column Break")
+_p.print_std=function(no_letterhead){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];var layout=_p.add_layout(dt,no_letterhead);pf_list[pf_list.length]=layout;var h1=$a(layout.cur_row.header,'h1','',{fontSize:'22px',marginBottom:'8px'});h1.innerHTML=cur_frm.pformat[dn]?cur_frm.pformat[dn]:get_doctype_label(dt);var h2=$a(layout.cur_row.header,'div','',{fontSize:'16px',color:'#888',marginBottom:'8px',paddingBottom:'8px',borderBottom:(layout.with_border?'0px':'1px solid #000')});h2.innerHTML=dn;var fl=getchildren('DocField',dt,'fields','DocType');if(fl[0]&&fl[0].fieldtype!="Section Break"){layout.addrow();if(fl[0].fieldtype!="Column Break")
 layout.addcell();}
 for(var i=0;i<fl.length;i++){var fn=fl[i].fieldname?fl[i].fieldname:fl[i].label;if(fn)
 var f=get_field(dt,fn,dn);else
