@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://service.globalsaas.com/soap/" xmlns:impl="http://service.globalsaas.com/soap/" xmlns:xsd1="http://service.globalsaas.com/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" name="ProvisionService" targetNamespace="http://service.globalsaas.com/soap/">
+    <wsdl:types>
+        <xsd:schema elementFormDefault="qualified" targetNamespace="http://service.globalsaas.com/soap/">
+
+			<xsd:complexType name="ServiceException">
+                <xsd:sequence>
+                    <xsd:element name="message" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="ValidationException">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:ServiceException">
+                        <xsd:sequence/>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="InternalException">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:ServiceException">
+                        <xsd:sequence/>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="AuthenticationException">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:ServiceException">
+                        <xsd:sequence/>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="RealmDoesNotExistException">
+				<xsd:complexContent>
+					<xsd:extension base="tns:ServiceException">
+						<xsd:sequence />
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="UserDoesNotExistException">
+				<xsd:complexContent>
+					<xsd:extension base="tns:ServiceException">
+						<xsd:sequence />
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="DuplicateUserException">
+				<xsd:complexContent>
+					<xsd:extension base="tns:ServiceException">
+						<xsd:sequence />
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="DuplicateRealmException">
+				<xsd:complexContent>
+					<xsd:extension base="tns:ServiceException">
+						<xsd:sequence />
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+            <xsd:complexType name="CustomField">
+                <xsd:sequence>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="FieldName" type="xsd:string"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="FieldValue" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="ArrayOfCustomField">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" name="CustomField" nillable="true" type="tns:CustomField"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="UserInfo">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="FirstName" type="xsd:string" nillable="true"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="LastName" type="xsd:string" nillable="true"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="Email" type="xsd:string" nillable="true"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="RoleName" type="xsd:string" nillable="true"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="UserName" type="xsd:string" nillable="false"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="PassWord" type="xsd:string" nillable="false"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="CustomFields" type="tns:ArrayOfCustomField"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="ApplicationUser">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:UserInfo">
+                        <xsd:sequence>
+                            <xsd:element minOccurs="1" maxOccurs="1" name="RealmName" type="xsd:string" nillable="false"/>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="ArrayOfApplicationUsers">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" name="ApplicationUser" nillable="true" type="tns:ApplicationUser"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="CommonInput">
+                <xsd:sequence>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="Timestamp" nillable="false" type="xsd:dateTime"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="AdminUserName" nillable="false" type="xsd:string"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="AdminPassWord" nillable="false" type="xsd:string"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="RealmName" nillable="false" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="InsertUserInput">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput">
+                        <xsd:sequence>
+                            <xsd:element minOccurs="1" maxOccurs="1" name="UserInfo" nillable="false" type="tns:UserInfo"/>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="InsertRealmInput">
+				<xsd:complexContent>
+					<xsd:extension base="tns:CommonInput">
+						<xsd:sequence>
+							<xsd:element minOccurs="0" maxOccurs="1" name="CustomFields" type="tns:ArrayOfCustomField"/>
+						</xsd:sequence>
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="EnableRealmInput">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput" />
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="RemoveRealmInput">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput" />
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="DisableRealmInput">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput" />
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="UpdateUserInput">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:InsertUserInput" />
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="UserInput">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput">
+                        <xsd:sequence>
+                        	<xsd:element minOccurs="1" maxOccurs="1" name="UserName" nillable="false" type="xsd:string" />
+						</xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+			<xsd:complexType name="SelectUserInput">
+				<xsd:complexContent>
+                    <xsd:extension base="tns:UserInput">
+                        <xsd:sequence />
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="SelectUserOutput">
+				<xsd:complexContent>
+					<xsd:extension base="tns:ApplicationUser">
+						<xsd:sequence />
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="SelectAllUsersInput">
+				<xsd:complexContent>
+					<xsd:extension base="tns:CommonInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="SelectAllUsersOutput">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="1" name="users" type="tns:ArrayOfApplicationUsers" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="RemoveUserInput">
+				<xsd:complexContent>
+                    <xsd:extension base="tns:UserInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="RemoveAllUsersInput">
+				<xsd:complexContent>
+					<xsd:extension base="tns:CommonInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="DisableUserInput">
+				<xsd:complexContent>
+                    <xsd:extension base="tns:UserInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="DisableAllUsersInput">
+				<xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="EnableUserInput">
+				<xsd:complexContent>
+                    <xsd:extension base="tns:UserInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="EnableAllUsersInput">
+				<xsd:complexContent>
+                    <xsd:extension base="tns:CommonInput" />
+				</xsd:complexContent>
+			</xsd:complexType>
+
+            <xsd:element name="insertUser" type="tns:InsertUserInput" />
+			<xsd:element name="updateUser" type="tns:UpdateUserInput" />
+
+			<xsd:element name="selectUser" type="tns:SelectUserInput" />
+			<xsd:element name="selectUserResponse" type="tns:SelectUserOutput" />
+
+			<xsd:element name="selectAllUsers" type="tns:SelectAllUsersInput" />
+			<xsd:element name="selectAllUsersResponse" type="tns:SelectAllUsersOutput" />
+
+			<xsd:element name="removeUser" type="tns:RemoveUserInput" />
+			<xsd:element name="removeAllUsers" type="tns:RemoveAllUsersInput" />
+
+			<xsd:element name="disableUser" type="tns:DisableUserInput" />
+			<xsd:element name="disableAllUsers" type="tns:DisableAllUsersInput" />
+
+			<xsd:element name="enableUser" type="tns:EnableUserInput" />
+			<xsd:element name="enableAllUsers" type="tns:EnableAllUsersInput" />
+
+			<xsd:element name="insertRealm" type="tns:InsertRealmInput" />
+			<xsd:element name="enableRealm" type="tns:EnableRealmInput" />
+			<xsd:element name="disableRealm" type="tns:DisableRealmInput" />
+			<xsd:element name="removeRealm" type="tns:RemoveRealmInput" />
+
+            <xsd:element name="ValidationException" type="tns:ValidationException"/>
+            <xsd:element name="InternalException" type="tns:InternalException"/>
+            <xsd:element name="AuthenticationException" type="tns:AuthenticationException"/>
+			<xsd:element name="DuplicateUserException" type="tns:DuplicateUserException" />
+			<xsd:element name="RealmDoesNotExistException" type="tns:RealmDoesNotExistException" />
+			<xsd:element name="UserDoesNotExistException" type="tns:UserDoesNotExistException" />
+			<xsd:element name="DuplicateRealmException" type="tns:DuplicateRealmException" />
+        </xsd:schema>
+    </wsdl:types>
+
+    <message name="ValidationException">
+        <part name="ValidationException" element="tns:ValidationException"/>
+    </message>
+
+    <message name="InternalException">
+        <part name="InternalException" element="tns:InternalException"/>
+    </message>
+
+    <message name="AuthenticationException">
+        <part name="AuthenticationException" element="tns:AuthenticationException"/>
+    </message>
+
+	<message name="DuplicateUserException">
+        <part name="DuplicateUserException" element="tns:DuplicateUserException"/>
+    </message>
+
+	<message name="DuplicateRealmException">
+        <part name="DuplicateRealmException" element="tns:DuplicateRealmException"/>
+    </message>
+
+    <message name="RealmDoesNotExistException">
+        <part name="RealmDoesNotExistException" element="tns:RealmDoesNotExistException"/>
+    </message>
+
+	<message name="UserDoesNotExistException">
+        <part name="UserDoesNotExistException" element="tns:UserDoesNotExistException"/>
+    </message>
+
+    <message name="EmptyResponse"/>
+
+    <message name="InsertUserRequest">
+        <part name="insertUser" element="tns:insertUser"/>
+    </message>
+
+	<message name="UpdateUserRequest">
+        <part name="updateUser" element="tns:updateUser"/>
+    </message>
+
+	<message name="SelectUserRequest">
+        <part name="selectUser" element="tns:selectUser"/>
+    </message>
+
+	<message name="SelectUserResponse">
+		<part name="selectUserResponse" element="tns:selectUserResponse" />
+	</message>
+
+	<message name="SelectAllUsersRequest">
+        <part name="selectAllUsersRequest" element="tns:selectAllUsers"/>
+    </message>
+
+	<message name="SelectAllUsersResponse">
+        <part name="selectAllUsersResponse" element="tns:selectAllUsersResponse"/>
+    </message>
+
+	<message name="RemoveUserRequest">
+        <part name="removeUser" element="tns:removeUser"/>
+    </message>
+
+	<message name="RemoveAllUsersRequest">
+        <part name="removeAllUsers" element="tns:removeAllUsers"/>
+    </message>
+
+	<message name="DisableUserRequest">
+        <part name="disableUser" element="tns:disableUser"/>
+    </message>
+
+	<message name="DisableAllUsersRequest">
+        <part name="disableAllUsers" element="tns:disableAllUsers"/>
+    </message>
+
+	<message name="EnableUserRequest">
+        <part name="enableUser" element="tns:enableUser"/>
+    </message>
+
+	<message name="EnableAllUsersRequest">
+        <part name="enableAllUsers" element="tns:enableAllUsers"/>
+    </message>
+
+	<message name="InsertRealmRequest">
+		<part name="insertRealm" element="tns:insertRealm" />
+	</message>
+
+	<message name="DisableRealmRequest">
+		<part name="disableRealm" element="tns:disableRealm" />
+	</message>
+
+	<message name="EnableRealmRequest">
+		<part name="enableRealm" element="tns:enableRealm" />
+	</message>
+
+	<message name="RemoveRealmRequest">
+		<part name="removeRealm" element="tns:removeRealm" />
+	</message>
+
+    <portType name="ProvisionServicePortType">
+        <operation name="InsertUser">
+            <input message="tns:InsertUserRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+			<fault name="DuplicateUserException" message="tns:DuplicateUserException"/>
+        </operation>
+
+		<operation name="UpdateUser">
+            <input message="tns:UpdateUserRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+			<fault name="UserDoesNotExistException" message="tns:UserDoesNotExistException"/>
+        </operation>
+
+		<operation name="SelectUser">
+			<input message="tns:SelectUserRequest"/>
+            <output message="tns:SelectUserResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="UserDoesNotExistException" message="tns:UserDoesNotExistException"/>
+		</operation>
+
+		<operation name="SelectAllUsers">
+			<input message="tns:SelectAllUsersRequest"/>
+            <output message="tns:SelectAllUsersResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+		<operation name="RemoveUser">
+			<input message="tns:RemoveUserRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="UserDoesNotExistException" message="tns:UserDoesNotExistException"/>
+		</operation>
+
+		<operation name="RemoveAllUsers">
+			<input message="tns:RemoveAllUsersRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+		<operation name="DisableUser">
+			<input message="tns:DisableUserRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="UserDoesNotExistException" message="tns:UserDoesNotExistException"/>
+		</operation>
+
+		<operation name="DisableAllUsers">
+			<input message="tns:DisableAllUsersRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+		<operation name="EnableUser">
+			<input message="tns:EnableUserRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="UserDoesNotExistException" message="tns:UserDoesNotExistException"/>
+		</operation>
+
+		<operation name="EnableAllUsers">
+			<input message="tns:EnableAllUsersRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+		<operation name="InsertRealm">
+			<input message="tns:InsertRealmRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="DuplicateRealmException" message="tns:DuplicateRealmException"/>
+		</operation>
+
+		<operation name="EnableRealm">
+			<input message="tns:EnableRealmRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+		<operation name="DisableRealm">
+			<input message="tns:DisableRealmRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+		<operation name="RemoveRealm">
+			<input message="tns:RemoveRealmRequest"/>
+            <output message="tns:EmptyResponse"/>
+
+            <fault name="ValidationException" message="tns:ValidationException"/>
+            <fault name="InternalException" message="tns:InternalException"/>
+            <fault name="AuthenticationException" message="tns:AuthenticationException"/>
+			<fault name="RealmDoesNotExistException" message="tns:RealmDoesNotExistException"/>
+		</operation>
+
+    </portType>
+    <binding name="ProvisionServiceBinding" type="tns:ProvisionServicePortType">
+
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+		<operation name="InsertUser">
+            <soap:operation soapAction="urn://ProvisionService#InsertUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="DuplicateUserException">
+                <soap:fault name="DuplicateUserException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="UpdateUser">
+            <soap:operation soapAction="urn://ProvisionService#UpdateUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="UserDoesNotExistException">
+                <soap:fault name="UserDoesNotExistException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="SelectUser">
+            <soap:operation soapAction="urn://ProvisionService#SelectUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="UserDoesNotExistException">
+                <soap:fault name="UserDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="SelectAllUsers">
+            <soap:operation soapAction="urn://ProvisionService#SelectAllUsers"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="RemoveUser">
+            <soap:operation soapAction="urn://ProvisionService#RemoveUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="UserDoesNotExistException">
+                <soap:fault name="UserDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="RemoveAllUsers">
+            <soap:operation soapAction="urn://ProvisionService#RemoveAllUsers"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="DisableUser">
+            <soap:operation soapAction="urn://ProvisionService#DisableUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="UserDoesNotExistException">
+                <soap:fault name="UserDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="DisableAllUsers">
+            <soap:operation soapAction="urn://ProvisionService#DisableAllUsers"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="EnableUser">
+            <soap:operation soapAction="urn://ProvisionService#EnableUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="UserDoesNotExistException">
+                <soap:fault name="UserDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="EnableAllUsers">
+            <soap:operation soapAction="urn://ProvisionService#EnableAllUsers"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="InsertRealm">
+            <soap:operation soapAction="urn://ProvisionService#InsertRealm"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="DuplicateRealmException">
+                <soap:fault name="DuplicateRealmException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="DisableRealm">
+            <soap:operation soapAction="urn://ProvisionService#DisableRealm"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="EnableRealm">
+            <soap:operation soapAction="urn://ProvisionService#EnableRealm"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+
+		<operation name="RemoveRealm">
+            <soap:operation soapAction="urn://ProvisionService#RemoveRealm"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="ValidationException">
+                <soap:fault name="ValidationException" use="literal"/>
+            </fault>
+            <fault name="InternalException">
+                <soap:fault name="InternalException" use="literal"/>
+            </fault>
+            <fault name="AuthenticationException">
+                <soap:fault name="AuthenticationException" use="literal"/>
+            </fault>
+			<fault name="RealmDoesNotExistException">
+                <soap:fault name="RealmDoesNotExistException" use="literal"/>
+            </fault>
+        </operation>
+    </binding>
+
+    <service name="ProvisionService">
+        <port name="ProvisionServicePort" binding="tns:ProvisionServiceBinding">
+            <soap:address location="http://10.18.124.156/isv/index.php"/>
+        </port>
+    </service>
+
+</wsdl:definitions>
