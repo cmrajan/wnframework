@@ -214,8 +214,9 @@ def update_contacts(recipients):
 	from webnotes.model.doc import Document
 	
 	for r in recipients:
+		r = r.strip()
 		try:
-			if not webnotes.conn.sql("select email_id from tabContact where email_id=%s"):
+			if not webnotes.conn.sql("select email_id from tabContact where email_id=%s", r):
 				d = Document('Contact')
 				d.email_id = r
 				d.save(1)
