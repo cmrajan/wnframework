@@ -320,7 +320,7 @@ def sync_control_panel():
 #==============================================================================
 def get_modules_from_filesystem():
 	import os, webnotes.defs
-	modules = os.listdir(webnotes.defs.modules_path, 'modules'))
+	modules = os.listdir(webnotes.defs.modules_path, 'modules')
 	return modules
 
 
