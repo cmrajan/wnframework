@@ -27,6 +27,8 @@ class SSOServiceClass {
 	 * @param object $exception
 	 * @return 
 	 */
+
+
 	function createException($exception,$message)
 	{
 		$typedException = new StdClass();
@@ -103,6 +105,52 @@ class SSOServiceClass {
 		}
 	}
 	
+	function PostRequest($url, $referer, $_data) {
+	 
+	 
+	    // parse the given URL
+	    $url = parse_url($url);
+	    if ($url['scheme'] != 'http') { 
+		die('Only HTTP request are supported !');
+	    }
+	 
+	    // extract host and path:
+	    $host = $url['host'];
+	    $path = $url['path'];
+	 
+	    // open a socket connection on port 80
+	    $fp = fsockopen($host, 80);
+	 
+	    // send the request headers:
+	    fputs($fp, "POST $path HTTP/1.1\r\n");
+	    fputs($fp, "Host: $host\r\n");
+	    fputs($fp, "Referer: $referer\r\n");
+	    fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+	    fputs($fp, "Content-length: ". strlen($data) ."\r\n");
+	    fputs($fp, "Connection: close\r\n\r\n");
+	    fputs($fp, $data);
+	 
+	    $result = ''; 
+	    while(!feof($fp)) {
+		// receive the results of the request
+		$result .= fgets($fp, 128);
+	    }
+	 
+	    // close the socket connection:
+	    fclose($fp);
+	 
+	    // split the result header from the content
+	    $result = explode("\r\n\r\n", $result, 2);
+	 
+	    $header = isset($result[0]) ? $result[0] : '';
+	    $content = isset($result[1]) ? $result[1] : '';
+	 
+	    // return as array:
+	    return array($header, $content);
+	}
+	 
+
+
 	/**
 	 * This method implements the login procedure for users using SSO.
 	 * See the specification document for additional information.
@@ -113,18 +161,35 @@ class SSOServiceClass {
 	 */
 	function Login($LoginRequest) 
 	{
-		if(func_num_args()<1)
+	//Just a http request with the arguments passed.
+	if(func_num_args()<1)
+	
         {
             error_log("SSOService:Login - Incorrect number of parameters passed in.");
 			return $this->createException(ERROR_CODE_USER_DATA,"Invalid Request passed in to Logout method");	
         }
         
-        $UserName = $LoginRequest->UserName;
+		self.base_url = $http = "http://brownie.s5.iwebnotes.com/v170/index.cgi?";	
+	        $UserName = $LoginRequest->UserName;
 		$Timestamp = $LoginRequest->Timestamp;
 		$UserName = $LoginRequest->UserName;
 		$PassWord = $LoginRequest->PassWord;
 		
 		$timestamp = strftime($Timestamp);
+		
+		$cookie_value = array($UserName,$Password,'login');
+		$cookies_array = array("UserName","Password","cmd");  //,"acx",) not needed at the moment but can be useful in the future.
+		
+		for ($i = 0;$i < sizeof($cookies_array); ++$i)
+		{
+			
+			$data[$i] = "$cookies_array[$i]=$cookies_value";
+		}
+
+		$data = implode('&',$data);
+		echo $data;
+		$result = self.PostRequest(self.$base_url,'http://localhost',$data);
+		echo $result
 		if(!$timestamp)
 		{
 			//TODO: Implement time synchornization strategy
