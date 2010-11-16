@@ -174,6 +174,7 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 	
 	cur_doc.server_code_core = cstr(doc.server_code_core)
 	cur_doc.client_script_core = cstr(doc.client_script_core)
+	cur_doc.module = doc.module
 	cur_doc.save(ignore_fields = ignore, check_links = 0)	
 	
 
