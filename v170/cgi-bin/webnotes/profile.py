@@ -2,7 +2,7 @@ import webnotes
 
 class Profile:
 	def __init__(self, name=''):
-		self.name = name or webnotes.session['user']
+		self.name = name or webnotes.session.get('user')
 		self.roles = []
 
 		self.can_create = []
@@ -15,7 +15,7 @@ class Profile:
 		self.roles = []
 		for t in res:
 			if t[0]: self.roles.append(t[0])
-		if webnotes.session['user'] == 'Guest':
+		if webnotes.session.get('user') == 'Guest':
 			self.roles.append('Guest')
 		else:
 			self.roles.append('All')
