@@ -1,5 +1,4 @@
-# ~~~~~~~~Export~~~~~~~~Export~~~~~~~~Export~~~~~~~~Export~~~~~~~~Export~~~~~~~~
-
+# to use module manger, set the path of the modules folder in defs.py
 
 transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','GL Mapper','Search Criteria', 'Patch']
 # TDS Category and TDS Rate chart updates should go, if at all as Patches not here.
@@ -9,7 +8,7 @@ transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','GL M
 # export to files
 # ==============================================================================
 
-def export_to_files(modules = [], record_list=[]):	
+def export_to_files(modules = [], record_list=[], verbose=0):	
 	# Multiple doctype  and multiple modules export to be done
 	# for Module Def, right now using a hack..should consider table update in the next version
 	# all modules transfer not working, because source db not known
@@ -26,6 +25,8 @@ def export_to_files(modules = [], record_list=[]):
 			module_doclist +=get_module_doclist(m)
 	# write files
 	for doclist in module_doclist:
+		if verbose:
+			print "Writing for " + doclist[0].doctype + "/" doclist[0].name
 		write_document_file(doclist)
 
 # ==============================================================================
@@ -69,7 +70,6 @@ def get_module_doclist(module):
 	# build the super_doclist
 	super_doclist = []
 	for i in item_list:
-		print i
 		dl = webnotes.model.doc.get(i[0], i[1])
 		if i[2]=='1':
 			dl[0].module = module
@@ -89,15 +89,16 @@ def get_module_doclist(module):
 def write_document_file(doclist):
 	import os
 	import webnotes
+	import webnotes.defs
 
 	# create the folder
-	folder = os.path.join(webnotes.get_index_path(), 'modules', doclist[0]['doctype'] == 'Module Def' and doclist[0]['name'] or doclist[0]['module'], doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
+	folder = os.path.join(webnotes.defs.modules_path, doclist[0]['doctype'] == 'Module Def' and doclist[0]['name'] or doclist[0]['module'], doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
 	
 	webnotes.create_folder(folder)
 
 	# separate code files
 	separate_code_files(doclist, folder)
-	
+		
 	# write the data file
 	txtfile = open(os.path.join(folder, doclist[0]['name'].replace('/', '-')+'.txt'),'w+')
 	txtfile.write(str(doclist))
@@ -142,8 +143,6 @@ def import_from_files(modules = [], record_list = [], execute_patches = 1, sync_
 		# get all doclist
 		all_doclist = get_all_doclist(folder_list)
 	
-		
-	
 		# import doclist
 		ret1 = accept_module(all_doclist)
 	
@@ -167,6 +166,7 @@ def get_folder_paths(modules, record_list):
 	import os
 	import webnotes
 	import fnmatch
+	import webnotes.defs
 
 	folder_list=[]
 	global low_folder_list
@@ -175,7 +175,7 @@ def get_folder_paths(modules, record_list):
 		if record_list:
 			for record in record_list:
 				low_folder_list = []
-				low_folder_list = get_lowest_file_paths(os.path.join(webnotes.get_index_path(),'modules'))
+				low_folder_list = get_lowest_file_paths(webnotes.defs.modules_path)
 			
 				for each in low_folder_list: 
 					if fnmatch.fnmatch(each,'*'+record[0]+'*'+record[1].replace('/', '-')):
@@ -184,14 +184,15 @@ def get_folder_paths(modules, record_list):
 			# system modules will be transferred in a predefined order and before all other modules
 			sys_mod_ordered_list = ['Roles', 'System', 'Application Internal', 'Mapper', 'Settings']
 			all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
+
 			for each in all_mod_ordered_list:
-				mod_path = os.path.join(webnotes.get_index_path(), 'modules', each)
+				mod_path = os.path.join(webnotes.defs.modules_path, each)
 				temp = os.listdir(mod_path)
 				temp = list(set(temp).difference(['Control Panel']))
 				all_transfer_types =[t for t in transfer_types if t in temp] + list(set(temp).difference(transfer_types))
 				for d in all_transfer_types:
 					low_folder_list = []
-					low_folder_list = get_lowest_file_paths(os.path.join(webnotes.get_index_path(),'modules',each, d))	
+					low_folder_list = get_lowest_file_paths(os.path.join(webnotes.defs.modules_path, each, d))	
 					folder_list+=low_folder_list
 
 		return folder_list
@@ -298,9 +299,11 @@ def accept_module(super_doclist):
 # =============================================================================
 def sync_control_panel():
 	import transfer
+	import webnotes.defs
+	
 	global low_folder_list
 	low_folder_list = []
-	low_folder_list = get_lowest_file_paths(os.path.join(webnotes.get_index_path(),'modules'))
+	low_folder_list = get_lowest_file_paths(webnotes.defs.modules_path)
 			
 	for each in low_folder_list: 
 		if fnmatch.fnmatch(each,'*Control Panel/Control Panel'):
@@ -316,8 +319,8 @@ def sync_control_panel():
 #Return module names present in File System
 #==============================================================================
 def get_modules_from_filesystem():
-	import os
-	modules = os.listdir(os.path.join(webnotes.get_index_path(), 'modules'))
+	import os, webnotes.defs
+	modules = os.listdir(webnotes.defs.modules_path, 'modules'))
 	return modules
 
 

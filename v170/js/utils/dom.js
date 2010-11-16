@@ -297,6 +297,18 @@ function get_url_arg(name) {
 		return decodeURIComponent(results[1]);
 }
 
+function get_url_dict() {
+	var d = {}
+	var t = window.location.href.split('?')[1];
+	if(t.indexOf('#')!=-1) t = t.split('#')[0];
+	t = t.split('&');
+	for(var i=0; i<t.length; i++) {
+		var a = t[i].split('=');
+		d[decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+	}
+	return d;
+}
+
 function get_cookie(c) {
 	var t=""+document.cookie;
 	var ind=t.indexOf(c);

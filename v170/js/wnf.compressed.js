@@ -174,6 +174,9 @@ st=document.body.scrollTop;return st;}
 function get_url_arg(name){name=name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");var regexS="[\\?&]"+name+"=([^&#]*)";var regex=new RegExp(regexS);var results=regex.exec(window.location.href);if(results==null)
 return"";else
 return decodeURIComponent(results[1]);}
+function get_url_dict(){var d={}
+var t=window.location.href.split('?')[1];if(t.indexOf('#')!=-1)t=t.split('#')[0];t=t.split('&');for(var i=0;i<t.length;i++){var a=t[i].split('=');d[decodeURIComponent(a[0])]=decodeURIComponent(a[1]);}
+return d;}
 function get_cookie(c){var t=""+document.cookie;var ind=t.indexOf(c);if(ind==-1||c=="")return"";var ind1=t.indexOf(';',ind);if(ind1==-1)ind1=t.length;return unescape(t.substring(ind+c.length+1,ind1));}
 add_space_holder=function(parent,cs){if(!cs)cs={margin:'170px 0px'}
 $y(space_holder_div,cs);parent.appendChild(space_holder_div);}
