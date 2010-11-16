@@ -26,7 +26,7 @@ def export_to_files(modules = [], record_list=[], verbose=0):
 	# write files
 	for doclist in module_doclist:
 		if verbose:
-			print "Writing for " + doclist[0].doctype + "/" doclist[0].name
+			print "Writing for " + doclist[0]['doctype'] + " / " + doclist[0]['name']
 		write_document_file(doclist)
 
 # ==============================================================================
