@@ -273,11 +273,12 @@ class Authentication:
 	# =================================================================================
 	def get_ipinfo(self):		
 		import os,httplib,urllib
-		conn=httplib.HTTPConnection("ipinfodb.com")  #open connention
-		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json'}
+		conn=httplib.HTTPConnection("api.ipinfodb.com")  #open connention
+		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json','key':'fbde5e1bc0cc79a17bf33f25e2fdb158218ec4177a7d0acd1853ea8d7fff0693'}
 		try:
-			conn.request("GET", "/ip_query.php?"+urllib.urlencode(args))
-			self.session['data']['ipinfo'] = eval(conn.getresponse().read())
+			conn.request("GET", "/v2/ip_query_country.php?"+urllib.urlencode(args))
+			ret = conn.getresponse().read()
+			self.session['data']['ipinfo'] = eval(ret)
 		except:
 			pass
 
