@@ -300,6 +300,7 @@ def accept_module(super_doclist):
 def sync_control_panel():
 	import transfer
 	import webnotes.defs
+	import fnmatch
 	
 	global low_folder_list
 	low_folder_list = []

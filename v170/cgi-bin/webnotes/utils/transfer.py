@@ -9,11 +9,13 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	from webnotes.model.meta import get_table_fields
 
 	sql = webnotes.conn.sql
-	override = 0
+
 	if not doclist:
 		return 'No Doclist'
+
 	doc = Document(fielddata = doclist[0])
 	orig_modified = doc.modified
+
 	exists = webnotes.conn.exists(doc.doctype, doc.name)
 	print doc.doctype, doc.name
 	if not webnotes.conn.in_transaction: 
@@ -391,7 +393,13 @@ def execute_patches(modules,record_list):
 	from webnotes.model import code
 	
 	ret = {}
-	patch_list, ret = get_patch_list(modules, record_list, ret)
+	try:
+		patch_list, ret = get_patch_list(modules, record_list, ret)
+	except Exception, e:
+		if e.args[0]==1146:
+			return 'No table Patch'
+		else:
+			raise e
 	
 	for d in patch_list:
 		try:
