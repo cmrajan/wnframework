@@ -13,7 +13,8 @@ def export_to_files(modules = [], record_list=[], verbose=0):
 	# for Module Def, right now using a hack..should consider table update in the next version
 	# all modules transfer not working, because source db not known
 	# get the items
-
+	
+	out = []
 	import webnotes.model.doc
 	module_doclist =[]
 	if record_list:
@@ -26,8 +27,10 @@ def export_to_files(modules = [], record_list=[], verbose=0):
 	# write files
 	for doclist in module_doclist:
 		if verbose:
-			print "Writing for " + doclist[0]['doctype'] + " / " + doclist[0]['name']
+			out.append("Writing for " + doclist[0]['doctype'] + " / " + doclist[0]['name'])
 		write_document_file(doclist)
+	
+	return out
 
 # ==============================================================================
 # prepare a list of items in a module
@@ -298,22 +301,13 @@ def accept_module(super_doclist):
 # Sync control panel
 # =============================================================================
 def sync_control_panel():
-	import transfer
+	import transfer, os
 	import webnotes.defs
-	import fnmatch, os
-	
-	global low_folder_list
-	low_folder_list = []
-	low_folder_list = get_lowest_file_paths(webnotes.defs.modules_path)
-			
-	for each in low_folder_list: 
-		if fnmatch.fnmatch(each,'*Control Panel/Control Panel'):
-			cp_path = each
-			
-	if fnmatch.fnmatch(os.listdir(cp_path),'Control Panel.txt'):
-		doclist = eval(open(os.path.join(cp_path, 'Control Panel.txt'),'r').read())
-		transfer.sync_control_panel(doclist[0].startup_code, doclist[0].startup_css)
-		return "Control Panel Synced!!!"
+							
+	doclist = eval(open(os.path.join(webnotes.defs.modules_path, \
+		'System','Control Panel', 'Control Panel', 'Control Panel.txt'),'r').read())
+	transfer.sync_control_panel(doclist[0].get('startup_code',''), doclist[0].get('startup_css',''))
+	return "Control Panel Synced!!!"
 
 
 #==============================================================================

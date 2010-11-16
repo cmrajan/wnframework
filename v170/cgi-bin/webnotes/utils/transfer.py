@@ -443,6 +443,7 @@ def get_patch_list(modules, record_list, ret):
 # Sync control panel
 # =============================================================================
 def sync_control_panel(startup_code, startup_css):
+	import webnotes
 	webnotes.conn.sql("start transaction")
 	webnotes.conn.set_value('Control Panel', None, 'startup_code', startup_code)
 	webnotes.conn.set_value('Control Panel', None, 'startup_css', startup_css)
