@@ -67,7 +67,7 @@ def create_folder(path):
 		else: 
 			raise e
 
-def set_as_admin():
+def set_as_admin(db_name=None, ac_name=None):
 	import os
 	if is_apache_user():
 		raise Exception, 'Not for web users!'
@@ -77,7 +77,14 @@ def set_as_admin():
 	global user
 	
 	import webnotes.db
-	conn = webnotes.db.Database(use_default=1)
+	if ac_name:
+		conn = webnotes.db.Database(ac_name = ac_name)
+	else:
+		conn = webnotes.db.Database(use_default=1)
+		if db_name:
+			conn.use(db_name)
+		
 	session = {'user':'Administrator'}
 	import webnotes.profile
 	user = webnotes.profile.Profile('Administrator')
+	
