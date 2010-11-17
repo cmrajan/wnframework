@@ -262,7 +262,7 @@ class CSVImport:
 	
 						# Check Link Fields
 						elif d[i] and f in link_list:
-							d[f] = self.check_select_link_data(row, col, f, d[i], l='Link')
+							fd[f] = self.check_select_link_data(row, col, f, d[i], l='Link')
 						
 						# Check Select Fields
 						elif d[i] and f in select_list:
