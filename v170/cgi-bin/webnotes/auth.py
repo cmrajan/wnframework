@@ -73,7 +73,7 @@ class Authentication:
 				# no ? login as guest
 				self.login(as_guest = True)
 		
-		if not self.session: 
+		if not self.session.get('user'): 
 			self.out['message'] = '"Authentication Failed"'
 			raise Exception, "Authentication Failed"
 
@@ -86,6 +86,7 @@ class Authentication:
 		webnotes.user = webnotes.profile.Profile()
 		webnotes.incoming_cookies = self.cookies
 
+		# load the profile data
 		if webnotes.session['data'].get('profile'):
 			webnotes.user.load_from_session(webnotes.session['data']['profile'])
 		else:
