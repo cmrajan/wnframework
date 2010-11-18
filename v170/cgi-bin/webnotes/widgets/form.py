@@ -200,7 +200,7 @@ def _get_doclist(clientlist):
 	del clientlist[midx]
 	return main_doc, clientlist
 
-def _do_action(doc, doclist, so, method_name, docstatus):
+def _do_action(doc, doclist, so, method_name, docstatus=0):
 	from webnotes.model.code import run_server_obj
 	set = webnotes.conn.set
 
@@ -212,9 +212,10 @@ def _do_action(doc, doclist, so, method_name, docstatus):
 		errmethod = ''
 
 	# set docstatus for all children records
-	for d in [doc] + doclist:
-		if int(d.docstatus or 0) != 2:
-			set(d, 'docstatus', docstatus)
+	if docstatus:
+		for d in [doc] + doclist:
+			if int(d.docstatus or 0) != 2:
+				set(d, 'docstatus', docstatus)
 
 def check_integrity(doc):
 	import webnotes
@@ -322,7 +323,11 @@ def savedocs():
 		# on_submit
 		if action == 'Submit':
 			_do_action(doc, doclist, server_obj, 'on_submit', 1)
-	
+
+		# on_submit
+		if action == 'Update':
+			_do_action(doc, doclist, server_obj, 'on_update_after_submit', 0)
+				
 		# on_cancel
 		if action == 'Cancel':
 			_do_action(doc, doclist, server_obj, 'on_cancel', 2)
