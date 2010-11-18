@@ -22,10 +22,10 @@ function WNToolbar(parent) {
 			})
 		}
 
-		this.table_wrapper = $a(this.wrapper, 'div', '', {marginLeft:'16px'});
-		this.body_tab = make_table(this.wrapper, 1, 2, '100%', ['64%','36%'],{padding:'2px'});
+		this.table_wrapper = $a(this.wrapper, 'div', '', {marginLeft:'4px'});
+		this.body_tab = make_table(this.table_wrapper, 1, 3, '100%', ['0%','64%','36%'],{padding:'2px', verticalAlign:'middle'});
 		
-		this.menu = new MenuToolbar($td(this.body_tab,0,0));
+		this.menu = new MenuToolbar($td(this.body_tab,0,1));
 		this.setup_home();
 		this.setup_new();
 		this.setup_search();
@@ -252,7 +252,7 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
-		var w = $a($td(this.body_tab, 0, 1),'div','',{paddingTop:'2px', textAlign:'right', verticalAlign:'middle'});
+		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px', textAlign:'right', verticalAlign:'middle'});
 		var t = make_table(w, 1, 6, null, [], {padding: '2px 6px', fontSize:'11px'});
 		$y(t,{cssFloat:'right', color:'#FFF'});
 		$td(t,0,0).innerHTML = user_fullname;

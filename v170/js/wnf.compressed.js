@@ -795,7 +795,7 @@ if(frm)
 f.frm=frm;if(f.init)f.init();f.make_body();return f;}
 var about_dialog;function WNToolbar(parent){var me=this;this.setup=function(){this.wrapper=$a(parent,'div','',{position:'fixed',top:'0px',width:'100%',color:'#FFF',zIndex:'1000',padding:'2px 0px'});if(!isIE){set_gradient(this.wrapper,'#444','#000');}
 if(isIE6){$y(me.wrapper,{position:'absolute',top:'0px'});scroll_list.push(function(){page_body.wntoolbar.wrapper.style.top=(get_scroll_top())+'px';})}
-this.table_wrapper=$a(this.wrapper,'div','',{marginLeft:'16px'});this.body_tab=make_table(this.wrapper,1,2,'100%',['64%','36%'],{padding:'2px'});this.menu=new MenuToolbar($td(this.body_tab,0,0));this.setup_home();this.setup_new();this.setup_search();this.setup_recent();if(in_list(user_roles,['Administrator']))
+this.table_wrapper=$a(this.wrapper,'div','',{marginLeft:'4px'});this.body_tab=make_table(this.table_wrapper,1,3,'100%',['0%','64%','36%'],{padding:'2px',verticalAlign:'middle'});this.menu=new MenuToolbar($td(this.body_tab,0,1));this.setup_home();this.setup_new();this.setup_search();this.setup_recent();if(in_list(user_roles,['Administrator']))
 this.setup_options();this.setup_help();this.setup_report_builder();this.setup_logout();}
 this.setup_options=function(){var tm=this.menu.add_top_menu('Pages',function(){},"sprite-pages");var fn=function(){if(this.dt=='Page')
 loadpage(this.dn);else
@@ -824,7 +824,7 @@ this.setup_search=function(){me.menu.add_top_menu('Search',function(){me.search_
 me.search_dialog=d;keypress_observers.push({notify_keypress:function(ev,keycode){if(keycode==13&&me.search_dialog.display)me.open_quick_search();}});me.search_sel=new SelectWidget(d.widgets['Select'],[],'120px');me.search_sel.inp.value='Select...';me.open_quick_search=function(){me.search_dialog.hide();var v=sel_val(me.search_sel);if(v)selector.set_search(v);me.search_sel.disabled=1;selector.show();}
 var nl=profile.can_read.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.search_sel.set_options(nl.sort());me.search_sel.onchange=function(){me.open_quick_search();}
 makeselector();}
-this.setup_logout=function(){var w=$a($td(this.body_tab,0,1),'div','',{paddingTop:'2px',textAlign:'right',verticalAlign:'middle'});var t=make_table(w,1,6,null,[],{padding:'2px 6px',fontSize:'11px'});$y(t,{cssFloat:'right',color:'#FFF'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;$y($td(t,0,5),{width:'18px'});this.spinner=$a($td(t,0,5),'img','',{display:'none'});this.spinner.src='images/ui/spinner.gif';}
+this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px',textAlign:'right',verticalAlign:'middle'});var t=make_table(w,1,6,null,[],{padding:'2px 6px',fontSize:'11px'});$y(t,{cssFloat:'right',color:'#FFF'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;$y($td(t,0,5),{width:'18px'});this.spinner=$a($td(t,0,5),'img','',{display:'none'});this.spinner.src='images/ui/spinner.gif';}
 this.download_backup=function(){$c('webnotes.utils.backups.get_backup',{},function(r,rt){});}
 this.enter_testing=function(){about_dialog.hide();if(is_testing){end_testing();return;}
 var a=prompt('Type in the password','');if(a=='start testing'){$c('start_test',args={},function(){$ds('testing_div');is_testing=true;$i('testing_mode_link').innerHTML='End Testing';});}else{msgprint('Sorry, only administrators are allowed use the testing mode.');}}
@@ -877,9 +877,9 @@ l.onclick=function(){loaddoc(this.dt,this.link_name);d.hide();}
 var cl=[]
 for(var j=1;j<r.values[i].length;j++)cl.push(r.values[i][j]);var c=$a(div,'div','comment',{marginTop:'2px'});c.innerHTML=cl.join(', ');}}
 selector=d;}
-var _loading_div;function set_loading(){if(page_body.wntoolbar)$ds(page_body.wntoolbar.spinner);pending_req++;}
+var _loading_div;function set_loading(){if(page_body.wntoolbar)$ds(page_body.wntoolbar.spinner);$y(document.getElementsByTagName('body')[0],{cursor:'progress'});pending_req++;}
 function hide_loading(){pending_req--;if(page_body.wntoolbar)
-var d=page_body.wntoolbar.spinner;if(!d)return;if(!pending_req){$dh(d);}}
+var d=page_body.wntoolbar.spinner;if(!d)return;if(!pending_req){$y(document.getElementsByTagName('body')[0],{cursor:'default'});$dh(d);}}
 var fcount=0;var frozen=0;var dialog_message;var dialog_back;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 if(!dialog_back){dialog_back=$a($i('body_div'),'div','dialog_back');if(isIE)dialog_back.style['filter']='alpha(opacity=60)';}
