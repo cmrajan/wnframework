@@ -210,7 +210,6 @@ class CSVImport:
 					msg = msg.__add__('</div>\n')
 					self.msg.append(msg)
 
-					#self.msg.append('<div style="color: RED">At Row %s and Column %s : => Data "%s" in field [%s] Not Found in options %s</div>\n' % (r, c, d, lbl, options))
 					self.validate_success = 0
 		except Exception, e:
 			self.msg.append('<div style="color: RED"> ERROR: %s </div>' % (str(webnotes.utils.getTraceback())))
@@ -223,7 +222,7 @@ class CSVImport:
 		date_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Date' and docstatus !=2" % self.dt_list[0])]
 
 		# get_link_fields
-		link_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and (fieldtype='Link' and ifnull(options,'') != '') or (fieldtype='Select' and ifnull(options,'') like '%%link:%%') and docstatus !=2 " % self.dt_list[0])]
+		link_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and ((fieldtype='Link' and ifnull(options,'') != '') or (fieldtype='Select' and ifnull(options,'') like '%%link:%%')) and docstatus !=2 " % self.dt_list[0])]
 
 		# get_select_fileds
 		select_list = [d[0] for d in sql("select fieldname from `tabDocField` where parent = '%s' and fieldtype='Select' and ifnull(options,'') not like '%%link:%%' and docstatus !=2" % self.dt_list[0])]
