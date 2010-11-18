@@ -7,7 +7,6 @@ _r.ReportContainer = function() {
 	this.wrapper = page_body.add_page("Report Builder", function() { });
 	var head_div = $a(this.wrapper, 'div');	
 	this.rb_area = $a(this.wrapper, 'div');
-	this.footer = $a(this.wrapper, 'div', 'page_footer', {padding: '2px'});
 		
 	$dh(this.wrapper);
 	
@@ -28,8 +27,6 @@ _r.ReportContainer = function() {
 	}
 	
 	var runbtn = this.page_head.add_button('Run', run_fn, 1, 'ui-icon-circle-triangle-e', 1);
-	var runbtn2 = $a($a(this.footer,'div','green_buttons'), 'button');
-	$(runbtn2).html('Run').click(run_fn).button({icons:{primary:'ui-icon-circle-triangle-e'}})
 
 	// new
 	if(has_common(['Administrator', 'System Manager'], user_roles)) {
@@ -134,8 +131,7 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 _r.set_rb_height = function() {
 	if(_r.rb_con.cur_rb) {
 		var headerh = _r.rb_con.page_head.wrapper.offsetHeight;
-		var footerh = _r.rb_con.footer.offsetHeight;
-		$y(_r.rb_con.cur_rb.mytabs.body, { height: get_window_height() - headerh - footerh + 'px', overflow:'auto' });
+		$y(_r.rb_con.cur_rb.mytabs.body, { height: get_window_height() - headerh + 'px', overflow:'auto' });
 	}
 }
 
