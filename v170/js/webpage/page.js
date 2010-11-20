@@ -15,9 +15,10 @@ function Page(page_name, content) {
 		} catch(e) { submit_error(e); }
 	}
 
-	this.cont = page_body.add_page(page_name, this.onshow);
+	this.wrapper = page_body.add_page(page_name, this.onshow);
+	this.cont = this.wrapper // bc
 	if(content)
-		this.cont.innerHTML = content;
+		this.wrapper.innerHTML = content;
 
 	if(page_name == home_page)
 		pages['_home'] = this;

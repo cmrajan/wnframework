@@ -17,7 +17,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	orig_modified = doc.modified
 
 	exists = webnotes.conn.exists(doc.doctype, doc.name)
-	print doc.doctype, doc.name
+	#print doc.doctype, doc.name
 	if not webnotes.conn.in_transaction: 
 		sql("START TRANSACTION")
 	
@@ -406,7 +406,7 @@ def execute_patches(modules,record_list):
 		try:
 			if not webnotes.conn.in_transaction:
 				webnotes.conn.sql("START TRANSACTION")
-			print 'Patch: ' + d[0]
+			#print 'Patch: ' + d[0]
 			ret_msg = code.execute(d[1])
 			webnotes.conn.sql("update tabPatch set status = 'Executed' where name = %s", d[0])
 			webnotes.conn.sql("COMMIT")

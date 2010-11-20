@@ -8,7 +8,7 @@ transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','GL M
 # export to files
 # ==============================================================================
 
-def export_to_files(modules = [], record_list=[], verbose=0):	
+def export_to_files(modules = [], record_list=[], verbose=1):	
 	# Multiple doctype  and multiple modules export to be done
 	# for Module Def, right now using a hack..should consider table update in the next version
 	# all modules transfer not working, because source db not known
@@ -21,24 +21,41 @@ def export_to_files(modules = [], record_list=[], verbose=0):
 		for record in record_list:
 			module_doclist.append([d.fields for d in webnotes.model.doc.get(record[0], record[1])])
 		
+	# build the doclist
 	if modules:
 		for m in modules:
 			module_doclist +=get_module_doclist(m)
+			
 	# write files
 	for doclist in module_doclist:
 		if verbose:
 			out.append("Writing for " + doclist[0]['doctype'] + " / " + doclist[0]['name'])
 		write_document_file(doclist)
 	
+	# write the module.info file
+	if modules:
+		for m in modules:
+			write_module_info(m)
+				
 	return out
 
+# ==============================================================================
+# write module.info file with last updated timestamp
+# ==============================================================================
+
+def write_module_info(mod):
+	import webnotes.utils, os
+
+	file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'w+')
+	file.write(str({'update_date': webnotes.utils.now()}))
+	file.close()
+	
 # ==============================================================================
 # prepare a list of items in a module
 # ==============================================================================
 
 def get_module_items(mod):
 	import webnotes
-
 
 	dl = []
 	for dt in transfer_types:
@@ -137,34 +154,36 @@ def separate_code_files(doclist, folder):
 # ==============================================================================
 # Import from files
 # =============================================================================
-def import_from_files(modules = [], record_list = [], execute_patches = 1, sync_cp = 0):
+def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_cp = 0):
 	import transfer
 	# Get paths of folder which will be imported
 	folder_list = get_folder_paths(modules, record_list)
-	ret1, ret2, ret3, ret4 = '', '', '', ''
+	ret = []
+		
 	if folder_list:
 		# get all doclist
 		all_doclist = get_all_doclist(folder_list)
 	
 		# import doclist
-		ret1 = accept_module(all_doclist)
+		ret += accept_module(all_doclist))
 	
 		# execute patches
 		if execute_patches:
-			ret2 = transfer.execute_patches(modules,record_list)
+			ret.append(transfer.execute_patches(modules,record_list))
 		
 		# sync control panel
 		if sync_cp:
-			ret3 = sync_control_panel()
+			ret.append(sync_control_panel())
 	else:
-		ret4 = "Module/Record not found" 
+		ret.append("Module/Record not found")
 		
-	return ret1, ret2, ret3, ret4
+	return ret
 
 
 # ==============================================================================
 # Get list of folder path
 # =============================================================================
+# record_list in format [[module,dt,dn], ..]
 def get_folder_paths(modules, record_list):
 	import os
 	import webnotes
@@ -172,35 +191,33 @@ def get_folder_paths(modules, record_list):
 	import webnotes.defs
 
 	folder_list=[]
-	global low_folder_list
-	try:
-		# get the folder list
-		if record_list:
-			for record in record_list:
-				low_folder_list = []
-				low_folder_list = get_lowest_file_paths(webnotes.defs.modules_path)
+
+	# get the folder list
+	if record_list:
+		for record in record_list:
+			folder_list.append(os.path.join(webnotes.defs.modules_path, \
+				record[0], record[1], record[2].replace('/','-')))
+
+	if modules:
+		# system modules will be transferred in a predefined order and before all other modules
+		sys_mod_ordered_list = ['Roles', 'System', 'Application Internal', 'Mapper', 'Settings']
+		all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
+
+		for module in all_mod_ordered_list:
+			mod_path = os.path.join(webnotes.defs.modules_path, module)
+			types_list = listfolders(mod_path, 1)
 			
-				for each in low_folder_list: 
-					if fnmatch.fnmatch(each,'*'+record[0]+'*'+record[1].replace('/', '-')):
-						folder_list.append(each)
-		if modules:
-			# system modules will be transferred in a predefined order and before all other modules
-			sys_mod_ordered_list = ['Roles', 'System', 'Application Internal', 'Mapper', 'Settings']
-			all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
+			# list of types
+			types_list = list(set(types_list).difference(['Control Panel']))
+			all_transfer_types =[t for t in transfer_types if t in types_list] + list(set(types_list).difference(transfer_types))
+			
+			# build the folders
+			for d in all_transfer_types:
 
-			for each in all_mod_ordered_list:
-				mod_path = os.path.join(webnotes.defs.modules_path, each)
-				temp = os.listdir(mod_path)
-				temp = list(set(temp).difference(['Control Panel']))
-				all_transfer_types =[t for t in transfer_types if t in temp] + list(set(temp).difference(transfer_types))
-				for d in all_transfer_types:
-					low_folder_list = []
-					low_folder_list = get_lowest_file_paths(os.path.join(webnotes.defs.modules_path, each, d))	
-					folder_list+=low_folder_list
+				# get all folders inside type
+				folder_list+=listfolders(os.path.join(webnotes.defs.modules_path, module, d))
 
-		return folder_list
-	except Exception, e:
-		return []
+	return folder_list
 
 	
 # ==============================================================================
@@ -258,18 +275,16 @@ def add_code_from_files(doclist, folder):
 # =============================================================================
 # Get the deepmost folder with files in the given path tree....
 # =============================================================================
-def get_lowest_file_paths(path):
+def listfolders(path, only_name=0):
 	import os
-	folderlist = os.listdir(path)
-	for each in folderlist:
+	out = []
+	for each in os.listdir(path):
 		temp = os.path.join(path,each)
 
 		if os.path.isdir(temp):
-			get_lowest_file_paths(temp)
-		else:
-			if os.path.dirname(temp) not in low_folder_list:
-				low_folder_list.append(os.path.dirname(temp))
-	return low_folder_list
+			if only_name: out.append(each)
+			else: out.append(temp)
+	return out
 	
 
 # ==============================================================================
@@ -283,6 +298,9 @@ def accept_module(super_doclist):
 	
 	for dl in super_doclist:
 		msg.append(transfer.set_doc(dl, 1, 1, 1))
+		
+		if dl[0]['doctype']=='Module Def':
+			update_module_timestamp(dl[0]['name'])
 
 	if not webnotes.conn.in_transaction:
 		webnotes.conn.sql("START TRANSACTION")
@@ -296,6 +314,34 @@ def accept_module(super_doclist):
 	
 	return msg
 
+# =============================================================================
+# Update timestamp in Module Def table
+# =============================================================================
+def update_module_timestamp(mod):
+	import webnotes, webnotes.defs, os
+	
+	file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
+	module_info = eval(file.read())
+	file.close()
+	
+	# update in table
+	try:
+		update_module_timestamp_query(mod, module_info['update_date'])
+	except Exception, e:
+		if e.args[0]==1054: # no column
+			# add column
+			webnotes.conn.sql("alter table `tabModule Def` add column last_updated_date varchar(40)")
+			
+			# try again
+			update_module_timestamp_query(mod, module_info['update_date'])
+		else:
+			raise e
+
+def update_module_timestamp_query(mod, timestamp):
+	import webnotes
+	webnotes.conn.sql("start transaction")
+	webnotes.conn.sql("update `tabModule Def` set last_updated_date=%s where name=%s", (timestamp, mod))
+	webnotes.conn.sql("commit")
 
 # =============================================================================
 # Sync control panel
@@ -311,11 +357,25 @@ def sync_control_panel():
 
 
 #==============================================================================
-#Return module names present in File System
+# Return module names present in File System
 #==============================================================================
 def get_modules_from_filesystem():
 	import os, webnotes.defs
-	modules = os.listdir(webnotes.defs.modules_path, 'modules')
-	return modules
+	
+	modules = os.listdir(webnotes.defs.modules_path)
+	out = []
+	
+	for m in modules:
+		file = open(os.path.join(webnotes.defs.modules_path, m, 'module.info'), 'r')
+		out.append([m, eval(file.read()), get_last_update_for(m), webnotes.conn.exists('Module Def',m) and 'Installed' or 'Not Installed'])
+		file.close()
 
+	return out
+	
+def get_last_update_for(mod):
+	import webnotes
+	try:
+		return webnotes.conn.sql("select last_updated_date from `tabModule Def` where name=%s", mod)[0][0]
+	except:
+		return ''
 

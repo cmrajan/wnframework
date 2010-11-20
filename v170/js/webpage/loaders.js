@@ -223,7 +223,7 @@ function loadpage(page_name, call_back, menuitem) {
 		if(p.menuitem) p.menuitem.show_selected();
 
 		// execute callback
-		cur_page=page_name;
+		cur_page = page_name;
 		if(call_back)call_back();
 		
 		// scroll to top

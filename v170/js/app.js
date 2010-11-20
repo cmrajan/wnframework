@@ -147,8 +147,8 @@ _p.go = function(html) {
 function setup_calendar() {
 
 	var p = new Page('_calendar');
-	p.cont.style.height = '100%'; // IE FIX
-	p.cont.onshow = function() { 
+	p.wrapper.style.height = '100%'; // IE FIX
+	p.wrapper.onshow = function() { 
 		if(!_c.calendar) {
 			new_widget('Calendar', function(c) { 
 				_c.calendar = c;

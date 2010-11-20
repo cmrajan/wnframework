@@ -1,4 +1,4 @@
-_f.FrmContainer = function() {  
+_f.FrmContainer = function() {
 	this.wrapper = page_body.add_page("Forms", function() {}, function() { });
 	this.last_displayed = null;
 	

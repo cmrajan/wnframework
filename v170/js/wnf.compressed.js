@@ -824,7 +824,7 @@ this.setup_search=function(){me.menu.add_top_menu('Search',function(){me.search_
 me.search_dialog=d;keypress_observers.push({notify_keypress:function(ev,keycode){if(keycode==13&&me.search_dialog.display)me.open_quick_search();}});me.search_sel=new SelectWidget(d.widgets['Select'],[],'120px');me.search_sel.inp.value='Select...';me.open_quick_search=function(){me.search_dialog.hide();var v=sel_val(me.search_sel);if(v)selector.set_search(v);me.search_sel.disabled=1;selector.show();}
 var nl=profile.can_read.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.search_sel.set_options(nl.sort());me.search_sel.onchange=function(){me.open_quick_search();}
 makeselector();}
-this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px',textAlign:'right',verticalAlign:'middle'});var t=make_table(w,1,6,null,[],{padding:'2px 6px',fontSize:'11px'});$y(t,{cssFloat:'right',color:'#FFF'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;$y($td(t,0,5),{width:'18px'});this.spinner=$a($td(t,0,5),'img','',{display:'none'});this.spinner.src='images/ui/spinner.gif';}
+this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px',textAlign:'right'});var t=make_table(w,1,6,null,[],{padding:'2px 6px',fontSize:'11px',verticalAlign:'middle',height:'16px'});$y(t,{cssFloat:'right',color:'#FFF'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;$y($td(t,0,5),{width:'18px'});this.spinner=$a($td(t,0,5),'img','',{display:'none'});this.spinner.src='images/ui/spinner.gif';}
 this.download_backup=function(){$c('webnotes.utils.backups.get_backup',{},function(r,rt){});}
 this.enter_testing=function(){about_dialog.hide();if(is_testing){end_testing();return;}
 var a=prompt('Type in the password','');if(a=='start testing'){$c('start_test',args={},function(){$ds('testing_div');is_testing=true;$i('testing_mode_link').innerHTML='End Testing';});}else{msgprint('Sorry, only administrators are allowed use the testing mode.');}}
@@ -945,8 +945,9 @@ script.onreadystatechange=function(){if(this.readyState=='complete'||this.readyS
 var doc_browser_page;function loaddocbrowser(dt,label,fields){dt=get_label_doctype(dt);if(!doc_browser_page)
 doc_browser_page=new DocBrowserPage();doc_browser_page.show(dt,label,fields);nav_obj.open_notify('DocBrowser',dt,'');}
 var pages=[];function Page(page_name,content){var me=this;this.name=page_name;this.onshow=function(){set_title(me.doc.page_title?me.doc.page_title:me.name);try{if(pscript['onshow_'+me.name])pscript['onshow_'+me.name]();}catch(e){submit_error(e);}}
-this.cont=page_body.add_page(page_name,this.onshow);if(content)
-this.cont.innerHTML=content;if(page_name==home_page)
+this.wrapper=page_body.add_page(page_name,this.onshow);this.cont=this.wrapper
+if(content)
+this.wrapper.innerHTML=content;if(page_name==home_page)
 pages['_home']=this;return this;}
 function render_page(page_name,menuitem){if(!page_name)return;if((!locals['Page'])||(!locals['Page'][page_name])){loadpage('_home');return;}
 var pdoc=locals['Page'][page_name];if(pdoc.style)set_style(pdoc.style)
@@ -1109,7 +1110,7 @@ _p.def_print_style="html, body{ font-family: Arial, Helvetica; font-size: 12px; 
 +"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"
 +"\n.noborder td { vertical-align: top; }"
 _p.go=function(html){var w=window.open('');w.document.write(html);w.document.close();}
-function setup_calendar(){var p=new Page('_calendar');p.cont.style.height='100%';p.cont.onshow=function(){if(!_c.calendar){new_widget('Calendar',function(c){_c.calendar=c;_c.calendar.init(p.cont);rename_observers.push(_c.calendar);});}}}
+function setup_calendar(){var p=new Page('_calendar');p.wrapper.style.height='100%';p.wrapper.onshow=function(){if(!_c.calendar){new_widget('Calendar',function(c){_c.calendar=c;_c.calendar.init(p.cont);rename_observers.push(_c.calendar);});}}}
 startup_list.push(setup_calendar);if(isIE6){var scroll_list=[]
 window.onscroll=function(){for(var i=0;i<scroll_list.length;i++){scroll_list[i]();}}}
 window.onload=function(){startup()}
