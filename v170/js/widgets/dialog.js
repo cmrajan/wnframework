@@ -139,13 +139,16 @@ Dialog.prototype.make_row = function(d) {
 		var f = make_field({fieldtype:'Link', 'label':d[1], 'options':d[2]}, '', c2, this, 0, 1);
 		f.not_in_form = 1;
 		f.dialog = this;
+		f.refresh();
 		this.widgets[d[1]] = f.input;
 	}
 	else if(d[0]=='Date') {
 		c1.innerHTML = d[1];
 		var f = make_field({fieldtype:'Date', 'label':d[1], 'options':d[2]}, '', c2, this, 0, 1);
 		f.not_in_form = 1;
+		f.refresh();
 		f.dialog = this;
+		this.widgets[d[1]] = f.input;
 	}
 	else if(d[0]=='Password') {
 		c1.innerHTML = d[1];

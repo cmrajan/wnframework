@@ -466,7 +466,7 @@ DateField.prototype.make_input = function() {
 	var me = this;
 
 	me.input.onchange = function() {
-
+		if(me.not_in_form) return;
 		// input as dd-mm-yyyy
 		if(this.value==null)this.value='';
 
