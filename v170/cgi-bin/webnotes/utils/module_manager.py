@@ -169,7 +169,7 @@ def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_
 	
 		# execute patches
 		if execute_patches:
-			ret.append += transfer.execute_patches(modules,record_list)
+			ret += transfer.execute_patches(modules,record_list)
 		
 		# sync control panel
 		if sync_cp:
