@@ -142,19 +142,19 @@ class AccountsManager(object):
 				db = db and webnotes.utils.cstr(db[0][0]) or ''
 				if db:
 					try:
-						root_conn.sql("DROP DATABASE %s" % (db))
+					#	root_conn.sql("DROP DATABASE %s" % (db))
 						print "Database : "+db+" deleted"
 						print "-------------------------------------"
 					except:
 						print "Database "+db+" not found"
 						pass
 					#finally:
-					root_conn.sql('drop user "%s"@"localhost"' % (db))
+					#root_conn.sql('drop user "%s"@"localhost"' % (db))
 					print "User"+db+"deleted"
 
-			acc_conn.sql("START TRANSACTION")
-			acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
-			acc_conn.sql("COMMIT")
+			#acc_conn.sql("START TRANSACTION")
+			#acc_conn.sql("delete from tabAccount where ac_name IN %s" % ("('"+"','".join(al)+"')"))
+			#acc_conn.sql("COMMIT")
 			print "No more unwanted Databases !!!"
 			root_conn.close()
 			acc_conn.close()
@@ -172,6 +172,12 @@ class AccountsManager(object):
 				print accounts['exc']
 			accounts = accounts['message']
 		self.delete_account_list(accounts)
+		msg = "Following accounts has been deleted: "+ NEWLINE + cstr(accounts)
+		self.send_email(['nabin@iwebnotes.com', 'saumil@iwebnotes.com'], 'Expired Accounts Deletion', msg)
+		
+	def send_email(self, email=[], subject='', message=''):
+		sendmail(email, sender = 'info@iwebnotes.com', subject = subject , parts = [['text/html', message]],cc=[],attach=[])
+		print "Mail Sent"
 		
 
 
