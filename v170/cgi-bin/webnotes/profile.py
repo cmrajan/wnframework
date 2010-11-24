@@ -155,7 +155,7 @@ class Profile:
 			webnotes.conn.sql("update tabProfile set recent_documents=%s where name=%s", (self.recent, self.name))
 			
 	def load_profile(self):
-		t = webnotes.conn.sql('select email, first_name, last_name, recent_documents from tabProfile where name = %s', self.name)[0]
+		t = webnotes.conn.sql('select email, first_name, last_name, recent_documents from tabProfile where name = %s', self.name)[0] or ''
 
 		d = {}
 		d['name'] = self.name
