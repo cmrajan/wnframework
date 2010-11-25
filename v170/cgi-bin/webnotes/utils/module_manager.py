@@ -319,15 +319,15 @@ def accept_module(super_doclist):
 # =============================================================================
 def update_module_timestamp(mod):
 	import webnotes, webnotes.defs, os
-	try:
-		file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
-		module_info = eval(file.read())
-		file.close()
-	except Exception,e:
-		pass	#module.info not found ==> First time install
 		
 	# update in table
 	try:
+		#module.info not found. ==> New install, no need to update.
+		file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
+		module_info = eval(file.read())
+		file.close()
+
+		
 		update_module_timestamp_query(mod, module_info['update_date'])
 	except Exception, e:
 		if e.args[0]==1054: # no column
@@ -336,6 +336,8 @@ def update_module_timestamp(mod):
 			
 			# try again
 			update_module_timestamp_query(mod, module_info['update_date'])
+		elif e.args[0] ==2:
+			pass
 		else:
 			raise e
 
