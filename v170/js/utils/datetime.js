@@ -20,8 +20,9 @@ function DateFn() {
 	this.str_to_obj = function(d) { 
 		if(!d) return new Date(); 
 		var tm = [null, null];
-		if(d.search(':')!=-1) {
+		if(d.search(' ')!=-1) {
 			var tm = d.split(' ')[1].split(':');
+			var d = d.split(' ')[0];
 		}
 		if(d.search('-')!=-1) {
 			var t = d.split('-'); return new Date(t[0],t[1]-1,t[2],tm[0],tm[1]); 
