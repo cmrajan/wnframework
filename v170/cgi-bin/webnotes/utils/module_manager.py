@@ -8,11 +8,14 @@ transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','GL M
 # export to files
 # ==============================================================================
 
-def export_to_files(modules = [], record_list=[], verbose=1):	
+def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, verbose=1):
 	# Multiple doctype  and multiple modules export to be done
 	# for Module Def, right now using a hack..should consider table update in the next version
 	# all modules transfer not working, because source db not known
 	# get the items
+
+	if from_ac or from_db:
+		init_db_login(from_ac, from_db)
 	
 	out = []
 	import webnotes.model.doc
@@ -154,7 +157,11 @@ def separate_code_files(doclist, folder):
 # ==============================================================================
 # Import from files
 # =============================================================================
-def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_cp = 0):
+def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_cp = 0, target_db=None, target_ac=None):
+
+	if target_db or target_ac:
+		init_db_login(target_ac, target_db)
+
 	import transfer
 	# Get paths of folder which will be imported
 	folder_list = get_folder_paths(modules, record_list)
@@ -319,15 +326,13 @@ def accept_module(super_doclist):
 # =============================================================================
 def update_module_timestamp(mod):
 	import webnotes, webnotes.defs, os
-		
+	
+	file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
+	module_info = eval(file.read())
+	file.close()
+	
 	# update in table
 	try:
-		#module.info not found. ==> New install, no need to update.
-		file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
-		module_info = eval(file.read())
-		file.close()
-
-		
 		update_module_timestamp_query(mod, module_info['update_date'])
 	except Exception, e:
 		if e.args[0]==1054: # no column
@@ -336,8 +341,6 @@ def update_module_timestamp(mod):
 			
 			# try again
 			update_module_timestamp_query(mod, module_info['update_date'])
-		elif e.args[0] ==2:
-			pass
 		else:
 			raise e
 
@@ -383,3 +386,20 @@ def get_last_update_for(mod):
 	except:
 		return ''
 
+#==============================================================================
+
+def init_db_login(ac_name, db_name):
+	import webnotes
+	import webnotes.db
+	import webnotes.profile
+	
+	if ac_name:
+		webnotes.conn = webnotes.db.Database(ac_name = ac_name)
+	else:
+		webnotes.conn = webnotes.db.Database(use_default=1)
+		if db_name:
+			webnotes.conn.use(db_name)
+			
+	webnotes.session = {'user':'Administrator'}
+	webnotes.user = webnotes.profile.Profile()
+	
