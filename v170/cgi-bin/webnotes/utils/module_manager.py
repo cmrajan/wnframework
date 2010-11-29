@@ -395,10 +395,12 @@ def init_db_login(ac_name, db_name):
 	
 	if ac_name:
 		webnotes.conn = webnotes.db.Database(ac_name = ac_name)
+		webnotes.conn.user(webnotes.conn.user)
+	elif db_name:
+		webnotes.conn = webnotes.db.Database(user=db_name)
+		webnotes.conn.use(db_name)
 	else:
 		webnotes.conn = webnotes.db.Database(use_default=1)
-		if db_name:
-			webnotes.conn.use(db_name)
 			
 	webnotes.session = {'user':'Administrator'}
 	webnotes.user = webnotes.profile.Profile()
