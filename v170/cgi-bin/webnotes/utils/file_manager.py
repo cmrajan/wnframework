@@ -49,7 +49,7 @@ def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js
 
 # -------------------------------------------------------
 
-def save_file(fname, content):
+def save_file(fname, content, module=None):
 	from webnotes.model.doc import Document
 
 	# some browsers return the full path
@@ -61,6 +61,8 @@ def save_file(fname, content):
 	# generate the ID (?)
 	f = Document('File Data')
 	f.file_name = fname
+	if module:
+		f.module = module
 	f.save(1)
 	
 	write_file(f.name, content)

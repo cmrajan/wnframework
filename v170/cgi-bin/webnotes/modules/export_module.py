@@ -1,9 +1,3 @@
-# to use module manger, set the path of the modules folder in defs.py
-
-transfer_types = ['Role', 'Print Format','DocType','Page','DocType Mapper','GL Mapper','Search Criteria', 'Patch']
-# TDS Category and TDS Rate chart updates should go, if at all as Patches not here.
-
-
 # ==============================================================================
 # export to files
 # ==============================================================================
@@ -39,9 +33,40 @@ def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, ve
 	if modules:
 		for m in modules:
 			write_module_info(m)
-				
+	
+	# write out attachments
+	for m in modules:
+		write_attachments(m)
+	
 	return out
 
+# ==============================================================================
+# write module.info file with last updated timestamp
+# ==============================================================================
+
+def write_attachments(mod):
+	import webnotes, os
+	from webnotes.utils.file_manager import get_file
+
+	try:
+		fl = sql("select name from `tabFile Data` where module=%s", m)
+	except Exception, e:
+		if e.args[0]==1054: # no field called module
+			return
+		else:
+			raise e
+	
+	# write the files	
+	if fl:
+		folder = os.path.join(webnotes.defs.modules_path, m, 'files')
+		webnotes.create_folder(folder)
+		for f in fl:
+			file_det = get_file(f)
+			file = open(os.path.join(folder, file_det[0]), 'w+')
+			file.write(file_det[1])
+			file.close()		
+		
+	
 # ==============================================================================
 # write module.info file with last updated timestamp
 # ==============================================================================
@@ -59,6 +84,7 @@ def write_module_info(mod):
 
 def get_module_items(mod):
 	import webnotes
+	from webnotes.modules import transfer_types
 
 	dl = []
 	for dt in transfer_types:

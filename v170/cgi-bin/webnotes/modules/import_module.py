@@ -6,7 +6,7 @@ def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_
 	if target_db or target_ac:
 		init_db_login(target_ac, target_db)
 
-	import transfer
+	from webnotes.utils import transfer
 	# Get paths of folder which will be imported
 	folder_list = get_folder_paths(modules, record_list)
 	ret = []
@@ -18,9 +18,13 @@ def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_
 		# import doclist
 		ret += accept_module(all_doclist)
 	
+		# import attachments
+		for m in modules:
+			import_attachments(m)
+	
 		# execute patches
-		if execute_patches:
-			ret += transfer.execute_patches(modules,record_list)
+		#if execute_patches:
+		#	ret += transfer.execute_patches(modules,record_list)
 		
 		# sync control panel
 		if sync_cp:
@@ -40,6 +44,7 @@ def get_folder_paths(modules, record_list):
 	import webnotes
 	import fnmatch
 	import webnotes.defs
+	from webnotes.modules import transfer_types
 
 	folder_list=[]
 
@@ -64,9 +69,9 @@ def get_folder_paths(modules, record_list):
 			
 			# build the folders
 			for d in all_transfer_types:
-
-				# get all folders inside type
-				folder_list+=listfolders(os.path.join(webnotes.defs.modules_path, module, d))
+				if d != 'files':
+					# get all folders inside type
+					folder_list+=listfolders(os.path.join(webnotes.defs.modules_path, module, d))
 
 	return folder_list
 
@@ -147,7 +152,7 @@ def listfolders(path, only_name=0):
 def accept_module(super_doclist):
 	import webnotes
 	import webnotes.utils
-	import transfer
+	from webnotes.utils import transfer
 	msg, i = [], 0
 	
 	for dl in super_doclist:
@@ -203,7 +208,8 @@ def update_module_timestamp_query(mod, timestamp):
 # Sync control panel
 # =============================================================================
 def import_control_panel():
-	import transfer, os
+	from webnotes.utils import transfer
+	import os
 	import webnotes.defs
 	
 	file = open(os.path.join(webnotes.defs.modules_path, \
@@ -214,3 +220,27 @@ def import_control_panel():
 	transfer.sync_control_panel(doclist[0].get('startup_code',''), doclist[0].get('startup_css',''))
 	return "Control Panel Synced"
 
+# =============================================================================
+# Import Attachments
+# =============================================================================
+
+def import_attachments(m):
+	import os, webnotes.defs
+	import webnotes.utils.file_manager
+	
+	out = []
+	
+	folder = os.path.join(webnotes.defs.modules_path, m, 'files')
+	fl = os.listdir(folder)
+	for f in fl:
+		# delete
+		webnotes.utils.file_manager.delete_file(f)
+	
+		# import
+		file = open(os.path.join(folder, f),'r')
+		webnotes.utils.file_manager.save_file(f, file.read(), m)
+		file.close()
+		
+		out.append(f)
+	
+	return out
