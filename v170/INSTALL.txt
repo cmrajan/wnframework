@@ -50,10 +50,10 @@ Hence we call this app "accounts". To setup the accounts app, you must first set
 Run the setup file in the cgi-bin folder, or run the following form the python shell
 
 import webnotes
-import webnotes.setup
+import setup
 
-webnotes.setup.import_db('Framework','accounts')
-webnotes.setup.create_account_doctype()
+setup.import_db('Framework','accounts')
+setup.create_account_doctype()
 
 ------------------------------------------------------------------------
 4. Login to application
