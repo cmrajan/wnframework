@@ -49,7 +49,7 @@ def write_attachments(mod):
 	from webnotes.utils.file_manager import get_file
 
 	try:
-		fl = sql("select name from `tabFile Data` where module=%s", m)
+		fl = webnotes.conn.sql("select name from `tabFile Data` where module=%s", m)
 	except Exception, e:
 		if e.args[0]==1054: # no field called module
 			return
