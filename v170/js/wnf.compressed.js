@@ -499,7 +499,7 @@ tray.cur_item=me;}
 this.collapse=function(){if(me.wrapper)$dh(me.wrapper);$y(me.ldiv,{backgroundColor:tray.tray_bg,color:'#000',fontWeight:'normal'})}
 this.hide=function(){me.collapse();$dh(me.ldiv);}
 this.show=function(){$ds(me.ldiv);}}
-var def_ph_style={wrapper:{marginBottom:'16px',backgroundColor:'#EEE'},main_heading:{fontSize:'22px',fontWeight:'bold',marginBottom:'8px',padding:'4px'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#555',display:'none'},toolbar_area:{margin:'0px',marginLeft:'4px',display:'none'},toolbar_area2:{margin:'0px',marginLeft:'4px',display:'none'},separator:{borderBottom:'2px solid #AAA',display:'none'},tag_area:{color:'#888',fontSize:'10px',textAlign:'right',padding:'2px'},close_btn:{cursor:'pointer',width:'64px',cssFloat:'right',height:'24px',background:"url('images/ui/close_btn.gif') center no-repeat"}}
+var def_ph_style={wrapper:{marginBottom:'16px',backgroundColor:'#EEE'},main_heading:{fontSize:'22px',fontWeight:'bold',marginBottom:'8px',padding:'4px',textShadow:'0px 1px 0px #fff'},sub_heading:{fontSize:'14px',marginBottom:'8px',color:'#555',display:'none'},toolbar_area:{margin:'0px',marginLeft:'4px',display:'none'},toolbar_area2:{margin:'0px',marginLeft:'4px',display:'none'},separator:{borderBottom:'2px solid #AAA',display:'none'},tag_area:{color:'#888',fontSize:'10px',textAlign:'right',padding:'2px'},close_btn:{cursor:'pointer',width:'64px',cssFloat:'right',height:'24px',background:"url('images/ui/close_btn.gif') center no-repeat"}}
 function PageHeader(parent,main_text,sub_text){this.wrapper=$a(parent,'div','page_header');this.t1=make_table($a(this.wrapper,'div','',def_ph_style.wrapper.backgroundColor),1,2,'100%',[null,'100px'],{padding:'2px'});$y(this.t1,{borderCollapse:'collapse'})
 this.lhs=$td(this.t1,0,0);this.main_head=$a(this.lhs,'div','',def_ph_style.main_heading);this.sub_head=$a(this.lhs,'div','',def_ph_style.sub_heading);this.toolbar_area=$a(this.lhs,'div','',def_ph_style.toolbar_area);this.toolbar_area2=$a(this.lhs,'div','blue_buttons',def_ph_style.toolbar_area2);this.separator=$a(this.wrapper,'div','',def_ph_style.separator);this.tag_area=$a(this.wrapper,'div','',def_ph_style.tag_area);$y($td(this.t1,0,1),{textAlign:'right'});this.close_btn=$a($td(this.t1,0,1),'button','',{fontSize:'11px'});this.close_btn.innerHTML='Close';$(this.close_btn).button({icons:{primary:'ui-icon-closethick'}});this.close_btn.onclick=function(){nav_obj.show_last_open();}
 if(main_text)this.main_head.innerHTML=main_text;if(sub_text)this.sub_head.innerHTML=sub_text;this.buttons={};this.buttons2={};}
@@ -960,18 +960,21 @@ setTimeout('page_body.pages[cur_page].set_page_height()',100);return p;}
 function refresh_page(page_name){var fn=function(r,rt){render_page(page_name)}
 $c('webnotes.widgets.page.getpage',{'name':page_name},fn);}
 DocBrowserPage=function(){this.lists={};this.dt_details={};this.cur_list=null;this.my_page=page_body.add_page('DocBrowser');this.wrapper=$a(this.my_page,'div');var h=$a(this.wrapper,'div');this.body=$a(this.wrapper,'div','',{margin:'16px'});this.page_head=new PageHeader(h,'List');this.new_button=this.page_head.add_button('New',function(){newdoc(me.cur_dt)},1,'ui-icon-plus',1)}
-DocBrowserPage.prototype.show=function(dt,label,field_list){var me=this;if(this.cur_list)$dh(this.cur_list.wrapper);add_space_holder(this.wrapper);$dh(this.body);var l=get_doctype_label(dt)
+DocBrowserPage.prototype.show=function(dt,label,field_list){var me=this;if(this.cur_list)$dh(this.cur_list.wrapper);var l=get_doctype_label(dt)
 this.page_head.main_head.innerHTML=(l.toLowerCase().substr(-4)=='list')?l:(l+' List')
 this.page_head.clear_toolbar();if(in_list(profile.can_create,dt)){var new_button=this.page_head.add_button('New '+l,function(){newdoc(this.dt)},1,'ui-icon-plus',1)
-this.dt=dt}
-var callback=function(r,rt){remove_space_holder();$ds(me.body);if(!me.lists[dt]){me.lists[dt]=new DocBrowser(me.body,dt,label,field_list);}
-if(r.message=='Yes'){me.lists[dt].show();}else{me.lists[dt].show_no_result();}
-me.cur_list=me.lists[dt];}
-$c_obj('Menu Control','has_result',dt,callback);page_body.change_to('DocBrowser');}
-DocBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.dt=dt;this.wrapper=$a(parent,'div');this.no_result_area=$a(this.wrapper,'div','',{margin:'160px auto',width:'480px',padding:'16px',backgroundColor:'#DDF',fontSize:'14px',border:'1px solid #AAF',textAlign:'center'})
-this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center',fontSize:'14px',color:'#888',display:'none'});this.loading_div.innerHTML='Loading...';this.body=$a(this.wrapper,'div');var callback=function(r,rt){me.dt_details=r.message;if(r.message){me.make_new(dt,label,r.message.field_list);}}
-$c_obj('Menu Control','get_dt_details',dt+'~~~'+cstr(field_list),callback);}
-DocBrowser.prototype.show=function(){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$dh(this.no_result_area);set_title(get_doctype_label(this.label));}
+new_button.dt=dt}
+if(!me.lists[dt]){me.lists[dt]=new DocBrowser(me.body,dt,label,field_list);}
+me.cur_list=me.lists[dt];me.cur_list.show();page_body.change_to('DocBrowser');}
+DocBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.dt=dt;this.field_list=field_list;this.wrapper=$a(parent,'div');this.no_result_area=$a(this.wrapper,'div','',{margin:'160px auto',width:'480px',padding:'16px',backgroundColor:'#DDF',fontSize:'14px',border:'1px solid #AAF',textAlign:'center',display:'none'})
+this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center',fontSize:'14px',color:'#888',display:'none'});this.loading_div.innerHTML='Loading...';this.body=$a(this.wrapper,'div');}
+DocBrowser.prototype.show=function(){var me=this;var callback=function(r,rt){if(r.message=='Yes'){if(!me.loaded)
+me.load_details();else
+me.show_results();}else{me.show_no_result();}}
+$c_obj('Menu Control','has_result',this.dt,callback);}
+DocBrowser.prototype.load_details=function(){var me=this;var callback=function(r,rt){me.dt_details=r.message;if(r.message){me.make_the_list(me.dt,me.body);me.show_results();}}
+$c_obj('Menu Control','get_dt_details',this.dt+'~~~'+cstr(this.field_list),callback);this.loaded=1;}
+DocBrowser.prototype.show_results=function(){$ds(this.wrapper);$dh(this.loading_div);$ds(this.body);$dh(this.no_result_area);set_title(get_doctype_label(this.label));}
 DocBrowser.prototype.show_no_result=function(){$ds(this.wrapper);$dh(this.loading_div);$dh(this.body);$ds(this.no_result_area);this.no_result_area.innerHTML=repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s',{dt:get_doctype_label(this.dt)});set_title(get_doctype_label(this.label));}
 DocBrowser.prototype.make_new=function(dt,label,field_list){this.make_the_list(dt,this.body);}
 DocBrowser.prototype.make_the_list=function(dt,wrapper){var me=this;var lst=new Listing(dt);lst.cl=me.dt_details.columns;lst.dt=dt;lst.opts={cell_style:{padding:'3px 2px',borderBottom:'1px dashed #CCC'},alt_cell_style:{backgroundColor:'#FFFFFF'},head_style:{overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},head_main_style:{padding:'0px'},hide_export:1,hide_print:1,hide_refresh:0,hide_rec_label:0,show_calc:0,show_empty_tab:0,show_no_records_label:1,show_bottom_paging:0,round_corners:0,no_border:1,show_new:0,show_report:1}

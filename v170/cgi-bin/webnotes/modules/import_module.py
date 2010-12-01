@@ -230,8 +230,17 @@ def import_attachments(m):
 	
 	out = []
 	
-	folder = os.path.join(webnotes.defs.modules_path, m, 'files')
-	fl = os.listdir(folder)
+	# get list
+	try:
+		folder = os.path.join(webnotes.defs.modules_path, m, 'files')
+		fl = os.listdir(folder)
+	except OSError, e:
+		if e.args[0]==2:
+			return
+		else:
+			raise e
+	
+	# import files
 	for f in fl:
 		# delete
 		webnotes.utils.file_manager.delete_file(f)

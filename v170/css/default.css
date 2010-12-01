@@ -79,8 +79,8 @@ div#head_div { background-color: #FFF; }
 
 div.page_header {
 	background-color: #EEE;
-	background: -moz-linear-gradient(top, #EEE, #DDD);
-	background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(#DDD));
+	background: -moz-linear-gradient(top, #eee, #ccc);
+	background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
 	border-bottom: 1px solid #AAA;
 }
 

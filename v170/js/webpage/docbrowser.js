@@ -15,80 +15,94 @@ DocBrowserPage = function() {
 	
 }
 
+// -------------------------------------------------
+
 DocBrowserPage.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
 	if(this.cur_list) $dh(this.cur_list.wrapper);
 	
-	add_space_holder(this.wrapper);
-	$dh(this.body);
-
-	var l = get_doctype_label(dt)
-
 	// page heading
+	var l = get_doctype_label(dt)
 	this.page_head.main_head.innerHTML = (l.toLowerCase().substr(-4) == 'list') ? l : (l + ' List')
 
 	// button label
 	this.page_head.clear_toolbar();
 	if(in_list(profile.can_create,dt)) {
 		var new_button = this.page_head.add_button('New ' + l, function() { newdoc(this.dt) }, 1, 'ui-icon-plus', 1)
-		this.dt = dt
+		new_button.dt = dt
 	}
 	
-	var callback = function(r, rt) {
-		remove_space_holder();
-		$ds(me.body);
-
-		if(!me.lists[dt]) {
-			me.lists[dt] = new DocBrowser(me.body, dt, label, field_list);
-		}
-
-		if(r.message == 'Yes') {
-			me.lists[dt].show();
-		} else {
-			me.lists[dt].show_no_result();			
-		}
-
-		me.cur_list = me.lists[dt];
+	if(!me.lists[dt]) {
+		me.lists[dt] = new DocBrowser(me.body, dt, label, field_list);
 	}
 
-	$c_obj('Menu Control', 'has_result', dt, callback);
+	me.cur_list = me.lists[dt];
+	me.cur_list.show();
 	
 	page_body.change_to('DocBrowser');
 }
+
+// -------------------------------------------------
 
 DocBrowser = function(parent, dt, label, field_list) {	
 	var me = this;
 	this.label = label ? label : dt;
 	this.dt = dt;
+	this.field_list = field_list;
 
 	this.wrapper = $a(parent, 'div');
 
 	// areas
-	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
+	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center', display:'none'})
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
 	this.body = $a(this.wrapper, 'div');
+}
 
-	var callback = function(r,rt) { 
-		me.dt_details = r.message; 
-		
-		// call make_new
-		if(r.message) {
-			me.make_new(dt, label, r.message.field_list);
+// -------------------------------------------------
+
+DocBrowser.prototype.show = function() {
+	var me = this;
+	var callback = function(r, rt) {
+		if(r.message == 'Yes') {
+			if(!me.loaded)
+				me.load_details();
+			else
+				me.show_results();
+		} else {
+			me.show_no_result();	
 		}
 	}
-
-	$c_obj('Menu Control', 'get_dt_details', dt + '~~~' + cstr(field_list), callback);
-	
+	$c_obj('Menu Control', 'has_result', this.dt, callback);	
 }
-DocBrowser.prototype.show = function() {
+
+// -------------------------------------------------
+
+DocBrowser.prototype.load_details = function() {
+	var me = this;
+	var callback = function(r,rt) { 
+		me.dt_details = r.message;
+		if(r.message) {
+			me.make_the_list(me.dt, me.body);
+			me.show_results();
+		}
+	}
+	$c_obj('Menu Control', 'get_dt_details', this.dt + '~~~' + cstr(this.field_list), callback);
+	this.loaded = 1;
+}
+
+// -------------------------------------------------
+
+DocBrowser.prototype.show_results = function() {
 	$ds(this.wrapper);
 	$dh(this.loading_div);
 	$ds(this.body);
 	$dh(this.no_result_area);
 	set_title(get_doctype_label(this.label));
 }
+
+// -------------------------------------------------
 
 DocBrowser.prototype.show_no_result = function() {
 	$ds(this.wrapper);
@@ -99,10 +113,14 @@ DocBrowser.prototype.show_no_result = function() {
 	set_title(get_doctype_label(this.label));
 }
 
+// -------------------------------------------------
+
 DocBrowser.prototype.make_new = function(dt, label, field_list) {
 	// make the list
 	this.make_the_list(dt, this.body);
 }
+
+// -------------------------------------------------
 	
 DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	var me = this;

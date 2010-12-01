@@ -7,6 +7,7 @@ def get_modules_from_filesystem():
 	
 	modules = listfolders(webnotes.defs.modules_path, 1)
 	out = []
+	modules.sort()
 	
 	for m in modules:
 		file = open(os.path.join(webnotes.defs.modules_path, m, 'module.info'), 'r')

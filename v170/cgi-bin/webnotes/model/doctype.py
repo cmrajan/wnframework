@@ -39,7 +39,7 @@ class _DocType:
 		# cache modified
 		cache_modified = webnotes.conn.sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
 
-		if not (cache_modified and modified==cache_modified[0][0]):
+		if not cache_modified or not (cache_modified and modified==cache_modified[0][0]):
 			is_modified = 1
 
 		return modified, is_modified, cache_modified
