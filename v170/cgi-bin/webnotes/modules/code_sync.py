@@ -74,7 +74,7 @@ def update_timestamp(doc, code_field, file_timestamp):
 	import webnotes
 	# update or insert
 	if webnotes.conn.sql("select name from __CodeFileTimeStamps where doctype=%s and name=%s and code_field=%s", (doc.doctype, doc.name, code_field[0])):
-		webnotes.conn.sql("update __CodeFileTimetamps set `timestamp`=%s where doctype=%s and name=%s and code_field=%s", (file_timestamp, doc.doctype, doc.name, code_field[0]))
+		webnotes.conn.sql("update __CodeFileTimeStamps set `timestamp`=%s where doctype=%s and name=%s and code_field=%s", (file_timestamp, doc.doctype, doc.name, code_field[0]))
 	else:
 		webnotes.conn.sql("insert into __CodeFileTimeStamps (`timestamp`, doctype, name, code_field) values (%s, %s, %s, %s)", (file_timestamp, doc.doctype, doc.name, code_field[0]))
 
