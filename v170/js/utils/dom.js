@@ -25,7 +25,12 @@ function set_opacity(ele, ieop) {
 // set gradient
 function set_gradient(ele, from, to) {
 	// gradient
-	if(isIE) {
+	var no_gradient=0;
+	
+	if(isIE)no_gradient=1;
+	if(isFF && ffversion < 3.6)no_gradient=1;
+
+	if(no_gradient) {
 		$y(ele, {backgroundColor: '#' + cint(cint(from.substr(1)) - cint(to.substr(1)) / 2)});
 	} else {
 		$y(ele, {background: '-webkit-gradient(linear, left top, left bottom, from('+from+'), to('+to+'))'});

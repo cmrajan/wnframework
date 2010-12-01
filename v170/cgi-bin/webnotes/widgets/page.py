@@ -22,16 +22,15 @@ class Page:
 		p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
 		return p.sub(self._page_import, script)
 
-	def load(self):
-	
+	def load(self):	
 		doclist = webnotes.model.doc.get('Page', self.name)
 		doc = doclist[0]
-		
+
 		doc.__script = self.get_script(doc.script)
 		if doc.fields.get('content') and doc.content.startswith('#python'):
 			doc.__content = webnotes.model.code.execute(doc.content)
 		return doclist
-		
+
 def get(name):
 	return Page(name).load()
 

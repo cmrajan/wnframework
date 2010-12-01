@@ -513,7 +513,9 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 # ---------------------------------------------------------------------
 
 def get(dt, dn='', with_children = 1, from_get_obj = 0):
+	import webnotes 
 	import webnotes.model
+	import webnotes.defs
 
 	dn = dn or dt
 
@@ -527,6 +529,11 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0):
 		if not doc.check_perm():
 			webnotes.msgprint("No read permission for %s %s" % (dt, dn))
 			raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
+
+	# scrub for code
+	if dt in webnotes.code_fields_dict.keys() and getattr(webnotes.defs,'developer_mode',None):
+		import webnotes.modules.code_sync
+		webnotes.modules.code_sync.sync(doc)
 
 	if not with_children:
 		# done

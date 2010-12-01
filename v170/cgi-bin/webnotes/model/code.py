@@ -56,6 +56,7 @@ def get_recompiled_code(dt):
 	# load
 	return webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)[0][0]
 
+#=================================================================================
 
 def get_server_obj(doc, doclist = [], basedoctype = ''):
 	import marshal
@@ -110,7 +111,8 @@ def run_server_obj(server_obj, method_name, arg=None):
 			return getattr(server_obj, method_name)(arg)
 		else:
 			return getattr(server_obj, method_name)()
-			
+
+
 # deprecated methods to keep v160 apps happy
 #=================================================================================
 

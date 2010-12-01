@@ -21,9 +21,11 @@ function setup_err_console() {
 	err_console.make_body([
 		['HTML', 'Error List']
 		,['Button', 'Clear']
-		,['Button', 'Send Error Report']
+		,['HTML', 'Error Report']
 	]);
-	err_console.widgets['Send Error Report'].onclick = function() {
+	var span = $a(err_console.widgets['Error Report'], 'span', 'link_type');
+	span.innerHTML = 'Send Error Report';
+	span.onclick = function() {
 		var call_back = function(r, rt){
 			err_console.hide();
 			msgprint("Error Report Sent")

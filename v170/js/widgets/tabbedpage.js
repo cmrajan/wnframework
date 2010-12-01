@@ -79,7 +79,7 @@ function TrayPage(parent, height, width) {
 	$y($td(this.tab, 0, 0),{
 		backgroundColor: this.tray_bg
 		,borderRight:'1px solid ' + this.tray_fg
-		,width: '122px'
+		,width: width
 	});
 
 	// body style

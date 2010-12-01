@@ -37,10 +37,10 @@ def delete_oldest_file(folder):
 		os.system('rm %s/%s' % (folder, a[0]))
 
 def mysqldump(db, folder=''):
-	import defs
+	import webnotes.defs
 
-	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
-	db_password = defs.db_password
+	mysql_path = hasattr(defs, 'mysql_path') and webnotes.defs.mysql_path or ''
+	db_password = webnotes.defs.db_password
 	
 	import os
 	os.system('%(path)smysqldump %(db)s > %(folder)s%(db)s.sql -u %(db)s -p%(pwd)s --ignore-table=%(db)s.__DocTypeCache' % {'path':mysql_path, 'db':db, 'pwd':db_password, 'folder':folder})
@@ -48,9 +48,9 @@ def mysqldump(db, folder=''):
 def backup_db(db, from_all=0):
 	import os
 
-	if defs.root_login:
+	if webnotes.defs.root_login:
 		global conn
-		conn = MySQLdb.connect(user=defs.root_login, host='localhost', passwd=defs.root_password)
+		conn = MySQLdb.connect(user=webnotes.defs.root_login, host='localhost', passwd=webnotes.defs.root_password)
 		
 	sql('use %s' % db)
 
@@ -72,9 +72,9 @@ def backup_db(db, from_all=0):
 		raise e
 
 def copy_db(source, target=''):
-	import defs
+	import webnotes.defs
 
-	if not defs.server_prefix:
+	if not webnotes.defs.server_prefix:
 		webnotes.msgprint("Server Prefix must be set in defs.py")
 		raise Exception
 
@@ -106,15 +106,27 @@ def get_db_name(conn, server_prefix):
 		dbn = server_prefix + '001'
 	return dbn
 
+def delete_user(target):
+	import webnotes
+	# delete user if exists
+	try:
+		webnotes.conn.sql("DROP USER '%s'@'localhost'" % target)
+		webnotes.conn.sql("FLUSH PRIVILEGES")
+	except Exception, e:
+		if e.args[0]==1396:
+			pass
+		else:
+			raise e
+
 def import_db(source, target='', is_accounts=0):
 	# dump source
 
 	import webnotes
 	import webnotes.db
-	import defs
+	import webnotes.defs
 	import os
 
-	mysql_path = hasattr(defs, 'mysql_path') and defs.mysql_path or ''
+	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
 
 	# default, use current user id
 	if webnotes.conn:
@@ -124,16 +136,19 @@ def import_db(source, target='', is_accounts=0):
 			conn.sql('COMMIT')
 
 	# login as root (if set)
-	if defs.root_login:
-		conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
+	if webnotes.defs.root_login:
+		conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 	sql = conn.sql
 
 	# get database number
 	if not target:
-		target = get_db_name(conn, defs.server_prefix)
+		target = get_db_name(conn, webnotes.defs.server_prefix)
+
+	# delete user (if exists)
+	delete_user(target)
 
 	# create user and db
-	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, defs.db_password))
+	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, webnotes.defs.db_password))
 	sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
 	sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, target))
 	sql("FLUSH PRIVILEGES")
@@ -142,7 +157,7 @@ def import_db(source, target='', is_accounts=0):
 	source_path = get_source_path(source)		
 
 	# import in target
-	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, defs.db_password, target, source_path))
+	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, webnotes.defs.db_password, target, source_path))
 
 	sql("use %s;" % target)
 	sql("DROP TABLE IF EXISTS `__DocTypeCache`")

@@ -42,12 +42,12 @@ function msgprint(msg, issmall, callback) {
 		msg_dialog.msg_icon.src = 'images/icons/accept.gif'; $di(msg_dialog.msg_icon); msg = msg.substr(3);
 	}
 
-	if(msg.length > 1000) {
-		$y(m, {height:'200px', width:'400px', overflow:'auto'})
-	} else {
-		$y(m, {height:'', width:''})
-	}
+
 	m.innerHTML = replace_newlines(msg);
+
+	if(m.offsetHeight > 200) {
+		$y(m, {height:'200px', width:'400px', overflow:'auto'})
+	}
 	
 	msg_dialog.custom_onhide = callback;
 	

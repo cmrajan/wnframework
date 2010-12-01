@@ -17,6 +17,14 @@ function Page(page_name, content) {
 
 	this.wrapper = page_body.add_page(page_name, this.onshow);
 	this.cont = this.wrapper // bc
+	
+	// resize
+	this.wrapper.set_page_height = function() {
+		$y(me.wrapper, { height: get_window_height() + 'px', overflow:'auto' });
+	}
+	
+	set_resize_observer(this.wrapper.set_page_height);	
+	
 	if(content)
 		this.wrapper.innerHTML = content;
 
@@ -25,6 +33,7 @@ function Page(page_name, content) {
 	
 	return this;
 }
+
 
 function render_page(page_name, menuitem) {
 	if(!page_name)return;
@@ -55,6 +64,7 @@ function render_page(page_name, menuitem) {
 		if(pscript['onload_'+page_name]) pscript['onload_'+page_name](); // onload
 	} catch(e) { submit_error(e); }
 		
+	setTimeout('page_body.pages[cur_page].set_page_height()', 100);
 	return p;
 }
 
