@@ -242,14 +242,15 @@ def import_attachments(m):
 	
 	# import files
 	for f in fl:
-		# delete
-		webnotes.utils.file_manager.delete_file(f)
-	
-		# import
-		file = open(os.path.join(folder, f),'r')
-		webnotes.utils.file_manager.save_file(f, file.read(), m)
-		file.close()
+		if not os.path.isdir(os.path.join(folder, f)):
+			# delete
+			webnotes.utils.file_manager.delete_file(f)
 		
-		out.append(f)
+			# import
+			file = open(os.path.join(folder, f),'r')
+			webnotes.utils.file_manager.save_file(f, file.read(), m)
+			file.close()
+			
+			out.append(f)
 	
 	return out
