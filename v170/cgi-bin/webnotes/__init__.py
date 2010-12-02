@@ -3,7 +3,6 @@ code_fields_dict = {
 	'Page':[('script', 'js'), ('content', 'html'), ('style', 'css'), ('static_content', 'html')],
 	'DocType':[('server_code_core', 'py'), ('client_script_core', 'js')],
 	'Search Criteria':[('report_script', 'js'), ('server_script', 'py'), ('custom_query', 'sql')],
-	'Module Def':[('widget_code', 'js')],
 	'Patch':[('patch_code', 'py')],
 	'Control Panel':[('startup_code', 'js'), ('startup_css', 'css')]
 }
