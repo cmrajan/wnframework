@@ -1,10 +1,11 @@
 # webnotes init (all shared variables come here)
 code_fields_dict = {
-	'Page':[('script','js'), ('content','html'), ('style','css'), ('static_content','html')],
-	'DocType':[('server_code_core','py'),('client_script_core','js')],
-	'Search Criteria':[('report_script','js'),('server_script','py'),('custom_query','sql')],
+	'Page':[('script', 'js'), ('content', 'html'), ('style', 'css'), ('static_content', 'html')],
+	'DocType':[('server_code_core', 'py'), ('client_script_core', 'js')],
+	'Search Criteria':[('report_script', 'js'), ('server_script', 'py'), ('custom_query', 'sql')],
 	'Module Def':[('widget_code', 'js')],
-	'Patch':[('patch_code', 'py')]
+	'Patch':[('patch_code', 'py')],
+	'Control Panel':[('startup_code', 'js'), ('startup_css', 'css')]
 }
 
 
@@ -56,16 +57,16 @@ def get_index_path():
 	return os.sep.join(os.path.dirname(os.path.abspath(__file__)).split(os.sep)[:-2])
 
 def get_files_path():
-	global auth_obj
+	global conn
 	import defs, os
 
-	if not auth_obj:
+	if not conn:
 		raise Exception, 'You must login first'
 
 	if defs.files_path:
-		return os.path.join(defs.files_path, auth_obj.account_id)
+		return os.path.join(defs.files_path, conn.cur_db_name)
 	else:
-		return os.path.join(get_index_path(), 'user_files', auth_obj.account_id)
+		return os.path.join(get_index_path(), 'user_files', conn.cur_db_name)
 	
 def create_folder(path):
 	import os
