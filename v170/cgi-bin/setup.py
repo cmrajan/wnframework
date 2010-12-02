@@ -106,12 +106,11 @@ def get_db_name(conn, server_prefix):
 		dbn = server_prefix + '001'
 	return dbn
 
-def delete_user(target):
-	import webnotes
+def delete_user(target, conn):
 	# delete user if exists
 	try:
-		webnotes.conn.sql("DROP USER '%s'@'localhost'" % target)
-		webnotes.conn.sql("FLUSH PRIVILEGES")
+		conn.sql("DROP USER '%s'@'localhost'" % target)
+		conn.sql("FLUSH PRIVILEGES")
 	except Exception, e:
 		if e.args[0]==1396:
 			pass
@@ -145,7 +144,7 @@ def import_db(source, target='', is_accounts=0):
 		target = get_db_name(conn, webnotes.defs.server_prefix)
 
 	# delete user (if exists)
-	delete_user(target)
+	delete_user(target, conn)
 
 	# create user and db
 	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, webnotes.defs.db_password))
