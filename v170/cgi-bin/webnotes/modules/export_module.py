@@ -140,8 +140,16 @@ def write_document_file(doclist):
 	import webnotes
 	import webnotes.defs
 
+	# module name
+	if doclist[0]['doctype'] == 'Module Def':
+		module = doclist[0]['name']
+	elif doclist[0]['doctype']=='Control Panel':
+		module = 'System'
+	else:
+		module = doclist[0]['module']
+
 	# create the folder
-	folder = os.path.join(webnotes.defs.modules_path, doclist[0]['doctype'] == 'Module Def' and doclist[0]['name'] or doclist[0]['module'], doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
+	folder = os.path.join(webnotes.defs.modules_path, module, doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
 	
 	webnotes.create_folder(folder)
 
@@ -176,4 +184,4 @@ def separate_code_files(doclist, folder):
 		
 			# clear it from the doclist
 			doclist[0][code_field[0]] = None
-
+		

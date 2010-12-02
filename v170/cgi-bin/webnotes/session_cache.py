@@ -27,15 +27,18 @@ def clear_cache(user=''):
 
 def get():
 	import webnotes
+	import webnotes.defs
+	
 	# get country
 	country = 'Not Defined'
 	if webnotes.session['data'].get('ipinfo',{}).get('CountryName'):
 		country = webnotes.session['data'].get('ipinfo')['CountryName']
 
 	# check if cache exists
-	cache = load(country)
-	if cache:
-		return cache
+	if not getattr(webnotes.defs,'developer_mode',None):
+		cache = load(country)
+		if cache:
+			return cache
 	
 	# if not create it
 	sd = build()
@@ -109,6 +112,7 @@ def build():
 	import webnotes.widgets.page
 	import webnotes.widgets.menus
 	import webnotes.profile
+	import webnotes.defs
 	
 	sql = webnotes.conn.sql
 	
@@ -117,7 +121,6 @@ def build():
 	doclist = []
 	doclist += webnotes.model.doc.get('Control Panel')
 	cp = doclist[0]
-	
 	
 	doclist += webnotes.model.doctype.get('Event')
 	doclist += webnotes.model.doctype.get('Search Criteria')

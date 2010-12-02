@@ -20,35 +20,35 @@ function Body() {
 	page_body = this;	
 
 	this.no_of_columns = function() {
-		var n = 1;
-		if(cint(this.cp.left_sidebar_width)) n++;
+		var n = 2;
 		if(cint(this.cp.right_sidebar_width)) n++;
 		return n;
 	}
 	
 	this.setup_page_areas = function() {
 		var n = this.no_of_columns();
-		if(n==1) 
-			// no sidebar
-			this.center = this.body;
-		else {
-			// has sidebars, make a table
-			this.body_table = make_table(this.body, 1, n, '100%');
-			$y(this.body_table, {tableLayout:'fixed'});
-			var c = 0;
-			if(cint(this.cp.left_sidebar_width)) {
-				this.left_sidebar = $td(this.body_table, 0, c);
-				$y(this.left_sidebar, {width:cint(this.cp.left_sidebar_width) + 'px'});
-				c++;
-			}
-			this.center = $a($td(this.body_table, 0, c), 'div');
-			c++;
-			if(cint(this.cp.right_sidebar_width)) {
-				this.right_sidebar = $td(this.body_table, 0, c);
-				$y(this.right_sidebar, {width:cint(this.cp.right_sidebar_width) + 'px'})
-				c++;
-			}			
+
+		// has sidebars, make a table
+		this.body_table = make_table(this.body, 1, n, '100%');
+		$y(this.body_table, {tableLayout:'fixed'});
+		var c = 0;
+				
+		// left sidebar
+		this.left_sidebar = $td(this.body_table, 0, c);
+		$y(this.left_sidebar, {width:cint(this.cp.left_sidebar_width) + 'px'});
+		c++;
+			
+		// center
+		this.center = $a($td(this.body_table, 0, c), 'div');
+		c++;
+			
+		// right side bar
+		if(cint(this.cp.right_sidebar_width)) {
+			this.right_sidebar = $td(this.body_table, 0, c);
+			$y(this.right_sidebar, {width:cint(this.cp.right_sidebar_width) + 'px'})
+			c++;			
 		}
+		
 		this.center.header = $a(this.center, 'div');
 		this.center.body = $a(this.center, 'div');
 		this.center.loading = $a(this.center, 'div', '', {margin:'200px 0px', fontSize:'14px', color:'#999', textAlign:'center'});

@@ -966,7 +966,7 @@ this.page_head.clear_toolbar();if(in_list(profile.can_create,dt)){var new_button
 new_button.dt=dt}
 if(!me.lists[dt]){me.lists[dt]=new DocBrowser(me.body,dt,label,field_list);}
 me.cur_list=me.lists[dt];me.cur_list.show();page_body.change_to('DocBrowser');}
-DocBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.dt=dt;this.field_list=field_list;this.wrapper=$a(parent,'div');this.no_result_area=$a(this.wrapper,'div','',{margin:'160px auto',width:'480px',padding:'16px',backgroundColor:'#DDF',fontSize:'14px',border:'1px solid #AAF',textAlign:'center',display:'none'})
+DocBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.dt=dt;this.field_list=field_list;this.wrapper=$a(parent,'div','',{display:'none'});this.no_result_area=$a(this.wrapper,'div','',{margin:'160px auto',width:'480px',padding:'16px',backgroundColor:'#DDF',fontSize:'14px',border:'1px solid #AAF',textAlign:'center'})
 this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center',fontSize:'14px',color:'#888',display:'none'});this.loading_div.innerHTML='Loading...';this.body=$a(this.wrapper,'div');}
 DocBrowser.prototype.show=function(){var me=this;var callback=function(r,rt){if(r.message=='Yes'){if(!me.loaded)
 me.load_details();else
@@ -1065,11 +1065,9 @@ if(doc.__islocal&&(doctype&&doctype.autoname&&doctype.autoname.toLowerCase()=='p
 function check_required(dt,dn){var doc=locals[dt][dn];if(doc.docstatus>1)return true;var fl=fields_list[dt];if(!fl)return true;var all_clear=true;var errfld=[];for(var i=0;i<fl.length;i++){var key=fl[i].fieldname;var v=doc[key];if(fl[i].reqd&&is_null(v)){errfld[errfld.length]=fl[i].label;if(cur_frm){var f=cur_frm.fields_dict[fl[i].fieldname];if(f){f.set_as_error(1);if(!cur_frm.error_in_section&&f.parent_section){cur_frm.set_section(f.parent_section.sec_id);cur_frm.error_in_section=1;}}}
 if(all_clear)all_clear=false;}}
 if(errfld.length)msgprint('<b>Following fields are required:</b>\n'+errfld.join('\n'));return all_clear;}
-function Body(){this.left_sidebar=null;this.right_sidebar=null;this.status_area=null;var me=this;page_body=this;this.no_of_columns=function(){var n=1;if(cint(this.cp.left_sidebar_width))n++;if(cint(this.cp.right_sidebar_width))n++;return n;}
-this.setup_page_areas=function(){var n=this.no_of_columns();if(n==1)
-this.center=this.body;else{this.body_table=make_table(this.body,1,n,'100%');$y(this.body_table,{tableLayout:'fixed'});var c=0;if(cint(this.cp.left_sidebar_width)){this.left_sidebar=$td(this.body_table,0,c);$y(this.left_sidebar,{width:cint(this.cp.left_sidebar_width)+'px'});c++;}
-this.center=$a($td(this.body_table,0,c),'div');c++;if(cint(this.cp.right_sidebar_width)){this.right_sidebar=$td(this.body_table,0,c);$y(this.right_sidebar,{width:cint(this.cp.right_sidebar_width)+'px'})
-c++;}}
+function Body(){this.left_sidebar=null;this.right_sidebar=null;this.status_area=null;var me=this;page_body=this;this.no_of_columns=function(){var n=2;if(cint(this.cp.right_sidebar_width))n++;return n;}
+this.setup_page_areas=function(){var n=this.no_of_columns();this.body_table=make_table(this.body,1,n,'100%');$y(this.body_table,{tableLayout:'fixed'});var c=0;this.left_sidebar=$td(this.body_table,0,c);$y(this.left_sidebar,{width:cint(this.cp.left_sidebar_width)+'px'});c++;this.center=$a($td(this.body_table,0,c),'div');c++;if(cint(this.cp.right_sidebar_width)){this.right_sidebar=$td(this.body_table,0,c);$y(this.right_sidebar,{width:cint(this.cp.right_sidebar_width)+'px'})
+c++;}
 this.center.header=$a(this.center,'div');this.center.body=$a(this.center,'div');this.center.loading=$a(this.center,'div','',{margin:'200px 0px',fontSize:'14px',color:'#999',textAlign:'center'});this.center.loading.innerHTML='Loading...'}
 this.setup_sidebar_menu=function(){if(this.left_sidebar&&this.cp.show_sidebar_menu){new_widget('SidebarMenu',function(m){sidebar_menu=m;m.make_menu('');});}}
 this.setup_header_footer=function(){if(cint(this.cp.header_height)){var hh=this.cp.header_height?(cint(this.cp.header_height)+'px'):'0px';$y(this.header,{height:hh,borderBottom:'1px solid #CCC'});if(this.cp.client_name)this.banner_area.innerHTML=this.cp.client_name;}

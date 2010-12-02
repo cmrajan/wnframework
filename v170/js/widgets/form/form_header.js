@@ -11,11 +11,11 @@ _f.FrmHeader = function(parent) {
 	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', fontWeight:'normal', marginRight:'8px'})
 
 	// timestamp
-	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline'});
+	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'0px 0px 0px #000'});
 	this.timestamp_area.innerHTML = 'more info';
 	
 	// status
-	this.status_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer'})
+	this.status_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer', textShadow:'0px 0px 0px #000'})
 }
 _f.FrmHeader.prototype.show = function() {  $ds(this.wrapper); }
 _f.FrmHeader.prototype.hide = function() {  $dh(this.wrapper); }
@@ -147,6 +147,7 @@ _f.FrmHeader.prototype.get_status_tags = function(doc, f) {
 
 	var make_tag = function(label, col) {
 		var s= $a(null, 'span', '', {padding: '2px', backgroundColor:col, color:'#FFF', fontWeight:'bold', marginLeft:(f.meta.issingle ? '0px' : '8px'), fontSize:'11px'});
+		$(s).css('-moz-border-radius','3px').css('-webkit-border-radius','3px')
 		s.innerHTML = label;
 		return s;
 	}

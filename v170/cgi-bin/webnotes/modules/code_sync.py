@@ -15,8 +15,7 @@ def sync(doc):
 def get_file_timestamp(doc, code_field):
 	import os
 	try:
-		return str(os.stat(get_code_path(doc, code_field)).st_mtime)
-			
+		return str(os.stat(get_code_path(doc, code_field)).st_mtime)			
 	except OSError, e:
 		if e.args[0]!=2:
 			raise e
@@ -59,8 +58,11 @@ def update_code(doc, code_field, file_timestamp):
 	file.close()
 	
 	# update in database, clear cache
-	webnotes.conn.sql("update tab%s set %s=%s, modified=%s where name=%s" % (doc.doctype, code_field[0], '%s', '%s', '%s'), (code, doc.name, webnotes.utils.now()))
-	webnotes.conn.sql("delete from __DocTypeCache")
+	if doc.doctype=='Control Panel':
+		webnotes.conn.set_value('Control Panel',None,code_field[0],code)
+	else:
+		webnotes.conn.sql("update tab%s set %s=%s, modified=%s where name=%s" % (doc.doctype, code_field[0], '%s', '%s', '%s'), (code, doc.name, webnotes.utils.now()))
+		webnotes.conn.sql("delete from __DocTypeCache")
 	
 	# update in doc
 	doc.fields[code_field[0]] = code
@@ -86,5 +88,5 @@ def get_code_path(doc, code_field):
 	if code_field[0]=='static_content':
 		fname+=' Static'
 
-	return os.path.join(webnotes.defs.modules_path, doc.module, doc.doctype, doc.name, fname) \
+	return os.path.join(webnotes.defs.modules_path, doc.module or 'System', doc.doctype, doc.name, fname) \
 		+ '.' + code_field[1]

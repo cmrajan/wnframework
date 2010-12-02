@@ -112,7 +112,11 @@ def delete_file(fname, verbose=0):
 	
 		# delete file
 		file_id = f[0].replace('/','-')
-		os.remove(os.path.join(webnotes.get_files_path(), file_id))
+		try:
+			os.remove(os.path.join(webnotes.get_files_path(), file_id))
+		except OSError, e:
+			if e.args[0]!=2:
+				raise e
 		
 		if verbose: webnotes.msgprint('Deleted %s (%s)' % (fname, file_id))
 

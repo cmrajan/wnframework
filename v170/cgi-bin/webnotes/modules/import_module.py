@@ -212,12 +212,27 @@ def import_control_panel():
 	import os
 	import webnotes.defs
 	
-	file = open(os.path.join(webnotes.defs.modules_path, \
-		'System','Control Panel', 'Control Panel', 'Control Panel.txt'),'r')
-	doclist = eval(file.read())
-	file.close()
+	startup_code = startup_css = ''
+	folder = os.path.join(webnotes.defs.modules_path, 'System','Control Panel','Control Panel')
 	
-	transfer.sync_control_panel(doclist[0].get('startup_code',''), doclist[0].get('startup_css',''))
+	# js
+	try:
+		file = open(os.path.join(folder, 'Control Panel.js'),'r')
+		startup_code = file.read()
+		file.close()
+	except OSError, e:
+		pass
+	
+	# css
+	try:
+		file = open(os.path.join(folder, 'Control Panel.css'),'r')
+		startup_css = file.read()
+		file.close()
+	except OSError, e:
+		pass
+
+
+	transfer.sync_control_panel(startup_code, startup_css)
 	return "Control Panel Synced"
 
 # =============================================================================
