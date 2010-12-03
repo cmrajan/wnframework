@@ -56,7 +56,7 @@ DocBrowser = function(parent, dt, label, field_list) {
 	// areas
 	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '140px auto', width: '480px', 
 		padding:'16px', backgroundColor:'#DDF', 
-		fontSize:'14px', border:'1px solid #AAF', textAlign: 'center',
+		fontSize:'14px', textAlign: 'center',
 	});
 	$br(this.no_result_area, '5px');
 	$gr(this.no_result_area, '#EEF', '#CCF');

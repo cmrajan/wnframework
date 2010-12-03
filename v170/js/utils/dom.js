@@ -39,6 +39,7 @@ function set_gradient(ele, from, to) {
 }
 $gr = set_gradient;
 $br = function(ele, r) { $(ele).css('-moz-border-radius',r).css('-webkit-border-radius',r); }
+$bs = function(ele, r) { $(ele).css('-moz-box-shadow',r).css('-webkit-box-shadow',r).css('box-shadow',r); }
 
 // Dom
 
