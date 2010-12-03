@@ -37,6 +37,8 @@ function set_gradient(ele, from, to) {
 		$y(ele, {background: '-moz-linear-gradient(top, '+from+', '+to+')'});		
 	}
 }
+$gr = set_gradient;
+$br = function(ele, r) { $(ele).css('-moz-border-radius',r).css('-webkit-border-radius',r); }
 
 // Dom
 

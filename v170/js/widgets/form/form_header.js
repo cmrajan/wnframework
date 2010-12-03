@@ -5,17 +5,17 @@ _f.FrmHeader = function(parent) {
 	$y(this.page_head.wrapper, {marginBottom:'0px'});
 	
 	// doctype
-	this.dt_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', fontWeight:'bold', marginRight:'8px'})
+	this.dt_area = $a(this.page_head.main_head, 'span', '', {fontSize:'16px', fontWeight:'bold', marginRight:'8px'})
 	
 	// name
-	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', fontWeight:'normal', marginRight:'8px'})
+	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'16px', fontWeight:'normal', marginRight:'8px'})
 
 	// timestamp
-	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'0px 0px 0px #000'});
+	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'none'});
 	this.timestamp_area.innerHTML = 'more info';
 	
 	// status
-	this.status_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer', textShadow:'0px 0px 0px #000'})
+	this.status_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer', textShadow:'none'})
 }
 _f.FrmHeader.prototype.show = function() {  $ds(this.wrapper); }
 _f.FrmHeader.prototype.hide = function() {  $dh(this.wrapper); }

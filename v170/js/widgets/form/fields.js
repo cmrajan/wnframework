@@ -28,7 +28,7 @@ Field.prototype.make_body = function() {
 		
 	// label
 	if(this.with_label) {
-		var t = make_table(this.label_area, 1, 3+ischk, null, [], {verticalAlign: 'middle', height: '18px', padding: '2px'});
+		var t = make_table(this.label_area, 1, 3+ischk, null, [], {verticalAlign: 'middle', height: '20px'});
 	
 		this.label_span = $a($td(t,0,0+ischk), 'span', '', {marginRight:'4px', fontSize:'11px'})
 	

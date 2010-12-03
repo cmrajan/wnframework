@@ -129,13 +129,13 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 	}
 	
 	this.show_as_expanded = function() {
-		$y(me.ldiv, {backgroundColor: tray.tray_fg, color:'#FFF', fontWeight: 'bold'})
+		$y(me.ldiv, {backgroundColor: tray.tray_fg, color:'#FFF', fontWeight: 'bold', textShadow:'0px 1px 0px #000'})
 		tray.cur_item = me;
 	}
 	
 	this.collapse = function() {
 		if(me.wrapper)$dh(me.wrapper);		
-		$y(me.ldiv, {backgroundColor: tray.tray_bg, color:'#000', fontWeight: 'normal'})
+		$y(me.ldiv, {backgroundColor: tray.tray_bg, color:'#000', fontWeight: 'normal', textShadow:''})
 	}
 	this.hide = function() {
 		me.collapse();

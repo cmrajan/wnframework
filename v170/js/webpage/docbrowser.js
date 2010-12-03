@@ -54,7 +54,13 @@ DocBrowser = function(parent, dt, label, field_list) {
 	this.wrapper = $a(parent, 'div', '', {display:'none'});
 
 	// areas
-	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '160px auto', width: '480px', padding:'16px', backgroundColor:'#DDF', fontSize:'14px', border:'1px solid #AAF', textAlign: 'center'})
+	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '140px auto', width: '480px', 
+		padding:'16px', backgroundColor:'#DDF', 
+		fontSize:'14px', border:'1px solid #AAF', textAlign: 'center',
+	});
+	$br(this.no_result_area, '5px');
+	$gr(this.no_result_area, '#EEF', '#CCF');
+	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
 	this.body = $a(this.wrapper, 'div');

@@ -177,64 +177,26 @@ function time_to_hhmm(hh,mm,am) {
 	return hh + ':' + mm;
 }
 
-// get date
-get_date = function(date){	// date string from server in 'yyyy-mm-dd' format
-	
-	if(date == null || date == '') return null;
-	
-	if(date.search('-') == -1){
-		show_alert('Date should be in yyyy-mm-dd format');
-		return;
-	}
+// when
 
-	var dict = {};
-	
-	var d = date.split('-');
-	dt = new Date(d[0],d[1]-1,d[2]);
-	
-	var today = get_today();
-	if(date == today){
-		dict.date = 'Today';
-	}
-	else{
-		dict.date = dt.getDate();
-	}
-	
-	dict.day = week_list[dt.getDay()];	
-	dict.day_full = week_list_full[dt.getDay()];
-
-	dict.month = month_list[dt.getMonth()];
-	dict.month_full = month_list_full[dt.getMonth()];
-
-	var year = dt.getFullYear();
-	dict.year = cstr(year).substr(2, cstr(year).length);
-	dict.year_full = cstr(year);
-
-	return dict;
-}
-
-// get time
-get_time = function(time){
-
-	if(time == null || time =='') return null;
-
-	if(time.search(':') == -1){
-		show_alert('Time should be in hh:mm:ss format');
-		return;
-	}
-
-	var t = time.split(':');
-	
-	var hr = t[0];
-	var m = t[1];
-	
-	if(hr>12){
-		hr = hr-12;
-		return hr + ':' + m + ' PM';
-	}
-	else{
-		if(hr == 12)	return hr + ':' + m + ' PM';
-		return hr + ':' + m + ' AM';
+function comment_when(dt) {
+	var cdate = dateutil.str_to_obj(dt);
+	var diff = (new Date() - cdate) / 1000;
+	if(diff < 30) {
+		return "Few moments ago"
+	} else if(diff < 600) {
+		var t = cint(diff/60);
+		return t + " minute" + (t==1?"":"s") + " ago"
+	} else if(diff < 3600) {
+		var t = cint(diff/600);
+		return t + " minute" + (t==1?"":"s") + " ago"
+	} else if(diff < 86400) {
+		var t = cint(diff/3600);
+		return t + " hour" + (t==1?"":"s") + " ago"
+	} else if(diff < 604800) {
+		var t = cint(diff/86400);
+		return t + " day" + (t==1?"":"s") + " ago"
+	} else {
+		return cdate.getDate() + " " + month_list[cdate.getMonth()] + " " + cdate.getFullYear();
 	}
 }
-

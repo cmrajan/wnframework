@@ -22,8 +22,8 @@ function WNToolbar(parent) {
 			})
 		}
 
-		this.table_wrapper = $a(this.wrapper, 'div', '', {marginLeft:'4px'});
-		this.body_tab = make_table(this.table_wrapper, 1, 3, '100%', ['0%','64%','36%'],{padding:'2px', verticalAlign:'middle'});
+		this.table_wrapper = $a(this.wrapper, 'div', '', {marginLeft:'4px', padding:'2px'});
+		this.body_tab = make_table(this.table_wrapper, 1, 3, '100%', ['0%','64%','36%'],{verticalAlign:'middle'});
 		
 		this.menu = new MenuToolbar($td(this.body_tab,0,1));
 		this.setup_home();
@@ -253,7 +253,7 @@ function WNToolbar(parent) {
 
 	this.setup_logout = function() {
 		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px', textAlign:'right'});
-		var t = make_table(w, 1, 6, null, [], {padding: '2px 6px', fontSize:'11px',verticalAlign:'middle',height:'16px'});
+		var t = make_table(w, 1, 6, null, [], {fontSize:'11px',verticalAlign:'middle',height:'20px',paddingLeft:'4px',paddingRight:'4px'});
 		$y(t,{cssFloat:'right', color:'#FFF'});
 		$td(t,0,0).innerHTML = user_fullname;
 		$td(t,0,1).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';
