@@ -800,7 +800,7 @@ _f.Frm.prototype.cleanup_refresh = function() {
 
 _f.Frm.prototype.refresh_dependency = function() {
 	var me = this;
-	var doc = this.doc;
+	var doc = locals[this.doctype][this.docname];
 
 	// build dependants' dictionary	
 	var dep_dict = {};
@@ -818,31 +818,16 @@ _f.Frm.prototype.refresh_dependency = function() {
 		}
 	}
 	if(!has_dep)return;
-	
-	// checks whether all dependants 
-	var d = locals[me.doctype][me.docname];
-	function all_dependants_clear(f) {
-		if(d[f.df.fieldname])return false;
-		var l = dep_dict[f.df.fieldname];
-		if(l) {
-			for(var i=0;i<l.length;i++) {
-				if(!l[i].dependencies_clear) { // dependant not clear
-					return false;
-				}
-				var v = d[l[i].df.fieldname];
-				if(v || (v==0 && !v.substr)) { // dependant has a value
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 
+
+	// show / hide based on values
 	for(var i=me.fields.length-1;i>=0;i--) { 
 		var f = me.fields[i];
 		f.guardian_has_value = true;
 		if(f.df.depends_on) {
-			var v = d[f.df.depends_on];
+			
+			// evaluate guardian
+			var v = doc[f.df.depends_on];
 			if(f.df.depends_on.substr(0,5)=='eval:') {
 				f.guardian_has_value = eval(f.df.depends_on.substr(5));
 			} else if(f.df.depends_on.substr(0,3)=='fn:') {
@@ -854,9 +839,8 @@ _f.Frm.prototype.refresh_dependency = function() {
 					f.guardian_has_value = false;
 				}
 			}
-		}
-		if(f.df.depends_on) {
-			f.dependencies_clear = all_dependants_clear(f);	
+
+			// show / hide
 			if(f.guardian_has_value) {
 				if(f.grid)f.grid.show(); else $ds(f.wrapper);		
 			} else {
