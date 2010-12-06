@@ -22,4 +22,7 @@ server_prefix = 's3u'
 
 mysql_path = ''
 
+files_path = ''
+modules_path = '/home/anand/workspace/webnotes/wnframework-modules/trunk'
+developer_mode = 1
 user_timezone = 'Asia/Calcutta'

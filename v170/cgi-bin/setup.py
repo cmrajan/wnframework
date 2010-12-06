@@ -298,11 +298,13 @@ def create_account(ac_name, ac_type='Framework'):
 
 def create_log_folder():
         import os
-        
-        os.mkdir(os.path.join(webnotes.get_index_path(),'log'))
+    	try:    
+	        os.mkdir(os.path.join(webnotes.get_index_path(),'log'))
 
-        webnotes.LOG_FILENAME = os.path.join(get_index_path(),'log','wnframework.log')
-        open(webnotes.LOG_FILENAME,'w+').close()
+        	webnotes.LOG_FILENAME = os.path.join(webnotes.get_index_path(),'log','wnframework.log')
+	        open(webnotes.LOG_FILENAME,'w+').close()
+	except:
+		pass
 
 
 # Installation
