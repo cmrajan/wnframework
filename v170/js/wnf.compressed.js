@@ -986,7 +986,7 @@ if(me.dt_details.submittable)
 fl.push(q.table+'.docstatus');q.fields=fl.join(', ');q.conds=q.table+'.docstatus < 2 ';this.query=repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s",q);this.query_max=repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s",q);}
 lst.colwidths=['100%'];lst.coltypes=['Data'];lst.coloptions=[''];lst.show_cell=function(cell,ri,ci,d){var div=$a(cell,'div');var span=$a(div,'span','link_type',{fontWeight:'bold'});span.innerHTML=d[ri][0];span.onclick=function(){loaddoc(me.dt,this.innerHTML);}
 var span=$a(div,'span','',{paddingLeft:'8px'});var tmp=[]
-for(var i=2;i<d[ri].length;i++){if(lst.cl[i][1]&&d[ri][i])
+for(var i=2;i<d[ri].length;i++){if(lst.cl[i]&&lst.cl[i][1]&&d[ri][i])
 tmp.push(lst.cl[i][1]+': '+d[ri][i]);}
 span.innerHTML=tmp.join(' | ');var div=$a(cell,'div','',{color:'#888',fontSize:'11px'});div.innerHTML=comment_when(d[ri][1]);}
 lst.make(wrapper);var sf=me.dt_details.filters;for(var i=0;i<sf.length;i++){var fname=sf[i][0];var label=sf[i][1];var ftype=sf[i][2];var fopts=sf[i][3];if(in_list(['Int','Currency','Float','Date'],ftype)){lst.add_filter('From '+label,ftype,fopts,dt,fname,'>=');lst.add_filter('To '+label,ftype,fopts,dt,fname,'<=');}else{lst.add_filter(label,ftype,fopts,dt,fname,(in_list(['Data','Text','Link'],ftype)?'LIKE':''));}}

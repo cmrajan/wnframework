@@ -230,7 +230,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		var span = $a(div, 'span', '', {paddingLeft:'8px'});
 		var tmp = []
 		for(var i=2; i<d[ri].length; i++) {
-			if(lst.cl[i][1] && d[ri][i])
+			if(lst.cl[i] && lst.cl[i][1] && d[ri][i])
 				tmp.push(lst.cl[i][1] + ': ' + d[ri][i]);
 		}
 		span.innerHTML = tmp.join(' | ');
