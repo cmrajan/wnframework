@@ -62,12 +62,9 @@ TabbedPage.prototype.enable_tab = function(n) {
 
 function TrayPage(parent, height, width) {
 	var me = this;
-	if(!width) width='122px';
-	
-	this.tray_bg = '#DDE3EA';
-	this.tray_mo = '#B5C3D6';
-	this.tray_fg = '#8392AC';
-	this.body_style = {margin: '16px'}
+	if(!width) width=(100/8)+'%';
+
+	this.body_style = {margin: '4px 8px'}
 	
 	this.cur_item = null;
 	
@@ -78,7 +75,7 @@ function TrayPage(parent, height, width) {
 	// tray style
 	$y($td(this.tab, 0, 0),{
 		backgroundColor: this.tray_bg
-		,borderRight:'1px solid ' + this.tray_fg
+		//,borderRight:'1px solid ' + this.tray_fg
 		,width: width
 	});
 
@@ -99,7 +96,9 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 	this.onclick = onclick;
 	var me = this;
 	
-	this.ldiv = $a($td(tray.tab, 0, 0), 'div', '', {padding: '6px 8px', cursor:'pointer'});
+	this.ldiv = $a($td(tray.tab, 0, 0), 'div');
+	$item_normal(this.ldiv);
+	
 	if(!no_body) {
 		this.wrapper = $a(tray.body, 'div', '', tray.body_style);
 		if(with_heading) {
@@ -114,12 +113,15 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 
 	$(this.ldiv).html(label)
 		.hover(
-			function() { if(tray.cur_item.label != this.innerHTML) $y(this,{backgroundColor:tray.tray_mo}) },
-			function() { if(tray.cur_item.label != this.innerHTML) $y(this,{backgroundColor:tray.tray_bg}) }
+			function() { if(tray.cur_item.label != this.innerHTML) $item_active(this); },
+			function() { if(tray.cur_item.label != this.innerHTML) $item_normal(this); }
 		)
 		.click(
 			function() { me.expand(); }
 		)
+
+	this.ldiv.onmousedown = function() { $item_pressed(this); }
+	this.ldiv.onmouseup = function() { $item_selected(this); }
 
 	this.expand = function() {
 		if(tray.cur_item) tray.cur_item.collapse();
@@ -129,13 +131,13 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 	}
 	
 	this.show_as_expanded = function() {
-		$y(me.ldiv, {backgroundColor: tray.tray_fg, color:'#FFF', fontWeight: 'bold', textShadow:'0px 1px 0px #000'})
+		$item_selected(me.ldiv);
 		tray.cur_item = me;
 	}
 	
 	this.collapse = function() {
-		if(me.wrapper)$dh(me.wrapper);		
-		$y(me.ldiv, {backgroundColor: tray.tray_bg, color:'#000', fontWeight: 'normal', textShadow:''})
+		if(me.wrapper)$dh(me.wrapper);
+		$item_normal(me.ldiv);
 	}
 	this.hide = function() {
 		me.collapse();

@@ -190,18 +190,6 @@ _f.Frm.prototype.set_section = function(sec_id) {
 	this.cur_section[this.docname] = sec_id;
 }
 
-// TABBED
-// ======================================================================================
-
-_f.Frm.prototype.setup_tabs = function() {
-	var me = this;
-	$ds(this.tab_wrapper);
-	$y(this.tab_wrapper, {backgroundColor:def_ph_style.wrapper.backgroundColor});
-	this.tabs = new TabbedPage(this.tab_wrapper, 1);
-	
-	$y(this.body,{padding:'0px 16px'});
-}
-
 // TIPS
 // ======================================================================================
 
@@ -258,7 +246,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 		this.tray = new TrayPage(this.form_wrapper);
 		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px'});
 	} else {
-		this.body = $a(this.form_wrapper, 'div', 'frm_body');
+		this.body = $a(this.form_wrapper, 'div', 'frm_body',{margin:'4px'});
 	}
 	
 
@@ -277,10 +265,6 @@ _f.Frm.prototype.setup_std_layout = function() {
 	// setup tips area
 	this.setup_tips();
 	
-	// setup tabbed sections
-	if(this.meta.section_style=='Tabbed' && !(this.meta.istable) && !(get_url_arg('embed')))
-		this.setup_tabs();
-
 	// bg colour
 	if(this.meta.colour) 
 		this.layout.wrapper.style.backgroundColor = '#'+this.meta.colour.split(':')[1];
@@ -399,10 +383,10 @@ _f.Frm.prototype.setup_template_layout = function() {
 
 // --------------------------------------------------------------------------------------
 _f.Frm.prototype.add_custom_button = function(label, fn, icon) {
-	this.frm_head.page_head.add_button(label, fn, icon, 0, 0, 1);
+	this.frm_head.page_head.add_button(label, fn, 1);
 }
 _f.Frm.prototype.clear_custom_buttons = function() {
-	this.frm_head.page_head.clear_toolbar2();
+	//
 }
 
 // --------------------------------------------------------------------------------------
@@ -687,11 +671,11 @@ _f.Frm.prototype.refresh = function(docname) {
 				$ds(this.form_wrapper);
 			}
 
-			// call trigger
-	 		this.runclientscript('refresh');
-
 			// header
 			if(!this.meta.istable) { this.refresh_header(); }
+
+			// call trigger
+	 		this.runclientscript('refresh');
 			
 			// tabs
 			this.refresh_tabs();

@@ -8,6 +8,40 @@ function addEvent(ev, fn) {
 	}
 }
 
+// widget styles
+$wid_normal = function(ele,color) { 
+	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:'11px',color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
+	if(color=='green') {
+		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
+	}
+}
+$wid_active = function(ele,color) {
+	$y(ele, {border:'1px solid #000'}); $gr(ele,'#FFF','#EEE');
+	if(color=='green') {
+		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#AFA','#7C7');
+	}
+}
+$wid_pressed = function(ele,color) {
+	$y(ele, {border:'1px solid #000'}); $gr(ele,'#EEF','#DDF');
+	if(color=='green') {
+		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#7C7','#2A2');
+	}
+}
+
+// item
+$item_normal = function(ele) { 
+	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal'}); $br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
+}
+$item_active = function(ele) {
+	$bg(ele,'#F90'); $fg(ele,'#FFF');$y(ele,{fontWeight:'bold'})
+}
+$item_selected = function(ele) {
+	$bg(ele,'#444'); $fg(ele,'#FFF');$y(ele,{fontWeight:'bold'});
+}
+$item_pressed = function(ele) {
+	$bg(ele,'#6AD'); $fg(ele,'#FFF');
+}
+
 // set out of 100
 function set_opacity(ele, ieop) {
 	var op = ieop / 100;
@@ -41,7 +75,28 @@ $gr = set_gradient;
 $br = function(ele, r) { $(ele).css('-moz-border-radius',r).css('-webkit-border-radius',r); }
 $bs = function(ele, r) { $(ele).css('-moz-box-shadow',r).css('-webkit-box-shadow',r).css('box-shadow',r); }
 
-// Dom
+// Button
+
+function wnbutton(parent, label, onclick, isbold, style, color) {
+	var btn = $a(parent, 'span')
+	$wid_normal(btn,color);
+	
+	btn.innerHTML = label
+	btn.onclick = onclick;
+	
+	$(btn).hover(
+		function() { $wid_active(this,color); },
+		function() { $wid_normal(this,color); }
+	)
+	btn.onmousedown = function() { $wid_pressed(this,color); }
+	btn.onmouseup = function() { $wid_active(this,color); }
+
+	if(isbold) $y(btn,{fontWeight:'bold'});
+	if(style) $y(btn, style);
+	return btn;
+}
+
+// Select
 
 function empty_select(s) {
 	if(s.custom_select) { s.empty(); return; }

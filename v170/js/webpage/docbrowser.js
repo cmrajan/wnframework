@@ -54,12 +54,9 @@ DocBrowser = function(parent, dt, label, field_list) {
 	this.wrapper = $a(parent, 'div', '', {display:'none'});
 
 	// areas
-	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '140px auto', width: '480px', 
-		padding:'16px', backgroundColor:'#DDF', 
-		fontSize:'14px', textAlign: 'center',
+	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '16px 0px', 
+		padding:'4px', backgroundColor:'#FFC'
 	});
-	$br(this.no_result_area, '5px');
-	$gr(this.no_result_area, '#EEF', '#CCF');
 	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
@@ -90,6 +87,7 @@ DocBrowser.prototype.load_details = function() {
 	var callback = function(r,rt) { 
 		me.dt_details = r.message;
 		if(r.message) {
+			me.show_trend(r.message.trend);
 			me.make_the_list(me.dt, me.body);
 			me.show_results();
 		}
@@ -106,6 +104,44 @@ DocBrowser.prototype.show_results = function() {
 	$ds(this.body);
 	$dh(this.no_result_area);
 	set_title(get_doctype_label(this.label));
+}
+
+// -------------------------------------------------
+
+DocBrowser.prototype.show_trend = function(trend) {
+	this.trend_area = $a(this.body, 'div', '', {margin:'8px 16px'});
+	var maxval = 0;
+	for(var key in trend) { if(trend[key]>maxval) maxval = trend[key] };
+
+	// head
+	var div = $a(this.trend_area, 'div','',{marginLeft:'32px', color:'#888'}); div.innerHTML = 'Activity in last 30 days';
+	var wrapper_tab = make_table(this.trend_area, 1, 2, '100%', ['20px',null], {padding:'4px',fontSize:'10px',color:'#888'});
+
+	// y-label
+	var ylab_tab = make_table($td(wrapper_tab,0,0),2,1,'100%',['100%'],{verticalAlign:'top', textAlign:'right',height:'24px'});
+	$td(ylab_tab,0,0).innerHTML = maxval;
+
+	$y($td(ylab_tab,1,0),{verticalAlign:'bottom'});
+	$td(ylab_tab,1,0).innerHTML = '0';
+
+	// infogrid
+	var tab = make_table($td(wrapper_tab,0,1), 1, 30, '100%', [], 
+		{width:10/3 + '%', border:'1px solid #DDD', height:'40px', verticalAlign:'bottom', textAlign:'center', padding:'4px'});
+		
+	// labels
+	var labtab = make_table($td(wrapper_tab,0,1), 1, 6, '100%', [], 
+		{width:100/6 + '%', border:'1px solid #FFF', height:'16px',color:'#888',textAlign:'right',fontSize:'10px'});
+	
+	for(var i=0; i<30; i++) {
+		var div = $a($td(tab,0,30-i),'div','',{backgroundColor:'#9CD', width:'50%', margin:'auto', height:(trend[i] ? (trend[i]*100/maxval) : 0) + '%'});		
+		
+		// date string
+		if(i % 5 == 0) {
+			$td(labtab,0,5-(i/5)).innerHTML = dateutil.obj_to_user(dateutil.add_days(new Date(), -i));
+			$y($td(tab,0,i-1),{'backgroundColor':'#EEE'});
+		}
+	}
+	$td(labtab,0,5).innerHTML = 'Today';
 }
 
 // -------------------------------------------------
@@ -130,15 +166,15 @@ DocBrowser.prototype.make_new = function(dt, label, field_list) {
 	
 DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	var me = this;
-	var lst = new Listing(dt);
+	var lst = new Listing(dt, 1);
 	lst.cl = me.dt_details.columns;
 	lst.dt = dt;
 
 	lst.opts = {
-		cell_style : {padding:'3px 2px',borderBottom:'1px dashed #CCC'},
+		cell_style : {padding:'6px 2px'},
 		alt_cell_style : {backgroundColor:'#FFFFFF'},
-		head_style : {overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},
-		head_main_style : {padding:'0px'},
+		//head_style : {overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},
+		//head_main_style : {padding:'0px'},
 		hide_export : 1,
 		hide_print : 1,
 		hide_refresh : 0,
@@ -173,16 +209,36 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	}
 	
 	// make the columns
-	lst.colwidths=['5%']; lst.colnames=['Sr']; lst.coltypes=['Data']; lst.coloptions = [''];
+	lst.colwidths=['100%']; lst.coltypes=['Data']; lst.coloptions = [''];
 
-	for(var i=0;i < lst.cl.length;i++) {
+	/*for(var i=0;i < lst.cl.length;i++) {
 		lst.colwidths[i+1] = cint(100/lst.cl.length) + '%';
 		lst.colnames[i+1] = lst.cl[i][1];
 		lst.coltypes[i+1] = lst.cl[i][2];
 		lst.coloptions[i+1] = lst.cl[i][3];
 			
 		lst.add_sort(i+1, lst.cl[i][0]);
+	}*/
+	
+	lst.show_cell = function(cell, ri, ci, d) {
+		var div = $a(cell, 'div');
+		
+		var span = $a(div, 'span', 'link_type', {fontWeight:'bold'});
+		span.innerHTML = d[ri][0];
+		span.onclick = function() { loaddoc(me.dt, this.innerHTML); }
+		
+		var span = $a(div, 'span', '', {paddingLeft:'8px'});
+		var tmp = []
+		for(var i=2; i<d[ri].length; i++) {
+			if(lst.cl[i][1] && d[ri][i])
+				tmp.push(lst.cl[i][1] + ': ' + d[ri][i]);
+		}
+		span.innerHTML = tmp.join(' | ');
+			
+		var div = $a(cell, 'div', '', {color:'#888', fontSize:'11px'});
+		div.innerHTML = comment_when(d[ri][1]);
 	}
+	
 	lst.make(wrapper);
 
 	// add the filters
@@ -199,7 +255,7 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	}
 	
 	// customize ID field - for submittable doctypes
-	if(me.dt_details.submittable) {
+	/*if(me.dt_details.submittable) {
 		lst.show_cell = function(cell,ri,ci,d) {
 			if (ci==0){
 				// link
@@ -217,9 +273,9 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 				lst.std_cell(d,ri,ci);
 			}
 		}
-	}
+	}*/
 	
 	// default sort
-	lst.set_default_sort('name', in_list(lst.coltypes, 'Date') ? 'DESC' : 'ASC');
+	lst.set_default_sort('modified', 'DESC');
 	lst.run();
 }

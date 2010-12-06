@@ -10,17 +10,8 @@ function WNToolbar(parent) {
 	var me = this;
 	
 	this.setup = function() {
-		this.wrapper = $a(parent, 'div', '', {position:'fixed', top:'0px', width: '100%', color:'#FFF', zIndex:'1000',padding:'2px 0px' });
-		if(!isIE) {
-			set_gradient(this.wrapper, '#444', '#000');
-		}
-
-		if(isIE6) {
-			$y(me.wrapper, {position:'absolute', top:'0px'});
-			scroll_list.push(function() { 
-				page_body.wntoolbar.wrapper.style.top = (get_scroll_top())+'px'; 
-			})
-		}
+		this.wrapper = $a(parent, 'div', '', {color:'#FFF', padding:'2px 0px' });
+		set_gradient(this.wrapper, '#444', '#000');
 
 		this.table_wrapper = $a(this.wrapper, 'div', '', {marginLeft:'4px', padding:'2px'});
 		this.body_tab = make_table(this.table_wrapper, 1, 3, '100%', ['0%','64%','36%'],{verticalAlign:'middle'});

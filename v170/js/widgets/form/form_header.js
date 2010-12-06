@@ -1,14 +1,15 @@
 _f.FrmHeader = function(parent) {
 	var me = this;
-	this.wrapper = $a(parent, 'div', '', {backgroundColor:def_ph_style.wrapper.backgroundColor});
+	this.wrapper = $a(parent, 'div');
+
 	this.page_head = new PageHeader(this.wrapper);
-	$y(this.page_head.wrapper, {marginBottom:'0px'});
+	//$y(this.page_head.wrapper, {marginBottom:'0px'});
 	
 	// doctype
-	this.dt_area = $a(this.page_head.main_head, 'span', '', {fontSize:'16px', fontWeight:'bold', marginRight:'8px'})
+	this.dt_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', marginRight:'8px', fontWeight:'bold'})
 	
 	// name
-	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'16px', fontWeight:'normal', marginRight:'8px'})
+	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'14px', fontWeight:'normal', marginRight:'8px'})
 
 	// timestamp
 	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'none'});
@@ -121,7 +122,7 @@ _f.FrmHeader.prototype.refresh_toolbar = function() {
 
 _f.FrmHeader.prototype.refresh_comments = function() {
 	if(!cur_frm.no_of_comments) cur_frm.no_of_comments = 0;
-	$(this.comment_btn).button('option','label','Comments ('+cur_frm.no_of_comments+')');
+	this.comment_btn.innerHTML = 'Comments ('+cur_frm.no_of_comments+')';
 }
 
 // refresh heading and labels

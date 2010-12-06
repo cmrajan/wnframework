@@ -95,7 +95,7 @@ function Body() {
 	this.setup = function() {
 		this.cp = locals['Control Panel']['Control Panel'];
 		
-		this.wntoolbar_area = $a(document.getElementsByTagName('body')[0], 'div');
+		this.wntoolbar_area = $a($i('body_div'),'div'); // $a(document.getElementsByTagName('body')[0], 'div');
 		this.wrapper = $a($i('body_div'),'div');
 		this.banner_area = $a(this.wrapper, 'div');;
 		

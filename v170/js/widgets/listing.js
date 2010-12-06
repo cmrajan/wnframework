@@ -22,7 +22,7 @@ function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
 	this.page_len = 20;
 	this.paging_len = 5;
-	this.filters_per_line = 5;
+	this.filters_per_line = 7;
 	this.cell_idx = 0;
 	this.head_text = head_text ? head_text : 'Result';
 	this.keyword = 'records';
@@ -295,7 +295,7 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	inp.df.single_select = 1;
 	inp.parent_cell = c;
 	inp.parent_tab = this.input_tab;
-	$y(inp.wrapper,{width:'140px'});
+	$y(inp.wrapper,{width:'95%'});
 	inp.refresh();
 	
 	//if(!inp.input.custom_select && !inp.input.txt)

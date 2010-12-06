@@ -7,22 +7,17 @@
 				+ sub_head
 			+ [r1c2] 
 				+ close_btn
-		+ seperator
 		+ toolbar_area
 		+ tag_area
+		+ seperator
 */
 
 var def_ph_style = {
 	wrapper: {marginBottom:'16px', backgroundColor:'#EEE'}
-	,main_heading: { fontSize:'16px', fontWeight:'bold', padding: '4px',textShadow:'0px 1px 0px #fff'}
+	,main_heading: { fontSize:'18px', padding: '4px 0px', fontWeight:'bold'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555', display:'none' }
-	,toolbar_area: { margin:'0px', marginLeft:'4px', display:'none'}
-	,toolbar_area2: { margin:'0px', marginLeft:'4px', display:'none'}
-	,separator: { borderBottom:'2px solid #AAA', display: 'none' } // show this when there is no toolbar
-	,tag_area: { color:'#888', fontSize:'10px', textAlign:'right', padding: '2px'}
-	,close_btn: { cursor:'pointer', width:'64px', cssFloat:'right', height: '24px', 
-		background:"url('images/ui/close_btn.gif') center no-repeat"
-	}
+	,separator: { borderTop:'3px solid #444' } // show this when there is no toolbar
+	,toolbar_area: { padding:'6px 0px', display:'none',borderBottom:'1px solid #AAA'}
 }
 
 function PageHeader(parent, main_text, sub_text) {
@@ -35,18 +30,13 @@ function PageHeader(parent, main_text, sub_text) {
 	this.main_head = $a(this.lhs, 'div', '', def_ph_style.main_heading);
 	this.sub_head = $a(this.lhs, 'div', '', def_ph_style.sub_heading);
 
-	this.toolbar_area = $a(this.lhs, 'div', '', def_ph_style.toolbar_area);
-	this.toolbar_area2 = $a(this.lhs, 'div', 'blue_buttons', def_ph_style.toolbar_area2);
 	this.separator = $a(this.wrapper, 'div', '', def_ph_style.separator);
-	this.tag_area = $a(this.wrapper, 'div', '', def_ph_style.tag_area);
+	this.toolbar_area = $a(this.wrapper, 'div', '', def_ph_style.toolbar_area);
+	this.padding_area = $a(this.wrapper, 'div', '', {padding:'3px'});
 
 	// close btn
-	$y($td(this.t1, 0, 1),{textAlign:'right'});
-	this.close_btn = $a($td(this.t1, 0, 1), 'button','',{fontSize:'11px'});
-	this.close_btn.innerHTML = 'Close';
-	$(this.close_btn).button({icons:{ primary: 'ui-icon-closethick' }});
-
-	this.close_btn.onclick = function() { nav_obj.show_last_open(); }
+	$y($td(this.t1, 0, 1),{textAlign:'right', padding:'3px'});
+	this.close_btn = wnbutton($td(this.t1, 0, 1), 'Close',function() { nav_obj.show_last_open(); },0);
 
 	if(main_text) this.main_head.innerHTML = main_text;
 	if(sub_text) this.sub_head.innerHTML = sub_text;
@@ -55,62 +45,21 @@ function PageHeader(parent, main_text, sub_text) {
 	this.buttons2 = {};
 }
 
-PageHeader.prototype.add_button = function(label, fn, bold, icon, green, toolbar2) {
+PageHeader.prototype.add_button = function(label, fn, bold, icon, green) {
 
 	var tb = this.toolbar_area;
-	
-	// set toolbar and no repeats
-	if(toolbar2) {
-		tb = this.toolbar_area2;
-		if(this.buttons2[label]) return;
-	} else {
-		if(this.buttons[label]) return;
-	}
-	
-	// make the button
-	if(green)
-		var btn = $a($a(tb, 'span', 'green_buttons'),'button','',{fontSize:'11px'});
-	else
-		var btn = $a(tb,'button','',{fontSize:'11px'});
-
-	// text and function
-	btn.onclick = fn;
-	
-	// if not icon
-	if(!icon)icon='ui-icon-circle-triangle-e';
-
-	// style
-	if(bold)$y(btn, {fontWeight: 'bold'});
-	$(btn).button({icons:{ primary: icon }, label:label});
-
-	// show toolbar
-	this.show_toolbar(toolbar2);
+	if(this.buttons[label]) return;
 		
-	// add to dict
-	if(toolbar2) {
-		this.buttons2[label]=btn;
-	} else {	
-		this.buttons[label]=btn;
-	}
+	var btn = wnbutton(tb,label,fn,bold,{marginRight:'4px'},(green ? 'green' : ''));
+	this.buttons[label]=btn;
+	$ds(this.toolbar_area);
 	
 	return btn;
-}
-
-PageHeader.prototype.show_toolbar = function(toolbar2) {
-	$ds(this.toolbar_area);
-	$dh(this.separator);
-	if(toolbar2) $ds(this.toolbar_area2);
 }
 
 PageHeader.prototype.clear_toolbar = function() {
 	this.toolbar_area.innerHTML = '';
 	this.buttons = {};
-}
-
-PageHeader.prototype.clear_toolbar2 = function() {
-	this.toolbar_area2.innerHTML = '';
-	$dh(this.toolbar_area2);	
-	this.buttons2 = {};
 }
 
 PageHeader.prototype.make_buttonset = function() {
