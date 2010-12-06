@@ -164,11 +164,11 @@ class AppManager:
 	# create a new app
 	# ----------------------------------
 	def new_app(self, ac_name, source):
-		import webnotes.setup
+		import setup
 
 		# setup
 		print 'Creating new application...'
-		ret = webnotes.setup.create_account(ac_name, source)
+		ret = setup.create_account(ac_name, source)
 		ret, db_name = ret.split(',')
 		print ac_name + ' created !!!'
 	
