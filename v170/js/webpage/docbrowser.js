@@ -115,7 +115,7 @@ DocBrowser.prototype.show_trend = function(trend) {
 
 	// head
 	var div = $a(this.trend_area, 'div','',{marginLeft:'32px', color:'#888'}); div.innerHTML = 'Activity in last 30 days';
-	var wrapper_tab = make_table(this.trend_area, 1, 2, '100%', ['20px',null], {padding:'4px',fontSize:'10px',color:'#888'});
+	var wrapper_tab = make_table(this.trend_area, 1, 2, '100%', ['20px',null], {padding:'2px 4px',fontSize:'10px',color:'#888'});
 
 	// y-label
 	var ylab_tab = make_table($td(wrapper_tab,0,0),2,1,'100%',['100%'],{verticalAlign:'top', textAlign:'right',height:'24px'});
@@ -126,14 +126,14 @@ DocBrowser.prototype.show_trend = function(trend) {
 
 	// infogrid
 	var tab = make_table($td(wrapper_tab,0,1), 1, 30, '100%', [], 
-		{width:10/3 + '%', border:'1px solid #DDD', height:'40px', verticalAlign:'bottom', textAlign:'center', padding:'4px'});
+		{width:10/3 + '%', border:'1px solid #DDD', height:'40px', verticalAlign:'bottom', textAlign:'center', padding:'2px'});
 		
 	// labels
 	var labtab = make_table($td(wrapper_tab,0,1), 1, 6, '100%', [], 
 		{width:100/6 + '%', border:'1px solid #FFF', height:'16px',color:'#888',textAlign:'right',fontSize:'10px'});
 	
 	for(var i=0; i<30; i++) {
-		var div = $a($td(tab,0,30-i),'div','',{backgroundColor:'#9CD', width:'50%', margin:'auto', height:(trend[i] ? (trend[i]*100/maxval) : 0) + '%'});		
+		var div = $a($td(tab,0,30-i),'div','',{backgroundColor:'#4AC', width:'50%', margin:'auto', height:(trend[i] ? (trend[i]*100/maxval) : 0) + '%'});		
 		
 		// date string
 		if(i % 5 == 0) {
