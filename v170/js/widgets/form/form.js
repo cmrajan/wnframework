@@ -426,28 +426,17 @@ _f.Frm.prototype.setup_print_layout = function() {
 	if(this.meta.read_only_onload) {
 		this.print_wrapper = $a(this.wrapper, 'div');
 		this.print_head = $a(this.print_wrapper, 'div');
-		set_gradient(this.print_head, '#EEE', '#DDD');
 		this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
 		
 		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '2px'});
 		this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
-		this.view_btn = $($a(this.view_btn_wrapper, 'button', '', {marginRight:'4px'}))
-			.html('View Details')
-			.button({icons:{ primary: 'ui-icon-document' }})
-			.click(function() { cur_frm.edit_doc() });
+		this.view_btn = wnbutton(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 0, null, 'green');
+
 		this.print_btn = $a($td(t,0,0), 'button')
-		$(this.print_btn)
-			.html('Print')
-			.button({icons:{ primary: 'ui-icon-print' }})
-			.click(function() { cur_frm.print_doc() });
+		this.print_btn = wnbutton($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
 
 		$y($td(t,0,1), {textAlign: 'right'});
-		this.print_close_btn = $a($td(t,0,1), 'button', '', {cssFloat: 'right'})
-		$(this.print_close_btn)
-			.html('Close')
-			.button({icons:{ primary: 'ui-icon-closethick' }})
-			.click(function() { nav_obj.show_last_open(); });
-
+		this.print_close_btn = wnbutton($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); }, 0, {cssFloat: 'right'});
 	}
 }
 
