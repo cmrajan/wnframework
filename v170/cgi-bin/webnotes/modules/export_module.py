@@ -2,7 +2,7 @@
 # export to files
 # ==============================================================================
 
-def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, verbose=1):
+def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, verbose=1, record_module=None):
 	# Multiple doctype  and multiple modules export to be done
 	# for Module Def, right now using a hack..should consider table update in the next version
 	# all modules transfer not working, because source db not known
@@ -27,7 +27,7 @@ def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, ve
 	for doclist in module_doclist:
 		if verbose:
 			out.append("Writing for " + doclist[0]['doctype'] + " / " + doclist[0]['name'])
-		write_document_file(doclist)
+		write_document_file(doclist, record_module)
 	
 	# write the module.info file
 	if modules:
@@ -135,7 +135,7 @@ def get_module_doclist(module):
 # ==============================================================================
 # Write doclist into file
 # ==============================================================================
-def write_document_file(doclist):
+def write_document_file(doclist, record_module=None):
 	import os
 	import webnotes
 	import webnotes.defs
@@ -145,6 +145,8 @@ def write_document_file(doclist):
 		module = doclist[0]['name']
 	elif doclist[0]['doctype']=='Control Panel':
 		module = 'System'
+	elif record_module:
+		module = record_module
 	else:
 		module = doclist[0]['module']
 

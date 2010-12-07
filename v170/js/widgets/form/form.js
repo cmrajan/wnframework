@@ -428,9 +428,9 @@ _f.Frm.prototype.setup_print_layout = function() {
 		this.print_head = $a(this.print_wrapper, 'div');
 		this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
 		
-		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '2px'});
+		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '4px'});
 		this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
-		this.view_btn = wnbutton(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 0, null, 'green');
+		this.view_btn = wnbutton(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 0, {marginRight:'4px'}, 'green');
 
 		this.print_btn = wnbutton($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
 
