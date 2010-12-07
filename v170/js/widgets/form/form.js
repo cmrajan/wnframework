@@ -432,7 +432,6 @@ _f.Frm.prototype.setup_print_layout = function() {
 		this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
 		this.view_btn = wnbutton(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 0, null, 'green');
 
-		this.print_btn = $a($td(t,0,0), 'button')
 		this.print_btn = wnbutton($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
 
 		$y($td(t,0,1), {textAlign: 'right'});
