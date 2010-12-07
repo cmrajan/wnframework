@@ -133,7 +133,8 @@ DocBrowser.prototype.show_trend = function(trend) {
 		{width:100/6 + '%', border:'1px solid #FFF', height:'16px',color:'#888',textAlign:'right',fontSize:'10px'});
 	
 	for(var i=0; i<30; i++) {
-		var div = $a($td(tab,0,30-i),'div','',{backgroundColor:'#4AC', width:'50%', margin:'auto', height:(trend[i] ? (trend[i]*100/maxval) : 0) + '%'});		
+		var div = $a($td(tab,0,29-i),'div','',{backgroundColor:'#4AC', width:'50%', margin:'auto', height:(trend[i+''] ? (trend[i+'']*100/maxval) : 0) + '%'});
+		div.setAttribute('title', trend[i] + ' records');
 		
 		// date string
 		if(i % 5 == 0) {
@@ -160,6 +161,19 @@ DocBrowser.prototype.show_no_result = function() {
 DocBrowser.prototype.make_new = function(dt, label, field_list) {
 	// make the list
 	this.make_the_list(dt, this.body);
+}
+
+// -------------------------------------------------
+
+DocBrowser.prototype.add_tag = function(cell, label) {
+	if(!cell.tag_area) {
+		cell.tag_area = $a(cell, 'div', '', {margin:'3px 0px', padding:'3px 0px', fontSize:'10px'});	
+	}
+	
+	// tag area
+	var span=$a(cell.tag_area,'span','',{padding:'3px', backgroundColor:'#4AC', color:'#FFF', marginRight:'4px'});
+	span.innerHTML = label;
+	$br(span,'3px');
 }
 
 // -------------------------------------------------
@@ -220,21 +234,40 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		lst.add_sort(i+1, lst.cl[i][0]);
 	}*/
 	
+	
+	// show cell
 	lst.show_cell = function(cell, ri, ci, d) {
 		var div = $a(cell, 'div');
 		
+		// link
 		var span = $a(div, 'span', 'link_type', {fontWeight:'bold'});
 		span.innerHTML = d[ri][0];
 		span.onclick = function() { loaddoc(me.dt, this.innerHTML); }
+
+		// docstatus tag
+		var docstatus = cint(d[ri][d[ri].length - 1]);
+		if(me.dt_details.submittable) 
+			{ me.add_tag(cell, (docstatus ? 'Submitted' : 'Draft')); }
 		
+		// values
 		var span = $a(div, 'span', '', {paddingLeft:'8px'});
 		var tmp = []
 		for(var i=2; i<d[ri].length; i++) {
-			if(lst.cl[i] && lst.cl[i][1] && d[ri][i])
-				tmp.push(lst.cl[i][1] + ': ' + d[ri][i]);
+			if(lst.cl[i] && lst.cl[i][1] && d[ri][i]) {
+				
+				// has status, group or type in the label
+				if(lst.cl[i][1].indexOf('Status') != -1 || 
+					lst.cl[i][1].indexOf('Group') != -1 || 
+					lst.cl[i][1].indexOf('Type') != -1) {
+						me.add_tag(cell, d[ri][i]);	
+				} else {
+					tmp.push(lst.cl[i][1] + ': ' + d[ri][i]);
+				}
+			}
 		}
 		span.innerHTML = tmp.join(' | ');
-			
+		
+		// time
 		var div = $a(cell, 'div', '', {color:'#888', fontSize:'11px'});
 		div.innerHTML = comment_when(d[ri][1]);
 	}

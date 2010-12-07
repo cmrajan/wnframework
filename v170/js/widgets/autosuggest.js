@@ -237,11 +237,13 @@ AutoSuggest.prototype.doAjaxRequest = function (input)
 		if(cur_frm)var doc = locals[cur_frm.doctype][cur_frm.docname];
 		q = this.oP.link_field.get_query(doc, this.oP.link_field.doctype, this.oP.link_field.docname);
 	}
+	$y(this.fld, {backgroundColor:'#FFD'});
 	$c('webnotes.widgets.search.search_link', args={
 		'txt': this.fld.value, 
 		'dt':this.oP.link_field.df.options,
 		'query':q  }
 		, function(r,rt) {
+		$y(me.fld, {backgroundColor:'#FFF'});
 		me.setSuggestions(r, rt, input);
 	});
 	

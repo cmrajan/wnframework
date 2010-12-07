@@ -112,10 +112,11 @@ def add_code_from_files(doclist, folder):
 	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
 	code = ''
 	for code_field in code_fields:
-		# see if the file exists		
-		fname = os.path.join(folder, os.path.basename(folder)+'.'+code_field[1])
+		# see if the file exists
+		name_extn = ''
 		if code_field[0]=='static_content':
-			fname += ' Static'
+			name_extn += ' Static'
+		fname = os.path.join(folder, os.path.basename(folder)+name_extn+'.'+code_field[1])
 		
 		code = ''
 		try:

@@ -146,8 +146,8 @@ Field.prototype.refresh_mandatory = function() {
 	if(this.label_area) {
 		if(this.df.reqd) {
 			this.label_area.style.color= "#d22";
-			if(this.txt)$y(this.txt,{backgroundColor:"#FFFED7"});
-			else if(this.input)$y(this.input,{backgroundColor:"#FFFED7"});
+			if(this.txt)$y(this.txt,{backgroundColor:"#FEE"});
+			else if(this.input)$y(this.input,{backgroundColor:"#FEE"});
 		} else {
 			this.label_area.style.color= "#222";
 			if(this.txt)$y(this.txt,{backgroundColor:"#FFF"});
