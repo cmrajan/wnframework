@@ -268,7 +268,7 @@ var doc_browser_page;
 function loaddocbrowser(dt, label, fields) {
 	dt = get_label_doctype(dt);
 	if(!doc_browser_page)
-		doc_browser_page = new DocBrowserPage();
+		doc_browser_page = new ItemBrowserPage();
 	doc_browser_page.show(dt, label, fields);
 	nav_obj.open_notify('DocBrowser',dt,'');
 }
