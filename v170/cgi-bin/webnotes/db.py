@@ -3,7 +3,7 @@
 
 import MySQLdb
 from webnotes import defs
-
+import webnotes
 class Database:
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
@@ -27,7 +27,7 @@ class Database:
 		if use_default:
 			self.use(defs.db_name)
 		
-
+		webnotes.logger.debug('Database object initialized for:%s',self.user)
 	def get_db_login(self, ac_name):
 		import webnotes.db
 		c = webnotes.db.Database(use_default = 1)
@@ -86,19 +86,25 @@ class Database:
 	
 	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1, ignore_no_table = 1):
 		# check security
-		import webnotes
-	
+		if self.user in defs.debug_dbs:
+			webnotes.logger.debug('SQL Query:%s',query)
 		# replace 'tab' by 'test' if testing
 		if self.is_testing and allow_testing:
 			query = self.replace_tab_by_test(query)
 
+		if self.user in defs.debug_dbs:
+			webnotes.logger.debug('Checking Transaction status' )
 		# in transaction validations
 		self.check_transaction_status(query)
 		
 		# execute
 		if values!=():
+			if self.user in defs.debug_dbs:
+				webnotes.logger.debug('Executing SQL Query %s with values:%s',query,values)
 			self._cursor.execute(query, values)
 		else:
+			if self.user in defs.debug_dbs:
+				webnotes.logger.debug('Executing SQL Query:%s',query)
 			self._cursor.execute(query)	
 
 		# scrub output if required

@@ -28,6 +28,10 @@ adt_list = ['DocType', 'DocField', 'DocPerm']
 response = {'message':'', 'exc':''}
 
 debug_log, message_log = [], []
+import logging
+import logging.handlers
+import os
+import defs
 
 def getTraceback():
 	import sys, traceback, string
@@ -98,4 +102,21 @@ def set_as_admin(db_name=None, ac_name=None):
 	session = {'user':'Administrator'}
 	import webnotes.profile
 	user = webnotes.profile.Profile('Administrator')
+
+
+LOG_FILENAME = os.path.join(defs.log_file_path,'wnframework.log')
+logger = logging.getLogger('WNLogger')
+logger.setLevel(eval(defs.log_level))
+
+
+log_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxBytes = 30000,backupCount = 5)
+
+console_handler = logging.StreamHandler()
+
+
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+log_handler.setFormatter(formatter)
+logger.addHandler(log_handler)
+logger.info('Importing Webnotes')
 	

@@ -4,8 +4,8 @@
 # 
 # After "accounts" is created, login and pwd should point to accounts db
 
-db_name = 'accounts'
-db_login = 'accounts'
+db_name = 's3u001'
+db_login = 's3u001'
 db_password = 'ac_user09'
 
 # root
@@ -21,8 +21,15 @@ mail_password = 'test'
 server_prefix = 's3u'
 
 mysql_path = ''
+files_path = ''
 
-#files_path = ''
-#modules_path = '/home/anand/workspace/webnotes/wnframework-modules/trunk'
-#developer_mode = 1
+#LOG SETTINGS
+log_file_path = '/home/anand/workspace/webnotes/wnframework/trunk/v170/log'
+debug_dbs = ['accounts']
+log_level = 'logging.INFO'
+
+
+#MODULE MANAGER SETTINGS
+modules_path = '/home/anand/workspace/webnotes/wnframework-modules/trunk'
+developer_mode = 1
 user_timezone = 'Asia/Calcutta'
