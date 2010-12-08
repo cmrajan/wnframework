@@ -143,7 +143,7 @@ def write_document_file(doclist, record_module=None):
 	import webnotes
 	import webnotes.defs
 
-	global
+	global updated_modules
 
 	# module name
 	if doclist[0]['doctype'] == 'Module Def':
