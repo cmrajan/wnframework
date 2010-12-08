@@ -122,7 +122,8 @@ _f.FrmHeader.prototype.refresh_toolbar = function() {
 
 _f.FrmHeader.prototype.refresh_comments = function() {
 	if(!cur_frm.no_of_comments) cur_frm.no_of_comments = 0;
-	this.comment_btn.innerHTML = 'Comments ('+cur_frm.no_of_comments+')';
+	if(this.comments_btn)
+		this.comment_btn.innerHTML = 'Comments ('+cur_frm.no_of_comments+')';
 }
 
 // refresh heading and labels

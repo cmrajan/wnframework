@@ -43,7 +43,8 @@ _f.FrmHeader.prototype.show_toolbar=function(){$ds(this.wrapper);this.refresh();
 _f.FrmHeader.prototype.hide_toolbar=function(){$dh(this.wrapper);}
 _f.FrmHeader.prototype.refresh_toolbar=function(){var m=cur_frm.meta;if(m.hide_heading){this.hide();}else{this.show();if(m.hide_toolbar){this.hide_toolbar();}else{this.show_toolbar();}}
 this.refresh_comments();}
-_f.FrmHeader.prototype.refresh_comments=function(){if(!cur_frm.no_of_comments)cur_frm.no_of_comments=0;this.comment_btn.innerHTML='Comments ('+cur_frm.no_of_comments+')';}
+_f.FrmHeader.prototype.refresh_comments=function(){if(!cur_frm.no_of_comments)cur_frm.no_of_comments=0;if(this.comments_btn)
+this.comment_btn.innerHTML='Comments ('+cur_frm.no_of_comments+')';}
 _f.FrmHeader.prototype.get_timestamp=function(doc){var scrub_date=function(d){if(d)t=d.split(' ');else return'';return dateutil.str_to_user(t[0])+' '+t[1];}
 return repl("Created: %(c_by)s %(c_on)s %(m_by)s %(m_on)s</span>",{c_by:doc.owner,c_on:scrub_date(doc.creation?doc.creation:''),m_by:doc.modified_by?('<br> Modified: '+doc.modified_by):'',m_on:doc.modified?('on '+scrub_date(doc.modified)):''});}
 _f.FrmHeader.prototype.get_status_tags=function(doc,f){var make_tag=function(label,col){var s=$a(null,'span','',{padding:'2px',backgroundColor:col,color:'#FFF',fontWeight:'bold',marginLeft:(f.meta.issingle?'0px':'8px'),fontSize:'11px'});$(s).css('-moz-border-radius','3px').css('-webkit-border-radius','3px')
