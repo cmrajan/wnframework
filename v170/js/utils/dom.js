@@ -30,8 +30,7 @@ $wid_pressed = function(ele,color) {
 
 // item
 $item_normal = function(ele) { 
-	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal',
-		textOverflow:'ellipsis-word', whiteSpace:'nowrap',overflow:'hidden'}); 
+	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden'});
 	
 	$br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
 }

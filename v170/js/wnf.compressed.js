@@ -103,7 +103,7 @@ function addEvent(ev,fn){if(isIE){document.attachEvent('on'+ev,function(){fn(win
 $wid_normal=function(ele,color){$y(ele,{padding:'2px 8px',border:'1px solid #CCC',cursor:'pointer',fontSize:'11px',color:'#444'});$br(ele,'3px');$gr(ele,'#FFF','#DDD');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #4B4'});$gr(ele,'#9C9','#4A4');}}
 $wid_active=function(ele,color){$y(ele,{border:'1px solid #000'});$gr(ele,'#FFF','#EEE');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#AFA','#7C7');}}
 $wid_pressed=function(ele,color){$y(ele,{border:'1px solid #000'});$gr(ele,'#EEF','#DDF');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#7C7','#2A2');}}
-$item_normal=function(ele){$y(ele,{padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal',textOverflow:'ellipsis-word',whiteSpace:'nowrap',overflow:'hidden'});$br(ele,'3px');$bg(ele,'#FFF');$fg(ele,'#000');}
+$item_normal=function(ele){$y(ele,{padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal',whiteSpace:'nowrap',overflow:'hidden'});$(ele).css('text-overflow','ellipsis');$br(ele,'3px');$bg(ele,'#FFF');$fg(ele,'#000');}
 $item_active=function(ele){$bg(ele,'#F90');$fg(ele,'#FFF');$y(ele,{fontWeight:'bold'})}
 $item_selected=function(ele){$bg(ele,'#444');$fg(ele,'#FFF');$y(ele,{fontWeight:'bold'});}
 $item_pressed=function(ele){$bg(ele,'#FC8');$fg(ele,'#FFF');}
