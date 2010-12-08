@@ -39,7 +39,7 @@ $item_selected = function(ele) {
 	$bg(ele,'#444'); $fg(ele,'#FFF');$y(ele,{fontWeight:'bold'});
 }
 $item_pressed = function(ele) {
-	$bg(ele,'#6AD'); $fg(ele,'#FFF');
+	$bg(ele,'#FC8'); $fg(ele,'#FFF');
 }
 
 // set out of 100
@@ -65,7 +65,11 @@ function set_gradient(ele, from, to) {
 	if(isFF && ffversion < 3.6)no_gradient=1;
 
 	if(no_gradient) {
-		$y(ele, {backgroundColor: '#' + cint(cint(from.substr(1)) - cint(to.substr(1)) / 2)});
+		var rgb_from = get_rgb(from.substr(1)); var rgb_to = get_rgb(to.substr(1));
+		$y(ele, {backgroundColor: '#' 
+			+ d2h(rgb_to[0] + (rgb_from[0]-rgb_to[0])/2) 
+			+ d2h(rgb_to[1] + (rgb_from[1]-rgb_to[1])/2)
+			+ d2h(rgb_to[2] + (rgb_from[2]-rgb_to[2])/2)});
 	} else {
 		$y(ele, {background: '-webkit-gradient(linear, left top, left bottom, from('+from+'), to('+to+'))'});
 		$y(ele, {background: '-moz-linear-gradient(top, '+from+', '+to+')'});		
@@ -134,15 +138,19 @@ function add_sel_options(s, list, sel_val, o_style) {
 function cint(v, def) { v=v+''; v=lstrip(v, ['0',]); v=parseInt(v); if(isNaN(v))v=def?def:0; return v; }
 function validate_email(id) { if(strip(id).search("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")==-1) return 0; else return 1; }
 	
-function d2h(d) {return d.toString(16);}
+function d2h(d) {return cint(d).toString(16);}
 function h2d(h) {return parseInt(h,16);} 
 
 function get_darker_shade(col, factor) {
 	if(!factor) factor = 0.5;
-	if(col.length==3) { var r = col[0]; var g=col[1]; var b=col[2] }
-	else if(col.length==6) { var r = col.substr(0,2); var g = col.substr(2,2); var b = col.substr(4,2) }
-	else return col;
-	return "" + d2h(cint(h2d(r)*factor)) + d2h(cint(h2d(g)*factor)) + d2h(cint(h2d(b)*factor));
+	rgb = get_rgb(col)
+	return "" + d2h(cint(rgb[0]*factor)) + d2h(cint(rgb[1]*factor)) + d2h(cint(rgb[2]*factor));
+}
+
+function get_rgb(col) {
+	if(col.length==3) { return [h2d(col[0]), h2d(col[1]), h2d(col[2])] }
+	else if(col.length==6) { return [h2d(col.substr(0,2)), h2d(col.substr(2,2)), h2d(col.substr(4,2))] }
+	else return [];	
 }
 
 var $n = '\n';

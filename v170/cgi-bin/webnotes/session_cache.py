@@ -35,14 +35,19 @@ def get():
 		country = webnotes.session['data'].get('ipinfo')['CountryName']
 
 	# check if cache exists
-	if not getattr(webnotes.defs,'developer_mode',None):
+	if not getattr(webnotes.defs,'auto_cache_clear',None):
 		cache = load(country)
 		if cache:
 			return cache
 	
+	# run patches
+	import webnotes.modules.patch
+	webnotes.modules.patch.run()
+
 	# if not create it
 	sd = build()
 	dump(sd, country)
+
 	# update profile from cache
 	webnotes.session['data']['profile'] = sd['profile']	
 		

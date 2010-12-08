@@ -11,10 +11,9 @@ list_opts = {
 	hide_refresh : 0,
 	hide_rec_label: 0,
 	show_calc: 1,
-	show_empty_tab : 1,
+	show_empty_tab : 0,
 	show_bottom_paging: 1,
-	round_corners: 1,
-	no_border: 0,
+	no_border: 1,
 	append_records: 0,
 	table_width: null
 };
@@ -281,13 +280,16 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	
 	$y(c,{width:cint(100/this.filters_per_line) + '%',textAlign:'left',verticalAlign:'top'});
 	
+	// filter label
 	var d1= $a(c,'div','',{fontSize:'11px', marginBottom:'2px'}); d1.innerHTML = label;
+	if(ftype=='Link') d1.innerHTML += ' <img src="images/icons/link.png" style="margin-bottom:-5px" title="Link">';
+	
 	var d2= $a(c,'div');
 	
 	// create the filter
 	if(in_list(['Text', 'Small Text', 'Code', 'Text Editor'],ftype)) 
 		ftype='Data';
-	var inp = make_field({fieldtype:ftype, 'label':label, 'options':options}, '', d2, this, 0, 1);
+	var inp = make_field({fieldtype:ftype, 'label':label, 'options':options, no_buttons:1}, '', d2, this, 0, 1);
 	inp.not_in_form = 1;
 	inp.report = this;
 

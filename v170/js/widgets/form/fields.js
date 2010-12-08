@@ -511,7 +511,47 @@ var _last_link_value = null;
 function LinkField() { } LinkField.prototype = new Field();
 LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
-	makeinput_popup(this, 'ic-zoom', 'ic-sq_next', 'ic-sq_plus');
+	var me = this;
+	
+	if(me.df.no_buttons) {
+		this.txt = $a(this.input_area, 'input');
+		this.input = this.txt;	
+	} else {
+		makeinput_popup(this, 'ic-zoom', 'ic-sq_next', 'ic-sq_plus');
+	
+		// setup buttons
+		me.setup_buttons();
+
+		me.onrefresh = function() {
+			if(me.can_create && cur_frm.doc.docstatus==0) $ds(me.btn2);
+			else $dh(me.btn2);
+		}
+	}
+
+
+	me.txt.field_object = this;		
+	// set onchange triggers
+	me.set_onchange();
+	me.input.set_input = function(val) {
+		if(val==undefined)val='';
+		me.txt.value = val;
+	}
+
+	me.get_value = function() { return me.txt.value; }
+
+		
+	// add auto suggest
+	var opts = {
+		script: '',
+		json: true,
+		maxresults: 10,
+		link_field: me
+	};
+	this.as = new AutoSuggest(me.txt, opts);
+	
+}
+
+LinkField.prototype.setup_buttons = function() { 
 	var me = this;
 
 	// magnifier - search
@@ -519,25 +559,11 @@ LinkField.prototype.make_input = function() {
 		selector.set(me, me.df.options, me.df.label);
 		selector.show(me.txt);
 	}
-	
+
 	// open
 	if(me.btn1)me.btn1.onclick = function() {
 		if(me.txt.value && me.df.options) { loaddoc(me.df.options, me.txt.value); }
-	}
-
-	me.txt.field_object = this;
-	
-	// set onchange triggers
-	me.set_onchange();
-
-	me.input.set_input = function(val) {
-		if(val==undefined)val='';
-		me.txt.value = val;
-	}
-	me.get_value = function() {
-		return me.txt.value;
-	}
-	
+	}	
 	// add button - for inline creation of records
 	me.can_create = 0;
 	if((!me.not_in_form) && in_list(profile.can_create, me.df.options)) {
@@ -559,23 +585,6 @@ LinkField.prototype.make_input = function() {
 	} else {
 		$dh(me.btn2); $y($td(me.tab,0,2), {width:'0px'});
 	}
-
-	me.onrefresh = function() {
-		if(me.can_create && cur_frm.doc.docstatus==0) 
-			$ds(me.btn2);
-		else 
-			$dh(me.btn2);
-	}
-	
-	// add auto suggest
-	var opts = {
-		script: '',
-		json: true,
-		maxresults: 10,
-		link_field: me
-	};
-	this.as = new AutoSuggest(me.txt, opts);
-	
 }
 
 LinkField.prototype.set_onchange = function() { 
@@ -1030,7 +1039,6 @@ function makeinput_popup(me, iconsrc, iconsrc1, iconsrc2) {
 	if(!me.not_in_form)
 		$y(me.input, {width:'80%'});
 		
-	me.input.onchange = function() { /*alert('in_oc'); me.txt.onchange();*/ }
 	me.input.set_width = function(w) {
 		$y(me.input, {width:(w-2)+'px'});
 	}

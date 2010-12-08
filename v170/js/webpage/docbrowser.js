@@ -1,9 +1,11 @@
-DocBrowserPage = function() {
+var new_tag_dialog = null;
+
+ItemBrowserPage = function() {
 	this.lists = {};
 	this.dt_details = {};
 	this.cur_list = null;
 
-	this.my_page = page_body.add_page('DocBrowser');
+	this.my_page = page_body.add_page('ItemBrowser');
 	this.wrapper = $a(this.my_page,'div');
 
 	var h = $a(this.wrapper, 'div');
@@ -17,7 +19,7 @@ DocBrowserPage = function() {
 
 // -------------------------------------------------
 
-DocBrowserPage.prototype.show = function(dt, label, field_list) {
+ItemBrowserPage.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
 	if(this.cur_list) $dh(this.cur_list.wrapper);
@@ -34,22 +36,23 @@ DocBrowserPage.prototype.show = function(dt, label, field_list) {
 	}
 	
 	if(!me.lists[dt]) {
-		me.lists[dt] = new DocBrowser(me.body, dt, label, field_list);
+		me.lists[dt] = new ItemBrowser(me.body, dt, label, field_list);
 	}
 
 	me.cur_list = me.lists[dt];
 	me.cur_list.show();
 	
-	page_body.change_to('DocBrowser');
+	page_body.change_to('ItemBrowser');
 }
 
 // -------------------------------------------------
 
-DocBrowser = function(parent, dt, label, field_list) {	
+ItemBrowser = function(parent, dt, label, field_list) {	
 	var me = this;
 	this.label = label ? label : dt;
 	this.dt = dt;
 	this.field_list = field_list;
+	this.tag_filter_dict = {};
 
 	this.wrapper = $a(parent, 'div', '', {display:'none'});
 
@@ -61,11 +64,17 @@ DocBrowser = function(parent, dt, label, field_list) {
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
 	this.body = $a(this.wrapper, 'div');
+	this.trend_area = $a(this.body, 'div', '', {margin:'8px 16px'});
+	
+	// tag filters
+	this.tag_filters = $a(this.body, 'div', '', {marginBottom:'8px', display:'none', padding:'6px 8px 8px 8px', backgroundColor:'#FFD'});
+	var span = $a(this.tag_filters,'span','',{marginRight:'4px',color:'#444'}); span.innerHTML = '<i>Showing for:</i>';
+	this.tag_area = $a(this.tag_filters, 'span');
 }
 
 // -------------------------------------------------
 
-DocBrowser.prototype.show = function() {
+ItemBrowser.prototype.show = function() {
 	var me = this;
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
@@ -82,7 +91,7 @@ DocBrowser.prototype.show = function() {
 
 // -------------------------------------------------
 
-DocBrowser.prototype.load_details = function() {
+ItemBrowser.prototype.load_details = function() {
 	var me = this;
 	var callback = function(r,rt) { 
 		me.dt_details = r.message;
@@ -98,7 +107,7 @@ DocBrowser.prototype.load_details = function() {
 
 // -------------------------------------------------
 
-DocBrowser.prototype.show_results = function() {
+ItemBrowser.prototype.show_results = function() {
 	$ds(this.wrapper);
 	$dh(this.loading_div);
 	$ds(this.body);
@@ -108,8 +117,7 @@ DocBrowser.prototype.show_results = function() {
 
 // -------------------------------------------------
 
-DocBrowser.prototype.show_trend = function(trend) {
-	this.trend_area = $a(this.body, 'div', '', {margin:'8px 16px'});
+ItemBrowser.prototype.show_trend = function(trend) {
 	var maxval = 0;
 	for(var key in trend) { if(trend[key]>maxval) maxval = trend[key] };
 
@@ -147,7 +155,7 @@ DocBrowser.prototype.show_trend = function(trend) {
 
 // -------------------------------------------------
 
-DocBrowser.prototype.show_no_result = function() {
+ItemBrowser.prototype.show_no_result = function() {
 	$ds(this.wrapper);
 	$dh(this.loading_div);
 	$dh(this.body);	
@@ -158,49 +166,56 @@ DocBrowser.prototype.show_no_result = function() {
 
 // -------------------------------------------------
 
-DocBrowser.prototype.make_new = function(dt, label, field_list) {
+ItemBrowser.prototype.make_new = function(dt, label, field_list) {
 	// make the list
 	this.make_the_list(dt, this.body);
 }
 
 // -------------------------------------------------
 
-DocBrowser.prototype.add_tag = function(cell, label) {
-	if(!cell.tag_area) {
-		cell.tag_area = $a(cell, 'div', '', {margin:'3px 0px', padding:'3px 0px', fontSize:'10px'});	
-	}
+ItemBrowser.prototype.add_tag_conditions = function(q) {
+	var me = this;
 	
-	// tag area
-	var span=$a(cell.tag_area,'span','',{padding:'3px', backgroundColor:'#4AC', color:'#FFF', marginRight:'4px'});
-	span.innerHTML = label;
-	$br(span,'3px');
+	if(keys(me.tag_filter_dict).length) {
+		var cl = [];
+		for(var key in me.tag_filter_dict) {
+			var val = key;
+			var op = '=';
+				
+			var fn = me.tag_filter_dict[key].fieldname;
+				
+			// conditions based on user tags
+			if(fn=='docstatus')val=(key='Draft'?'0':'1');
+			if(fn=='_user_tags'){ val='%,'+key; op=' LIKE '; }
+				
+			cl.push(q.table + '.`' + fn + '`'+op+'"' + val + '"');
+		}
+		if(cl)
+			q.conds += ' AND ' + cl.join(' AND ') + ' ';
+	}
 }
-
+	
 // -------------------------------------------------
 	
-DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
+ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	var me = this;
 	var lst = new Listing(dt, 1);
-	lst.cl = me.dt_details.columns;
 	lst.dt = dt;
+	lst.cl = this.dt_details.columns;
 
 	lst.opts = {
 		cell_style : {padding:'6px 2px'},
 		alt_cell_style : {backgroundColor:'#FFFFFF'},
-		//head_style : {overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'2px'},
-		//head_main_style : {padding:'0px'},
 		hide_export : 1,
 		hide_print : 1,
-		hide_refresh : 0,
 		hide_rec_label: 0,
 		show_calc: 0,
 		show_empty_tab : 0,
 		show_no_records_label: 1,
 		show_bottom_paging: 0,
-		round_corners: 0,
-		no_border: 1,
 		show_new: 0,
-		show_report: 1
+		show_report: 1,
+		no_border: 1
 	}
 		
 	if(user_defaults.hide_report_builder) lst.opts.show_report = 0;
@@ -212,11 +227,20 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		var fl = [];
 		q.table = repl('`tab%(dt)s`', {dt:this.dt});
 	
+		// columns
 		for(var i=0;i<this.cl.length;i++) fl.push(q.table+'.`'+this.cl[i][0]+'`')
+
 		if(me.dt_details.submittable)
-			fl.push(q.table + '.docstatus');			
+			fl.push(q.table + '.docstatus');
+
+		// columns
 		q.fields = fl.join(', ');
+
+		// conitions
 		q.conds = q.table + '.docstatus < 2 ';
+		
+		// filter conditions
+		me.add_tag_conditions(q);
 		
 		this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
 		this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
@@ -224,52 +248,10 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 	
 	// make the columns
 	lst.colwidths=['100%']; lst.coltypes=['Data']; lst.coloptions = [''];
-
-	/*for(var i=0;i < lst.cl.length;i++) {
-		lst.colwidths[i+1] = cint(100/lst.cl.length) + '%';
-		lst.colnames[i+1] = lst.cl[i][1];
-		lst.coltypes[i+1] = lst.cl[i][2];
-		lst.coloptions[i+1] = lst.cl[i][3];
-			
-		lst.add_sort(i+1, lst.cl[i][0]);
-	}*/
-	
 	
 	// show cell
 	lst.show_cell = function(cell, ri, ci, d) {
-		var div = $a(cell, 'div');
-		
-		// link
-		var span = $a(div, 'span', 'link_type', {fontWeight:'bold'});
-		span.innerHTML = d[ri][0];
-		span.onclick = function() { loaddoc(me.dt, this.innerHTML); }
-
-		// docstatus tag
-		var docstatus = cint(d[ri][d[ri].length - 1]);
-		if(me.dt_details.submittable) 
-			{ me.add_tag(cell, (docstatus ? 'Submitted' : 'Draft')); }
-		
-		// values
-		var span = $a(div, 'span', '', {paddingLeft:'8px'});
-		var tmp = []
-		for(var i=2; i<d[ri].length; i++) {
-			if(lst.cl[i] && lst.cl[i][1] && d[ri][i]) {
-				
-				// has status, group or type in the label
-				if(lst.cl[i][1].indexOf('Status') != -1 || 
-					lst.cl[i][1].indexOf('Group') != -1 || 
-					lst.cl[i][1].indexOf('Type') != -1) {
-						me.add_tag(cell, d[ri][i]);	
-				} else {
-					tmp.push(lst.cl[i][1] + ': ' + d[ri][i]);
-				}
-			}
-		}
-		span.innerHTML = tmp.join(' | ');
-		
-		// time
-		var div = $a(cell, 'div', '', {color:'#888', fontSize:'11px'});
-		div.innerHTML = comment_when(d[ri][1]);
+		new ItemBrowserItem(cell, d[ri], me);		
 	}
 	
 	lst.make(wrapper);
@@ -287,28 +269,251 @@ DocBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		}
 	}
 	
-	// customize ID field - for submittable doctypes
-	/*if(me.dt_details.submittable) {
-		lst.show_cell = function(cell,ri,ci,d) {
-			if (ci==0){
-				// link
-				var s1 = $a(cell, 'span', 'link_type', {marginRight:'8px'});
-				s1.innerHTML = d[ri][0];
-				s1.dt = dt; s1.dn = d[ri][0];
-				s1.onclick = function() { loaddoc(this.dt, this.dn); };
-
-				// tag
-				var docstatus = cint(d[ri][d[ri].length - 1]);
-				var hl=$a(cell,'span','',{padding: '1px', color:'#FFF', backgroundColor:(docstatus ? '#44F' : '#999'), fontSize:'10px'});
-				hl.innerHTML = (docstatus ? 'Submitted' : 'Draft');
-			} else{
-				// show standard output
-				lst.std_cell(d,ri,ci);
-			}
-		}
-	}*/
-	
 	// default sort
 	lst.set_default_sort('modified', 'DESC');
+	this.lst = lst;
 	lst.run();
+}
+
+// ========================== ITEM ==================================
+
+function ItemBrowserItem(parent, det, ib) {
+	this.wrapper = $a(parent, 'div');
+	this.det = det;
+	this.ib = ib;
+	this.dn = det[0];
+	
+	this.make_details()
+	this.make_tags()
+	this.add_timestamp()
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.make_details = function() {
+
+	// link
+	var me = this;
+	var div = $a(this.wrapper, 'div');
+	
+	var span = $a(div, 'span', 'link_type', {fontWeight:'bold'});
+	span.innerHTML = me.dn;
+	span.onclick = function() { loaddoc(me.ib.dt, me.dn); }
+	
+	// properties
+	var tmp = [];
+	var cl = me.ib.dt_details.columns;
+
+	
+	for(var i=3; i<me.det.length; i++) {
+		if(cl[i] && cl[i][1] && me.det[i]) {
+			// has status, group or type in the label
+			if(cl[i][1].indexOf('Status') != -1 || 
+				cl[i][1].indexOf('Group') != -1 || 
+				cl[i][1].indexOf('Type') != -1) {
+					me.add_tag(me.det[i], 1, cl[i][0]);	
+			} else {
+
+				// separator
+				if(i>2) {
+					var span = $a(div,'span'); span.innerHTML = ' |';
+				}
+				
+				// label
+				var span = $a(div,'span','',{color:'#888'});
+				span.innerHTML = ' ' + cl[i][1] + ': ';
+				
+				// value
+				var span = $a(div,'span');
+				$s(span,me.det[i],(cl[i][2]=='Link'?'Data':cl[i][2]), cl[i][3]);
+			}
+		}
+	}
+
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.make_tags = function() {
+	// docstatus tag
+	var docstatus = cint(this.det[this.det.length - 1]);
+	if(this.ib.dt_details.submittable) 
+		{ this.add_tag((docstatus ? 'Submitted' : 'Draft'), 1, 'docstatus'); }
+
+	// make custom tags
+	if(this.det[2]) {
+		var tl = this.det[2].split(',');
+		for(var i=0; i<tl.length; i++) if(tl[i]) this.add_tag(tl[i], 0, '_user_tags');
+	}
+
+	// "Add Tag"
+	this.make_add_tag();
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.add_timestamp = function() {
+	// time
+	var div = $a(this.wrapper, 'div', '', {color:'#888', fontSize:'11px'});
+	div.innerHTML = comment_when(this.det[1]);
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.make_tag_area = function() {
+	var div = $a(this.wrapper, 'div', '', {margin:'3px 0px', padding:'3px 0px'});
+	this.tag_area = $a(div, 'span', '', {marginRight:'4px'});
+	this.add_tag_area = $a(div, 'span');
+	this.tag_list = [];
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.add_tag = function(label, static, fieldname) {
+	var me = this;
+
+	if(!this.tag_area) this.make_tag_area();	
+	if(in_list(this.tag_list, label)) return; // no double tags
+	
+	// tag area
+	var tag = new ItemBrowserTag(this.tag_area, label, this.ib.dt, this.dn, static);
+	tag.remove = function(tag_ref) {
+		var callback = function(r,rt) {
+			// clear tag
+			$dh(tag_ref.body);
+			
+			// remove from tag_list
+			var nl=[]; for(var i in me.tag_list) if(me.tag_list[i]!=tag_ref.label) nl.push(me.tag_list[i]);
+			me.tag_list = nl;
+		}
+		$c_obj('Menu Control', 'remove_tag', JSON.stringify([me.ib.dt, me.dn, tag_ref.label]), callback)
+		$bg(tag_ref.body,'#DDD');
+	}
+	tag.fieldname = fieldname;
+	
+	this.set_tag_fitler(tag);
+	this.tag_list.push(label);
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.set_tag_fitler = function(tag) {
+	var me = this;
+	tag.onclick = function(tag_ref) {
+		
+		// check if exists
+		if(in_list(keys(me.ib.tag_filter_dict), tag.label)) return;
+		
+		// create a tag in filters
+		var filter_tag = new ItemBrowserTag(me.ib.tag_area, tag_ref.label, me.ib.dt, null, 0);
+		filter_tag.ib = me.ib;
+		filter_tag.fieldname = tag_ref.fieldname;
+
+		// remove tag from filters
+		filter_tag.remove = function(tag_ref_remove) {
+			var ib = tag_ref_remove.ib;
+			$dh(tag_ref_remove.body);
+			delete ib.tag_filter_dict[tag_ref_remove.label];
+			
+			// hide everything?
+			if(!keys(ib.tag_filter_dict).length) {
+				$dh(ib.tag_filters); // hide
+			}
+			
+			// run
+			ib.lst.run();
+		}
+
+		// add to dict
+		me.ib.tag_filter_dict[tag_ref.label] = filter_tag;
+		$ds(me.ib.tag_filters);
+		
+		// run
+		me.ib.lst.run();
+	}
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.new_tag = function() {
+	var me = this;
+	
+	if(!new_tag_dialog) {
+		var d = new Dialog(400,200,'New Tag');
+		d.make_body([['HTML','Tag'],['Button','Save']])
+		d.tag_input = make_field({fieldtype:'Link', label:'New Tag', options:'Tag', no_buttons:1}, '', 
+			d.widgets['Tag'], this, 0, 1);
+		d.tag_input.not_in_form = 1;
+		d.tag_input.refresh();
+		
+		$y(d.tag_input.txt, {width:'80%'});
+
+		// save
+		d.widgets['Save'].onclick = function() {
+			var val = strip(d.tag_input.txt.value);
+			if(!val) {
+				msgprint("Please type something");
+				return;
+			}
+			
+			if(val.search(/^[a-z0-9\s]+$/i)==-1) {
+				msgprint("Special charaters, commas etc not allowed in tags");
+				return;
+			}
+			
+			var callback = function(r,rt) {
+				new_tag_dialog.tag_input.txt.value= '';
+				new_tag_dialog.hide();
+
+				if(!r.message) return;
+				new_tag_dialog.ibi.add_tag(r.message, 0, '_user_tags');
+			}
+			$c_obj('Menu Control','add_tag',JSON.stringify(
+				[new_tag_dialog.ibi.ib.dt, new_tag_dialog.ibi.dn, val]), callback);
+		}
+		new_tag_dialog = d;
+	}
+	new_tag_dialog.ibi = me;
+	new_tag_dialog.show();
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.make_add_tag = function() {
+	if(!this.tag_area) this.make_tag_area();
+
+	var me = this;
+
+	this.add_tag_span = $a(this.add_tag_area, 'span', '', {color:'#888', textDecoration:'underline', cursor:'pointer',marginLeft:'4px',fontSize:'11px'});
+	this.add_tag_span.innerHTML = 'Add tag';
+	this.add_tag_span.onclick = function() {
+		// show tag link
+		me.new_tag();
+		
+	}
+}
+
+// ========================== Tag ==================================
+
+function ItemBrowserTag(parent, label, dt, dn, static) {
+	this.dt = dt; this.dn = dn; this.label = label;
+	var me = this;
+	
+	// tag area
+	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor:'#489', color:'#FFF', marginRight:'4px', fontSize:'11px', cursor:'pointer'});
+	
+	$br(this.body,'3px');
+
+	var span = $a(this.body,'span');
+	span.innerHTML = label;
+	span.onclick = function() { if(me.onclick) me.onclick(me); }
+	
+	if(!static) {
+		var span = $a(this.body,'span');
+		span.innerHTML += ' |';
+		
+		var span = $a(this.body,'span');
+		span.innerHTML = ' x'
+		span.onclick = function() { me.remove(me); }
+	}	
 }

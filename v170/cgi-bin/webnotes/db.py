@@ -234,6 +234,28 @@ class Database:
 
 	# ======================================================================================
 
+	def set_global(self, key, val):
+		res = self.sql('select defkey from `tabDefaultValue` where defkey=%s and parent = "__global"', key)
+		if res:
+			self.sql('update `tabDefaultValue` set defvalue=%s where parent = "__global" and defkey=%s', (str(val), key))
+		else:
+			self.sql('insert into `tabDefaultValue` (name, defkey, defvalue, parent) values (%s,%s,%s,"__global")', (key,key,str(val)))
+
+	def get_global(self, key):
+		g = self.sql("select defvalue from tabDefaultValue where defkey=%s and parent='__global'", key)
+		return g and g[0][0] or None
+
+	# ======================================================================================
+
+	def begin(self):
+		if not self.in_transaction:
+			self.sql("start transaction")
+	
+	def commit(self):
+		self.sql("commit")
+
+	# ======================================================================================
+
 	def field_exists(self, dt, fn):
 		return self.sql("select name from tabDocField where fieldname=%s and parent=%s", (dt, fn))
 

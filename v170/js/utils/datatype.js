@@ -184,10 +184,7 @@ function values(obj) { var myvalues=[];for (key in obj) myvalues[myvalues.length
 function seval(s) { return eval('var a='+s+';a'); }
 
 function in_list(list, item) {
-	for(var i=0;i<list.length;i++) {
-		if(list[i]==item) return true;
-	}
-	return false;
+	return list.indexOf(item)==-1 ? false : true;
 }
 function has_common(list1, list2) {
 	if(!list1 || !list2) return false;
