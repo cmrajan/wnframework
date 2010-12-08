@@ -60,7 +60,7 @@ TabbedPage.prototype.enable_tab = function(n) {
 
 // =================================================================================
 
-function TrayPage(parent, height, width) {
+function TrayPage(parent, height, width, width_body) {
 	var me = this;
 	if(!width) width=(100/8)+'%';
 
@@ -70,7 +70,7 @@ function TrayPage(parent, height, width) {
 	
 	this.items = {};
 	this.tabs = this.items // for tabs
-	this.tab = make_table($a(parent, 'div'), 1, 2, '100%', [width, null]);
+	this.tab = make_table($a(parent, 'div'), 1, 2, '100%', [width, width_body]);
 	
 	// tray style
 	$y($td(this.tab, 0, 0),{
@@ -120,6 +120,7 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 			function() { me.expand(); }
 		)
 
+	this.ldiv.setAttribute('title',label);
 	this.ldiv.onmousedown = function() { $item_pressed(this); }
 	this.ldiv.onmouseup = function() { $item_selected(this); }
 

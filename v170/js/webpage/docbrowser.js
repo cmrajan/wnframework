@@ -186,7 +186,7 @@ ItemBrowser.prototype.add_tag_conditions = function(q) {
 				
 			// conditions based on user tags
 			if(fn=='docstatus')val=(key='Draft'?'0':'1');
-			if(fn=='_user_tags'){ val='%,'+key; op=' LIKE '; }
+			if(fn=='_user_tags'){ val='%,'+key + '%'; op=' LIKE '; }
 				
 			cl.push(q.table + '.`' + fn + '`'+op+'"' + val + '"');
 		}
@@ -412,12 +412,12 @@ ItemBrowserItem.prototype.set_tag_fitler = function(tag) {
 		// remove tag from filters
 		filter_tag.remove = function(tag_ref_remove) {
 			var ib = tag_ref_remove.ib;
-			$dh(tag_ref_remove.body);
+			$(tag_ref_remove.body).fadeOut();
 			delete ib.tag_filter_dict[tag_ref_remove.label];
 			
 			// hide everything?
 			if(!keys(ib.tag_filter_dict).length) {
-				$dh(ib.tag_filters); // hide
+				$(ib.tag_filters).slideUp(); // hide
 			}
 			
 			// run
@@ -501,6 +501,10 @@ function ItemBrowserTag(parent, label, dt, dn, static) {
 	
 	// tag area
 	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor:'#489', color:'#FFF', marginRight:'4px', fontSize:'11px', cursor:'pointer'});
+	$(this.body).hover(
+		function() { $bg(this,'#4AC'); }
+		,function() { $bg(this,'#489'); }
+	);
 	
 	$br(this.body,'3px');
 

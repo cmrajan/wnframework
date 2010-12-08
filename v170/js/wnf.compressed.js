@@ -103,7 +103,7 @@ function addEvent(ev,fn){if(isIE){document.attachEvent('on'+ev,function(){fn(win
 $wid_normal=function(ele,color){$y(ele,{padding:'2px 8px',border:'1px solid #CCC',cursor:'pointer',fontSize:'11px',color:'#444'});$br(ele,'3px');$gr(ele,'#FFF','#DDD');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #4B4'});$gr(ele,'#9C9','#4A4');}}
 $wid_active=function(ele,color){$y(ele,{border:'1px solid #000'});$gr(ele,'#FFF','#EEE');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#AFA','#7C7');}}
 $wid_pressed=function(ele,color){$y(ele,{border:'1px solid #000'});$gr(ele,'#EEF','#DDF');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#7C7','#2A2');}}
-$item_normal=function(ele){$y(ele,{padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal'});$br(ele,'3px');$bg(ele,'#FFF');$fg(ele,'#000');}
+$item_normal=function(ele){$y(ele,{padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal',textOverflow:'ellipsis-word',whiteSpace:'nowrap',overflow:'hidden'});$br(ele,'3px');$bg(ele,'#FFF');$fg(ele,'#000');}
 $item_active=function(ele){$bg(ele,'#F90');$fg(ele,'#FFF');$y(ele,{fontWeight:'bold'})}
 $item_selected=function(ele){$bg(ele,'#444');$fg(ele,'#FFF');$y(ele,{fontWeight:'bold'});}
 $item_pressed=function(ele){$bg(ele,'#FC8');$fg(ele,'#FFF');}
@@ -499,14 +499,14 @@ tab.onclick=function(){this.show();}
 this.tabs[n]=tab;return tab;}
 TabbedPage.prototype.disable_tab=function(n){if(this.cur_tab==this.tabs[n])this.tabs[n].hide();$dh(this.tabs[n])}
 TabbedPage.prototype.enable_tab=function(n){$di(this.tabs[n])}
-function TrayPage(parent,height,width){var me=this;if(!width)width=(100/8)+'%';this.body_style={margin:'4px 8px'}
+function TrayPage(parent,height,width,width_body){var me=this;if(!width)width=(100/8)+'%';this.body_style={margin:'4px 8px'}
 this.cur_item=null;this.items={};this.tabs=this.items
-this.tab=make_table($a(parent,'div'),1,2,'100%',[width,null]);$y($td(this.tab,0,0),{backgroundColor:this.tray_bg,width:width});this.body=$a($td(this.tab,0,1),'div');if(height){$y(this.body,{height:height,overflow:'auto'});}
+this.tab=make_table($a(parent,'div'),1,2,'100%',[width,width_body]);$y($td(this.tab,0,0),{backgroundColor:this.tray_bg,width:width});this.body=$a($td(this.tab,0,1),'div');if(height){$y(this.body,{height:height,overflow:'auto'});}
 this.add_item=function(label,onclick,no_body,with_heading){this.items[label]=new TrayItem(me,label,onclick,no_body,with_heading);return this.items[label];}}
 function TrayItem(tray,label,onclick,no_body,with_heading){this.label=label;this.onclick=onclick;var me=this;this.ldiv=$a($td(tray.tab,0,0),'div');$item_normal(this.ldiv);if(!no_body){this.wrapper=$a(tray.body,'div','',tray.body_style);if(with_heading){this.header=$a(this.wrapper,'div','sectionHeading',{marginBottom:'16px',paddingBottom:'0px'});this.header.innerHTML=label;}
 this.body=$a(this.wrapper,'div');this.tab_body=this.body;$dh(this.wrapper);}
 $(this.ldiv).html(label).hover(function(){if(tray.cur_item.label!=this.innerHTML)$item_active(this);},function(){if(tray.cur_item.label!=this.innerHTML)$item_normal(this);}).click(function(){me.expand();})
-this.ldiv.onmousedown=function(){$item_pressed(this);}
+this.ldiv.setAttribute('title',label);this.ldiv.onmousedown=function(){$item_pressed(this);}
 this.ldiv.onmouseup=function(){$item_selected(this);}
 this.expand=function(){if(tray.cur_item)tray.cur_item.collapse();if(me.wrapper)$ds(me.wrapper);if(me.onclick)me.onclick(me.label);me.show_as_expanded();}
 this.show_as_expanded=function(){$item_selected(me.ldiv);tray.cur_item=me;}
@@ -981,7 +981,7 @@ ItemBrowser.prototype.show_trend=function(trend){var maxval=0;for(var key in tre
 $td(labtab,0,5).innerHTML='Today';}
 ItemBrowser.prototype.show_no_result=function(){$ds(this.wrapper);$dh(this.loading_div);$dh(this.body);$ds(this.no_result_area);this.no_result_area.innerHTML=repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s',{dt:get_doctype_label(this.dt)});set_title(get_doctype_label(this.label));}
 ItemBrowser.prototype.make_new=function(dt,label,field_list){this.make_the_list(dt,this.body);}
-ItemBrowser.prototype.add_tag_conditions=function(q){var me=this;if(keys(me.tag_filter_dict).length){var cl=[];for(var key in me.tag_filter_dict){var val=key;var op='=';var fn=me.tag_filter_dict[key].fieldname;if(fn=='docstatus')val=(key='Draft'?'0':'1');if(fn=='_user_tags'){val='%,'+key;op=' LIKE ';}
+ItemBrowser.prototype.add_tag_conditions=function(q){var me=this;if(keys(me.tag_filter_dict).length){var cl=[];for(var key in me.tag_filter_dict){var val=key;var op='=';var fn=me.tag_filter_dict[key].fieldname;if(fn=='docstatus')val=(key='Draft'?'0':'1');if(fn=='_user_tags'){val='%,'+key+'%';op=' LIKE ';}
 cl.push(q.table+'.`'+fn+'`'+op+'"'+val+'"');}
 if(cl)
 q.conds+=' AND '+cl.join(' AND ')+' ';}}
@@ -1008,7 +1008,7 @@ ItemBrowserItem.prototype.add_tag=function(label,static,fieldname){var me=this;i
 $c_obj('Menu Control','remove_tag',JSON.stringify([me.ib.dt,me.dn,tag_ref.label]),callback)
 $bg(tag_ref.body,'#DDD');}
 tag.fieldname=fieldname;this.set_tag_fitler(tag);this.tag_list.push(label);}
-ItemBrowserItem.prototype.set_tag_fitler=function(tag){var me=this;tag.onclick=function(tag_ref){if(in_list(keys(me.ib.tag_filter_dict),tag.label))return;var filter_tag=new ItemBrowserTag(me.ib.tag_area,tag_ref.label,me.ib.dt,null,0);filter_tag.ib=me.ib;filter_tag.fieldname=tag_ref.fieldname;filter_tag.remove=function(tag_ref_remove){var ib=tag_ref_remove.ib;$dh(tag_ref_remove.body);delete ib.tag_filter_dict[tag_ref_remove.label];if(!keys(ib.tag_filter_dict).length){$dh(ib.tag_filters);}
+ItemBrowserItem.prototype.set_tag_fitler=function(tag){var me=this;tag.onclick=function(tag_ref){if(in_list(keys(me.ib.tag_filter_dict),tag.label))return;var filter_tag=new ItemBrowserTag(me.ib.tag_area,tag_ref.label,me.ib.dt,null,0);filter_tag.ib=me.ib;filter_tag.fieldname=tag_ref.fieldname;filter_tag.remove=function(tag_ref_remove){var ib=tag_ref_remove.ib;$(tag_ref_remove.body).fadeOut();delete ib.tag_filter_dict[tag_ref_remove.label];if(!keys(ib.tag_filter_dict).length){$(ib.tag_filters).slideUp();}
 ib.lst.run();}
 me.ib.tag_filter_dict[tag_ref.label]=filter_tag;$ds(me.ib.tag_filters);me.ib.lst.run();}}
 ItemBrowserItem.prototype.new_tag=function(){var me=this;if(!new_tag_dialog){var d=new Dialog(400,200,'New Tag');d.make_body([['HTML','Tag'],['Button','Save']])
@@ -1019,7 +1019,7 @@ $c_obj('Menu Control','add_tag',JSON.stringify([new_tag_dialog.ibi.ib.dt,new_tag
 new_tag_dialog=d;}
 new_tag_dialog.ibi=me;new_tag_dialog.show();}
 ItemBrowserItem.prototype.make_add_tag=function(){if(!this.tag_area)this.make_tag_area();var me=this;this.add_tag_span=$a(this.add_tag_area,'span','',{color:'#888',textDecoration:'underline',cursor:'pointer',marginLeft:'4px',fontSize:'11px'});this.add_tag_span.innerHTML='Add tag';this.add_tag_span.onclick=function(){me.new_tag();}}
-function ItemBrowserTag(parent,label,dt,dn,static){this.dt=dt;this.dn=dn;this.label=label;var me=this;this.body=$a(parent,'span','',{padding:'2px 4px',backgroundColor:'#489',color:'#FFF',marginRight:'4px',fontSize:'11px',cursor:'pointer'});$br(this.body,'3px');var span=$a(this.body,'span');span.innerHTML=label;span.onclick=function(){if(me.onclick)me.onclick(me);}
+function ItemBrowserTag(parent,label,dt,dn,static){this.dt=dt;this.dn=dn;this.label=label;var me=this;this.body=$a(parent,'span','',{padding:'2px 4px',backgroundColor:'#489',color:'#FFF',marginRight:'4px',fontSize:'11px',cursor:'pointer'});$(this.body).hover(function(){$bg(this,'#4AC');},function(){$bg(this,'#489');});$br(this.body,'3px');var span=$a(this.body,'span');span.innerHTML=label;span.onclick=function(){if(me.onclick)me.onclick(me);}
 if(!static){var span=$a(this.body,'span');span.innerHTML+=' |';var span=$a(this.body,'span');span.innerHTML=' x'
 span.onclick=function(){me.remove(me);}}}
 var locals={};var fields={};var fields_list={};var LocalDB={};var READ=0;var WRITE=1;var CREATE=2;var SUBMIT=3;var CANCEL=4;var AMEND=5;LocalDB.getchildren=function(child_dt,parent,parentfield,parenttype){var l=[];for(var key in locals[child_dt]){var d=locals[child_dt][key];if((d.parent==parent)&&(d.parentfield==parentfield)){if(parenttype){if(d.parenttype==parenttype)l.push(d);}else{l.push(d);}}}

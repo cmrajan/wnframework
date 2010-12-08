@@ -30,7 +30,10 @@ $wid_pressed = function(ele,color) {
 
 // item
 $item_normal = function(ele) { 
-	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal'}); $br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
+	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal',
+		textOverflow:'ellipsis-word', whiteSpace:'nowrap',overflow:'hidden'}); 
+	
+	$br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
 }
 $item_active = function(ele) {
 	$bg(ele,'#F90'); $fg(ele,'#FFF');$y(ele,{fontWeight:'bold'})

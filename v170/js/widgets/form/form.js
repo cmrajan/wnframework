@@ -243,7 +243,9 @@ _f.Frm.prototype.setup_std_layout = function() {
 
 	// build the sidebar
 	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
-		this.tray = new TrayPage(this.form_wrapper);
+		this.tray = new TrayPage(this.form_wrapper,null,100/8 + '%',700/8 + '%');
+		$y(this.tray.tab,{tableLayout:'fixed'});
+
 		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px'});
 	} else {
 		this.body = $a(this.form_wrapper, 'div', 'frm_body',{margin:'4px'});
