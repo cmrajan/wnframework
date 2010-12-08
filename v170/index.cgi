@@ -1,5 +1,7 @@
 #!/usr/bin/python
-
+def getTraceback():
+	from webnotes import utils
+	utils.getTraceback()
 try:
 
 	import sys, os, cgi
@@ -7,8 +9,6 @@ try:
 	sys.path.append(os.getcwd()+'/cgi-bin')
 	import webnotes
 
-	def getTraceback():
-		webnotes.getTraceback()
 
 	webnotes.form = cgi.FieldStorage()
 	for each in webnotes.form.keys():
