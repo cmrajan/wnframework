@@ -1,7 +1,12 @@
 #!/usr/bin/python
 def getTraceback():
-	from webnotes import utils
-	utils.getTraceback()
+	import sys, traceback, string
+        type, value, tb = sys.exc_info()
+        body = "Traceback (innermost last):\n"
+        list = traceback.format_tb(tb, None) + traceback.format_exception_only(type, value)
+        body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
+#        log("Server Error", body)
+        return body	
 try:
 
 	import sys, os, cgi
