@@ -21,7 +21,7 @@ function WNToolbar(parent) {
 		this.setup_new();
 		this.setup_search();
 		this.setup_recent();
-		if(in_list(user_roles, ['Administrator']))
+		if(in_list(user_roles, 'Administrator'))
 			this.setup_options();
 		this.setup_help();
 

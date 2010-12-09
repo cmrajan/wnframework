@@ -14,9 +14,12 @@ list_opts = {
 	show_empty_tab : 0,
 	show_bottom_paging: 1,
 	no_border: 1,
-	append_records: 0,
+	append_records: 1,
 	table_width: null
 };
+
+// -------------------------------------------------------
+
 function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
 	this.page_len = 20;
@@ -53,6 +56,8 @@ function Listing(head_text, no_index, no_loading) {
 	this.opts = copy_dict(list_opts);
 }
 
+// -------------------------------------------------------
+
 Listing.prototype.make = function(parent) {
 	var me = this;
 	
@@ -67,15 +72,22 @@ Listing.prototype.make = function(parent) {
 	this.body_area = $a(parent,'div','srs_body_area');
 
 	// paging area
-	var div = $a(this.body_area,'div','srs_paging_area');
-	this.body_head = make_table(div, 1, 2, '100%', ['50%','50%'], {verticalAlign:'middle'});
-	$y(this.body_head,{borderCollapse:'collapse'});
-	this.rec_label = $td(this.body_head,0,0);
+	if(this.opts.append_records) {
+		if(!this.opts.hide_rec_label)
+			this.rec_label = $a(this.body_area, 'div', '', {margin:'4px 0px'});
+	} else {
+		var div = $a(this.body_area,'div','srs_paging_area');
+		this.body_head = make_table(div, 1, 2, '100%', ['50%','50%'], {verticalAlign:'middle'});
+		$y(this.body_head,{borderCollapse:'collapse'});
 
-	if(this.opts.hide_rec_label) {
-		$y($td(this.body_head,0,0),{width:'0%'}); 
-		$y($td(this.body_head,0,1),{width:'100%'});
+		this.rec_label = $td(this.body_head,0,0);
+
+		if(this.opts.hide_rec_label) {
+			$y($td(this.body_head,0,0),{width:'0%'}); 
+			$y($td(this.body_head,0,1),{width:'100%'});
+		}
 	}
+	
 
 	// results
 	this.results = $a($a(this.body_area, 'div','srs_results_area'),'div');
@@ -83,25 +95,41 @@ Listing.prototype.make = function(parent) {
 	this.show_no_records = $a(this.body_area,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.show_no_records.innerHTML = 'No Result';
 
+	// empty table (old style)
 	if(this.opts.show_empty_tab)
 		this.make_result_tab();
 	
-	this.bottom_div = $a(this.body_area,'div','',{paddingTop:'8px',height:'22px'});
+	this.bottom_div = $a(this.body_area,'div','',{paddingTop:'8px'});
 	
-	// buttons
-	var make_btn = function(label,icon,onclick,bold) {
-		var btn = $a(me.btn_area,'button');
-		if(bold)$y(btn,{fontWeight: 'bold'});
-		btn.innerHTML = label;
-		btn.onclick = onclick;
-		$(btn).button({icons:{ primary: icon }});
+	this.make_toolbar();
+	
+	if(!this.opts.append_records) {
+		this.paging_nav = {};
+		this.make_paging_area('top',$td(this.body_head,0,1));
+		if(this.opts.show_bottom_paging) 
+			this.make_paging_area('bottom',this.bottom_div);
 	}
 	
+}
+
+// -------------------------------------------------------
+
+Listing.prototype.make_toolbar = function() {
+	var me = this;
+
+	// buttons
+	var make_btn = function(label,icon,onclick,bold) {
+		var btn = $btn(me.btn_area,label,onclick,{marginRight:'4px'});
+		if(bold)$y(btn,{fontWeight: 'bold'});
+	}
 	
 	// refresh btn
 	var cnt = 0;
 	if(!this.opts.hide_refresh) {
-		make_btn('Refresh','ui-icon-refresh',function() {me.run();},1); cnt+=2;
+		make_btn('Refresh','ui-icon-refresh',function(btn) {
+			btn.set_working();
+			me.run(null, function() { btn.done_working(); });
+		},1); cnt+=2;
 	}
 
 	// new
@@ -129,14 +157,9 @@ Listing.prototype.make = function(parent) {
 		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
 	}
 	if(!cnt)$dh(this.btn_area);
-	else {  $(this.btn_area).buttonset();  }
-	
-	this.paging_nav = {};
-	this.make_paging_area('top',$td(this.body_head,0,1));
-	if(this.opts.show_bottom_paging) 
-		this.make_paging_area('bottom',this.bottom_div);
-	
 }
+
+// -------------------------------------------------------
 
 Listing.prototype.do_print = function() {
 	this.build_query();
@@ -163,9 +186,14 @@ Listing.prototype.do_print = function() {
 	}, 1);
 }
 
+// -------------------------------------------------------
+
+
 Listing.prototype.do_calc = function() {
 	show_calc(this.result_tab, this.colnames, this.coltypes, 0)
 }
+
+// -------------------------------------------------------
 
 ListPaging = function(id, list, p) {
 	var mo_bg = '#FFF';
@@ -206,6 +234,8 @@ ListPaging = function(id, list, p) {
 	list.paging_nav[id] = this;
 }
 
+// -------------------------------------------------------
+
 ListPaging.prototype.refresh = function(nr) {
 	var lst = this.list;
 	if(cint(lst.max_len) <= cint(lst.page_len)) {
@@ -243,9 +273,13 @@ ListPaging.prototype.refresh = function(nr) {
 }
 
 
+// -------------------------------------------------------
+
 Listing.prototype.make_paging_area = function(id, p) { new ListPaging(id,this,p); }
 Listing.prototype.refresh_paging = function(nr) { for(var i in this.paging_nav) this.paging_nav[i].refresh(nr);}
 Listing.prototype.hide_paging = function() { for(var i in this.paging_nav) $dh(this.paging_nav[i].wrapper); }
+
+// -------------------------------------------------------
 
 Listing.prototype.add_filter = function(label, ftype, options, tname, fname, cond) {
 	if(!this.filter_area){alert('[Listing] make() must be called before add_filter');}
@@ -311,11 +345,15 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	this.filter_set = 1;
 }
 
+// -------------------------------------------------------
+
 Listing.prototype.remove_filter = function(label) {
 	var inp = this.filters[label];
 	inp.parent_tab.rows[0].deleteCell(inp.parent_cell.cellIndex);
 	delete this.filters[label];
 }
+
+// -------------------------------------------------------
 
 Listing.prototype.remove_all_filters = function() {
 	for(var k in this.filters) this.remove_filter(k);
@@ -325,6 +363,8 @@ Listing.prototype.remove_all_filters = function() {
 Listing.prototype.add_sort = function(ci, fname) { this.sort_list[ci]=fname;	}
 Listing.prototype.has_data = function() { return this.n_records; }
 
+// -------------------------------------------------------
+
 Listing.prototype.set_default_sort = function(fname, sort_order) {
 	this.sort_order = sort_order;
 	this.sort_order_dict[fname] = sort_order;
@@ -332,6 +372,9 @@ Listing.prototype.set_default_sort = function(fname, sort_order) {
 	if(this.sort_heads[fname])
 		this.sort_heads[fname].set_sorting_as(sort_order);
 }
+
+// -------------------------------------------------------
+
 Listing.prototype.set_sort = function(cell, ci, fname) {
 	var me = this;
 	$y(cell.sort_cell,{width:'18px'});
@@ -394,6 +437,9 @@ Listing.prototype.set_sort = function(cell, ci, fname) {
 	
 	this.sort_heads[fname] = cell;
 }
+
+// -------------------------------------------------------
+
 Listing.prototype.do_export = function() {
 	this.build_query();
 	var me = this;
@@ -409,6 +455,8 @@ Listing.prototype.do_export = function() {
 			export_csv(query, me.head_text, null, 1, null, me.cn); 
 		});
 }
+
+// -------------------------------------------------------
 
 Listing.prototype.build_query = function() {
 	if(this.get_query)this.get_query(this);
@@ -441,6 +489,9 @@ Listing.prototype.build_query = function() {
 	}
 	if(this.show_query) msgprint(this.query);
 }
+
+// -------------------------------------------------------
+
 Listing.prototype.set_rec_label = function(total, cur_page_len) {
 	if(this.opts.hide_rec_label) 
 		return;
@@ -454,7 +505,9 @@ Listing.prototype.set_rec_label = function(total, cur_page_len) {
 		this.rec_label.innerHTML = this.no_rec_message;
 }
 
-Listing.prototype.run = function(from_page) {
+// -------------------------------------------------------
+
+Listing.prototype.run = function(from_page, run_callback) {
 	this.build_query();
 	
 	var q = this.query;
@@ -472,20 +525,30 @@ Listing.prototype.run = function(from_page) {
 		// show results
 		me.clear_tab();
 		me.max_len = r.n_values;
+		
+		// result!
 		if(r.values && r.values.length) {
 			me.n_records = r.values.length;
 			var nc = r.values[0].length;
 			if(me.colwidths) nc = me.colwidths.length-(me.no_index?0:1); // -1 for sr no
 
 			// redraw table
-			if(!me.opts.append_records && !me.show_empty_tab) {
-				me.remove_result_tab();
-				me.make_result_tab(r.values.length);
+			if(me.opts.append_records && me.start!=0) {
+				// add columns
+				me.append_rows(r.values.length)
+			} else {
+				if(!me.show_empty_tab) {
+					me.remove_result_tab();
+					me.make_result_tab(r.values.length);
+				}				
 			}
 			me.refresh(r.values.length, nc, r.values);
 			me.total_records = r.n_values;
 			me.set_rec_label(r.n_values, r.values.length);
-		} else { // no result
+			if(run_callback)run_callback();
+			
+		// no result
+		} else { 
 			if(!me.opts.append_records) {
 				me.n_records = 0;
 				me.set_rec_label(0);
@@ -519,16 +582,22 @@ Listing.prototype.run = function(from_page) {
 	}
 }
 
+// -------------------------------------------------------
+
 Listing.prototype.remove_result_tab = function() {
 	if(!this.result_tab) return;
 	this.result_tab.parentNode.removeChild(this.result_tab);
 	delete this.result_tab;
 }
 
+// -------------------------------------------------------
+
 Listing.prototype.reset_tab = function() {
 	this.remove_result_tab();
 	this.make_result_tab();
 }
+
+// -------------------------------------------------------
 
 Listing.prototype.make_result_tab = function(nr) {
 	if(this.result_tab)return;
@@ -572,6 +641,17 @@ Listing.prototype.make_result_tab = function(nr) {
 
 	this.result_tab = t;
 }
+
+// -------------------------------------------------------
+
+Listing.prototype.append_rows = function(nr) {
+	for(var i=0; i<nr; i++) {
+		append_row(this.result_tab);
+	}
+}
+
+// -------------------------------------------------------
+
 Listing.prototype.clear_tab = function() {
 	$dh(this.results);
 	if(this.result_tab) {
@@ -581,10 +661,16 @@ Listing.prototype.clear_tab = function() {
 				$td(this.result_tab, ri, ci).innerHTML = (this.opts.show_empty_tab ? '&nbsp;' : '');
 	}
 }
+
+// -------------------------------------------------------
+
 Listing.prototype.clear = function() {
 	this.rec_label.innerHTML = '';
 	this.clear_tab();
 }
+
+// -------------------------------------------------------
+
 
 Listing.prototype.refresh_calc = function() {
 	if(!this.opts.show_calc) return;
@@ -592,9 +678,17 @@ Listing.prototype.refresh_calc = function() {
 	}
 }
 
+// -------------------------------------------------------
+
+
 Listing.prototype.refresh = function(nr, nc, d) {
 
-	this.refresh_paging(nr);
+	if(this.opts.append_records) {
+		this.refresh_more_button(nr);
+	} else {
+		this.refresh_paging(nr);
+	}
+
 	this.refresh_calc();
 	
 	if(this.show_result) 
@@ -603,16 +697,20 @@ Listing.prototype.refresh = function(nr, nc, d) {
 	else { 
 		if(nr) {
 			// Standard Result Display
-			var has_headrow = this.colnames ? 1 : 0;	
+			var start = this.result_tab.rows.length - nr;
 	
 			// display results
-			for(var ri=0 ; ri<nr ; ri++) {
-				var c0 = $td(this.result_tab,ri+has_headrow,0);
-				if(!this.no_index) { // show index
-					c0.innerHTML = cint(this.start) + cint(ri) + 1;
+			for(var ri=start ; ri<start+nr ; ri++) {
+				var c0 = $td(this.result_tab,ri,0);
+				
+				// show index
+				if(!this.no_index) { 
+					c0.innerHTML = cint(this.start) + cint(ri-start) + 1;
 				}
+				
+				// columns
 				for(var ci=0 ; ci<nc ; ci++) {
-					var c = $td(this.result_tab,ri+has_headrow,ci+(this.no_index?0:1));
+					var c = $td(this.result_tab,ri,ci+(this.no_index?0:1));
 					if(c) {
 						c.innerHTML = ''; // clear
 						if(this.show_cell) this.show_cell(c, ri, ci, d);
@@ -620,10 +718,34 @@ Listing.prototype.refresh = function(nr, nc, d) {
 					}
 				}
 			}
-
 		}
 	}
 }
+// -------------------------------------------------------
+
+Listing.prototype.refresh_more_button = function(nr) {
+	var me = this;
+	if((this.start + nr) == this.max_len) {
+
+		// all records shown
+		if(this.more_btn) $dh(this.more_btn);	
+	} else {
+		if(!this.more_btn) {
+
+			// make button
+			$y(this.bottom_div, {margin:'16px 0px', textAlign:'center'});
+			this.more_btn = $btn(this.bottom_div, 'Show more results...', 
+				function() {
+					me.start = me.start + me.page_len;
+					me.more_btn.set_working();
+					me.run(null,function() { me.more_btn.done_working(); $y(me.more_btn,{fontSize:'14px', color:'#888'}) });
+				}, {fontSize:'14px', color:'#888'}, 0, 1);
+		}
+		$di(this.more_btn);
+	}
+}
+
+// -------------------------------------------------------
 
 Listing.prototype.make_headings = function(t,nr,nc) {
 	for(var ci=0 ; ci<nc ; ci++) { 
@@ -645,6 +767,8 @@ Listing.prototype.make_headings = function(t,nr,nc) {
 		if(this.coltypes && this.coltypes[ci] && in_list(['Currency','Float','Int'], this.coltypes[ci])) $y($td(t,0,ci).label_cell,{textAlign:'right'})
 	}
 }
+
+// -------------------------------------------------------
 
 Listing.prototype.std_cell = function(d, ri, ci) {
 	var has_headrow = this.colnames ? 1 : 0;
