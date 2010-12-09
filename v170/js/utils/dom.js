@@ -10,18 +10,26 @@ function addEvent(ev, fn) {
 
 // widget styles
 $wid_normal = function(ele,color) { 
+	if(ele.disabled) return;
 	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:'11px',color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
 	if(color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
 	}
 }
+$wid_disabled = function(ele) { 
+	ele.disabled = 1;
+	$y(ele, {border:'1px solid #AAA'}); $bg(ele,'#EEE'); $fg(ele,'#AAA');
+}
+
 $wid_active = function(ele,color) {
+	if(ele.disabled) return;
 	$y(ele, {border:'1px solid #000'}); $gr(ele,'#FFF','#EEE');
 	if(color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#AFA','#7C7');
 	}
 }
 $wid_pressed = function(ele,color) {
+	if(ele.disabled) return;
 	$y(ele, {border:'1px solid #000'}); $gr(ele,'#EEF','#DDF');
 	if(color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#7C7','#2A2');
@@ -35,13 +43,13 @@ $item_normal = function(ele) {
 	$br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
 }
 $item_active = function(ele) {
-	$bg(ele,'#F90'); $fg(ele,'#FFF');$y(ele,{fontWeight:'bold'})
+	$bg(ele,'#FE8'); $fg(ele,'#000');
 }
 $item_selected = function(ele) {
-	$bg(ele,'#444'); $fg(ele,'#FFF');$y(ele,{fontWeight:'bold'});
+	$bg(ele,'#444'); $fg(ele,'#FFF');
 }
 $item_pressed = function(ele) {
-	$bg(ele,'#FC8'); $fg(ele,'#FFF');
+	$bg(ele,'#F90'); $fg(ele,'#FFF');
 }
 
 // set out of 100
@@ -83,13 +91,19 @@ $bs = function(ele, r) { $(ele).css('-moz-box-shadow',r).css('-webkit-box-shadow
 
 // Button
 
-function wnbutton(parent, label, onclick, isbold, style, color) {
-	var btn = $a(parent, 'span')
+function $btn(parent, label, onclick, style, color, ajax) {
+	var btn = $a(parent, 'span');
+	btn.loading_img = $a(parent,'img','',{margin:'-3px 4px -3px 4px', display:'none'});
+	btn.loading_img.src= 'images/ui/button-load.gif';
 	$wid_normal(btn,color);
+	if(ajax) $y(btn,{marginRight:'24px'});
 	
-	btn.innerHTML = label
-	btn.onclick = onclick;
-	
+	// click
+	btn.innerHTML = label;
+	btn.user_onclick = onclick; btn.color = color;
+	btn.onclick = function() { if(!this.disabled) this.user_onclick(this); }
+
+	// color
 	$(btn).hover(
 		function() { $wid_active(this,color); },
 		function() { $wid_normal(this,color); }
@@ -97,7 +111,27 @@ function wnbutton(parent, label, onclick, isbold, style, color) {
 	btn.onmousedown = function() { $wid_pressed(this,color); }
 	btn.onmouseup = function() { $wid_active(this,color); }
 
-	if(isbold) $y(btn,{fontWeight:'bold'});
+	// disabled
+	btn.set_disabled = function() {
+		$wid_disabled(this);
+	}
+	btn.set_enabled = function() {
+		this.disabled = 0;
+		$wid_normal(this, this.color);
+	}
+
+	// working
+	btn.set_working = function() {
+		this.set_disabled();
+		$di(this.loading_img);
+		if(ajax) $y(btn,{marginRight:'0px'});
+	}
+	btn.done_working = function() {
+		this.set_enabled();
+		$dh(this.loading_img);
+		if(ajax) $y(btn,{marginRight:'24px'});
+	}
+	
 	if(style) $y(btn, style);
 	return btn;
 }

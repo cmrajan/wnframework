@@ -36,7 +36,7 @@ function PageHeader(parent, main_text, sub_text) {
 
 	// close btn
 	$y($td(this.t1, 0, 1),{textAlign:'right', padding:'3px'});
-	this.close_btn = wnbutton($td(this.t1, 0, 1), 'Close',function() { nav_obj.show_last_open(); },0);
+	this.close_btn = $btn($td(this.t1, 0, 1), 'Close',function() { nav_obj.show_last_open(); },0);
 
 	if(main_text) this.main_head.innerHTML = main_text;
 	if(sub_text) this.sub_head.innerHTML = sub_text;
@@ -50,7 +50,9 @@ PageHeader.prototype.add_button = function(label, fn, bold, icon, green) {
 	var tb = this.toolbar_area;
 	if(this.buttons[label]) return;
 		
-	var btn = wnbutton(tb,label,fn,bold,{marginRight:'4px'},(green ? 'green' : ''));
+	var btn = $btn(tb,label,fn,{marginRight:'4px'},(green ? 'green' : ''));
+	if(bold) $y(btn,{fontWeight:'bold'});
+
 	this.buttons[label]=btn;
 	$ds(this.toolbar_area);
 	

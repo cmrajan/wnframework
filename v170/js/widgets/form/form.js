@@ -432,12 +432,13 @@ _f.Frm.prototype.setup_print_layout = function() {
 		
 		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '6px'});
 		this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
-		this.view_btn = wnbutton(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 0, {marginRight:'4px'}, 'green');
+		this.view_btn = $btn(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 
+			{marginRight:'4px'}, 'green');
 
-		this.print_btn = wnbutton($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
+		this.print_btn = $btn($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
 
 		$y($td(t,0,1), {textAlign: 'right'});
-		this.print_close_btn = wnbutton($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); }, 0);
+		this.print_close_btn = $btn($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); });
 	}
 }
 
@@ -982,7 +983,7 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 				me.refresh_dependency();
 
 				// enable button
-				if(callingfield)callingfield.input.disabled = false;
+				if(callingfield)callingfield.input.done_working();
 			}
 		);
 	}

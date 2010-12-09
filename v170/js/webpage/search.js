@@ -106,7 +106,9 @@ function makeselector() {
 	}
 
 	btn.onclick = function() {
-		btn.disabled = true;
+		if(this.disabled) return;
+
+		this.set_working();
 		d.set_doctype = d.sel_type;
 		var q = '';
 		if(d.input && d.input.get_query) {
@@ -135,11 +137,11 @@ function makeselector() {
 				,'searchfield':get_sf_fieldname(sel_val(field_sel))
 			},
 			function(r, rtxt) {
-				btn.disabled = false;
+				btn.done_working();
 				if(r.coltypes)r.coltypes[0]='Link'; // first column must always be selectable even if it is not a link
 				d.values_len = r.values.length;
 				d.set_result(r);
-			}, function() { btn.disabled= false; });
+			}, function() { btn.done_working(); });
 	}
 	
 	d.set_result = function(r) {
@@ -155,7 +157,7 @@ function makeselector() {
 			var div = $a(w,'div','',{marginBottom:'4px',paddingBottom:'4px',borderBottom:'1px dashed #CCC'});
 
 			// link
-			var l = $a(div,'div','link_type'); l.innerHTML = r.values[i][0]; l.link_name = r.values[i][0]; l.dt = r.coloptions[0];
+			var l = $a($a(div,'div'),'span','link_type'); l.innerHTML = r.values[i][0]; l.link_name = r.values[i][0]; l.dt = r.coloptions[0];
 			if(d.input)
 				l.onclick = function() { setlinkvalue(this.link_name); }
 			else

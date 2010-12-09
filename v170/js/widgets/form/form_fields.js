@@ -56,14 +56,14 @@ _f.SectionBreak.prototype.make_row = function() {
 _f.SectionBreak.prototype.make_collapsible = function(head) {
 	var me = this;
 
-	var t = make_table($a(head,'div','',{backgroundColor:'#EEE', padding:'4px 8px'}), 1,2, '100%', [null, '60px'], {verticalAlign:'middle'});
+	var t = make_table($a(head,'div','',{padding:'4px 8px', borderBottom:'1px solid #AAA'}), 1,2, '100%', [null, '60px'], {verticalAlign:'middle'});
 	$y(t,{borderCollapse:'collapse'});
 		
 	this.label = $a($td(t,0,0), 'div', 'sectionHeading');
 	this.label.innerHTML = this.df.label?this.df.label:'';
 	
 	// indent
-	$y(this.row.body, { margin:'16px 24px' });
+	$y(this.row.body, { margin:'8px' });
 
 	// exp / collapse
 	$y($td(t,0,1),{textAlign:'right'});
@@ -380,25 +380,23 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	}
 
 	// make a button area for one button
-	if(!this.button_area) this.button_area = $a(this.input_area, 'span');
+	if(!this.button_area) this.button_area = $a(this.input_area, 'span','',{marginRight:'4px'});
 	
 	// make the input
-	this.input = $a(this.button_area, 'button', '', {width:'170px'});
-
-	$y(this.input,{marginRight:'8px'});
-	
-	this.input.innerHTML = me.df.label.substr(0,20) + ((me.df.label.length>20) ? '..' : '');
+	this.input = $btn(this.button_area, 
+		me.df.label.substr(0,20) + ((me.df.label.length>20) ? '..' : ''), {width:'170px', fontWeight:'bold'}, null, 1)
 	this.input.onclick = function() {
-		this.disabled = true;
+		this.set_disabled();
 		if(cur_frm.cscript[me.df.label] && (!me.in_filter)) {			
 			cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
-			this.disabled = false;
-		} else
+			this.set_enabled();
+		} else {
+			this.set_working();
 			cur_frm.runscript(me.df.options, me);
+		}
 	}
-	
-	$(this.input).button({icons:{ primary: 'ui-icon-circle-triangle-e' }});
 }
+
 _f.ButtonField.prototype.hide = function() { 
 	$dh(this.button_area);
 };

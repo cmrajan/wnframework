@@ -102,7 +102,7 @@ this.fetch_dict[link_field].columns.push(src_field);this.fetch_dict[link_field].
 _f.Frm.prototype.setup_client_script=function(){if(this.meta.client_script_core||this.meta.client_script||this.meta._client_script){this.runclientscript('setup',this.doctype,this.docname);}}
 _f.Frm.prototype.set_parent=function(parent){if(parent){this.parent=parent;if(this.wrapper&&this.wrapper.parentNode!=parent)
 parent.appendChild(this.wrapper);}}
-_f.Frm.prototype.setup_print_layout=function(){if(this.meta.read_only_onload){this.print_wrapper=$a(this.wrapper,'div');this.print_head=$a(this.print_wrapper,'div');this.print_body=$a($a(this.print_wrapper,'div','',{backgroundColor:'#888',padding:'8px'}),'div','frm_print_wrapper');var t=make_table(this.print_head,1,2,'100%',[],{padding:'6px'});this.view_btn_wrapper=$a($td(t,0,0),'span','green_buttons');this.view_btn=wnbutton(this.view_btn_wrapper,'View Details',function(){cur_frm.edit_doc()},0,{marginRight:'4px'},'green');this.print_btn=wnbutton($td(t,0,0),'Print',function(){cur_frm.print_doc()});$y($td(t,0,1),{textAlign:'right'});this.print_close_btn=wnbutton($td(t,0,1),'Close',function(){nav_obj.show_last_open();},0);}}
+_f.Frm.prototype.setup_print_layout=function(){if(this.meta.read_only_onload){this.print_wrapper=$a(this.wrapper,'div');this.print_head=$a(this.print_wrapper,'div');this.print_body=$a($a(this.print_wrapper,'div','',{backgroundColor:'#888',padding:'8px'}),'div','frm_print_wrapper');var t=make_table(this.print_head,1,2,'100%',[],{padding:'6px'});this.view_btn_wrapper=$a($td(t,0,0),'span','green_buttons');this.view_btn=$btn(this.view_btn_wrapper,'View Details',function(){cur_frm.edit_doc()},{marginRight:'4px'},'green');this.print_btn=$btn($td(t,0,0),'Print',function(){cur_frm.print_doc()});$y($td(t,0,1),{textAlign:'right'});this.print_close_btn=$btn($td(t,0,1),'Close',function(){nav_obj.show_last_open();});}}
 _f.Frm.prototype.refresh_print_layout=function(){$ds(this.print_wrapper);$dh(this.form_wrapper);var me=this;var print_callback=function(print_html){me.print_body.innerHTML=print_html;}
 if(user!='Guest'){$di(this.view_btn_wrapper);$di(this.print_close_btn);}else{$dh(this.view_btn_wrapper);$dh(this.print_close_btn);}
 _p.build(this.default_format,print_callback);}
@@ -173,7 +173,7 @@ this.savingflag=true;if(this.docname&&validated){return this.savedoc(save_action
 _f.Frm.prototype.runscript=function(scriptname,callingfield,onrefresh){var me=this;if(this.docname){var doclist=compress_doclist(make_doclist(this.doctype,this.docname));if(callingfield)callingfield.input.disabled=true;page_body.set_status('Working...')
 $c('runserverobj',{'docs':doclist,'method':scriptname},function(r,rtxt){page_body.set_status('Done')
 if(onrefresh)
-onrefresh(r,rtxt);me.refresh_fields();me.refresh_dependency();if(callingfield)callingfield.input.disabled=false;});}}
+onrefresh(r,rtxt);me.refresh_fields();me.refresh_dependency();if(callingfield)callingfield.input.done_working();});}}
 _f.Frm.prototype.runclientscript=function(caller,cdt,cdn){var _dt=this.parent_doctype?this.parent_doctype:this.doctype;var _dn=this.parent_docname?this.parent_docname:this.docname;var doc=get_local(_dt,_dn);if(!cdt)cdt=this.doctype;if(!cdn)cdn=this.docname;var ret=null;try{if(this.cscript[caller])
 ret=this.cscript[caller](doc,cdt,cdn);if(this.cscript['custom_'+caller])
 ret+=this.cscript['custom_'+caller](doc,cdt,cdn);}catch(e){submit_error(e);}
@@ -216,7 +216,7 @@ this.cell.hide();else
 this.cell.show();this.set_hidden=this.df.hidden;}}}
 _f.SectionBreak=function(){this.set_input=function(){};}
 _f.SectionBreak.prototype.make_row=function(){this.row=this.frm.layout.addrow();}
-_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div','',{backgroundColor:'#EEE',padding:'4px 8px'}),1,2,'100%',[null,'60px'],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,0),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.body,{margin:'16px 24px'});$y($td(t,0,1),{textAlign:'right'});this.exp_icon=$a($td(t,0,1),'div','wn-icon ic-rnd_br_up',{cssFloat:'right'});this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
+_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var t=make_table($a(head,'div','',{padding:'4px 8px',borderBottom:'1px solid #AAA'}),1,2,'100%',[null,'60px'],{verticalAlign:'middle'});$y(t,{borderCollapse:'collapse'});this.label=$a($td(t,0,0),'div','sectionHeading');this.label.innerHTML=this.df.label?this.df.label:'';$y(this.row.body,{margin:'8px'});$y($td(t,0,1),{textAlign:'right'});this.exp_icon=$a($td(t,0,1),'div','wn-icon ic-rnd_br_up',{cssFloat:'right'});this.exp_icon.onclick=function(){if(me.row.body.style.display.toLowerCase()=='none')me.exp_icon.expand();else me.exp_icon.collapse();}
 this.exp_icon.expand=function(){$ds(me.row.body)
 $ds(me.row.header.head.desc_area);me.exp_icon.className='wn-icon ic-rnd_br_up';}
 this.exp_icon.collapse=function(){$dh(me.row.body)
@@ -255,9 +255,8 @@ _f.ImageField.prototype.set=function(val){}
 _f.ButtonField=function(){};_f.ButtonField.prototype=new Field();_f.ButtonField.prototype.init=function(){this.prev_button=null;if(cur_frm&&cur_frm.fields[cur_frm.fields.length-1]&&cur_frm.fields[cur_frm.fields.length-1].df.fieldtype=='Button'){this.make_body=function(){this.prev_button=cur_frm.fields[cur_frm.fields.length-1];if(!this.prev_button.prev_button){this.prev_button.button_area=$a(this.prev_button.input_area,'span');}
 this.wrapper=this.prev_button.wrapper;this.input_area=this.prev_button.input_area;this.disp_area=this.prev_button.disp_area;this.button_area=$a(this.prev_button.input_area,'span');}}}
 _f.ButtonField.prototype.make_input=function(){var me=this;if(!this.prev_button){$y(this.input_area,{marginTop:'4px',marginBottom:'4px'});}
-if(!this.button_area)this.button_area=$a(this.input_area,'span');this.input=$a(this.button_area,'button','',{width:'170px'});$y(this.input,{marginRight:'8px'});this.input.innerHTML=me.df.label.substr(0,20)+((me.df.label.length>20)?'..':'');this.input.onclick=function(){this.disabled=true;if(cur_frm.cscript[me.df.label]&&(!me.in_filter)){cur_frm.runclientscript(me.df.label,me.doctype,me.docname);this.disabled=false;}else
-cur_frm.runscript(me.df.options,me);}
-$(this.input).button({icons:{primary:'ui-icon-circle-triangle-e'}});}
+if(!this.button_area)this.button_area=$a(this.input_area,'span','',{marginRight:'4px'});this.input=$btn(this.button_area,me.df.label.substr(0,20)+((me.df.label.length>20)?'..':''),{width:'170px',fontWeight:'bold'},null,1)
+this.input.onclick=function(){this.set_disabled();if(cur_frm.cscript[me.df.label]&&(!me.in_filter)){cur_frm.runclientscript(me.df.label,me.doctype,me.docname);this.set_enabled();}else{this.set_working();cur_frm.runscript(me.df.options,me);}}}
 _f.ButtonField.prototype.hide=function(){$dh(this.button_area);};_f.ButtonField.prototype.show=function(){$ds(this.button_area);};_f.ButtonField.prototype.set=function(v){};_f.ButtonField.prototype.set_disp=function(val){}
 _f.TableField=function(){};_f.TableField.prototype=new Field();_f.TableField.prototype.make_body=function(){if(this.perm[this.df.permlevel]&&this.perm[this.df.permlevel][READ]){if(this.df.description){this.comment_area=$a(this.parent,'div','comment',{padding:'0px 8px 8px 8px'});this.comment_area.innerHTML=this.df.description;}
 this.grid=new _f.FormGrid(this);if(this.frm)this.frm.grids[this.frm.grids.length]=this;this.grid.make_buttons();}}

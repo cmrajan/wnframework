@@ -57,9 +57,8 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	this.wrapper = $a(parent, 'div', '', {display:'none'});
 
 	// areas
-	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '16px 0px', 
-		padding:'4px', backgroundColor:'#FFC'
-	});
+	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '16px 0px'});
+	this.no_result_message = $a(this.no_result_area,'span','',{backgroundColor:'#FFC', padding:'6px'});
 	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
@@ -160,7 +159,7 @@ ItemBrowser.prototype.show_no_result = function() {
 	$dh(this.loading_div);
 	$dh(this.body);	
 	$ds(this.no_result_area);
-	this.no_result_area.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(this.dt)});
+	this.no_result_message.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(this.dt)});
 	set_title(get_doctype_label(this.label));
 }
 

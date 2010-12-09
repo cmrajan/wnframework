@@ -172,14 +172,12 @@ Dialog.prototype.make_row = function(d) {
 	else if(d[0]=='Button') {
 		c2.style.height = '32px';
 		c2.style.textAlign = 'right';
-		var b = $a(c2, 'button');
-		b.innerHTML = d[1];
+		var b = $btn(c2, d[1], null, null, null, 1);
 		b.dialog = me;
-		if(d[2]){
+		if(d[2]) {
 			b._onclick = d[2];
 			b.onclick = function() { this._onclick(me); }
 		}
-		$(b).button({icons:{ primary: 'ui-icon-circle-triangle-e' }});
 		this.widgets[d[1]] = b;
 	}
 }
