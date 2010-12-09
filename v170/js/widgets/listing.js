@@ -507,7 +507,7 @@ Listing.prototype.set_rec_label = function(total, cur_page_len) {
 
 // -------------------------------------------------------
 
-Listing.prototype.run = function(from_page, run_callback) {
+Listing.prototype.run = function(do_continue, run_callback) {
 	this.build_query();
 	
 	var q = this.query;
@@ -515,7 +515,7 @@ Listing.prototype.run = function(from_page, run_callback) {
 
 	// add limits
 	if(this.max_len && this.start>=this.max_len) this.start-= this.page_len;
-	if(this.start<0 || (!from_page)) this.start = 0;
+	if(this.start<0 || (!do_continue)) this.start = 0;
 	
 	q += ' LIMIT ' + this.start + ',' + this.page_len;
 	
@@ -523,7 +523,6 @@ Listing.prototype.run = function(from_page, run_callback) {
 	var call_back = function(r,rt) {
 		page_body.set_status('Done');
 		// show results
-		me.clear_tab();
 		me.max_len = r.n_values;
 		
 		// result!
@@ -535,8 +534,9 @@ Listing.prototype.run = function(from_page, run_callback) {
 			// redraw table
 			if(me.opts.append_records && me.start!=0) {
 				// add columns
-				me.append_rows(r.values.length)
+				me.append_rows(r.values.length);
 			} else {
+				me.clear_tab();
 				if(!me.show_empty_tab) {
 					me.remove_result_tab();
 					me.make_result_tab(r.values.length);
@@ -545,7 +545,6 @@ Listing.prototype.run = function(from_page, run_callback) {
 			me.refresh(r.values.length, nc, r.values);
 			me.total_records = r.n_values;
 			me.set_rec_label(r.n_values, r.values.length);
-			if(run_callback)run_callback();
 			
 		// no result
 		} else { 
@@ -564,6 +563,7 @@ Listing.prototype.run = function(from_page, run_callback) {
 			}
 		}
 		$ds(me.results);
+		if(run_callback)run_callback();
 		if(me.onrun) me.onrun();
 	}
 	
@@ -645,6 +645,7 @@ Listing.prototype.make_result_tab = function(nr) {
 // -------------------------------------------------------
 
 Listing.prototype.append_rows = function(nr) {
+	alert(nr);
 	for(var i=0; i<nr; i++) {
 		append_row(this.result_tab);
 	}
@@ -713,8 +714,8 @@ Listing.prototype.refresh = function(nr, nc, d) {
 					var c = $td(this.result_tab,ri,ci+(this.no_index?0:1));
 					if(c) {
 						c.innerHTML = ''; // clear
-						if(this.show_cell) this.show_cell(c, ri, ci, d);
-						else this.std_cell(d, ri, ci);
+						if(this.show_cell) this.show_cell(c, ri-start, ci, d);
+						else this.std_cell(d, ri-start, ci);
 					}
 				}
 			}
@@ -738,8 +739,8 @@ Listing.prototype.refresh_more_button = function(nr) {
 				function() {
 					me.start = me.start + me.page_len;
 					me.more_btn.set_working();
-					me.run(null,function() { me.more_btn.done_working(); $y(me.more_btn,{fontSize:'14px', color:'#888'}) });
-				}, {fontSize:'14px', color:'#888'}, 0, 1);
+					me.run(1,function() { me.more_btn.done_working(); });
+				}, {fontSize:'14px'}, 0, 1);
 		}
 		$di(this.more_btn);
 	}

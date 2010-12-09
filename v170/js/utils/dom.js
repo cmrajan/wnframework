@@ -11,7 +11,9 @@ function addEvent(ev, fn) {
 // widget styles
 $wid_normal = function(ele,color) { 
 	if(ele.disabled) return;
-	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:'11px',color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
+	fsize = ele.style.fontSize ? ele.style.fontSize : '11px';
+	
+	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
 	if(color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
 	}

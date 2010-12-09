@@ -211,10 +211,10 @@ ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		show_calc: 0,
 		show_empty_tab : 0,
 		show_no_records_label: 1,
-		show_bottom_paging: 0,
 		show_new: 0,
 		show_report: 1,
-		no_border: 1
+		no_border: 1,
+		append_records: 1
 	}
 		
 	if(user_defaults.hide_report_builder) lst.opts.show_report = 0;
