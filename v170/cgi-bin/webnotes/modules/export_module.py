@@ -155,7 +155,7 @@ def write_document_file(doclist, record_module=None):
 	else:
 		module = doclist[0]['module']
 
-	updated_modules.push(module)
+	updated_modules.append(module)
 
 	# create the folder
 	folder = os.path.join(webnotes.defs.modules_path, module, doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
