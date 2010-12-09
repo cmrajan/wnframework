@@ -3,11 +3,11 @@
 
 list_opts = {
 	cell_style : {padding:'3px 2px'},
-	alt_cell_style : {backgroundColor:'#F2F2FF'},
+	alt_cell_style : {},
 	head_style : {height:'20px',overflow:'hidden',verticalAlign:'middle',textAlign:'center',fontWeight:'bold',padding:'1px',fontSize:'13px'},
 	head_main_style : {padding:'0px'},
-	hide_export : 0,
-	hide_print : 0,
+	hide_export : 1,
+	hide_print : 1,
 	hide_refresh : 0,
 	hide_rec_label: 0,
 	show_calc: 1,
@@ -116,11 +116,13 @@ Listing.prototype.make = function(parent) {
 
 Listing.prototype.make_toolbar = function() {
 	var me = this;
+	this.buttons = {};
 
 	// buttons
 	var make_btn = function(label,icon,onclick,bold) {
 		var btn = $btn(me.btn_area,label,onclick,{marginRight:'4px'});
 		if(bold)$y(btn,{fontWeight: 'bold'});
+		me.buttons[label] = btn;
 	}
 	
 	// refresh btn
@@ -673,6 +675,9 @@ Listing.prototype.clear = function() {
 Listing.prototype.refresh_calc = function() {
 	if(!this.opts.show_calc) return;
 	if(has_common(this.coltypes, ['Currency','Int','Float'])) {
+		$di(this.buttons['Calc']);
+	} else {
+		$dh(this.buttons['Calc']);
 	}
 }
 
@@ -731,13 +736,14 @@ Listing.prototype.refresh_more_button = function(nr) {
 		if(!this.more_btn) {
 
 			// make button
-			$y(this.bottom_div, {margin:'8px 0px', textAlign:'center'});
+			$y(this.bottom_div, {margin:'8px 0px 16px 0px', textAlign:'center'});
 			this.more_btn = $btn(this.bottom_div, 'Show more results...', 
 				function() {
 					me.start = me.start + me.page_len;
 					me.more_btn.set_working();
 					me.run(1,function() { me.more_btn.done_working(); });
 				}, {fontSize:'14px'}, 0, 1);
+			$y(this.more_btn.loading_img, {marginBottom:'0px'});
 		}
 		$di(this.more_btn);
 	}

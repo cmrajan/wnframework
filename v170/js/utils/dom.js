@@ -94,8 +94,8 @@ $bs = function(ele, r) { $(ele).css('-moz-box-shadow',r).css('-webkit-box-shadow
 // Button
 
 function $btn(parent, label, onclick, style, color, ajax) {
-	var btn = $a(parent, 'span');
-	btn.loading_img = $a(parent,'img','',{margin:'-3px 4px -3px 4px', display:'none'});
+	var btn = $a(parent, 'button');
+	btn.loading_img = $a(parent,'img','',{margin:'0px 4px -2px 4px', display:'none'});
 	btn.loading_img.src= 'images/ui/button-load.gif';
 	$wid_normal(btn,color);
 	if(ajax) $y(btn,{marginRight:'24px'});
