@@ -645,10 +645,7 @@ Listing.prototype.make_result_tab = function(nr) {
 // -------------------------------------------------------
 
 Listing.prototype.append_rows = function(nr) {
-	alert(nr);
-	for(var i=0; i<nr; i++) {
-		append_row(this.result_tab);
-	}
+	for(var i=0; i<nr; i++) { append_row(this.result_tab); }
 }
 
 // -------------------------------------------------------
@@ -734,7 +731,7 @@ Listing.prototype.refresh_more_button = function(nr) {
 		if(!this.more_btn) {
 
 			// make button
-			$y(this.bottom_div, {margin:'16px 0px', textAlign:'center'});
+			$y(this.bottom_div, {margin:'8px 0px', textAlign:'center'});
 			this.more_btn = $btn(this.bottom_div, 'Show more results...', 
 				function() {
 					me.start = me.start + me.page_len;

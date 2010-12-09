@@ -402,7 +402,7 @@ if(has_headrow){this.make_headings(t,nr,nc);if(this.sort_by&&this.sort_heads[thi
 for(var ri=(has_headrow?1:0);ri<t.rows.length;ri++){for(var ci=0;ci<t.rows[ri].cells.length;ci++){if(this.opts.cell_style)$y($td(t,ri,ci),this.opts.cell_style);if(this.opts.alt_cell_style&&(ri%2))$y($td(t,ri,ci),this.opts.alt_cell_style);if(this.opts.show_empty_tab)$td(t,ri,ci).innerHTML='&nbsp;';}}
 if(this.opts.no_border==1){$y(t,{border:'0px'});}
 this.result_tab=t;}
-Listing.prototype.append_rows=function(nr){alert(nr);for(var i=0;i<nr;i++){append_row(this.result_tab);}}
+Listing.prototype.append_rows=function(nr){for(var i=0;i<nr;i++){append_row(this.result_tab);}}
 Listing.prototype.clear_tab=function(){$dh(this.results);if(this.result_tab){var nr=this.result_tab.rows.length;for(var ri=(this.colnames?1:0);ri<nr;ri++)
 for(var ci=0;ci<this.result_tab.rows[ri].cells.length;ci++)
 $td(this.result_tab,ri,ci).innerHTML=(this.opts.show_empty_tab?'&nbsp;':'');}}
@@ -412,7 +412,7 @@ Listing.prototype.refresh=function(nr,nc,d){if(this.opts.append_records){this.re
 this.refresh_calc();if(this.show_result)
 this.show_result();else{if(nr){var start=this.result_tab.rows.length-nr;for(var ri=start;ri<start+nr;ri++){var c0=$td(this.result_tab,ri,0);if(!this.no_index){c0.innerHTML=cint(this.start)+cint(ri-start)+1;}
 for(var ci=0;ci<nc;ci++){var c=$td(this.result_tab,ri,ci+(this.no_index?0:1));if(c){c.innerHTML='';if(this.show_cell)this.show_cell(c,ri-start,ci,d);else this.std_cell(d,ri-start,ci);}}}}}}
-Listing.prototype.refresh_more_button=function(nr){var me=this;if((this.start+nr)==this.max_len){if(this.more_btn)$dh(this.more_btn);}else{if(!this.more_btn){$y(this.bottom_div,{margin:'16px 0px',textAlign:'center'});this.more_btn=$btn(this.bottom_div,'Show more results...',function(){me.start=me.start+me.page_len;me.more_btn.set_working();me.run(1,function(){me.more_btn.done_working();});},{fontSize:'14px'},0,1);}
+Listing.prototype.refresh_more_button=function(nr){var me=this;if((this.start+nr)==this.max_len){if(this.more_btn)$dh(this.more_btn);}else{if(!this.more_btn){$y(this.bottom_div,{margin:'8px 0px',textAlign:'center'});this.more_btn=$btn(this.bottom_div,'Show more results...',function(){me.start=me.start+me.page_len;me.more_btn.set_working();me.run(1,function(){me.more_btn.done_working();});},{fontSize:'14px'},0,1);}
 $di(this.more_btn);}}
 Listing.prototype.make_headings=function(t,nr,nc){for(var ci=0;ci<nc;ci++){var tmp=make_table($td(t,0,ci),1,2,'100%',['','0px'],this.opts.head_style);$y(tmp,{tableLayout:'fixed',borderCollapse:'collapse'});$y($td(t,0,ci),this.opts.head_main_style);$td(t,0,ci).sort_cell=$td(tmp,0,1);$td(t,0,ci).label_cell=$td(tmp,0,0);$td(tmp,0,1).style.padding='0px';$td(tmp,0,0).innerHTML=this.colnames[ci]?this.colnames[ci]:'&nbsp;';if(this.sort_list[ci])this.set_sort($td(t,0,ci),ci,this.sort_list[ci]);var div=$a($td(t,0,ci),'div');$td(t,0,ci).style.borderBottom='1px solid #CCC';if(this.coltypes&&this.coltypes[ci]&&in_list(['Currency','Float','Int'],this.coltypes[ci]))$y($td(t,0,ci).label_cell,{textAlign:'right'})}}
 Listing.prototype.std_cell=function(d,ri,ci){var has_headrow=this.colnames?1:0;var c=$td(this.result_tab,ri+has_headrow,ci+(this.no_index?0:1));c.div=$a(c,'div');$s(c.div,d[ri][ci],this.coltypes?this.coltypes[ci+(this.no_index?0:1)]:null,this.coloptions?this.coloptions[ci+(this.no_index?0:1)]:null);}
