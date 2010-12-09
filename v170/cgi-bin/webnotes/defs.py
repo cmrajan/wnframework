@@ -25,8 +25,10 @@ files_path = ''
 
 #LOG SETTINGS
 log_file_path = '/home/anand/workspace/webnotes/wnframework/trunk/v170/log'
-debug_dbs = ['accounts']
-log_level = 'logging.INFO'
+debug_log_dbs = ['accounts']
+log_level = 'logging.INFO' #possible values: logging.critical,error,warning,info,debug,notset
+log_file_size = 1000 #In max bytes
+log_file_backup_count = 5 #It is a rotating file handler. keeps upto 5 files
 
 
 #MODULE MANAGER SETTINGS

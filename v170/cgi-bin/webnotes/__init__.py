@@ -105,16 +105,20 @@ def set_as_admin(db_name=None, ac_name=None):
 
 
 LOG_FILENAME = os.path.join(defs.log_file_path,'wnframework.log')
+if not os.path.exists(LOG_FILENAME):
+	open(LOG_FILENAME).close()
+
+
 logger = logging.getLogger('WNLogger')
 logger.setLevel(eval(defs.log_level))
 
 
-log_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxBytes = 30000,backupCount = 5)
+log_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxBytes = defs.log_file_size,backupCount = defs.log_file_backup_count)
 
 console_handler = logging.StreamHandler()
 
 
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s - %(message)s')
 
 log_handler.setFormatter(formatter)
 logger.addHandler(log_handler)
