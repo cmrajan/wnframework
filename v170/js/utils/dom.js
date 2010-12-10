@@ -41,17 +41,27 @@ $wid_pressed = function(ele,color) {
 // item
 $item_normal = function(ele) { 
 	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden'});
-	
 	$br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
 }
 $item_active = function(ele) {
 	$bg(ele,'#FE8'); $fg(ele,'#000');
 }
 $item_selected = function(ele) {
-	$bg(ele,'#444'); $fg(ele,'#FFF');
+	$bg(ele,'#777'); $fg(ele,'#FFF');
 }
 $item_pressed = function(ele) {
 	$bg(ele,'#F90'); $fg(ele,'#FFF');
+}
+$item_set_working = function(ele) {
+	if(ele.loading_img) { 
+		$di(ele.loading_img) 
+	} else {
+		ele.loading_img = $a(ele,'img','',{marginLeft:'2px',marginBottom:'-2px'});
+		ele.loading_img.src = 'images/ui/button-load.gif';
+	}
+}
+$item_done_working = function(ele) {
+	if(ele.loading_img) { $dh(ele.loading_img) };
 }
 
 // set out of 100

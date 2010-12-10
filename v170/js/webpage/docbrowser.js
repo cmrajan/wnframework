@@ -73,16 +73,18 @@ ItemBrowser = function(parent, dt, label, field_list) {
 
 // -------------------------------------------------
 
-ItemBrowser.prototype.show = function() {
+ItemBrowser.prototype.show = function(show_callback) {
 	var me = this;
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
 			if(!me.loaded)
-				me.load_details();
+				me.load_details(show_callback);
 			else
 				me.show_results();
+				if(show_callback)show_callback();
 		} else {
-			me.show_no_result();	
+			me.show_no_result();
+			if(show_callback)show_callback();
 		}
 	}
 	$c_obj('Menu Control', 'has_result', this.dt, callback);	
@@ -90,7 +92,7 @@ ItemBrowser.prototype.show = function() {
 
 // -------------------------------------------------
 
-ItemBrowser.prototype.load_details = function() {
+ItemBrowser.prototype.load_details = function(load_callback) {
 	var me = this;
 	var callback = function(r,rt) { 
 		me.dt_details = r.message;
@@ -98,6 +100,7 @@ ItemBrowser.prototype.load_details = function() {
 			me.show_trend(r.message.trend);
 			me.make_the_list(me.dt, me.body);
 			me.show_results();
+			if(load_callback) load_callback();
 		}
 	}
 	$c_obj('Menu Control', 'get_dt_details', this.dt + '~~~' + cstr(this.field_list), callback);
@@ -184,7 +187,7 @@ ItemBrowser.prototype.add_tag_conditions = function(q) {
 			var fn = me.tag_filter_dict[key].fieldname;
 				
 			// conditions based on user tags
-			if(fn=='docstatus')val=(key='Draft'?'0':'1');
+			if(fn=='docstatus')val=(key=='Draft'?'0':'1');
 			if(fn=='_user_tags'){ val='%,'+key + '%'; op=' LIKE '; }
 				
 			cl.push(q.table + '.`' + fn + '`'+op+'"' + val + '"');

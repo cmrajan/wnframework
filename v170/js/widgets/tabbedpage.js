@@ -113,13 +113,14 @@ function TrayItem(tray, label, onclick, no_body, with_heading) {
 
 	$(this.ldiv).html(label)
 		.hover(
-			function() { if(tray.cur_item.label != this.innerHTML) $item_active(this); },
-			function() { if(tray.cur_item.label != this.innerHTML) $item_normal(this); }
+			function() { if(tray.cur_item.label != this.label) $item_active(this); },
+			function() { if(tray.cur_item.label != this.label) $item_normal(this); }
 		)
 		.click(
 			function() { me.expand(); }
 		)
 
+	this.ldiv.label = label;
 	this.ldiv.setAttribute('title',label);
 	this.ldiv.onmousedown = function() { $item_pressed(this); }
 	this.ldiv.onmouseup = function() { $item_selected(this); }

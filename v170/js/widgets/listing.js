@@ -129,8 +129,7 @@ Listing.prototype.make_toolbar = function() {
 	var cnt = 0;
 	if(!this.opts.hide_refresh) {
 		make_btn('Refresh','ui-icon-refresh',function(btn) {
-			btn.set_working();
-			me.run(null, function() { btn.done_working(); });
+			me.run();
 		},1); cnt+=2;
 	}
 
@@ -158,6 +157,10 @@ Listing.prototype.make_toolbar = function() {
 	if(this.opts.show_calc) {
 		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
 	}
+	
+	this.loading_img = $a(this.btn_area,'img','',{display:'none',marginBottom:'-2px'});
+	this.loading_img.src = 'images/ui/button-load.gif';
+	
 	if(!cnt)$dh(this.btn_area);
 }
 
@@ -523,7 +526,7 @@ Listing.prototype.run = function(do_continue, run_callback) {
 	
 	// callback
 	var call_back = function(r,rt) {
-		page_body.set_status('Done');
+		$dh(me.loading_img);
 		// show results
 		me.max_len = r.n_values;
 		
@@ -573,6 +576,7 @@ Listing.prototype.run = function(do_continue, run_callback) {
 	$dh(me.show_no_records);
 	
 	this.set_rec_label(-1);
+	$di(this.loading_img);
 	if(this.server_call) 
 		{ this.server_call(this, call_back); }
 	else {
@@ -580,7 +584,6 @@ Listing.prototype.run = function(do_continue, run_callback) {
 		if(this.is_std_query) args.query = q;
 		else args.simple_query = q;
 		$c('webnotes.widgets.query_builder.runquery', args, call_back, null, this.no_loading);
-		page_body.set_status('Running Query...');
 	}
 }
 
