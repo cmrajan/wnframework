@@ -26,7 +26,7 @@ class HTTPRequest:
 		webnotes.session = webnotes.session_obj.data
 
 		# write out cookies if sid is supplied (this is a pre-logged in redirect)
-		if webnotes.form_dic.get('sid'):
+		if webnotes.form_dict.get('sid'):
 			webnotes.cookie_manager.set_cookies()
 
 		# run login triggers
