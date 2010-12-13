@@ -125,7 +125,7 @@ function logout() {
 		if(login_file) 
 			window.location.href = login_file;
 		else 
-			window.location.reload();
+			window.location.href = 'index.cgi';
 	});
 }
 

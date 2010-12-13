@@ -31,17 +31,7 @@ try:
 	n = form.getvalue('name')
 
 	# authenticate
-	webnotes.auth_obj = webnotes.auth.Authentication(webnotes.form_dict, {}, [])
-	
-	# login to a particular account (if specified)
-	if form.getvalue('acx'):
-		# resolve database name from account id
-		c = webnotes.db.Database(use_default=1)
-		res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % form.getvalue('acx'))
-
-		# connect
-		webnotes.conn = webnotes.db.Database(user=res[0][1] or res[0][0])
-		webnotes.conn.use(res[0][0])
+	webnotes.auth.HTTPRequest()
 	
 	# get file
 	res = webnotes.utils.file_manager.get_file(n)

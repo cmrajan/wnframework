@@ -47,13 +47,11 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 				alert('Handler Exception:' + rtxt);
 				return; 
 			}
-			if(r.exc && r.__redirect_login) {
-				msgprint(r.exc, 0, function() { document.location = login_file });
-				// logout
-				return;
-			}
 			// unfreeze
 			if(freeze_msg)unfreeze();
+			if(r.exc && r.message=='Session Expired') {
+				resume_session();
+			}
 			if(r.exc) { errprint(r.exc); };
 			if(r.server_messages) { msgprint(r.server_messages);};
 			if(r.docs) { LocalDB.sync(r.docs); }
@@ -242,4 +240,43 @@ function open_url_post(URL, PARAMS, new_window) {
 	document.body.appendChild(temp);
 	temp.submit();
 	return temp;
+}
+
+// Resume sessions
+var resume_dialog = null;
+
+function resume_session() {
+	if(!resume_dialog) {
+		var d = new Dialog(400,200,'Session Expired');
+		d.make_body([
+			['Password','password','Re-enter your password to resume the session'], ['Button','Go']]);
+
+		// check password
+		d.widgets['Go'].onclick = function() {
+			resume_dialog.widgets['Go'].set_working();
+			var callback = function(r, rt) {
+				resume_dialog.widgets['Go'].done_working();
+				if(r.message == 'Logged In') {
+					
+					// okay
+					resume_dialog.allow_close=1;
+					resume_dialog.hide();
+					setTimeout('resume_dialog.allow_close=0',100);
+				} else {
+					
+					// wrong password
+					msgprint('Wrong Password, try again');
+					resume_dialog.wrong_count++;
+					if(resume_dialog.wrong_count > 2) logout();
+				}
+			}
+			$c('resume_session',{pwd:resume_dialog.widgets['password'].value},callback)
+		}
+		d.onhide = function() {
+			if(!resume_dialog.allow_close) logout();
+		}
+		resume_dialog = d;
+	}
+	resume_dialog.wrong_count = 0;
+	resume_dialog.show();
 }
