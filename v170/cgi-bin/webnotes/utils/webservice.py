@@ -37,6 +37,9 @@ class FrameworkServer:
 			if ret.get('message') and ret.get('message')!='Logged In':
 				raise Exception, ret.get('message')
 				
+			if ret.get('exc'):
+				raise Exception, ret.get('exc')
+				
 			self._extract_cookies(res)
 
 			self.account_id = cookies.get('account_id')
@@ -74,12 +77,12 @@ class FrameworkServer:
 	def _extract_cookies(self, res):
 		h = res.getheader('set-cookie')
 		if h:
-			h=h.replace(',',';')
 			cl = h.split(';')
 			for c in cl:
 				if c:
 					t = c.split('=')
-					self.cookies[t[0].strip(', ')] = t[1].strip()
+					if len(t)==2:
+						self.cookies[t[0].strip(', ')] = t[1].strip()
 
 	def runserverobj(self, doctype, docname, method, arg=''):
 		res = self.http_get_response('runserverobj', args = {

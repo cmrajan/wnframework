@@ -64,7 +64,7 @@ class HTTPRequest:
 		
 		# in form
 		elif webnotes.form_dict.get('ac_name'):
-			return form.get('ac_name')
+			return webnotes.form_dict.get('ac_name')
 			
 		# in cookie
 		elif webnotes.incoming_cookies.get('ac_name'):
@@ -158,6 +158,7 @@ class LoginManager:
 		except Exception, e:
 			webnotes.response['Control Panel Exception'] = webnotes.utils.getTraceback()
 	
+	# --------
 	def run_trigger(self, method='on_login'):
 		self.load_control_panel()
 		try:
@@ -367,7 +368,7 @@ class Session:
 	# -------------
 	def check_expired(self):
 		# in control panel?
-		exp_sec = webnotes.conn.get_value('Control Panel', None, 'session_expiry') or '6:00'
+		exp_sec = webnotes.conn.get_value('Control Panel', None, 'session_expiry') or '6:00:00'
 		
 		# set sessions as expired
 		try:
@@ -377,7 +378,7 @@ class Session:
 				self.add_status_column()
 		
 		# clear out old sessions
-		webnotes.conn.sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > '72:00'")
+		webnotes.conn.sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > '72:00:00'")
 
 	# -----------------------------
 	def add_status_column(self):
