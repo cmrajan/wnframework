@@ -293,9 +293,7 @@ class Session:
 			r = webnotes.conn.sql("select user, sessiondata, status from tabSessions where sid='%s'" % self.sid)
 		except Exception, e:
 			if e.args[0]==1054:
-				webnotes.conn.commit()
-				webnotes.conn.sql("alter table tabSessions add column `status` varchar(20)")
-				webnotes.conn.begin()
+				self.add_status_column()
 			else:
 				raise e
 	
@@ -332,7 +330,14 @@ class Session:
 			self.get_ipinfo()
 		
 		# insert session
-		webnotes.conn.sql("insert into tabSessions (sessiondata, user, lastupdate, sid, status) values (%s , %s, NOW(), %s, 'Active')", (str(self.data['data']), self.data['user'], self.data['sid']))
+		try:
+			self.insert_session_record()
+		except Exception, e:
+			if e.args[0]==1054:
+				self.add_status_column()
+				self.insert_session_record()
+			else:
+				raise e
 
 		# update profile
 		webnotes.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (webnotes.utils.now(), webnotes.remote_ip, self.data['user']))
@@ -369,15 +374,20 @@ class Session:
 			webnotes.conn.sql("update from tabSessions where TIMEDIFF(NOW(), lastupdate) > %s SET `status`='Expired'", exp_sec)
 		except Exception, e:
 			if e.args[0]==1054:
-				sql("alter table tabSessions add column `status` varchar(20)")
+				self.add_status_column()
 		
 		# clear out old sessions
 		webnotes.conn.sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > '72:00'")
 
+	# -----------------------------
+	def add_status_column(self):
+		webnotes.conn.commit()
+		webnotes.conn.sql("alter table tabSessions add column `status` varchar(20)")
+		webnotes.conn.begin()
 
 	# Get IP Info from ipinfodb.com
 	# -----------------------------
-	def get_ipinfo(self):		
+	def get_ipinfo(self):
 		import os,httplib,urllib
 		conn=httplib.HTTPConnection("api.ipinfodb.com")  #open connention
 		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json','key':'fbde5e1bc0cc79a17bf33f25e2fdb158218ec4177a7d0acd1853ea8d7fff0693'}
@@ -387,3 +397,8 @@ class Session:
 			self.data['data']['ipinfo'] = eval(ret)
 		except:
 			pass
+			
+	# -----------------------------
+	def insert_session_record(self):
+		webnotes.conn.sql("insert into tabSessions (sessiondata, user, lastupdate, sid, status) values (%s , %s, NOW(), %s, 'Active')", (str(self.data['data']), self.data['user'], self.data['sid']))
+		
