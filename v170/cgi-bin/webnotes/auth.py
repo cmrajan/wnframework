@@ -100,7 +100,7 @@ class HTTPRequest:
 # Login Manager
 # =================================================================================
 
-class LoginManager():
+class LoginManager:
 	def __init__(self):
 		self.cp = None
 		if webnotes.form_dict.get('cmd')=='login':
