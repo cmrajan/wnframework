@@ -47,7 +47,7 @@ def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, ve
 # write module.info file with last updated timestamp
 # ==============================================================================
 
-def write_attachments(mod):
+def write_attachments(m):
 	import webnotes, os
 	from webnotes.utils.file_manager import get_file
 
