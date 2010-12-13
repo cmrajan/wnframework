@@ -1,11 +1,10 @@
-import Cookie, sys, os
+import sys, os
 import webnotes
 import webnotes.defs
 import webnotes.utils
 
 form = webnotes.form
 form_dict = webnotes.form_dict
-cookies = Cookie.SimpleCookie()
 
 sql = None
 session = None
@@ -36,7 +35,7 @@ def runserverobj():
 	webnotes.widgets.form.runserverobj()
 
 def logout():
-	webnotes.auth_obj.logout()
+	webnotes.login_manager.logout()
 
 # DocType Mapper
 # ------------------------------------------------------------------------------------
@@ -99,7 +98,20 @@ def get_template():
 
 def uploadfile():
 	import webnotes.utils.file_manager
-	webnotes.utils.file_manager.upload()	
+	if webnotes.form_dict.get('from_form'):
+		webnotes.utils.file_manager.upload()
+	else:
+		# save the file
+		fid, fname = webnotes.utils.file_manager.save_uploaded()
+		
+		# do something with the uploaded file
+		if fid and webnotes.form_dict.get('server_obj'):
+			from webnotes.model.code import get_obj
+			getattr(get_obj(webnotes.form_dict.get('server_obj')), webnotes.form_dict.get('method'))(fid, fname)
+			
+		# return the upload
+		if fid:
+			webnotes.response['result'] = '<script>window.parent.upload_callback("'+webnotes.form_dict.get('uploader_id')+'", "'+fid+'")</script>'
 	
 # File upload (from scripts)
 # ------------------------------------------------------------------------------------
@@ -173,104 +185,11 @@ def reset_password():
 	except Exception, e:
 		webnotes.msgprint(str(e))
 
-# Testing
+# Resume session
 # ------------------------------------------------------------------------------------
 
-def start_test(form_dict,session):
-	webnotes.session['data']['__testing'] = 1
-
-def end_test(form_dict,session):
-	webnotes.session['data']['__testing'] = 0
-
-def setup_test(form_dict, session):
-	sql = webnotes.conn.sql
-	names = webnotes.conn.get_testing_tables()
-	for n in names:
-		ntest = 'test'+n[3:]
-		if n.startswith('tab'):
-			sql("DROP TABLE IF EXISTS `%s`" % ntest)
-			sql("CREATE TABLE `%s` LIKE `%s`" % (ntest, n), allow_testing = 0)
-			sql("INSERT INTO `%s` SELECT * FROM `%s`" % (ntest, n), allow_testing = 0)
-
-# Module Exchange
-# ---------------
-
-def init_acc_mgmt(session):
-
-	res = sql('SELECT name from tabDocType')	
-	res = [r[0] for r in res]
-	webnotes.response['dt_list'] = res	
-	webnotes.response['acc_list'] = []
-
-	db_name = incookies.get('dbx', server.db_name)
-	if not db_name:
-		db_name = server.db_name
-		
-	tab_list = server.sql_accounts("show tables")
-	tab_list = [r[0] for r in tab_list]
-		
-	if 'tabAccount' in tab_list:
-		try:
-			res = server.sql_accounts('select ac_name from tabAccount')
-			webnotes.response['acc_list'] = [i[0] for i in res]
-	
-			ac_name = server.sql_accounts('select ac_name from tabAccount where db_name="%s"' % db_name)
-			ac_name = ac_name and ac_name[0][0] or db_name
-		except:
-			ac_name = 'accounts'
-	else:
-		ac_name = 'accounts'
-
-	webnotes.response['account_id'] = db_name
-	webnotes.response['acc'] = ac_name
-	webnotes.response['user'] = session['user']
-
-def get_modules(form_dict, session):
-	if form_dict.has_key('ac_name') and form_dict.get('ac_name'):
-		server.use_account(ac_name = form_dict.get('ac_name'))
-
-	res = sql("select name from `tabModule Def`")
-	webnotes.response['mod_list'] = [i[0] for i in res]
-
-def get_dt_version(form_dict, session):
-	if form_dict.has_key('dn'):
-		try:
-			webnotes.response['message'] = sql("select version from tabDocType where name=%s", form_dict.get('dn'))[0][0]
-		except:
-			webnotes.response['message'] = 0
-
-def get_module_doctypes(src, mod):
-	if src:
-		server.use_account(ac_name = src)
-
-	exp_list = server.get_module_items(mod)
-
-	doc_list = []
-	
-	no_export_fields = ('creation','modified_by','owner','server_code_compiled','recent_documents','oldfieldtype','oldfieldname','superclass','ss_colourkey','has_monitors','onupdate','permtype','no_copy', 'print_hide','transaction_safe','setup_test')
-
-	for e in exp_list:
-		doc_list += server.getdoc(e[0], e[1])
-
-		for d in doc_list:
-			for f in no_export_fields:
-				if d.fields.has_key(f): del d.fields[f]
-
-	return doc_list
-
-def export_module(form_dict,session):
-	dt_list = get_module_doctypes(form_dict.get('src'), form_dict.get('mod'))
-	
-	l = '['
-	for d in dt_list:
-		l += str(d.fields) + ",\n"
-	
-	webnotes.response['export_data'] = l + ']'
-
-def import_docs(form_dict, session):
-	if form_dict.get('tar'):
-		server.use_account(ac_name = form_dict.get('tar'))
-	webnotes.msgprint(server.import_docs(eval(form_dict.get('data'))))
+def resume_session():
+	webnotes.response['message'] = webnotes.session_obj.resume()
 
 # -------------
 # Create Backup
@@ -329,9 +248,9 @@ elif form_dict.has_key('cmd') and (form_dict.get('cmd')=='prelogin'):
 else:
 
 	try:
-		webnotes.auth_obj = webnotes.auth.Authentication(form_dict, cookies, webnotes.response)
+		webnotes.request = webnotes.auth.HTTPRequest()
 	
-		if webnotes.conn:
+		if form_dict.get('cmd') not in ['login','startup'] and webnotes.conn:
 			sql = webnotes.conn.sql
 		
 			# NOTE:
@@ -345,7 +264,7 @@ else:
 
 			# load module
 			if webnotes.session['user'] == 'Guest':
-				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoctype','logout','webnotes.widgets.page.getpage','get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form.savedocs']:
+				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc','webnotes.widgets.form.getdoctype','logout','webnotes.widgets.page.getpage','get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form.savedocs','startup']:
 					webnotes.msgprint('Guest not allowed to perform this action')
 					raise Exception
 
@@ -354,7 +273,6 @@ else:
 				module = '.'.join(cmd.split('.')[:-1])
 				cmd = cmd.split('.')[-1]
 
-				
 				exec 'from %s import %s' % (module, cmd) in locals()
 	
 			# execute
@@ -365,7 +283,7 @@ else:
 				locals()[cmd]()
 						
 				# update session
-				webnotes.auth_obj.update()
+				webnotes.session_obj.update()
 				
 				if webnotes.conn.in_transaction:
 					sql("COMMIT")
@@ -482,11 +400,11 @@ else:
 	print "Content-Type: text/html; Charset: ISO-8859-1"
 	
 	# if there ar additional cookies defined during the request, add them here
-	if cookies or webnotes.add_cookies: 
+	if webnotes.cookies or webnotes.add_cookies: 
 		for c in webnotes.add_cookies.keys():
-			cookies[c] = webnotes.add_cookies[c]
+			webnotes.cookies[c] = webnotes.add_cookies[c]
 			
-		print cookies
+		print webnotes.cookies
 		
 	print # Headers end
 	

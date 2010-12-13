@@ -1,102 +1,50 @@
-# Authentication
-#
-# The authentication will be called at the beginning of every request.
-#   1. It will authenticate a session
-#   2. It will authenticate the user
-#   3. It will create the database cursor
-#   4. It will setup the session object
-#   5. It will clean-up old sessions and update the current one
-#
-# Case A: "account" is specified in defs -> defs.single_account = True
-#
-#   The system will try and authenticate the user by 3 ways
-#     1. Check self.cookies for valid session id (sid)
-#     2. Check formdata for valid sid (coming from a re-direct)
-#     3. Login using "user" and "password" in the form data & start a new session
-#     4. Login as "Guest" & start a new session
-#   If all 3 fail, then throw exception
-#
-# Case B: "account" is not specified
-#
-#   1. Find the database using "account_id" key in the self.cookies
-#   2. Find the database using "account_id" key in the formdata
-#   Set the database. and revert to Case A:
-#
-# Post authentication
-#   1. Update the session
-#   2. Update the profile
-#   3. Update self.cookies
-#
-#-----------------------------------------------------
-
 import webnotes
 import webnotes.db
 import webnotes.utils
 import webnotes.profile
+import webnotes.defs
 
-import defs
+# =================================================================================
+# HTTPRequest
+# =================================================================================
 
-class Authentication:
-	def __init__(self, form, out_cookies, out):
-
-		self.form = form
-		self.cookies = self.set_in_cookies()
-		self.account = None
-		self.account_id = None
-		self.session = None
-		self.out_cookies = out_cookies
-		self.out = out
-		self.login_flag = 0
-		self.user_id = None
-		self.cp = None
-		self.session = {'data':{}}
-	
+class HTTPRequest:
+	def __init__(self):
 		self.get_env()
+	
+		# load cookies
+		webnotes.cookie_manager = CookieManager()
+
+		# set db
 		self.set_db()
-		
-		# make the connections global
-		webnotes.conn = self.conn
-		
-		# called from login
-		if form.get('cmd')=='login':
-			if form.get('acx'):
-				self.set_db(form.get('acx'))
-				webnotes.conn = self.conn
-			
-			self.login()
-			self.login_flag = 1
-		
-		else:
-			# authenticated user
-			if not self.load_session(self.form.get('sid') or self.cookies.get('sid')):
-			
-				# no ? login as guest
-				self.login(as_guest = True)
-		
-		if not self.session.get('user'): 
-			self.out['message'] = '"Authentication Failed"'
-			raise Exception, "Authentication Failed"
 
-		# if just logged in
-		if self.login_flag or form.get('sid') or form.get('ac_name'):
-			self.set_cookies()
-			self.set_remember_me()
-		
-		webnotes.session = self.session
+		# login
+		webnotes.login_manager = LoginManager()
+
+		# start session
+		webnotes.session_obj = Session()
+		webnotes.session = webnotes.session_obj.data
+
+		# run login triggers
+		if webnotes.form_dict.get('cmd')=='login':
+			webnotes.login_manager.run_trigger('on_login_post_session')
+			
+		# load profile
+		self.setup_profile()
+
+	# setup profile
+	# -------------
+
+	def setup_profile(self):
 		webnotes.user = webnotes.profile.Profile()
-		webnotes.incoming_cookies = self.cookies
-
 		# load the profile data
 		if webnotes.session['data'].get('profile'):
 			webnotes.user.load_from_session(webnotes.session['data']['profile'])
 		else:
-			webnotes.user.load_profile()
-		
-		# clear defs password - for security
-		#defs.db_password = ''
-	
-	# Load Domain and IP
-	# =================================================================================
+			webnotes.user.load_profile()	
+
+	# load env variables
+	# ------------------
 
 	def get_env(self): 
 		import os
@@ -104,251 +52,149 @@ class Authentication:
 		if self.domain.startswith('www.'):
 			self.domain = self.domain[4:]
 			
-		self.remote_ip = os.environ.get('REMOTE_ADDR')
-	
-	# Make the database connection - either from cookies or from domain info
-	# =================================================================================
+		webnotes.remote_ip = os.environ.get('REMOTE_ADDR')
+
+	# get account name
+	# ------------------
+
+	def get_ac_name(self):
+		# login
+		if webnotes.form_dict.get('cmd')=='login' and webnotes.form_dict.get('acx'):
+			return webnotes.form_dict.get('acx')
+		
+		# in form
+		elif webnotes.form_dict.get('ac_name'):
+			return form.get('ac_name')
+			
+		# in cookie
+		elif webnotes.incoming_cookies.get('ac_name'):
+			return webnotes.incoming_cookies.get('ac_name')
+			
+		# from defs
+		elif getattr(webnotes.defs, 'ac_name', None):
+			return webnotes.defs.ac_name
+			
+		# from domain name
+		else:
+			return self.domain.split('.')[0]
+
+	# set database login
+	# ------------------
 
 	def set_db(self, ac_name = None):
 		res = None
 
 		# Case 1 - Single Account
-		# -----------------------
-		if hasattr(defs, 'single_account'):
-			self.conn = webnotes.db.Database(use_default=1)
-			return
-		
-		# database_id (account_id) is given --- not for login
-		# ---------------------------------------------------
-		if not (ac_name or self.form.get('ac_name')) and self.cookies.get('account_id'):
-			self.account_id = self.cookies.get('account_id')
-			self.conn = webnotes.db.Database(user = self.account_id)
-			self.conn.use(self.account_id)
+		if hasattr(webnotes.defs, 'single_account'):
+			webnotes.conn = webnotes.db.Database(use_default=1)
 			return
 
-		# account id is given
-		# -------------------
 		if not ac_name:
-			ac_name = self.form.get('ac_name') or self.cookies.get('ac_name')
-		
-		c = webnotes.db.Database(use_default=1)
-		if ac_name:
-			try:
-				res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
-			except: 
-				pass
-			if res:
-				self.account = ac_name
-			else:
-				# default account may not have entry
-				if ac_name == defs.db_name:
-					res = [[defs.db_name, defs.db_login],]
+			ac_name = self.get_ac_name()
 
-		# select database from domain mapping table "Account Domain"
-		# ----------------------------------------------------------
-		else:
-			if c.sql("select name from tabDocType where name='Account Domain'"):
-				res = c.sql("select tabAccount.db_name, tabAccount.db_login, tabAccount.ac_name from tabAccount, `tabAccount Domain` where tabAccount.name = `tabAccount Domain`.parent and `tabAccount Domain`.domain = '%s'" % self.domain)
-			if res:
-				self.account = res[0][2]
-				
-			# see if the first part of the domain name matches the account id
-			if not self.account:
-				fp = self.domain.split('.')[0]
-				try:
-					if c.sql("select name from tabAccount where ac_name = %s", fp):
-						self.account = fp
-				except:
-					pass
-		
-		# connect
-		# -------
-		if res:
-			self.account_id = res[0][0]
-			c = webnotes.db.Database(user = res[0][1] or res[0][0])
-			c.use(self.account_id)
-		else:
-			self.account_id = defs.db_name
-			c =  webnotes.db.Database(use_default = 1)
-			
-		self.conn = c
-		
-	def check_ip(self):
-		if self.session:
-			if self.session['data']['session_ip'] != self.remote_ip:
-				raise Exception, "Your IP address has changed mid-session. For security reasons, please login again"
+		webnotes.conn = webnotes.db.Database(ac_name = ac_name)
+		webnotes.conn = webnotes.conn
+		webnotes.ac_name = ac_name
 
-	# Load Session
-	# =================================================================================
+# =================================================================================
+# Login Manager
+# =================================================================================
 
-	def load_session(self, sid):
-		if not sid: 
-			return False
+class LoginManager():
+	def __init__(self):
+		self.cp = None
+		if webnotes.form_dict.get('cmd')=='login':
+			# clear cache
+			from webnotes.session_cache import clear_cache
+			clear_cache(webnotes.form_dict.get('usr'))				
 
-		if not self.conn:
-			self.conn = self.set_db()
+			self.authenticate()
+			self.post_login()
+			webnotes.response['message'] = 'Logged In'
 
-		r = self.conn.sql("select user, sessiondata from tabSessions where sid='%s'" % sid)
-		if r:
-			self.session = {'data':eval(r[0][1]), 'user':r[0][0], 'sid':sid}
-			return True
-		return False
+	# run triggers, write cookies
+	# ---------------------------
 	
-	# Login
-	# =================================================================================
-
-	def login(self, as_guest = 0):
-		if as_guest:
-			res = self.conn.sql("select name from tabProfile where name='Guest' and ifnull(enabled,0)=1")
-			if not res:
-				raise Exception, "No Guest Access"
-			self.user_id = res[0][0]
-		else:
-			self.user_id = self.check_password(self.form.get('usr'), self.form.get('pwd'))
-		
-		# yes allowed to create session
-		if self.user_id:
-		
-			# if not guest, then do login
-			if not as_guest:
-				self.out['message'] = 'Logged In'
-				self.call_on_login_pre_session()
-
-				# clear cache
-				from webnotes.session_cache import clear_cache
-				clear_cache(self.user_id)
-				
-			# validate blocked IP
-			self.validate_ip(self.user_id)
-
-			# start session
-			self.start_session(self.user_id)
-			
-			# second on_login method - post session
-			if not as_guest:
-				self.call_on_login_post_session()
-				
-			return True
+	def post_login(self):
+		self.validate_ip_address()
+		self.run_trigger()
 	
-	def call_on_login_pre_session(self):
+	# check password
+	# --------------
+	
+	def authenticate(self, user=None, pwd=None):
+		if not (user and pwd):	
+			user, pwd = webnotes.form_dict.get('usr'), webnotes.form_dict.get('pwd')
+
+		if not (user and pwd):
+			raise Exception, 'Incomplete Login Details'
+			webnotes.msgprint('Incomplete Login Details')
+		
+		# custom authentication (for single-sign on)
+		self.load_control_panel()
+		if hasattr(self.cp, 'authenticate'):
+			self.user = self.cp.authenticate()
+		
+		# check the password
+		if user=='Administrator':
+			p = webnotes.conn.sql("select name from tabProfile where name=%s and (`password`=%s OR `password`=PASSWORD(%s))", (user, pwd, pwd))
+		else:
+			p = webnotes.conn.sql("select name from tabProfile where name=%s and (`password`=%s  OR `password`=PASSWORD(%s)) and IFNULL(enabled,0)=1", (user, pwd, pwd))
+			
+		if not p:
+			raise Exception, 'Authentication Failed'
+			webnotes.msgprint('Authentication Failed')
+			
+		self.user = p[0][0]
+	
+	# triggers
+	# --------
+	
+	def load_control_panel(self):
 		import webnotes.model.code
 		try:
-			self.cp = webnotes.model.code.get_obj('Control Panel')
-			if hasattr(self.cp, 'on_login'):
-				self.cp.on_login(self)
+			if not self.cp:
+				self.cp = webnotes.model.code.get_obj('Control Panel')
 		except Exception, e:
-			self.out['on_login Exception'] = webnotes.utils.getTraceback()
-
-	def call_on_login_post_session(self):
-		if not self.cp:
-			return
-		if hasattr(self.cp, 'on_login_post_session'):
-			try:
-				self.cp.on_login_post_session(self)
-			except Exception, e:
-				self.out['on_login Exception'] = webnotes.utils.getTraceback()
+			webnotes.response['Control Panel Exception'] = webnotes.utils.getTraceback()
 	
-	def check_password(self, user, pwd):
-		if not (user and pwd):
-			return None
-		if user=='Administrator':
-			p = self.conn.sql("select name from tabProfile where name=%s and (`password`=%s OR `password`=PASSWORD(%s))", (user, pwd, pwd))
-		else:
-			p = self.conn.sql("select name from tabProfile where name=%s and (password=%s  OR `password`=PASSWORD(%s)) and IFNULL(enabled,0)=1", (user, pwd, pwd))
-	
-		return p and p[0][0] or ''
-	
-	def validate_ip(self, user):
+	def run_trigger(self, method='on_login'):
+		self.load_control_panel()
 		try:
-			ip = self.conn.sql("select ip_address from tabProfile where name = '%s'" % user)[0][0] or ''
+			if self.cp and hasattr(self.cp, method):
+				self.cp.on_login(self)
+				
+		except Exception, e:
+			webnotes.response[method + ' Exception'] = webnotes.utils.getTraceback()
+	
+	# ip validation
+	# -------------
+	
+	def validate_ip_address(self):
+		try:
+			ip = webnotes.conn.sql("select ip_address from tabProfile where name = '%s'" % self.user)[0][0] or ''
 		except: return
 			
 		ip = ip.replace(",", "\n").split('\n')
 		ip = [i.strip() for i in ip]
 			
 		if ret and ip:
-			if not (self.remote_ip.startswith(ip[0]) or (remote_ip in ip)):
-				raise Exception, 'Not allowed from this IP Address'
+			if not (webnotes.remote_ip.startswith(ip[0]) or (remote_ip in ip)):
+				raise Exception, 'Not allowed from this IP Address'	
 
-	# Get IP Info from ipinfodb.com
-	# =================================================================================
-	def get_ipinfo(self):		
-		import os,httplib,urllib
-		conn=httplib.HTTPConnection("api.ipinfodb.com")  #open connention
-		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json','key':'fbde5e1bc0cc79a17bf33f25e2fdb158218ec4177a7d0acd1853ea8d7fff0693'}
-		try:
-			conn.request("GET", "/v2/ip_query_country.php?"+urllib.urlencode(args))
-			ret = conn.getresponse().read()
-			self.session['data']['ipinfo'] = eval(ret)
-		except:
-			pass
-
-	# Start Session
-	# =================================================================================
+	# login as guest
+	# --------------
 	
-	def start_session(self, user):
-		self.session['user'] = user
-		self.session['sid'] = webnotes.utils.generate_hash()
-		self.session['data']['session_ip'] = self.remote_ip;
-
-		# get ipinfo
-		if self.conn.get_value('Control Panel',None,'get_ip_info'):
-			self.get_ipinfo()
-		
-		# insert session
-		self.conn.sql("insert into tabSessions (sessiondata, user, lastupdate, sid) values (%s , %s, NOW(), %s)", (str(self.session['data']), self.session['user'], self.session['sid']))
-
-		# update profile
-		self.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (webnotes.utils.now(), self.remote_ip, self.session['user']))
-
-	# Update session, at the end of the request
-	# =================================================================================
-	
-	def update(self):
-		# update session
-		self.conn.sql("update tabSessions set sessiondata=%s, user=%s, lastupdate=NOW() where sid=%s" , (str(self.session['data']), self.session['user'], self.session['sid']))
-				
-		# clear expired sessions
-		self.clear_expired()
-		
-	def clear_expired(self):
-		# in control panel?
-		exp_sec = self.conn.get_value('Control Panel', None, 'session_expiry') or '24:00'
-		
-		# clear out old sessions
-		self.conn.sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > %s OR TIMEDIFF(NOW(), lastupdate) > '72:00'", exp_sec)
-
-	# Set cookies, on login
-	# =================================================================================
-	
-	def set_cookies(self):
-		if self.account_id:
-			self.out_cookies['account_id'] = self.account_id
-			
-		elif self.account:
-			self.out_cookies['ac_name'] = self.account
-		
-		if self.session.get('sid'):
-			self.out_cookies['sid'] = self.session['sid']
-
-	# Set the remember me cookie, give expiry to cookies
-	# =================================================================================
-
-	def set_remember_me(self):
-		if webnotes.utils.cint(self.form.get('remember_me')):
-			remember_days = self.conn.get_value('Control Panel',None,'remember_for_days') or 7
-			import datetime
-			self.out_cookies['remember_me'] = 1
-			expires = datetime.datetime.now() + datetime.timedelta(days=remember_days)
-			for k in self.out_cookies.keys():
-				self.out_cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')	
-	
-	def set_in_cookies(self):
-		return webnotes.utils.get_incoming_cookies()
+	def login_as_guest(self):
+		res = webnotes.conn.sql("select name from tabProfile where name='Guest' and ifnull(enabled,0)=1")
+		if not res:
+			raise Exception, "No Guest Access"
+		self.user = 'Guest'
+		self.post_login()
 
 	# Logout
-	# =================================================================================
-
+	# ------
+	
 	def call_on_logout_event(self):
 		import webnotes.model.code
 		cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
@@ -360,6 +206,184 @@ class Authentication:
 			self.call_on_logout_event()
 
 		webnotes.conn.sql('delete from tabSessions where sid="%s"' % webnotes.session['sid'])
-		self.out_cookies['sid'] = ''
-		self.out_cookies['remember_me'] = ''
+		webnotes.cookies['sid'] = ''
+		webnotes.cookies['remember_me'] = ''
+
+# =================================================================================
+# Cookie Manager
+# =================================================================================
+
+class CookieManager:
+	def __init__(self):
+		import Cookie
+		self.get_incoming_cookies()
+		webnotes.cookies = Cookie.SimpleCookie()
+
+	# get incoming cookies
+	# --------------------
+	def get_incoming_cookies(self):
+		import os
+		cookies = {}
+		if 'HTTP_COOKIE' in os.environ:
+			c = os.environ['HTTP_COOKIE']
+			c = c.split('; ')
+				  
+			for cookie in c:
+				cookie = cookie.split('=')
+				cookies[cookie[0].strip()] = cookie[1].strip()
+					
+		webnotes.incoming_cookies = cookies
 		
+	# Set cookies
+	# -----------
+	
+	def set_cookies(self):
+		if webnotes.conn.cur_db_name:
+			webnotes.cookies['account_id'] = webnotes.conn.cur_db_name
+		
+		# ac_name	
+		webnotes.cookies['ac_name'] = webnotes.ac_name or ''
+		
+		if webnotes.session.get('sid'):
+			webnotes.cookies['sid'] = webnotes.session['sid']
+
+			# sid expires in 3 days
+			import datetime
+			expires = datetime.datetime.now() + datetime.timedelta(days=3)
+
+			webnotes.cookies['sid']['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')		
+
+	# Set Remember Me
+	# ---------------
+
+	def set_remember_me(self):
+		if webnotes.utils.cint(webnotes.form_dict.get('remember_me')):
+			remember_days = webnotes.conn.get_value('Control Panel',None,'remember_for_days') or 7
+			webnotes.cookies['remember_me'] = 1
+
+			import datetime
+			expires = datetime.datetime.now() + datetime.timedelta(days=remember_days)
+
+			for k in webnotes.cookies.keys():
+				webnotes.cookies[k]['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')	
+
+# =================================================================================
+# Session 
+# =================================================================================
+
+class Session:
+	def __init__(self, user=None):
+		self.user = user
+		self.sid = webnotes.form_dict.get('sid') or webnotes.incoming_cookies.get('sid')
+		self.data = {'user':user,'data':{}}
+
+		if webnotes.form_dict.get('cmd')=='login':
+			self.start()
+			return
+			
+		self.load()
+	
+	# start a session
+	# ---------------
+	def load(self):
+		import webnotes
+		
+		r=None
+		try:
+			r = webnotes.conn.sql("select user, sessiondata, status from tabSessions where sid='%s'" % self.sid)
+		except Exception, e:
+			if e.args[0]==1054:
+				webnotes.conn.commit()
+				webnotes.conn.sql("alter table tabSessions add column `status` varchar(20)")
+				webnotes.conn.begin()
+			else:
+				raise e
+	
+		if r:
+			r=r[0]
+			if r[2]=='Expired' and (webnotes.form_dict.get('cmd')!='resume_session'):
+				if r[0]=='Guest' or (not webnotes.form_dict.get('cmd')) or webnotes.form_dict.get('cmd')=='logout':
+					webnotes.login_manager.login_as_guest()
+					self.start()
+				else:
+					webnotes.response['message'] = 'Session Expired'
+					raise Exception, 'Session Expired'
+			else:
+				self.data = {'data':eval(r[1]), 'user':r[0], 'sid': self.sid}
+		else:
+			webnotes.login_manager.login_as_guest()
+			self.start()
+			
+
+	# start a session
+	# ---------------
+	def start(self):
+		import os
+		import webnotes
+		import webnotes.utils
+		
+		# generate sid
+		self.data['user'] = webnotes.login_manager.user
+		self.data['sid'] = webnotes.utils.generate_hash()
+		self.data['data']['session_ip'] = os.environ.get('REMOTE_ADDR');
+
+		# get ipinfo
+		if webnotes.conn.get_value('Control Panel',None,'get_ip_info'):
+			self.get_ipinfo()
+		
+		# insert session
+		webnotes.conn.sql("insert into tabSessions (sessiondata, user, lastupdate, sid, status) values (%s , %s, NOW(), %s, 'Active')", (str(self.data['data']), self.data['user'], self.data['sid']))
+
+		# update profile
+		webnotes.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (webnotes.utils.now(), webnotes.remote_ip, self.data['user']))
+
+		# set cookies to write
+		webnotes.session = self.data
+		webnotes.cookie_manager.set_cookies()
+
+
+	# resume session
+	# --------------
+	def resume(self):
+		pwd = webnotes.form_dict.get('pwd')
+		webnotes.login_manager.authenticate(self.data['user'], pwd)
+		webnotes.conn.sql("update tabSessions set status='Active' where sid=%s", self.data['sid'])
+		return 'Logged In'
+	
+	# update session
+	# --------------
+	def update(self):
+		# update session
+		webnotes.conn.sql("update tabSessions set sessiondata=%s, user=%s, lastupdate=NOW() where sid=%s" , (str(self.data['data']), self.data['user'], self.data['sid']))	
+
+		self.check_expired()
+
+	# check expired
+	# -------------
+	def check_expired(self):
+		# in control panel?
+		exp_sec = webnotes.conn.get_value('Control Panel', None, 'session_expiry') or '6:00'
+		
+		# set sessions as expired
+		try:
+			webnotes.conn.sql("update from tabSessions where TIMEDIFF(NOW(), lastupdate) > %s SET `status`='Expired'", exp_sec)
+		except Exception, e:
+			if e.args[0]==1054:
+				sql("alter table tabSessions add column `status` varchar(20)")
+		
+		# clear out old sessions
+		webnotes.conn.sql("delete from tabSessions where TIMEDIFF(NOW(), lastupdate) > '72:00'")
+
+
+	# Get IP Info from ipinfodb.com
+	# -----------------------------
+	def get_ipinfo(self):		
+		import os,httplib,urllib
+		conn=httplib.HTTPConnection("api.ipinfodb.com")  #open connention
+		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json','key':'fbde5e1bc0cc79a17bf33f25e2fdb158218ec4177a7d0acd1853ea8d7fff0693'}
+		try:
+			conn.request("GET", "/v2/ip_query_country.php?"+urllib.urlencode(args))
+			ret = conn.getresponse().read()
+			self.data['data']['ipinfo'] = eval(ret)
+		except:
+			pass

@@ -26,9 +26,6 @@ _f.Frm.prototype.setup_attach = function() {
 	//var img = $a(d, 'img', '', {marginRight:'8px'}); img.src = 'images/icons/paperclip.gif';
 	$a(d, 'span').innerHTML = '<h4>File Attachments:</h4>';
 	
-	//me.attach_msg = $a(label_area,'div','comment', {padding:'8px', fontSize:'11px'});
-	//me.attach_msg.innerHTML = "Changes made to the attachments are not permanent until the document is saved";
-
 	// button
 	var btn_add_attach = $a(this.btn_area, 'button');
 	btn_add_attach.innerHTML = 'Add';
@@ -163,26 +160,7 @@ _f.FileField = function(parent, at_id, frm, addlink) {
 	this.upload_div = $a(main_area, 'div');
 	this.download_div = $a(main_area, 'div');
 
-	var div = $a(this.upload_div, 'div');
-	div.innerHTML = '<iframe id="RSIFrame" name="RSIFrame" src="blank1.html" style="width:0px; height:0px; border:0px"></iframe>';
-
-	// upload form
-	var div = $a(this.upload_div,'div');
-	div.innerHTML = '<form method="POST" enctype="multipart/form-data" action="'+outUrl+'" target="RSIFrame"></form>';
-	var ul_form = div.childNodes[0];
-      
-	var f_list = [];
-  
-	// file data
-	var inp_fdata = $a_input($a(ul_form,'span'),'file',{name:'filedata'});
-
-	var inp = $a_input($a(ul_form,'span'),'hidden',{name:'cmd'}); inp.value = 'uploadfile';
-	var inp = $a_input($a(ul_form,'span'),'submit'); inp.value = 'Upload';
-	
-	// dt, dn to show
-	var inp = $a_input($a(ul_form,'span'),'hidden',{name:'doctype'}); inp.value = frm.doctype;
-	var inp = $a_input($a(ul_form,'span'),'hidden',{name:'docname'}); inp.value = frm.docname;
-	var inp = $a_input($a(ul_form,'span'),'hidden',{name:'at_id'}); inp.value = at_id;
+	this.uploader = new Uploader(this.upload_div,{from_form:1, doctype:frm.doctype, docname:frm.docname, at_id:at_id},_f.file_upload_done);
 	
 	// download
 	this.download_link = $a(this.download_div, 'a', 'link_type');

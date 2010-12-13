@@ -4,6 +4,7 @@
 import MySQLdb
 from webnotes import defs
 import webnotes
+
 class Database:
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
@@ -23,9 +24,7 @@ class Database:
 		self.testing_tables = []
 		
 		self.connect()
-	
-		if use_default:
-			self.use(defs.db_name)
+		self.use(self.user)
 		
 		if webnotes.logger:
 			webnotes.logger.debug('Database object initialized for:%s',self.user)
@@ -40,7 +39,6 @@ class Database:
 		if res:
 			return res[0][1] or res[0][0]
 
-
 	def connect(self):
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
 		self._cursor = self._conn.cursor()
@@ -48,11 +46,8 @@ class Database:
 		return self._cursor
 	
 	def use(self, db_name):
-		try:
-			self._conn.select_db(db_name)
-			self.cur_db_name = db_name
-		except Exception,e:
-			raise e
+		self._conn.select_db(db_name)
+		self.cur_db_name = db_name
 	
 	def check_transaction_status(self, query):
 		if query and query.strip().lower()=='start transaction':

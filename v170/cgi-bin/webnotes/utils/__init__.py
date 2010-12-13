@@ -32,21 +32,6 @@ def generate_hash():
 def db_exists(dt, dn):
 	return webnotes.conn.sql('select name from `tab%s` where name="%s"' % (dt, dn))
 
-# Cookies
-# ------------------
-
-def get_incoming_cookies():
-	import os
-	cookies = {}
-	if 'HTTP_COOKIE' in os.environ:
-		c = os.environ['HTTP_COOKIE']
-		c = c.split('; ')
-			  
-		for cookie in c:
-			cookie = cookie.split('=')
-			cookies[cookie[0].strip()] = cookie[1].strip()
-				
-	return cookies
 
 # Get Traceback
 # -------------

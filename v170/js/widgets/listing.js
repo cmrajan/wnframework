@@ -126,42 +126,43 @@ Listing.prototype.make_toolbar = function() {
 	}
 	
 	// refresh btn
-	var cnt = 0;
 	if(!this.opts.hide_refresh) {
 		make_btn('Refresh','ui-icon-refresh',function(btn) {
 			me.run();
-		},1); cnt+=2;
+		},1);
 	}
 
 	// new
 	if(this.opts.show_new) {
-		make_btn('New ','ui-icon-document',function() { new_doc(me.dt); },1); cnt+=2;
+		make_btn('New ','ui-icon-document',function() { new_doc(me.dt); },1);
 	}
 
 	// report
 	if(this.opts.show_report) {
-		make_btn('Report Builder','ui-icon-clipboard',function() { loadreport(me.dt); },0); cnt+=2;
+		make_btn('Report Builder','ui-icon-clipboard',function() { loadreport(me.dt); },0);
 	}
 	
 	// export
 	if(!this.opts.hide_export) {
-		make_btn('Export','ui-icon-circle-arrow-e',function() {me.do_export();}); cnt +=2;
+		make_btn('Export','ui-icon-circle-arrow-e',function() {me.do_export();});
 	}
 
 	// print
 	if(!this.opts.hide_print) {
-		make_btn('Print','ui-icon-print',function() {me.do_print();}); cnt+=2;
+		make_btn('Print','ui-icon-print',function() {me.do_print();});
 	}
 	
 	// calc
 	if(this.opts.show_calc) {
-		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); cnt+=2;
+		make_btn('Calc','ui-icon-calculator',function() {me.do_calc();});
+		$dh(me.buttons['Calc'])
 	}
 	
 	this.loading_img = $a(this.btn_area,'img','',{display:'none',marginBottom:'-2px'});
 	this.loading_img.src = 'images/ui/button-load.gif';
 	
-	if(!cnt)$dh(this.btn_area);
+	if(!keys(this.buttons).length)
+		$dh(this.btn_area);
 }
 
 // -------------------------------------------------------

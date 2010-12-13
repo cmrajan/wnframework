@@ -27,6 +27,7 @@ in_files_main = [
        ,'webpage/error_console.js'
        ,'webpage/about.js'
        ,'webpage/loaders.js'
+       ,'webpage/uploader.js'
        ,'webpage/page.js'
        ,'webpage/docbrowser.js'
        ,'model/local_data.js'

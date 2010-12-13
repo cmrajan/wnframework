@@ -182,7 +182,7 @@ function time_to_hhmm(hh,mm,am) {
 function comment_when(dt) {
 	var cdate = dateutil.str_to_obj(dt);
 	var diff = (new Date() - cdate) / 1000;
-	if(diff < 30) {
+	if(diff < 60) {
 		return "Few moments ago"
 	} else if(diff < 600) {
 		var t = cint(diff/60);

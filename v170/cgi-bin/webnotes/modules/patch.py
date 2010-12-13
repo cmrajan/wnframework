@@ -30,7 +30,7 @@ def get_patch(patch):
 	import webnotes.defs, os
 	
 	try:
-		file = open(os.path.join(webnotes.defs.modules_path, 'patches', 'p' + str(patch)), 'r')
+		file = open(os.path.join(webnotes.defs.modules_path, 'patches', 'p' + str(patch) + '.py'), 'r')
 		code = file.read()
 		file.close()
 		return code

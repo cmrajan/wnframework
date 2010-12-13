@@ -104,6 +104,23 @@ Dialog.prototype.make_body = function(content) {
 	for(var i in content) this.make_row(content[i]);
 }
 
+Dialog.prototype.clear_inputs = function(d) {
+	for(var wid in this.widgets) {
+		var w = this.widgets[wid];
+
+		var tn = w.tagName ? w.tagName.toLowerCase() : '';
+		if(tn=='input' || tn=='textarea') {
+			w.value = '';
+		} else if(tn=='select') {
+			sel_val(w.options[0].value);
+		} else if(w.txt) {
+			w.txt.value = '';
+		} else if(w.input) {
+			w.input.value = '';
+		}
+	}
+}
+
 Dialog.prototype.make_row = function(d) {
 	var me = this;
 	

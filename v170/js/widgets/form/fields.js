@@ -682,8 +682,8 @@ LinkField.prototype.set_disp = function(val) {
 
 function IntField() { } IntField.prototype = new DataField();
 IntField.prototype.validate = function(v) {
-	var v= parseInt(v); if(isNaN(v))return null;
-	return v;
+	if(isNaN(parseInt(v)))return null;
+	return cint(v);
 }; 
 IntField.prototype.format_input = function() {
 	if(this.input.value==null) this.input.value='';

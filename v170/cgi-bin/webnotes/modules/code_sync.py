@@ -53,7 +53,7 @@ def update_code(doc, code_field, file_timestamp):
 	
 	# get the code
 	fn = get_code_path(doc, code_field)
-	file = open(fn,'r+')
+	file = open(fn,'r')
 	code = file.read()
 	file.close()
 	

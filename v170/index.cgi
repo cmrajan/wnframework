@@ -10,10 +10,9 @@ def getTraceback():
 try:
 
 	import sys, os, cgi
-	
+
 	sys.path.append(os.getcwd()+'/cgi-bin')
 	import webnotes
-
 
 	webnotes.form = cgi.FieldStorage()
 	for each in webnotes.form.keys():
@@ -25,12 +24,9 @@ try:
 		# Page Call
 		import webnotes.auth
 		import webnotes.widgets.page_body
-		import webnotes.profile
-		import Cookie
 
-		webnotes.cookies = Cookie.SimpleCookie()
-		auth_obj = webnotes.auth.Authentication(webnotes.form_dict, webnotes.cookies, {})
-	
+		webnotes.auth.HTTPRequest()
+
 		print "Content-Type: text/html"
 
 		# print cookies, if there ar additional cookies defined during the request, add them here

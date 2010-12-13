@@ -56,7 +56,7 @@ $item_set_working = function(ele) {
 	if(ele.loading_img) { 
 		$di(ele.loading_img) 
 	} else {
-		ele.loading_img = $a(ele,'img','',{marginLeft:'2px',marginBottom:'-2px'});
+		ele.loading_img = $a(ele,'img','',{marginLeft:'4px',marginBottom:'-2px'});
 		ele.loading_img.src = 'images/ui/button-load.gif';
 	}
 }
@@ -176,7 +176,7 @@ function add_sel_options(s, list, sel_val, o_style) {
 		return;
 	}
 	if(s.inp)s = s.inp;
-	for(var i=0; i<list.length; i++) {
+	for(var i=0, len=list.length; i<len; i++) {
 		var o = new Option(list[i], list[i], false, (list[i]==sel_val? true : false));
 		if(o_style) $y(o, o_style);
 		s.options[s.options.length] = o;	
@@ -452,30 +452,49 @@ remove_space_holder = function(){
 
 // set user image
 var user_img = {}
+var user_img_queue = {};
+var user_img_loading = [];
 
-set_user_img = function(img, username, get_latest) {
-
-	function set_it() {
+set_user_img = function(img, username, get_latest, img_id) {
+	function set_it(i) {
 		if(user_img[username]=='no_img_m')
-			img.src = 'images/ui/no_img/no_img_m.gif';
+			i.src = 'images/ui/no_img/no_img_m.gif';
 		else if(user_img[username]=='no_img_f')
-			img.src = 'images/ui/no_img/no_img_f.gif'; // no image
+			i.src = 'images/ui/no_img/no_img_f.gif'; // no image
 		else
-			img.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
-
+			i.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
 	}
 
-	if(get_latest){
-		$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
+	// given
+	if(img_id) {
+		user_img[username] = img_id;
+		set_it(img);
+		return;
 	}
-	else{
-		if(user_img[username]) {
-			set_it();
+	
+	// from dict or load
+	if(user_img[username] && !get_latest) {
+		set_it(img);
+	} else{
+		// queue multiple request while loading
+		if(in_list(user_img_loading,username)) {
+			if(!user_img_queue[username]) 
+				user_img_queue[username] = [];
+			user_img_queue[username].push(img);
+			return;
 		}
+		$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { 
+				delete user_img_loading[user_img_loading.indexOf(username)];
+				user_img[username] = r.message; 
 
-		else{
-			$c('webnotes.profile.get_user_img',{username:username},function(r,rt) { user_img[username] = r.message; set_it(); }, null, 1);
-		}
+				if(user_img_queue[username]) {
+					var q=user_img_queue[username];
+					for(var i in q) { set_it(q[i]); }
+				}
+				set_it(img); 
+				
+			}, null, 1);
+		user_img_loading.push(username);
 	}
 
 }

@@ -21,6 +21,21 @@ window.parent.frms['%s'].show_doc('%s');
 
 # -------------------------------------------------------
 
+def make_thumbnail(blob, size):
+	from PIL import Image
+	import cStringIO
+				
+	fobj = cStringIO.StringIO(blob)
+	image = Image.open(fobj)
+	image.thumbnail((tn,tn*2), Image.ANTIALIAS)
+	outfile = cStringIO.StringIO()
+	image.save(outfile, 'JPEG')
+	outfile.seek(0)
+	fcontent = outfile.read()
+	
+	return fcontent
+
+
 def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js_fail=''):
 	import webnotes
 	import webnotes.utils
@@ -34,8 +49,19 @@ def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js
 		if 'filedata' in form:
 			i = form['filedata']
 	
+			fname, content = i.filename, i.file.read()
+	
+			# thumbnail
+			if webnotes.form_dict.get('thumbnail'):
+				try:
+					content = make_thumbnail(content, int(form.get('thumbnail')))
+					# change extension to jpg
+					fname = '.'.join(fname.split('.')[:-1])+'.jpg'
+				except Exception, e:
+					pass
+		
 			# get the file id
-			fid = save_file(i.filename, i.file.read())
+			fid = save_file(fname, content)
 			
 			# okay
 			webnotes.response['result'] = """<script type='text/javascript'>%s</script>""" % js_okay
