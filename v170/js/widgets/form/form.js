@@ -228,7 +228,7 @@ _f.Frm.prototype.setup_meta = function() {
 	this.setup_print();
 }
 _f.set_frm_height = function() {
-	if(!cur_frm.meta.in_dialog && cur_frm.tray && !get_url_arg('embed')) {
+	if(cur_frm && !cur_frm.meta.in_dialog && cur_frm.tray && !get_url_arg('embed')) {
 		var headerh = cur_frm.frm_head.page_head.wrapper.offsetHeight;
 		var footerh = cur_frm.footer.offsetHeight;
 		$y(cur_frm.tray.body, { height: get_window_height() - headerh - footerh + 'px', overflow:'auto' });

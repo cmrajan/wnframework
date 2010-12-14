@@ -318,7 +318,7 @@ ItemBrowserItem.prototype.make_details = function() {
 
 				// separator
 				if(i>2) {
-					var span = $a(div,'span'); span.innerHTML = ' |';
+					var span = $a(div,'span'); span.innerHTML = ',';
 				}
 				
 				// label

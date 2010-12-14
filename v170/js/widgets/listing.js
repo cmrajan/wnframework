@@ -74,14 +74,15 @@ Listing.prototype.make = function(parent) {
 	// paging area
 	if(this.opts.append_records) {
 		if(!this.opts.hide_rec_label)
-			this.rec_label = $a(this.body_area, 'div', '', {margin:'4px 0px'});
+			this.rec_label = $a(this.body_area, 'div', '', {margin:'4px 0px',color:'#888'});
 	} else {
 		var div = $a(this.body_area,'div','srs_paging_area');
 		this.body_head = make_table(div, 1, 2, '100%', ['50%','50%'], {verticalAlign:'middle'});
 		$y(this.body_head,{borderCollapse:'collapse'});
 
 		this.rec_label = $td(this.body_head,0,0);
-
+		$fg(this.rec_label,'#888');
+		
 		if(this.opts.hide_rec_label) {
 			$y($td(this.body_head,0,0),{width:'0%'}); 
 			$y($td(this.body_head,0,1),{width:'100%'});
@@ -554,9 +555,11 @@ Listing.prototype.run = function(do_continue, run_callback) {
 			
 		// no result
 		} else { 
+			me.n_records = 0;
+			me.set_rec_label(0);
+			me.clear_tab();
+		
 			if(!me.opts.append_records) {
-				me.n_records = 0;
-				me.set_rec_label(0);
 				if(me.show_empty_tab) {
 					me.clear_tab();
 				} else {
@@ -660,8 +663,9 @@ Listing.prototype.clear_tab = function() {
 	$dh(this.results);
 	if(this.result_tab) {
 		var nr = this.result_tab.rows.length;
+		var nc = this.result_tab.rows[0].cells.length;
 		for(var ri=(this.colnames?1:0); ri<nr; ri++)
-			for(var ci=0; ci< this.result_tab.rows[ri].cells.length; ci++)
+			for(var ci=0; ci < nc; ci++)
 				$td(this.result_tab, ri, ci).innerHTML = (this.opts.show_empty_tab ? '&nbsp;' : '');
 	}
 }
