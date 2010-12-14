@@ -362,7 +362,7 @@ class App:
                         print sc
                         self.close()
                 except Exception, e:
-			print getTraceback()
+			print webnotes.utils.getTraceback()
                         self.conn.sql("rollback")
                         self.close()
 			raise e
