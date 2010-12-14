@@ -32,6 +32,7 @@ class Database:
 	def get_db_login(self, ac_name):
 		import webnotes.db
 		c = webnotes.db.Database(use_default = 1)
+		res = ''
 		try:
 			res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
 		except:
@@ -88,8 +89,12 @@ class Database:
 		
 		# execute
 		if values!=():
+			if webnotes.logger and (self.user in defs.debug_log_dbs):
+				webnotes.logger.debug('Executing SQL Query %s with values %s',query,values)
 			self._cursor.execute(query, values)
 		else:
+			if webnotes.logger and (self.user in defs.debug_log_dbs):
+				webnotes.logger.debug('Executing SQL Query %s without any values',query)
 			self._cursor.execute(query)	
 
 		# scrub output if required
