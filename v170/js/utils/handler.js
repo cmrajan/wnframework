@@ -49,13 +49,8 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 			}
 			// unfreeze
 			if(freeze_msg)unfreeze();
-			if(r.exc && r.session_status=='Session Expired') {
-				resume_session();
-			}
-			if(r.exc && r.session_status=='Logged Out') {
-				msgprint('You have been logged out');
-				setTimeout('redirect_to_login()', 3000);
-			}
+			
+			if(!validate_session(r,rtxt)) return;
 			if(r.exc) { errprint(r.exc); };
 			if(r.server_messages) { msgprint(r.server_messages);};
 			if(r.docs) { LocalDB.sync(r.docs); }
@@ -71,6 +66,33 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 	req.send(makeArgString(args)); 
 	if(!no_spinner)set_loading(); // Loading
 	if(freeze_msg)freeze(freeze_msg,1);
+}
+
+function validate_session(r,rt) {
+	// check for midway change in session
+	if(start_sid && start_sid != get_cookie('sid') && r.message!='Logged In') {
+		page_body.set_session_changed();	
+		return
+	}
+
+	// check for expired session
+	if(r.exc && r.session_status=='Session Expired') {
+		resume_session();
+		return;
+	}
+
+	// check for logged out sesion
+	if(r.exc && r.session_status=='Logged Out') {
+		msgprint('You have been logged out');
+		setTimeout('redirect_to_login()', 3000);
+		return;
+	}
+	
+	if(r.exc && r.exc_type && r.exc_type=='PermissionError') {
+		loadpage('_home');
+	}
+	
+	return true;
 }
 
 // For calling an object

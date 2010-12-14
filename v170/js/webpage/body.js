@@ -8,7 +8,7 @@
 			+ center
 			+ right_sidebar
 		+ footer
-
+	+ dead session
 
 **/
 
@@ -167,6 +167,13 @@ function Body() {
 	this.set_status = function(txt) {
 		if(this.status_area)
 			this.status_area.innerHTML = txt;
+	}
+	
+	this.set_session_changed = function() {
+		var div = $a($i('body_div').parentNode,'div','',{textAlign: 'center', fontSize:'14px', margin:'150px auto'});
+		$dh('body_div');
+		
+		div.innerHTML = 'This session has been changed. Please <span class="link_type" onclick="window.location.reload()">refresh</span> to continue';
 	}
 	
 	this.setup();

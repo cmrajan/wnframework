@@ -3,6 +3,7 @@
 // dialog container
 var popup_cont;
 var session = {};
+var start_sid = null;
 
 function startup() {
 	//initialize our DHTML history
@@ -11,6 +12,9 @@ function startup() {
 	//subscribe to DHTML history change events
 	dhtmlHistory.addListener(historyChange);
 
+	// save the sid (so that we know if it changes mid-session)
+	start_sid = get_cookie('sid');
+	
 	popup_cont = $a(document.getElementsByTagName('body')[0], 'div');
 
 	// Globals

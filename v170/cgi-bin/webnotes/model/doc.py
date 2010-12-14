@@ -507,6 +507,15 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 	
 	return l
 
+# Check if "Guest" is allowed to view this page
+# ---------------------------------------------
+
+def check_page_perm(dn):
+	if dn=='Login Page': 
+		return
+	if not webnotes.conn.sql("select name from `tabPage Role` where parent=%s and role='Guest'", dn):
+		webnotes.response['exc_type'] = 'PermissionError'
+		raise Exception, '[WNF] No read permission for %s %s' % ('Page', dn)		
 
 # called from everywhere
 # load a record and its child records and bundle it in a list - doclist
@@ -524,10 +533,11 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0):
 
 	# check permission - for doctypes, pages
 	if (dt in ('DocType', 'Page', 'Control Panel', 'Search Criteria')) or (from_get_obj and webnotes.session.get('user') != 'Guest'):
-		pass # dont check permissions for non-guest get_obj calls and metadata
+		if dt=='Page' and webnotes.session['user'] == 'Guest':
+			check_page_perm(dn)
 	else:
 		if not doc.check_perm():
-			webnotes.msgprint("No read permission for %s %s" % (dt, dn))
+			webnotes.response['exc_type'] = 'PermissionError'
 			raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
 
 	# scrub for code

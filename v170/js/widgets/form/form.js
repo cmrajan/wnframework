@@ -605,13 +605,10 @@ _f.Frm.prototype.check_doc_perm = function() {
 	if(!this.perm[0][READ]) { 
 		if(user=='Guest') {
 			// allow temp access? via encryted akey
-			if(_f.temp_access[dt][dn]) {
+			if(_f.temp_access[dt] && _f.temp_access[dt][dn]) {
 				this.perm = [[1,0,0]]
 				return 1;
 			}
-			msgprint('You must log in to view this page');
-		} else {
-			msgprint('No Read Permission');
 		}
 		nav_obj.show_last_open();
 		return 0;
