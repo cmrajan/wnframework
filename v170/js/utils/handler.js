@@ -32,7 +32,7 @@ function newHttpReq() {
 	return r;
 }
 
-// call execute serverside request        
+// call execute serverside request
 function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 	var req=newHttpReq();
 	ret_fn=function() {
@@ -49,8 +49,12 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 			}
 			// unfreeze
 			if(freeze_msg)unfreeze();
-			if(r.exc && r.message=='Session Expired') {
+			if(r.exc && r.session_status=='Session Expired') {
 				resume_session();
+			}
+			if(r.exc && r.session_status=='Logged Out') {
+				msgprint('You have been logged out');
+				setTimeout('redirect_to_login()', 3000);
 			}
 			if(r.exc) { errprint(r.exc); };
 			if(r.server_messages) { msgprint(r.server_messages);};

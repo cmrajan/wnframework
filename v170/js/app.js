@@ -122,11 +122,15 @@ function logout() {
 			msgprint(r.exc);
 			return;
 		}
-		if(login_file) 
-			window.location.href = login_file;
-		else 
-			window.location.href = 'index.cgi';
+		redirect_to_login();
 	});
+}
+
+function redirect_to_login() {
+	if(login_file) 
+		window.location.href = login_file;
+	else 
+		window.location.href = 'index.cgi';	
 }
 
 // default print style

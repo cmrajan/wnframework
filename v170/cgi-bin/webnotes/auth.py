@@ -210,10 +210,8 @@ class LoginManager:
 		if call_on_logout:
 			self.call_on_logout_event()
 
-		webnotes.conn.sql('delete from tabSessions where sid="%s"' % webnotes.session['sid'])
-		webnotes.cookies['sid'] = ''
-		webnotes.cookies['remember_me'] = ''
-
+		webnotes.conn.sql('update tabSessions set status="Logged Out" where sid="%s"' % webnotes.session['sid'])
+		
 # =================================================================================
 # Cookie Manager
 # =================================================================================
@@ -304,16 +302,25 @@ class Session:
 	
 		if r:
 			r=r[0]
+			
+			# ExipredSession
 			if r[2]=='Expired' and (webnotes.form_dict.get('cmd')!='resume_session'):
 				if r[0]=='Guest' or (not webnotes.form_dict.get('cmd')) or webnotes.form_dict.get('cmd')=='logout':
 					webnotes.login_manager.login_as_guest()
 					self.start()
 				else:
-					webnotes.response['message'] = 'Session Expired'
+					webnotes.response['session_status'] = 'Session Expired'
 					raise Exception, 'Session Expired'
+			elif r[2]=='Logged Out':
+				webnotes.login_manager.login_as_guest()
+				self.start()
+				# allow refresh or logout
+				if webnotes.form_dict.get('cmd') and webnotes.form_dict.get('cmd')!='logout':
+					webnotes.response['session_status'] = 'Logged Out'
+					raise Exception, 'Logged Out'
 			else:
 				self.data = {'data':eval(r[1]), 'user':r[0], 'sid': self.sid}
-		else:
+		else:				
 			webnotes.login_manager.login_as_guest()
 			self.start()
 			

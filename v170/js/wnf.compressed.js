@@ -219,7 +219,8 @@ var pending_req=0;function newHttpReq(){if(!isIE)
 var r=new XMLHttpRequest();else if(window.ActiveXObject)
 var r=new ActiveXObject("Microsoft.XMLHTTP");return r;}
 function $c(command,args,fn,on_timeout,no_spinner,freeze_msg){var req=newHttpReq();ret_fn=function(){if(checkResponse(req,on_timeout,no_spinner,freeze_msg)){if(!no_spinner)hide_loading();var rtxt=req.responseText;try{var r=eval("var a="+rtxt+";a");}catch(e){alert('Handler Exception:'+rtxt);return;}
-if(freeze_msg)unfreeze();if(r.exc&&r.message=='Session Expired'){resume_session();}
+if(freeze_msg)unfreeze();if(r.exc&&r.session_status=='Session Expired'){resume_session();}
+if(r.exc&&r.session_status=='Logged Out'){msgprint('You have been logged out');setTimeout('redirect_to_login()',3000);}
 if(r.exc){errprint(r.exc);};if(r.server_messages){msgprint(r.server_messages);};if(r.docs){LocalDB.sync(r.docs);}
 saveAllowed=true;if(fn)fn(r,rtxt);}}
 req.onreadystatechange=ret_fn;req.open("POST",outUrl,true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");args['cmd']=command;req.send(makeArgString(args));if(!no_spinner)set_loading();if(freeze_msg)freeze(freeze_msg,1);}
@@ -1167,9 +1168,10 @@ $c('startup',{},callback,null,1);}}
 function to_open(){if(get_url_arg('page'))
 return get_url_arg('page');if(location.hash){return location.hash.substr(1);}}
 function logout(){$c('logout',args={},function(r,rt){if(r.exc){msgprint(r.exc);return;}
-if(login_file)
+redirect_to_login();});}
+function redirect_to_login(){if(login_file)
 window.location.href=login_file;else
-window.location.href='index.cgi';});}
+window.location.href='index.cgi';}
 _p.def_print_style="html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
 +"\nbody { }"
 +"\npre { margin:0; padding:0;}"
