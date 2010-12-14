@@ -250,7 +250,7 @@ else:
 	try:
 		webnotes.request = webnotes.auth.HTTPRequest()
 	
-		if form_dict.get('cmd') not in ['login','startup'] and webnotes.conn:
+		if form_dict.get('cmd') != 'login' and webnotes.conn:
 			sql = webnotes.conn.sql
 		
 			# NOTE:
