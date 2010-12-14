@@ -63,7 +63,7 @@ class HTTPRequest:
 
 	def get_ac_name(self):
 		# login
-		if webnotes.form_dict.get('cmd')=='login' and webnotes.form_dict.get('acx'):
+		if webnotes.form_dict.get('acx'):
 			return webnotes.form_dict.get('acx')
 		
 		# in form
