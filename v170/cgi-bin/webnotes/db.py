@@ -32,7 +32,7 @@ class Database:
 	def get_db_login(self, ac_name):
 		import webnotes.db
 		c = webnotes.db.Database(use_default = 1)
-		res = ''
+		res = None
 		try:
 			res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
 		except:
