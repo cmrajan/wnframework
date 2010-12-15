@@ -34,8 +34,26 @@ def getcoldef(ftype, length=''):
 	
 	return dt
 
+# get fields in a doctype
+#=================================================================================
+	
+def get_dt_fields(doctype):
+	sql = webnotes.conn.sql
+	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
+		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+	else:
+		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+
+	return fl
+	
+#=================================================================================
+
+def update_oldfield_values(doctype):
+	webnotes.conn.sql("UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent= '%s'" % doctype)
+
+
 # Add Columns In Database
-# -----------------------
+#=================================================================================
 
 def _validate_column_name(n):
 	n = n.replace(' ','_').strip().lower()
@@ -80,7 +98,7 @@ def _change_column(f, dt, col_def):
 
 def updatecolumns(doctype):
 
-	flist = webnotes.model.meta.get_dt_fields(doctype)
+	flist = get_dt_fields(doctype)
 
 
 	# list of existing columns - always from user db
@@ -112,7 +130,7 @@ def updatecolumns(doctype):
 	
 	# update the "old" columns
 	webnotes.conn.sql("start transaction")
-	webnotes.model.meta.update_oldfield_values(doctype)
+	update_oldfield_values(doctype)
 
 
 # Add Indices
@@ -156,7 +174,7 @@ def create_table(dt):
 	add_fields, add_index = [], []
 	
 	# build
-	flist = webnotes.model.meta.get_dt_fields(dt)
+	flist = get_dt_fields(dt)
 	fname_list = []
 	for f in flist:
 		ft = getcoldef(f[2], f[3])
@@ -197,6 +215,8 @@ def create_table(dt):
 	webnotes.conn.sql(q)
 
 def updatedb(dt):
+	import webnotes.widgets.auto_master
+
 	# if single type, nothing to do
 	if webnotes.model.meta.is_single(dt):
 		return
@@ -213,3 +233,4 @@ def updatedb(dt):
 		# update index
 		updateindex(dt)
 
+	webnotes.widgets.auto_master.create_auto_masters(dt)

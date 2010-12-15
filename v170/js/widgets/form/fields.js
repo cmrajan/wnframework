@@ -24,22 +24,25 @@ Field.prototype.make_body = function() {
 	else
 		this.wrapper = document.createElement('div');
 
-	this.label_area = $a(this.wrapper, 'div');
+	this.label_area = $a(this.wrapper, 'div', '', {margin:'4px 0px 2px 0px'});
 		
 	// label
-	if(this.with_label) {
-		var t = make_table(this.label_area, 1, 3+ischk, null, [], {verticalAlign: 'middle', height: '20px'});
-	
-		this.label_span = $a($td(t,0,0+ischk), 'span', '', {marginRight:'4px', fontSize:'11px'})
+	if(this.with_label) {	
+		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px', fontSize:'11px'})
 	
 		// help icon
-		//this.help_icon = $a($td(t,0,1+ischk),'div','wn-icon ic-question',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
-		this.help_icon = $a($td(t,0,1+ischk),'img','',{cursor:'pointer', marginRight:'4px'}); $dh(this.help_icon);
+		this.help_icon = $a(this.label_area,'img','',{cursor:'pointer', margin:'-3px 4px -3px 0px'}); $dh(this.help_icon);
 		this.help_icon.src = 'images/icons/help.gif';
 	
 		// error icon
-		this.label_icon = $a($td(t,0,2+ischk),'img','',{marginRight:'4px'}); $dh(this.label_icon);
+		this.label_icon = $a(this.label_area,'img','',{marginRight:'4px', margin:'-3px 4px -3px 0px'}); $dh(this.label_icon);
 		this.label_icon.src = 'images/icons/error.gif';
+		this.label_icon.title = 'Mandatory value needs to be entered';
+
+		// error icon
+		this.suggest_icon = $a(this.label_area,'img','',{marginRight:'4px', margin:'-3px 4px -3px 0px'}); $dh(this.suggest_icon);
+		this.suggest_icon.src = 'images/icons/bullet_arrow_down.png';
+		this.suggest_icon.title = 'With suggestions';
 
 	} else {
 		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px'})
@@ -48,8 +51,8 @@ Field.prototype.make_body = function() {
 
 	// make the input areas
 	if(ischk && !this.in_grid) {
-		this.input_area = $a($td(t,0,0), 'div');
-		this.disp_area = $a($td(t,0,0), 'div');
+		this.input_area = $a(this.label_area, 'div');
+		this.disp_area = $a(this.label_area, 'div');
 	} else {
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
@@ -384,6 +387,25 @@ DataField.prototype.make_input = function() {
 		if(val==null)val='';
 		me.input.value = val; 
 		if(me.format_input)me.format_input();
+	}
+	
+	// autosuggest type fields
+	// -----------------------
+	
+	if(this.df.options=='Suggest') {
+		// add auto suggest
+		if(this.suggest_icon) $di(this.suggest_icon);
+		this.set_get_query = function() { }
+		this.get_query = function(doc, dt, dn) {
+			return repl('SELECT DISTINCT `value` FROM `__%(fieldname)s` WHERE `value` LIKE "%s" LIMIT 50', {fieldname:me.df.fieldname})
+		}
+		var opts = {
+			script: '',
+			json: true,
+			maxresults: 10,
+			link_field: this
+		};
+		this.as = new AutoSuggest(this.input, opts);
 	}
 }
 DataField.prototype.validate = function(v) {

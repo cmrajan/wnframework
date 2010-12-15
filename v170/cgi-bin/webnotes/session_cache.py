@@ -29,6 +29,11 @@ def get():
 	import webnotes
 	import webnotes.defs
 	
+	# check if system is updated, if yes - clear the cache
+	from webnotes.modules import code_sync
+	if code_sync.check_modules_update():
+		clear_cache()
+	
 	# get country
 	country = 'Not Defined'
 	if webnotes.session['data'].get('ipinfo',{}).get('CountryName'):

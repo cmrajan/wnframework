@@ -70,9 +70,7 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	try:
 		# get compiled code
 		sc_compiled = webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)[0][0]
-		#	sc_compiled = None
-			
-	except:
+	except IndexError, e:
 		# no code yet
 		sc_compiled = None
 

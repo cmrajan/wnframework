@@ -236,6 +236,7 @@ def savedocs():
 	from webnotes.model.code import get_server_obj
 	from webnotes.model.code import run_server_obj
 	import webnotes.utils
+	from webnotes.widgets.auto_master import update_auto_masters
 
 	from webnotes.utils import cint
 
@@ -284,6 +285,7 @@ def savedocs():
 		# save main doc
 		try:
 			t = doc.save(is_new)
+			update_auto_masters(doc)
 		except NameError, e:
 			webnotes.msgprint('%s "%s" already exists' % (doc.doctype, doc.name))
 			if webnotes.conn.sql("select docstatus from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]==2:
@@ -303,6 +305,7 @@ def savedocs():
 					d.parenttype = doc.doctype
 				d.modified, d.modified_by = webnotes.utils.now(), webnotes.session['user']
 				d.save(new = cint(local))
+				update_auto_masters(d)
 	
 		# on_update
 		if action in ('Save','Submit') and server_obj:

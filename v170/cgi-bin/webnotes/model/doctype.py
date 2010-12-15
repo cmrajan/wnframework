@@ -30,29 +30,28 @@ class _DocType:
 	# =================================================================
 	
 	def is_modified(self):
-		is_modified = 0
-		
-		# doctype modified
-		modified = webnotes.model.meta.get_dt_values(self.name, 'modified')
-		modified = modified and modified[0][0] or None
+		try:
+			# doctype modified
+			modified = webnotes.conn.sql("select modified from tabDocType where name=%s", self.name)[0][0]
+	
+			# cache modified
+			cache_modified = webnotes.conn.sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)[0][0]
+			
+		except IndexError, e:
+			return 1
 
-		# cache modified
-		cache_modified = webnotes.conn.sql("SELECT modified from `__DocTypeCache` where name='%s'" % self.name)
-
-		if not cache_modified or not (cache_modified and modified==cache_modified[0][0]):
-			is_modified = 1
-
-		return modified, is_modified, cache_modified
+		return cache_modified != modified
 
 	# write to cache
 	# =================================================================
 
-	def _update_cache(self, is_cache_modified, modified, doclist):
+	def _update_cache(self, doclist):
 		import zlib
 
-		if not is_cache_modified:
-			webnotes.conn.sql("INSERT INTO `__DocTypeCache` (`name`) VALUES ('%s')" % self.name)
-		webnotes.conn.sql("UPDATE `__DocTypeCache` SET `modified`=%s, `content`=%s WHERE name=%s", (modified, zlib.compress(str([d.fields for d in doclist]),2), self.name))
+		if webnotes.conn.sql("SELECT name FROM __DocTypeCache WHERE name=%s", self.name):
+			webnotes.conn.sql("UPDATE `__DocTypeCache` SET `modified`=%s, `content`=%s WHERE name=%s", (doclist[0].modified, zlib.compress(str([d.fields for d in doclist]),2), self.name))
+		else:
+			webnotes.conn.sql("INSERT INTO `__DocTypeCache` (`name`, `modified`, `content`) VALUES (%s, %s, %s)" , (self.name, doclist[0].modified, zlib.compress(str([d.fields for d in doclist]))))
 
 		# cache the code
 		self.compile_code(doclist[0])
@@ -128,7 +127,7 @@ class _DocType:
 	
 	def _add_compiled_code_to_cache(self, code, dt, modified):
 		import marshal
-		if webnotes.conn.sql("select name from __DocTypeCache where name=%s", dt):
+		if webnotes.conn.sql("SELECT name FROM __DocTypeCache WHERE name=%s", dt):
 			webnotes.conn.sql("UPDATE __DocTypeCache set server_code_compiled = %s, modified=%s WHERE name=%s", (marshal.dumps(code), modified, dt))
 		else:
 			webnotes.conn.sql("INSERT INTO __DocTypeCache (name, modified, server_code_compiled) VALUES (%s, %s, %s)", (dt, modified, marshal.dumps(code)))
@@ -181,9 +180,8 @@ class _DocType:
 
 	def make_doclist(self):
 		tablefields = webnotes.model.meta.get_table_fields(self.name)
-		modified, is_modified, is_cache_modified = self.is_modified()
 
-		if is_modified:
+		if self.is_modified():
 			# yes
 			doclist = webnotes.model.doc.get('DocType', self.name, 1)
 			for t in tablefields: 
@@ -193,7 +191,7 @@ class _DocType:
 			doclist[0].server_code_compiled = None
 
 			self._build_client_script(doclist)		
-			self._update_cache(is_cache_modified, modified, doclist)
+			self._update_cache(doclist)
 		else:
 			doclist = self._load_from_cache()
 	

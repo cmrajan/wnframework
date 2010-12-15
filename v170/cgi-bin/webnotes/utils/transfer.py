@@ -16,12 +16,16 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	doc = Document(fielddata = doclist[0])
 	orig_modified = doc.modified
 
-	exists = webnotes.conn.exists(doc.doctype, doc.name)
+	# check timestamp
+	timestamp = sql("select modified from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)
+	if timestamp and timestamp[0][0]==doc.modified:
+		return doc.doctype + '/' + doc.name + ': Same timestamp - nothing to do'
+	
 	#print doc.doctype, doc.name
 	if not webnotes.conn.in_transaction: 
 		sql("START TRANSACTION")
 	
-	if exists:
+	if timestamp:
 		 
 		if ovr:
 			if doc.doctype == 'DocType':
@@ -42,19 +46,13 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 
 			# Replace the record
 			# ------------------
-
-			# remove main doc
-			newname = '__overwritten:'+doc.name
-			n_records = sql("SELECT COUNT(*) from `tab%s` WHERE name like '%s%%'" % (doc.doctype, newname))
-			if n_records[0][0]:
-				newname = newname + '-' + str(n_records[0][0])
 				
-			sql("UPDATE `tab%s` SET name='%s', docstatus=2 WHERE name = '%s' limit 1" % (doc.doctype, newname, doc.name))
+			sql("DELETE FROM `tab%s` WHERE name = '%s' limit 1" % (doc.doctype, doc.name))
 			
 			# remove child elements
 			tf_list = get_table_fields(doc.doctype)
 			for t in tf_list:
-				sql("UPDATE `tab%s` SET parent='%s', docstatus=2 WHERE parent='%s' AND parentfield='%s'" % (t[0], 'oldparent:'+doc.name, doc.name, t[1]))
+				sql("DELETE FROM `tab%s` WHERE parent='%s' AND parentfield='%s'" % (t[0], doc.name, t[1]))
 				
 		else:
 			if webnotes.conn.in_transaction: 
@@ -180,12 +178,9 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 
 	# update schema
 	# -------------
-	import webnotes.model
-	try:
-		dl = webnotes.model.doc.get('DocType', doc.name)
-		webnotes.model.doctype.update_doctype(dl)
-	except:
-		pass
+	if not doc.issingle:
+		from webnotes.model import db_schema
+		db_schema.updatedb(doc.name)
 	
 	webnotes.conn.set(doc,'modified',orig_modified)
 	

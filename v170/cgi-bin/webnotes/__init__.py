@@ -19,6 +19,7 @@ is_testing = None
 incoming_cookies = {}
 add_cookies = {}
 cookies = {}
+auto_masters = {}
 
 # for applications
 app_conn = None
@@ -40,8 +41,6 @@ def getTraceback():
 	        + traceback.format_exception_only(type, value)
 	body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
 	return body
-
-
 
 def errprint(msg):
 	debug_log.append(str(msg or ''))

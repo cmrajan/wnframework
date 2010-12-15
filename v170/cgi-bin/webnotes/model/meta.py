@@ -5,22 +5,6 @@ import webnotes
 def get_index_fields(dt, index=0):
 	return webnotes.conn.sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=%s and parent=%s", (index, dt))
 
-# get fields in a doctype
-#=================================================================================
-	
-def get_dt_fields(doctype):
-	sql = webnotes.conn.sql
-	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
-		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
-	else:
-		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
-
-	return fl
-	
-#=================================================================================
-
-def update_oldfield_values(doctype):
-	webnotes.conn.sql("UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent= '%s'" % doctype)
 	
 #=================================================================================
 

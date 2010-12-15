@@ -578,7 +578,7 @@ else
 return false;};AutoSuggest.prototype.doAjaxRequest=function(input)
 {if(input!=this.fld.value)
 return false;var me=this;var q='';this.oP.link_field.set_get_query();if(this.oP.link_field.get_query){if(cur_frm)var doc=locals[cur_frm.doctype][cur_frm.docname];q=this.oP.link_field.get_query(doc,this.oP.link_field.doctype,this.oP.link_field.docname);}
-this.fld.old_bg=this.fld.style.backgroundColor;$y(this.fld,{backgroundColor:'#FFD'});$c('webnotes.widgets.search.search_link',args={'txt':this.fld.value,'dt':this.oP.link_field.df.options,'query':q},function(r,rt){$y(me.fld,{backgroundColor:(me.fld.old_bg?me.fld.old_bg:'#FFF')});me.setSuggestions(r,rt,input);});return;};AutoSuggest.prototype.setSuggestions=function(r,rt,input)
+this.fld.old_bg=this.fld.style.backgroundColor;$y(this.fld,{backgroundColor:'#FFC'});$c('webnotes.widgets.search.search_link',args={'txt':this.fld.value,'dt':this.oP.link_field.df.options,'query':q},function(r,rt){$y(me.fld,{backgroundColor:(me.fld.old_bg?me.fld.old_bg:'#FFF')});me.setSuggestions(r,rt,input);});return;};AutoSuggest.prototype.setSuggestions=function(r,rt,input)
 {if(input!=this.fld.value)
 return false;this.aSug=[];if(this.oP.json){var jsondata=eval('('+rt+')');for(var i=0;i<jsondata.results.length;i++){this.aSug.push({'id':jsondata.results[i].id,'value':jsondata.results[i].value,'info':jsondata.results[i].info});}}
 this.createList(this.aSug);};AutoSuggest.prototype.createList=function(arr){if(cur_autosug&&cur_autosug!=this)
@@ -656,10 +656,10 @@ args.colnames=colnames.join(',');args.report_name=report_name?report_name:'';ope
 var no_value_fields=['Section Break','Column Break','HTML','Table','FlexTable','Button','Image'];var codeid=0;var code_editors={};function Field(){}
 Field.prototype.make_body=function(){var ischk=(this.df.fieldtype=='Check'?1:0);if(this.parent)
 this.wrapper=$a(this.parent,'div');else
-this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div');if(this.with_label){var t=make_table(this.label_area,1,3+ischk,null,[],{verticalAlign:'middle',height:'20px'});this.label_span=$a($td(t,0,0+ischk),'span','',{marginRight:'4px',fontSize:'11px'})
-this.help_icon=$a($td(t,0,1+ischk),'img','',{cursor:'pointer',marginRight:'4px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a($td(t,0,2+ischk),'img','',{marginRight:'4px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})
+this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div','',{margin:'4px 0px 2px 0px'});if(this.with_label){this.label_span=$a(this.label_area,'span','',{marginRight:'4px',fontSize:'11px'})
+this.help_icon=$a(this.label_area,'img','',{cursor:'pointer',margin:'-3px 4px -3px 0px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a(this.label_area,'img','',{marginRight:'4px',margin:'-3px 4px -3px 0px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';this.label_icon.title='Mandatory value needs to be entered';this.suggest_icon=$a(this.label_area,'img','',{marginRight:'4px',margin:'-3px 4px -3px 0px'});$dh(this.suggest_icon);this.suggest_icon.src='images/icons/bullet_arrow_down.png';this.suggest_icon.title='With suggestions';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})
 $dh(this.label_area);}
-if(ischk&&!this.in_grid){this.input_area=$a($td(t,0,0),'div');this.disp_area=$a($td(t,0,0),'div');}else{this.input_area=$a(this.wrapper,'div');this.disp_area=$a(this.wrapper,'div');}
+if(ischk&&!this.in_grid){this.input_area=$a(this.label_area,'div');this.disp_area=$a(this.label_area,'div');}else{this.input_area=$a(this.wrapper,'div');this.disp_area=$a(this.wrapper,'div');}
 if(this.in_grid){if(this.label_area)$dh(this.label_area);}else{this.input_area.className='input_area';$y(this.wrapper,{marginBottom:'4px'})}
 if(this.onmake)this.onmake();}
 Field.prototype.set_label=function(){if(this.with_label&&this.label_area&&this.label!=this.df.label){this.label_span.innerHTML=this.df.label;this.label=this.df.label;}}
@@ -711,7 +711,10 @@ this.input.name=this.df.fieldname;this.input.onchange=function(){if(!me.last_val
 me.input.value=me.validate(me.input.value);me.set(me.input.value);if(me.format_input)
 me.format_input();if(in_list(['Currency','Float','Int'],me.df.fieldtype)){if(flt(me.last_value)==flt(me.input.value)){me.last_value=me.input.value;return;}}
 me.last_value=me.input.value;me.run_trigger();}
-this.input.set_input=function(val){if(val==null)val='';me.input.value=val;if(me.format_input)me.format_input();}}
+this.input.set_input=function(val){if(val==null)val='';me.input.value=val;if(me.format_input)me.format_input();}
+if(this.df.options=='Suggest'){if(this.suggest_icon)$di(this.suggest_icon);this.set_get_query=function(){}
+this.get_query=function(doc,dt,dn){return repl('SELECT DISTINCT `value` FROM `__%(fieldname)s` WHERE `value` LIKE "%s" LIMIT 50',{fieldname:me.df.fieldname})}
+var opts={script:'',json:true,maxresults:10,link_field:this};this.as=new AutoSuggest(this.input,opts);}}
 DataField.prototype.validate=function(v){if(this.df.options=='Phone'){if(v+''=='')return'';v1=''
 v=v.replace(/ /g,'').replace(/-/g,'').replace(/\(/g,'').replace(/\)/g,'');if(v&&v.substr(0,1)=='+'){v1='+';v=v.substr(1);}
 if(v&&v.substr(0,2)=='00'){v1+='00';v=v.substr(2);}

@@ -24,7 +24,8 @@ class Database:
 		self.testing_tables = []
 		
 		self.connect()
-		self.use(self.user)
+		if self.user != 'root':
+			self.use(self.user)
 		
 		if webnotes.logger:
 			webnotes.logger.debug('Database object initialized for:%s',self.user)

@@ -1,7 +1,7 @@
 # ==============================================================================
 # Import from files
 # =============================================================================
-def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_cp = 0, target_db=None, target_ac=None):
+def import_from_files(modules = [], record_list = [], sync_cp = 0, target_db=None, target_ac=None):
 
 	if target_db or target_ac:
 		init_db_login(target_ac, target_db)
@@ -21,10 +21,6 @@ def import_from_files(modules = [], record_list = [], execute_patches = 0, sync_
 		# import attachments
 		for m in modules:
 			import_attachments(m)
-	
-		# execute patches
-		#if execute_patches:
-		#	ret += transfer.execute_patches(modules,record_list)
 		
 		# sync control panel
 		if sync_cp:
@@ -163,9 +159,6 @@ def accept_module(super_doclist):
 
 	if not webnotes.conn.in_transaction:
 		webnotes.conn.sql("START TRANSACTION")
-
-	# clear over-written records / deleted child records
-	webnotes.utils.clear_recycle_bin()
 	
 	# clear cache
 	webnotes.conn.sql("DELETE from __DocTypeCache")

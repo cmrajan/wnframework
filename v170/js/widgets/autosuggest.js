@@ -240,7 +240,7 @@ AutoSuggest.prototype.doAjaxRequest = function (input)
 	
 	// do ajax request
 	this.fld.old_bg = this.fld.style.backgroundColor;
-	$y(this.fld, {backgroundColor:'#FFD'});
+	$y(this.fld, {backgroundColor:'#FFC'});
 	$c('webnotes.widgets.search.search_link', args={
 		'txt': this.fld.value, 
 		'dt':this.oP.link_field.df.options,

@@ -1,14 +1,58 @@
 # code sync - syncs code from files and is called from webnotes.model.doc.get
 
+# -------------------------------------------------
+
+# check if the .svn folder is updated - if yes, clear the cache
+
+def check_modules_update():
+	import webnotes.defs
+	import webnotes
+	import os
+	
+	fs = None
+	try:
+		fs = str(os.stat(os.path.join(webnotes.defs.modules_path, '.svn')).st_mtime)
+	except OSError, e:
+		if e.args[0]!=2:
+			raise e
+				
+	if fs != webnotes.conn.get_global('modules_last_update'):
+		# clear cache
+		webnotes.conn.sql("delete from __DocTypeCache")
+		webnotes.conn.set_global('modules_last_update', fs)
+		return 1
+
+# -------------------------------------------------
+
 def sync(doc):
 	import webnotes
 	
+	if doc.doctype=='DocType' and doc.name!='DocType':
+		sync_doctype(doc)
+		
 	# check if all code is updated
 	for code_field in webnotes.code_fields_dict[doc.doctype]:
 		file_timestamp = get_file_timestamp(doc, code_field)
 
 		if file_timestamp and (file_timestamp != get_system_timestamp(doc, code_field)):
 			update_code(doc, code_field, file_timestamp)
+			
+
+# -------------------------------------------------
+
+def sync_doctype(doc):
+	import webnotes
+	
+	file_timestamp = get_file_timestamp(doc, ['','txt'])
+	
+	if file_timestamp and (file_timestamp != get_system_timestamp(doc, ['record'])):
+		from webnotes.modules import import_module
+		
+		# import
+		import_module.import_from_files(record_list=[[doc.module, doc.doctype, doc.name]])
+		
+		# update
+		update_timestamp(doc, ['record'], file_timestamp)
 
 # -------------------------------------------------
 
@@ -28,7 +72,7 @@ def get_system_timestamp(doc, code_field):
 	import webnotes
 	
 	try:
-		webnotes.conn.sql("select `timestamp` from __CodeFileTimeStamps where doctype=%s and name=%s and code_field=%s", (doc.doctype, doc.name, code_field[0]))[0][0]
+		return webnotes.conn.sql("select `timestamp` from __CodeFileTimeStamps where doctype=%s and name=%s and code_field=%s", (doc.doctype, doc.name, code_field[0]))[0][0]
 	except IndexError, e:
 		return None
 	except Exception, e:
@@ -42,7 +86,6 @@ def get_system_timestamp(doc, code_field):
 
 def make_table():
 	import webnotes
-	
 	webnotes.conn.sql("create table `__CodeFileTimeStamps` (name VARCHAR(120), doctype VARCHAR(120), code_field VARCHAR(120), `timestamp` VARCHAR(120))")
 	
 	
