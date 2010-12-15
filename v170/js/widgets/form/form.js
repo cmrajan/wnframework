@@ -453,6 +453,10 @@ _f.Frm.prototype.refresh_print_layout = function() {
 		me.print_body.innerHTML = print_html;
 	}
 	
+	// print head
+	if(cur_frm.doc.select_print_heading)
+		cur_frm.set_print_heading(cur_frm.doc.select_print_heading)
+	
 	if(user!='Guest') {
 		$di(this.view_btn_wrapper);
 		$di(this.print_close_btn);
