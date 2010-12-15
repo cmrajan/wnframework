@@ -76,6 +76,7 @@ def save_uploaded(js_okay='window.parent.msgprint("File Upload Successful")', js
 # -------------------------------------------------------
 
 def save_file(fname, content, module=None):
+	import webnotes
 	from webnotes.model.doc import Document
 
 	# some browsers return the full path
@@ -83,7 +84,7 @@ def save_file(fname, content, module=None):
 		fname = fname.split('\\')[-1]
 	if '/' in fname:
 		fname = fname.split('/')[-1]
-		
+
 	# generate the ID (?)
 	f = Document('File Data')
 	f.file_name = fname
@@ -166,7 +167,9 @@ def get_file(fname):
 	
 	file_id = f[0].replace('/','-')
 	file = open(os.path.join(webnotes.get_files_path(), file_id), 'r')
-	return [f[1], file.read()]
+	content = file.read()
+	file.close()
+	return [f[1], content]
 
 # Conversion Patch
 # -------------------------------------------------------
