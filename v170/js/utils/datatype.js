@@ -8,7 +8,7 @@ function fmt_money(v){
 	} else {
 		var cp = locals['Control Panel']['Control Panel'];
 		var val = 2; // variable used to differentiate other values from Millions
-		if(cp.currency_format == 'Millions')	val = 3;
+		if(cp.currency_format == 'Millions') val = 3;
 		v = v.toFixed(2);
 		var delimiter = ","; // replace comma if desired
 		amount = v+'';
@@ -259,6 +259,7 @@ var known_numbers = {
 }
 
 function in_words(n) {
+	var is_million = locals['Control Panel']['Control Panel'].currency_format == 'Millions' ? 1 : 0;
     n=cint(n)
     if(known_numbers[n]) return known_numbers[n];
     var bestguess = n + '';
@@ -270,15 +271,29 @@ function in_words(n) {
     } else if(n<1000) {
         bestguess= in_words(Math.floor(n/100)) + ' ' + 'hundred';
         remainder = n%100;
-    } else if(n<100000) {
-        bestguess= in_words(Math.floor(n/1000)) + ' ' + 'thousand';
-        remainder = n%1000;
-    } else if(n < 10000000) {
-        bestguess= in_words(Math.floor(n/100000)) + ' ' + 'lakh';
-        remainder = n%100000;
+    } else if(!is_million) {
+    	if(n<100000) {
+	        bestguess= in_words(Math.floor(n/1000)) + ' ' + 'thousand';
+    	    remainder = n%1000;
+	    } else if(n < 10000000) {
+	        bestguess= in_words(Math.floor(n/100000)) + ' ' + 'lakh';
+	        remainder = n%100000;
+	    } else {
+	        bestguess= in_words(Math.floor(n/10000000)) + ' ' + 'crore'
+	        remainder = n%10000000
+	    }
     } else {
-        bestguess= in_words(Math.floor(n/10000000)) + ' ' + 'crore'
-        remainder = n%10000000
+    	if(n<1000000) {
+	        bestguess= in_words(Math.floor(n/1000)) + ' ' + 'thousand';
+    	    remainder = n%1000;
+	    } else if(n < 1000000000) {
+	        bestguess= in_words(Math.floor(n/1000000)) + ' ' + 'million';
+	        remainder = n%1000000;
+	    } else {
+	        bestguess= in_words(Math.floor(n/1000000000)) + ' ' + 'billion'
+	        remainder = n%1000000000
+	    }
+    	
     }
     if(remainder) {
         if(remainder >= 100) comma = ','
