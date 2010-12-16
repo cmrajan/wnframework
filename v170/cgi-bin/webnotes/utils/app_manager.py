@@ -187,12 +187,13 @@ class AppManager:
 	# get the next app in line
 	# ----------------------------------
 	def register_app(self):
-		ret = self.account_conn.sql("select ac_name from tabAccount where ifnull(registered,0)=0 order by ac_name limit 1")
+		self.account_conn = webnotes.db.Database(user='accounts')
+		app = self.account_conn.sql("select ac_name from tabAccount where ifnull(allocated,0)=0 order by ac_name limit 1")
 		if not ret:
 			raise Exception, "No more apps to register"
 
-		self.account_conn.sql("update tabAccount set registered=1 where ac_name=%s", ret[0][0])
-		return ret[0][0]
+		self.account_conn.sql("update tabAccount set allocated=1 where ac_name=%s", app[0][0])
+		return app[0][0]
 		
 		
 # Application Instance
