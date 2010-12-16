@@ -104,7 +104,7 @@ def update_code(doc, code_field, file_timestamp):
 	if doc.doctype=='Control Panel':
 		webnotes.conn.set_value('Control Panel',None,code_field[0],code)
 	else:
-		webnotes.conn.sql("update tab%s set %s=%s, modified=%s where name=%s" % (doc.doctype, code_field[0], '%s', '%s', '%s'), (code, doc.name, webnotes.utils.now()))
+		webnotes.conn.sql("update `tab%s` set `%s`=%s, modified=%s where name=%s" % (doc.doctype, code_field[0], '%s', '%s', '%s'), (code, webnotes.utils.now(), doc.name))
 		webnotes.conn.sql("delete from __DocTypeCache")
 	
 	# update in doc

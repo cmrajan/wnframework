@@ -657,10 +657,11 @@ args.colnames=colnames.join(',');args.report_name=report_name?report_name:'';ope
 var no_value_fields=['Section Break','Column Break','HTML','Table','FlexTable','Button','Image'];var codeid=0;var code_editors={};function Field(){}
 Field.prototype.make_body=function(){var ischk=(this.df.fieldtype=='Check'?1:0);if(this.parent)
 this.wrapper=$a(this.parent,'div');else
-this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div','',{margin:'4px 0px 2px 0px'});if(this.with_label){this.label_span=$a(this.label_area,'span','',{marginRight:'4px',fontSize:'11px'})
+this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div','',{margin:'4px 0px 2px 0px'});if(ischk&&!this.in_grid){this.input_area=$a(this.label_area,'span','',{marginRight:'4px'});this.disp_area=$a(this.label_area,'span','',{marginRight:'4px'});}
+if(this.with_label){this.label_span=$a(this.label_area,'span','',{marginRight:'4px',fontSize:'11px'})
 this.help_icon=$a(this.label_area,'img','',{cursor:'pointer',margin:'-3px 4px -3px 0px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a(this.label_area,'img','',{marginRight:'4px',margin:'-3px 4px -3px 0px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';this.label_icon.title='Mandatory value needs to be entered';this.suggest_icon=$a(this.label_area,'img','',{marginRight:'4px',margin:'-3px 4px -3px 0px'});$dh(this.suggest_icon);this.suggest_icon.src='images/icons/bullet_arrow_down.png';this.suggest_icon.title='With suggestions';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})
 $dh(this.label_area);}
-if(ischk&&!this.in_grid){this.input_area=$a(this.label_area,'div');this.disp_area=$a(this.label_area,'div');}else{this.input_area=$a(this.wrapper,'div');this.disp_area=$a(this.wrapper,'div');}
+if(!this.input_area){this.input_area=$a(this.wrapper,'div');this.disp_area=$a(this.wrapper,'div');}
 if(this.in_grid){if(this.label_area)$dh(this.label_area);}else{this.input_area.className='input_area';$y(this.wrapper,{marginBottom:'4px'})}
 if(this.onmake)this.onmake();}
 Field.prototype.set_label=function(){if(this.with_label&&this.label_area&&this.label!=this.df.label){this.label_span.innerHTML=this.df.label;this.label=this.df.label;}}

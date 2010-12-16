@@ -25,7 +25,12 @@ Field.prototype.make_body = function() {
 		this.wrapper = document.createElement('div');
 
 	this.label_area = $a(this.wrapper, 'div', '', {margin:'4px 0px 2px 0px'});
-		
+
+	if(ischk && !this.in_grid) {
+		this.input_area = $a(this.label_area, 'span', '', {marginRight:'4px'});
+		this.disp_area = $a(this.label_area, 'span', '', {marginRight:'4px'});
+	}
+	
 	// label
 	if(this.with_label) {	
 		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px', fontSize:'11px'})
@@ -50,10 +55,7 @@ Field.prototype.make_body = function() {
 	}
 
 	// make the input areas
-	if(ischk && !this.in_grid) {
-		this.input_area = $a(this.label_area, 'div');
-		this.disp_area = $a(this.label_area, 'div');
-	} else {
+	if(!this.input_area) {
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
 	}
