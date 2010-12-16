@@ -245,8 +245,7 @@ class Database:
 	# ======================================================================================
 
 	def begin(self):
-		if not self.in_transaction:
-			self.sql("start transaction")
+		self.sql("start transaction")
 	
 	def commit(self):
 		self.sql("commit")

@@ -51,6 +51,9 @@ def sync_doctype(doc):
 		# import
 		import_module.import_from_files(record_list=[[doc.module, doc.doctype, doc.name]])
 		
+		# implicit commit (?)
+		webnotes.conn.begin()
+		
 		# update
 		update_timestamp(doc, ['record'], file_timestamp)
 
