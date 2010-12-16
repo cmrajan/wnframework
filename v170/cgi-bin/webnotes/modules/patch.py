@@ -17,7 +17,11 @@ def run():
 			webnotes.conn.begin()
 		
 			# execute
-			execute_patch(patch_code, patch)
+			try:
+				execute_patch(patch_code, patch)
+			except Exception, e:
+				pass
+				# log
 			
 			# next
 			patch_list.append(patch+1)
