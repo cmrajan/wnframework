@@ -130,6 +130,7 @@ def build():
 	
 	sql = webnotes.conn.sql
 	
+	webnotes.conn.begin()
 	sd['profile'] = webnotes.user.load_profile()
 
 	doclist = []
@@ -155,5 +156,6 @@ def build():
 		
 	webnotes.session['data']['profile'] = sd['profile']
 	sd['dt_labels'] = webnotes.model.get_dt_labels()
+	webnotes.conn.commit()
 	
 	return sd
