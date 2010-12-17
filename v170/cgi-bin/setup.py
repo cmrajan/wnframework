@@ -1,9 +1,8 @@
 # Setup
 
-import os
-import webnotes
 
 def backup_all():
+	import os
 	# backups folder
 	dblist = sql_accounts('select db_name from tabAccount')
 
@@ -297,6 +296,7 @@ def create_account(ac_name, ac_type='Framework'):
 
 
 def create_log_folder(path):
+	import os
     	try:   
 		 
 	        os.mkdir(os.path.join(path,'log'))
@@ -310,6 +310,7 @@ def create_log_folder(path):
 
 
 def copy_defs_py():
+	import os
 	try:
 		cur_path = os.getcwd()
 		defs_path = os.path.join(cur_path,'webnotes','defs')
@@ -320,20 +321,32 @@ def copy_defs_py():
 		print ret
 	except Exception,ret:
 		print ret
+
+
 # Installation
 # -------------------------------------------------------------
 
 if __name__=='__main__':
-	import sys
-	
+	import sys,os
 	# set path
 	sys.path.append(os.path.abspath(os.path.dirname(sys.argv[0]) + '/../../'))	
+	
+	print "Creating defs.py"	
+	copy_defs_py()
+
+#	from webnotes import defs
+	
+#	print "Creating log folder and file..."
+#	log_path = getattr(defs,log_file_path,None)
+#	if log_path:
+#		create_log_folder(os.path.dirname(log_path))
+
+
+	import webnotes	 #Should be here since it requires defs.py
 	
 	if sys.argv[1]=='install':
 		# create the first account
 	
-		print "Creating defs.py"	
-		copy_defs_py()
 		
 		print "Importing Framework.sql..." 
 		import_db("Framework", "accounts")
@@ -342,7 +355,4 @@ if __name__=='__main__':
 		create_account_doctype()
 	
 		
-		print "Creating log folder and file..."
-		log_path = getattr(webnotes.defs,log_file_path,None)
-		if log_path:
-			create_log_folder(log_path)
+

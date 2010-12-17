@@ -113,8 +113,6 @@ def setup_logging():
 	global logger
 
 	LOG_FILENAME = os.path.join(defs.log_file_path,'wnframework.log')
-	if not os.path.exists(LOG_FILENAME):
-		open(LOG_FILENAME,'w+').close()
 	
 	
 	logger = logging.getLogger('WNLogger')
@@ -133,5 +131,6 @@ def setup_logging():
 	logger.info('Importing Webnotes')
 
 if getattr(defs, 'log_file_path', None):
+	create_folder(defs.log_file_path)
 	setup_logging()
 	
