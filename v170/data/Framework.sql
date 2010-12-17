@@ -33,10 +33,31 @@ SET character_set_client = @saved_cs_client;
 -- Dumping data for table `__DocTypeCache`
 --
 
+
 LOCK TABLES `__DocTypeCache` WRITE;
 /*!40000 ALTER TABLE `__DocTypeCache` DISABLE KEYS */;
 /*!40000 ALTER TABLE `__DocTypeCache` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `__SessionCache`
+--
+
+DROP TABLE IF EXISTS `__SessionCache`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `__SessionCache` (
+  `user` varchar(120) default NULL,
+  `country` varchar(120) default NULL,
+  `cache` longtext
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `__SessionCache`
+--
+
+
 
 --
 -- Table structure for table `tabAnnouncement`
