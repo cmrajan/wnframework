@@ -296,12 +296,13 @@ def create_account(ac_name, ac_type='Framework'):
 
 
 
-def create_log_folder():
+def create_log_folder(path):
         import os
-    	try:    
-	        os.mkdir(os.path.join(webnotes.get_index_path(),'log'))
+    	try:   
+		 
+	        os.mkdir(os.path.join(path,'log'))
 
-        	webnotes.LOG_FILENAME = os.path.join(webnotes.get_index_path(),'log','wnframework.log')
+        	webnotes.LOG_FILENAME = os.path.join(path,'log','wnframework.log')
 	        open(webnotes.LOG_FILENAME,'w+').close()
 	except:
 		pass
@@ -319,12 +320,15 @@ if __name__=='__main__':
 	if sys.argv[1]=='install':
 		# create the first account
 		
+		
 		print "Importing Framework.sql..." 
 		import_db("Framework", "accounts")
 		
 		print "Setting up Account..."
 		create_account_doctype()
 	
-		print "Creating log folder and file..."
-		create_log_folder()
 		
+		print "Creating log folder and file..."
+		log_path = getattr(webnotes.defs,log_file_path,None)
+		if log_path:
+			create_log_folder(log_path)
