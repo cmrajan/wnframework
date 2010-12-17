@@ -32,6 +32,7 @@ def get():
 	# check if system is updated, if yes - clear the cache
 	from webnotes.modules import code_sync
 	if code_sync.check_modules_update():
+		webnotes.conn.sql("delete from __DocTypeCache")
 		clear_cache()
 	
 	# get country
@@ -44,6 +45,9 @@ def get():
 		cache = load(country)
 		if cache:
 			return cache
+	else:
+		# for developers, clear out cache after every refresh
+		webnotes.conn.sql("delete from __DocTypeCache")
 	
 	# run patches
 	import webnotes.modules.patch
