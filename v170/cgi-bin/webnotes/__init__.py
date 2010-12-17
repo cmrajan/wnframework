@@ -114,7 +114,7 @@ def setup_logging():
 
 	LOG_FILENAME = os.path.join(defs.log_file_path,'wnframework.log')
 	if not os.path.exists(LOG_FILENAME):
-		open(LOG_FILENAME).close()
+		open(LOG_FILENAME,'w+').close()
 	
 	
 	logger = logging.getLogger('WNLogger')

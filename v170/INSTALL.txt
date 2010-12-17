@@ -65,3 +65,13 @@ The default logins are:
 login: Administrator
 password: admin
 
+
+
+
+
+
+Step by step instructions on CentOS/Fedora:
+	1. yum install mysql
+	2. yum install httpd
+	3. yum install MySQL-python
+

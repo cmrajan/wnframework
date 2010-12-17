@@ -5,7 +5,6 @@ def getTraceback():
         body = "Traceback (innermost last):\n"
         list = traceback.format_tb(tb, None) + traceback.format_exception_only(type, value)
         body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
-#        log("Server Error", body)
         return body	
 try:
 
