@@ -1,10 +1,10 @@
 # Setup
 
+import os
 import webnotes
 
 def backup_all():
 	# backups folder
-	import os
 	dblist = sql_accounts('select db_name from tabAccount')
 
 	# backup -all in /backups folder
@@ -297,29 +297,43 @@ def create_account(ac_name, ac_type='Framework'):
 
 
 def create_log_folder(path):
-        import os
     	try:   
 		 
 	        os.mkdir(os.path.join(path,'log'))
 
         	webnotes.LOG_FILENAME = os.path.join(path,'log','wnframework.log')
 	        open(webnotes.LOG_FILENAME,'w+').close()
-	except:
+	except Exception,e:
+		print e
 		pass
 
 
+
+def copy_defs_py():
+	try:
+		cur_path = os.getcwd()
+		defs_path = os.path.join(cur_path,'webnotes','defs')
+		cp_cmd = 'cp'
+		
+		ret = os.system(cp_cmd +' '+ defs_path+' '+defs_path+'.py')
+		assert ret == 0 
+		print ret
+	except Exception,ret:
+		print ret
 # Installation
 # -------------------------------------------------------------
 
 if __name__=='__main__':
-	import sys, os
+	import sys
 	
 	# set path
 	sys.path.append(os.path.abspath(os.path.dirname(sys.argv[0]) + '/../../'))	
 	
 	if sys.argv[1]=='install':
 		# create the first account
-		
+	
+		print "Creating defs.py"	
+		copy_defs_py()
 		
 		print "Importing Framework.sql..." 
 		import_db("Framework", "accounts")
