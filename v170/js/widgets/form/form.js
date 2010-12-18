@@ -939,10 +939,6 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		}
 		if(!me.meta.istable) {
 			me.refresh();
-			
-			// any fields changed, won't be unsaved (?)
-			locals[me.doctype][me.docname].__unsaved=0;
-			me.refresh_header();
 		}
 
 		if(call_back){

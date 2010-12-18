@@ -211,7 +211,7 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	var doc = locals[f.doctype][f.docname];
 	
 	// get the tags
-	var sl = this.get_status_tags(doc, f)
+	var sl = this.get_status_tags(doc, f);
 
 	// add the tags
 	var t = this.status_area;

@@ -752,8 +752,8 @@ _f.cur_grid_cell.grid.cell_deselect();if(!me.txt.value){me.run_trigger();return;
 var fetch='';if(cur_frm.fetch_dict[me.df.fieldname])
 fetch=cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');$c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options,'fetch':fetch},function(r,rt){if(selector&&selector.display)return;if(r.message=='Ok'){me.run_trigger();if(r.fetch_values)me.set_fetch_values(r.fetch_values);}else{var astr='';if(in_list(profile.can_create,me.df.options))astr=repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s',{dt:me.df.options,dtl:get_doctype_label(me.df.options)})
 msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s',{val:me.txt.value,dt:get_doctype_label(me.df.options),add:astr}));me.txt.value='';me.set('');}});}}}
-LinkField.prototype.set_fetch_values=function(fetch_values){var fl=cur_frm.fetch_dict[this.df.fieldname].fields;for(var i=0;i<fl.length;i++){locals[this.doctype][this.docname][fl[i]]=fetch_values[i];if(!this.grid){refresh_field(fl[i]);if(cur_frm.fields_dict[fl[i]])
-cur_frm.fields_dict[fl[i]].run_trigger();}}
+LinkField.prototype.set_fetch_values=function(fetch_values){var fl=cur_frm.fetch_dict[this.df.fieldname].fields;for(var i=0;i<fl.length;i++){if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]){locals[this.doctype][this.docname][fl[i]]=fetch_values[i];if(!this.grid){refresh_field(fl[i]);if(cur_frm.fields_dict[fl[i]])
+cur_frm.fields_dict[fl[i]].run_trigger();}}}
 if(this.grid)this.grid.refresh();}
 LinkField.prototype.set_get_query=function(){if(this.get_query)return;if(this.grid){var f=this.grid.get_field(this.df.fieldname);if(f.get_query)this.get_query=f.get_query;}}
 LinkField.prototype.set_disp=function(val){var t=null;if(val)t="<a href=\'javascript:loaddoc(\""+this.df.options+"\", \""+val+"\")\'>"+val+"</a>";this.set_disp_html(t);}
@@ -794,7 +794,7 @@ this.refresh_options=function(options){if(options)
 me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];empty_select(this.input);add_sel_options(this.input,me.options_list);}
 this.onrefresh=function(){this.refresh_options();if(this.not_in_form){this.input.value='';return;}
 if(_f.get_value)
-var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);else{if(this.options_list)
+var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);else{if(this.options_list&&this.options_list.length)
 var v=this.options_list[0];else
 var v=null;}
 this.input.set_input(v);}
@@ -1133,7 +1133,7 @@ all_clear=tmp;}}
 var f=frms[dt];if(f&&!all_clear){if(f)f.savingflag=false;return'Error';}
 var _save=function(){page_body.set_status('Saving...')
 $c('webnotes.widgets.form.savedocs',{'docs':compress_doclist(doclist),'docname':dn,'action':save_action,'user':user},function(r,rtxt){if(f){f.savingflag=false;}
-if(r.saved){if(onsave)onsave(r);page_body.set_status('Saved')}else{if(onerr)onerr(r);page_body.set_status('Did not save')}},function(){if(f){f.savingflag=false;}},0,(f?'Saving...':''));}
+if(r.saved){if(onsave)onsave(r);}else{if(onerr)onerr(r);}},function(){if(f){f.savingflag=false;}},0,(f?'Saving...':''));}
 if(doc.__islocal&&(doctype&&doctype.autoname&&doctype.autoname.toLowerCase()=='prompt')){var newname=prompt('Enter the name of the new '+dt,'');if(newname){doc.__newname=strip(newname);_save();}else{msgprint('Not Saved');onerr();}}else{_save();}}
 function check_required(dt,dn){var doc=locals[dt][dn];if(doc.docstatus>1)return true;var fl=fields_list[dt];if(!fl)return true;var all_clear=true;var errfld=[];for(var i=0;i<fl.length;i++){var key=fl[i].fieldname;var v=doc[key];if(fl[i].reqd&&is_null(v)){errfld[errfld.length]=fl[i].label;if(cur_frm){var f=cur_frm.fields_dict[fl[i].fieldname];if(f){f.set_as_error(1);if(!cur_frm.error_in_section&&f.parent_section){cur_frm.set_section(f.parent_section.sec_id);cur_frm.error_in_section=1;}}}
 if(all_clear)all_clear=false;}}

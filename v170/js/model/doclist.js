@@ -77,10 +77,8 @@ function save_doclist(dt, dn, save_action, onsave, onerr) {
 				if(f){ f.savingflag = false;}
 				if(r.saved) {
 					if(onsave)onsave(r);
-					page_body.set_status('Saved')
 				} else {
 					if(onerr)onerr(r);
-					page_body.set_status('Did not save')
 				}
 			}, function() {
 				if(f){ f.savingflag = false; } /*time out*/ 

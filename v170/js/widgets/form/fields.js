@@ -940,7 +940,7 @@ SelectField.prototype.make_input = function() {
 		if(_f.get_value)
 			var v = _f.get_value(this.doctype,this.docname,this.df.fieldname);
 		else {
-			if(this.options_list)
+			if(this.options_list && this.options_list.length)
 				var v = this.options_list[0];
 			else
 				var v = null;
