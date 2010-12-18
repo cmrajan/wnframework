@@ -166,8 +166,8 @@ msgprint('Validation Error: '+validation_message);this.savingflag=false;return'E
 var ret_fn=function(r){if(user=='Guest'&&!r.exc){$dh(me.form_wrapper);$ds(me.saved_wrapper);me.saved_wrapper.innerHTML='<div style="padding: 150px 16px; text-align: center; font-size: 14px;">'
 +(cur_frm.message_after_save?cur_frm.message_after_save:'Your information has been sent. Thank you!')
 +'</div>';return;}
-if(!me.meta.istable)
-me.refresh();if(call_back){if(call_back=='home'){loadpage('_home');return;}
+if(!me.meta.istable){me.refresh();locals[me.doctype][me.docname].__unsaved=0;me.refresh_header();}
+if(call_back){if(call_back=='home'){loadpage('_home');return;}
 call_back(r);}}
 var me=this;var ret_fn_err=function(r){var doc=locals[me.doctype][me.docname];me.savingflag=false;ret_fn(r);}
 this.savingflag=true;if(this.docname&&validated){return this.savedoc(save_action,ret_fn,ret_fn_err);}}

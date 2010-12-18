@@ -937,8 +937,13 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 				+ '</div>';
 			return; // no refresh
 		}
-		if(!me.meta.istable)
+		if(!me.meta.istable) {
 			me.refresh();
+			
+			// any fields changed, won't be unsaved (?)
+			locals[me.doctype][me.docname].__unsaved=0;
+			me.refresh_header();
+		}
 
 		if(call_back){
 			if(call_back == 'home'){ loadpage('_home'); return; }
