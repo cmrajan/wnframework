@@ -798,7 +798,7 @@ var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);else{if(this.opt
 var v=this.options_list[0];else
 var v=null;}
 this.input.set_input(v);}
-this.input.set_input=function(v){if(!v){if(!me.input.multiple){if(me.docname){if(me.options_list){me.set(me.options_list[0]);me.txt.value=me.options_list[0];}else{me.txt.value='';}}}}else{if(me.options_list&&in_list(me.options_list,v)){if(me.input.multiple){for(var i=0;i<me.input.options.length;i++){me.input.options[i].selected=0;if(me.input.options[i].value&&me.input.options[i].value==v)
+this.input.set_input=function(v){if(!v){if(!me.input.multiple){if(me.docname){if(me.options_list&&me.options_list.length){me.set(me.options_list[0]);me.txt.value=me.options_list[0];}else{me.txt.value='';}}}}else{if(me.options_list&&in_list(me.options_list,v)){if(me.input.multiple){for(var i=0;i<me.input.options.length;i++){me.input.options[i].selected=0;if(me.input.options[i].value&&me.input.options[i].value==v)
 me.input.options[i].selected=1;}}else{me.txt.value=v;}}}}
 this.get_value=function(){if(me.input.multiple){var l=[];for(var i=0;i<me.input.options.length;i++){if(me.input.options[i].selected)l[l.length]=me.input.options[i].value;}
 return l;}else{if(me.txt.options){return sel_val(me.txt);}

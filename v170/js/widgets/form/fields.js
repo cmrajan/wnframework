@@ -952,7 +952,7 @@ SelectField.prototype.make_input = function() {
 		if(!v) {
 			if(!me.input.multiple) {
 				if(me.docname) { // if called from onload without docname being set on fields
-					if(me.options_list) {
+					if(me.options_list && me.options_list.length) {
 						me.set(me.options_list[0]);
 						me.txt.value = me.options_list[0];
 					} else {
