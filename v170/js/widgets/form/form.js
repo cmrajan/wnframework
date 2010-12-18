@@ -288,7 +288,7 @@ _f.Frm.prototype.setup_footer = function() {
 	this.footer = $a(this.form_wrapper, 'div', '',{display:'none'});
 
 	// save buttom
-	var b = $btn(this.footer, 'Save',function() { cur_frm.save('Save'); },'green');
+	var b = $btn(this.footer, 'Save',function() { cur_frm.save('Save'); },{marginLeft:'12px'},'green');
 	
 	// show / hide save
 	this.footer.show_save = function() {
