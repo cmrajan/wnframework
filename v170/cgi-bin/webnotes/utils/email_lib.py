@@ -7,12 +7,13 @@
 from webnotes import msgprint
 
 class EMail:
-	def __init__(self, sender='', recipients=[], subject=''):
+	def __init__(self, sender='', recipients=[], subject='', from_defs=0):
 		from email.mime.multipart import MIMEMultipart
 		if type(recipients)==str:
 			recipients.replace(';', ',')
 			recipients = recipients.split(',')
 			
+		self.from_defs = from_defs
 		self.sender = sender
 		self.reply_to = sender
 		self.recipients = recipients
@@ -82,16 +83,25 @@ class EMail:
 				raise Exception, "%s is not a valid email id" % e	
 	
 	def setup(self):
-		import webnotes.model.doc
-		from webnotes.utils import cint
+		if self.from_defs:
+			import webnotes.defs
+			self.server = getattr(webnotes.defs,'mail_server','')
+			self.login = getattr(webnotes.defs,'mail_login','')
+			self.port = getattr(webnotes.defs,'mail_port',None)
+			self.password = getattr(webnotes.defs,'mail_password','')
+			self.use_ssl = getattr(webnotes.defs,'use_ssl',0)
 
-		# get defaults from control panel
-		cp = webnotes.model.doc.Document('Control Panel','Control Panel')
-		self.server = cp.outgoing_mail_server and cp.outgoing_mail_server or mail_server
-		self.login = cp.mail_login and cp.mail_login or mail_login
-		self.port = cp.mail_port and cp.mail_port or None
-		self.password = cp.mail_password and cp.mail_password or mail_password
-		self.use_ssl = cint(cp.use_ssl)
+		else:	
+			import webnotes.model.doc
+			from webnotes.utils import cint
+
+			# get defaults from control panel
+			cp = webnotes.model.doc.Document('Control Panel','Control Panel')
+			self.server = cp.outgoing_mail_server and cp.outgoing_mail_server or getattr(webnotes.defs,'mail_server','')
+			self.login = cp.mail_login and cp.mail_login or mail_login or getattr(webnotes.defs,'mail_login','')
+			self.port = cp.mail_port and cp.mail_port or getattr(webnotes.defs,'mail_port',None)
+			self.password = cp.mail_password and cp.mail_password or getattr(webnotes.defs,'mail_password','')
+			self.use_ssl = cint(cp.use_ssl)
 	
 	def send(self):
 		from webnotes.utils import cint
@@ -141,7 +151,7 @@ def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc
 	for a in attach:
 		email.attach(a)
 
-	c = webnotes.app_conn or webnotes.conn
+	c = webnotes.conn
 	email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.erpnext.com">erpnext</a></div>')
 	email.send()
 

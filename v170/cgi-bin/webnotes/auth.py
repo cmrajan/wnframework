@@ -18,6 +18,11 @@ class HTTPRequest:
 		# set db
 		self.set_db()
 
+		# check status
+		if webnotes.conn.get_global("__session_status")=='stop':
+			webnotes.msgprint(webnotes.conn.get_global("__session_status_message"))
+			raise Exception
+
 		# login
 		webnotes.login_manager = LoginManager()
 
