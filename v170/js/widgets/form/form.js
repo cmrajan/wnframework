@@ -285,31 +285,19 @@ _f.Frm.prototype.setup_footer = function() {
 	var me = this;
 	
 	// footer toolbar
-	this.footer = $a(this.form_wrapper, 'div', 'page_footer',{display:'none'});
-	this.footer.tab = make_table(this.footer, 1, 2, '100%', ['50%', '50%'], {padding:'4px'});
-
-	// style	
-	this.footer.save_area = $a($td(this.footer.tab, 0, 0), 'div', 'green_buttons');
-	$y($td(this.footer.tab, 0, 1), {textAlign:'right'});
+	this.footer = $a(this.form_wrapper, 'div', '',{display:'none'});
 
 	// save buttom
-	var b = $a(this.footer.save_area,'button','',{fontSize:'11px'});
-	b.innerHTML = 'Save';
-	$(b).button({icons:{ primary: 'ui-icon-disk' }});
-	b.onclick = function() { cur_frm.save('Save'); }
+	var b = $btn(this.footer, 'Save',function() { cur_frm.save('Save'); },'green');
 	
 	// show / hide save
 	this.footer.show_save = function() {
-		$ds(me.footer.save_area);
+		$ds(me.footer);
 	}
 
 	this.footer.hide_save = function() {
-		$dh(me.footer.save_area);
+		$dh(me.footer);
 	}
-	
-	// no footer for table - form views
-	if(this.meta.istable || this.meta.hide_heading || this.meta.in_dialog) $dh(this.footer);
-
 }
 
 // --------------------------------------------------------------------------------------
@@ -723,9 +711,9 @@ _f.Frm.prototype.refresh_tabs = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_footer = function() {
-	if(this.editable && !this.meta.in_dialog && cint(this.doc.docstatus)==0 && !this.meta.istable && this.get_doc_perms()[WRITE] && this.footer) 
+	if(get_url_arg('embed')) {
 		this.footer.show_save();
-	else {
+	} else {
 		this.footer.hide_save();
 	}
 }

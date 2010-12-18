@@ -162,8 +162,6 @@ _f.SectionBreak.prototype.make_body = function() {
 			
 			this.expand = function() { 
 				this.row.show(); me.mytab.set_selected();
-
-				this.refresh_footer();
 				
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
@@ -200,7 +198,6 @@ _f.SectionBreak.prototype.make_body = function() {
 				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
 					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
 
-				this.refresh_footer();
 			}
 	
 			this.make_row();
@@ -216,36 +213,6 @@ _f.SectionBreak.prototype.make_body = function() {
 	}	
 }
 
-
-// ======================================================================================
-
-_f.SectionBreak.prototype.add_section_button = function(sec_id, east_or_west) {
-	var btn = $a($td(this.frm.footer.tab, 0, 1), 'button','',{marginLeft:'4px', fontSize:'11px'});
-	btn.innerHTML = this.frm.sections[sec_id].df.label;
-	btn.sec_id = sec_id;
-	btn.onclick = function() {
-		cur_frm.set_section(this.sec_id);
-	}
-	$(btn).button({icons:{ primary: 'ui-icon-triangle-1-' + east_or_west }});
-}
-
-_f.SectionBreak.prototype.refresh_footer = function() {
-	if(this.frm.footer) {
-
-		// clear
-		$td(this.frm.footer.tab, 0, 1).innerHTML = '';
-
-		// make buttons
-		if(in_list(['Tabbed', 'Tray'],this.frm.meta.section_style)) {
-			if(this.sec_id>0) {
-				this.add_section_button(this.sec_id-1, 'w');
-			}
-			if(this.sec_id<this.frm.sections.length-1) {
-				this.add_section_button(this.sec_id+1, 'e');
-			}
-		}
-	}
-}
 
 // ======================================================================================
 
