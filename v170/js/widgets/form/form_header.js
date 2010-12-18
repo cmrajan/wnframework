@@ -158,7 +158,7 @@ _f.FrmHeader.prototype.get_status_tags = function(doc, f) {
 	if(doc.__islocal) {
 		label = 'Unsaved Draft'; col = '#F81';
 
-	} else if(doc.__unsaved) {
+	} else if(cint(doc.__unsaved)) {
 		label = 'Not Saved'; col = '#F81';
 		if(doc.docstatus==1 && this.update_btn) $ds(this.update_btn);
 
