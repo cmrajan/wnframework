@@ -674,13 +674,16 @@ LinkField.prototype.set_onchange = function() {
 LinkField.prototype.set_fetch_values = function(fetch_values) { 
 	var fl = cur_frm.fetch_dict[this.df.fieldname].fields;
 	for(var i=0; i< fl.length; i++) {
-		locals[this.doctype][this.docname][fl[i]] = fetch_values[i];
-		if(!this.grid) {
-			refresh_field(fl[i]);
-			
-			// call trigger on the target field
-			if(cur_frm.fields_dict[fl[i]]) // on main
-				cur_frm.fields_dict[fl[i]].run_trigger();
+		if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]) {
+		
+			locals[this.doctype][this.docname][fl[i]] = fetch_values[i];
+			if(!this.grid) {
+				refresh_field(fl[i]);
+				
+				// call trigger on the target field
+				if(cur_frm.fields_dict[fl[i]]) // on main
+					cur_frm.fields_dict[fl[i]].run_trigger();
+			}
 		}
 	}
 	// refresh grid

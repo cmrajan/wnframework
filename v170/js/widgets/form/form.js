@@ -663,9 +663,6 @@ _f.Frm.prototype.refresh = function(docname) {
 				$ds(this.form_wrapper);
 			}
 
-			// header
-			if(!this.meta.istable) { this.refresh_header(); }
-
 			// call trigger
 	 		this.runclientscript('refresh');
 			
@@ -683,6 +680,9 @@ _f.Frm.prototype.refresh = function(docname) {
 
 			// footer
 			this.refresh_footer();
+
+			// header
+			if(!this.meta.istable) { this.refresh_header(); }
 
 			// layout
 			if(this.layout) this.layout.show();
