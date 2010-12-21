@@ -23,10 +23,10 @@ try:
 	import webnotes.db
 	
 	form = cgi.FieldStorage()
-	form_dict = {}
+	webnotes.form_dict = {}
 	
 	for each in form.keys():
-		form_dict[each] = form.getvalue(each)	
+		webnotes.form_dict[each] = form.getvalue(each)	
 	
 	n = form.getvalue('name')
 
