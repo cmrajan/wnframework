@@ -99,8 +99,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 			if(onload)onload(frm);
 						
 			// tweets
-			if(r && r.n_tweets) frm.n_tweets[name] = r.n_tweets;
-			if(r && r.last_comment) frm.last_comments[name] = r.last_comment;
+			if(r && r.no_of_comments) frm.n_comments[name] = r.no_of_comments;
 			
 			// show
 			frm.refresh(name);

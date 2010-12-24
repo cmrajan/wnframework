@@ -121,9 +121,9 @@ _f.FrmHeader.prototype.refresh_toolbar = function() {
 }
 
 _f.FrmHeader.prototype.refresh_comments = function() {
-	if(!cur_frm.no_of_comments) cur_frm.no_of_comments = 0;
-	if(this.comments_btn)
-		this.comment_btn.innerHTML = 'Comments ('+cur_frm.no_of_comments+')';
+	var n = cint(cur_frm.n_comments[cur_frm.doc.name]);
+	if(this.comment_btn && !cur_frm.doc.__islocal)
+		this.comment_btn.innerHTML = 'Comments ('+n+')';
 }
 
 // refresh heading and labels

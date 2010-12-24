@@ -1090,8 +1090,7 @@ _f.Frm.prototype.reload_doc = function() {
 	var ret_fn = function(r, rtxt) {
 		page_body.set_status('Done')
 		// n tweets and last comment
-		if(r.n_comments) this.n_comments[me] = r.n_comments;
-		if(r.last_comment) this.last_comments[me] = r.last_comment;
+		if(r.n_comments) this.n_comments[me] = r.no_of_comments;
 		
 		me.runclientscript('setup', me.doctype, me.docname);
 		me.refresh();

@@ -130,8 +130,9 @@ _f.add_frm = function(doctype, onload, opt_name) {
 		f.in_dialog = in_dialog;
 
 		// set # of comments
-		if(r.no_of_comments)
-			f.no_of_comments = r.no_of_comments;
+		if(r.no_of_comments) {
+			f.n_comments[opt_name] = r.no_of_comments;
+		}
 
 		if(onload)onload(r,rt);
 	}

@@ -37,7 +37,7 @@ CommentList.prototype.add_comment = function() {
     me.lst.run();
     // clean up the text area
     me.input.value = '';
-    cur_frm.no_of_comments += 1;
+    cur_frm.n_comments[cur_frm.doc.name] = cint(cur_frm.n_comments[cur_frm.doc.name]) + 1;
     cur_frm.frm_head.refresh_comments();
   });
 }
@@ -77,7 +77,7 @@ CommentList.prototype.make_lst = function() {
 //=============
 CommentItem = function(cell, ri, ci, d, comment) {
   this.comment = comment;
-  $y(cell, {borderBottom:'1px solid #AAA', padding:'4px 0px'})
+  $y(cell, {padding:'4px 0px'})
   var t = make_table(cell, 1, 3, '100%', ['15%', '65%', '20%'], {padding:'4px'});
   
   // image
