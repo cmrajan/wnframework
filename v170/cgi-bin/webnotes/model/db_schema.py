@@ -129,8 +129,9 @@ def updatecolumns(doctype):
 				_change_column(f, doctype, col_def)
 	
 	# update the "old" columns
-	webnotes.conn.sql("start transaction")
+	webnotes.conn.begin()
 	update_oldfield_values(doctype)
+	webnotes.conn.commit()
 
 
 # Add Indices
@@ -222,6 +223,7 @@ def updatedb(dt):
 		return
 
 	# create table
+	webnotes.conn.commit()
 	names = [rec[0].lower() for rec in webnotes.conn.sql('SHOW TABLES')]
 	if not (('tab'+dt).lower() in names):  
 		create_table(dt)
@@ -232,5 +234,7 @@ def updatedb(dt):
 	
 		# update index
 		updateindex(dt)
+
+	webnotes.conn.begin()
 
 	webnotes.widgets.auto_master.create_auto_masters(dt)

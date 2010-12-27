@@ -29,6 +29,7 @@ class HTTPRequest:
 		# start session
 		webnotes.session_obj = Session()
 		webnotes.session = webnotes.session_obj.data
+		webnotes.tenant_id = webnotes.session.get('tenant_id', 0)
 
 		# write out cookies if sid is supplied (this is a pre-logged in redirect)
 		if webnotes.form_dict.get('sid'):
@@ -341,6 +342,7 @@ class Session:
 		self.data['user'] = webnotes.login_manager.user
 		self.data['sid'] = webnotes.utils.generate_hash()
 		self.data['data']['session_ip'] = os.environ.get('REMOTE_ADDR');
+		self.data['data']['tenant_id'] = webnotes.form_dict.get('tenant_id', 0)
 
 		# get ipinfo
 		if webnotes.conn.get_value('Control Panel',None,'get_ip_info'):
@@ -401,6 +403,7 @@ class Session:
 		webnotes.conn.commit()
 		webnotes.conn.sql("alter table tabSessions add column `status` varchar(20)")
 		webnotes.conn.begin()
+
 
 	# Get IP Info from ipinfodb.com
 	# -----------------------------

@@ -52,11 +52,14 @@ class Database:
 		self.cur_db_name = db_name
 	
 	def check_transaction_status(self, query):
+		if self.in_transaction and query and query.strip().split()[0].lower() in ['start', 'alter', 'drop', 'create']:
+			raise Exception, 'This statement can cause implicit commit'
+
 		if query and query.strip().lower()=='start transaction':
 			self.in_transaction = 1
 			self.transaction_writes = 0
-
-		if query and query.strip().lower() in ['commit', 'rollback']:
+			
+		if query and query.strip().split()[0].lower() in ['commit', 'rollback']:
 			self.in_transaction = 0
 
 		if self.in_transaction and query[:6].lower() in ['update', 'insert']:
@@ -88,6 +91,9 @@ class Database:
 		# in transaction validations
 		self.check_transaction_status(query)
 		
+		if getattr(defs,'multi_tenant',None):
+			query = self.add_multi_tenant_condition(query)
+			
 		# execute
 		if values!=():
 			if webnotes.logger and (self.user in defs.debug_log_dbs):
@@ -106,47 +112,11 @@ class Database:
 		else:
 			return self._cursor.fetchall()
 
-	# Check whether the query is from metadata
+	# add condition for tenant id
 	# ======================================================================================
-	def _scrub_table(self, tn, adt_list):
-		if tn.startswith('`'):
-			tn = tn[1:-1]
-			
-		if tn.startswith('tab'):
-			tn = tn[3:]
-
-		if tn in adt_list:
-			return 1
-		else:
-			return 0
-
-	def parse_for_metadata(self, query, adt_list):
-		#try:
-		import sqlparse
-		
-		# parse
-		tokens = sqlparse.parse(query)[0].tokens
-		tablist = []
-		
-		# only for selects - never update or delete metadata
-		if tokens[0].value.lstrip().lower() != 'select':
-			return 0
-		
-		tflag = 0
-		for t in tokens:
-
-			if type(t).__name__ == 'Token' and str(t.ttype)=='Token.Keyword' and t.value.lower()=='from':
-				tflag = 1
-
-			# find tables from a list
-			elif tflag and type(t).__name__=='IdentifierList':
-				return self._scrub_table(str(t.get_identifiers()[0].tokens[0]), adt_list)
-							
-			# find the tables
-			elif tflag and type(t).__name__=='Identifier':
-				return self._scrub_table(t.tokens[0].value, adt_list)
-		
-		return 0
+	def add_multi_tenant_condition(query):
+		import webnotes.multi_tenant
+		return webnotes.multi_tenant.query_parser.add_condition(query)
 		
 	# ======================================================================================
 
@@ -245,7 +215,8 @@ class Database:
 	# ======================================================================================
 
 	def begin(self):
-		self.sql("start transaction")
+		if not self.in_transaction:
+			self.sql("start transaction")
 	
 	def commit(self):
 		self.sql("commit")

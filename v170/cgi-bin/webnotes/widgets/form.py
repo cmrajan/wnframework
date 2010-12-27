@@ -110,6 +110,7 @@ def runserverobj():
 
 	form = webnotes.form
 
+
 	method = form.getvalue('method')
 	doclist, clientlist = [], []
 	arg = form.getvalue('arg')
@@ -221,7 +222,7 @@ def check_integrity(doc):
 	import webnotes
 		
 	if (not webnotes.model.meta.is_single(doc.doctype)) and (not doc.fields.get('__islocal')):
-		tmp = webnotes.conn.sql('SELECT modified FROM `tab%s` WHERE name="%s"' % (doc.doctype, doc.name))
+		tmp = webnotes.conn.sql('SELECT modified FROM `tab%s` WHERE name="%s" for update' % (doc.doctype, doc.name))
 		if tmp and str(tmp[0][0]) != str(doc.modified):
 			webnotes.msgprint('Document has been modified after you have opened it. To maintain the integrity of the data, you will not be able to save your changes. Please refresh this document. [%s/%s]' % (tmp[0][0], doc.modified))
 			return 0
@@ -327,7 +328,7 @@ def savedocs():
 		if action == 'Submit':
 			_do_action(doc, doclist, server_obj, 'on_submit', 1)
 
-		# on_submit
+		# for allow_on_submit type
 		if action == 'Update':
 			_do_action(doc, doclist, server_obj, 'on_update_after_submit', 0)
 				

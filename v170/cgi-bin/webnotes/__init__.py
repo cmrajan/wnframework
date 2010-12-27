@@ -20,6 +20,7 @@ incoming_cookies = {}
 add_cookies = {}
 cookies = {}
 auto_masters = {}
+tenant_id = None
 
 # for applications
 app_conn = None
@@ -113,16 +114,13 @@ def setup_logging():
 	global logger
 
 	LOG_FILENAME = os.path.join(defs.log_file_path,'wnframework.log')
-	
-	
+		
 	logger = logging.getLogger('WNLogger')
 	logger.setLevel(eval(defs.log_level))
-	
-	
+		
 	log_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxBytes = defs.log_file_size,backupCount = defs.log_file_backup_count)
 	
 	console_handler = logging.StreamHandler()
-	
 	
 	formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s - %(message)s')
 	
