@@ -1,6 +1,7 @@
-_f.FrmHeader = function(parent) {
+_f.FrmHeader = function(parent, frm) {
 	var me = this;
 	this.wrapper = $a(parent, 'div');
+	if(frm.meta.in_dialog) $y(this.wrapper, {marginLeft:'8px', marginRight:'8px'});
 
 	this.page_head = new PageHeader(this.wrapper);
 	//$y(this.page_head.wrapper, {marginBottom:'0px'});

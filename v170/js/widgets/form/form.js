@@ -259,7 +259,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 	this.setup_footer();
 		
 	// header - no headers for tables and guests
-	if(!(this.meta.istable || user=='Guest')) this.frm_head = new _f.FrmHeader(this.head);
+	if(!(this.meta.istable || user=='Guest')) this.frm_head = new _f.FrmHeader(this.head, this);
 	
 	// hide close btn for dialog rendering
 	if(this.frm_head && this.meta.in_dialog) $dh(this.frm_head.page_head.close_btn);
