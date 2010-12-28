@@ -673,6 +673,7 @@ LinkField.prototype.set_onchange = function() {
 }
 LinkField.prototype.set_fetch_values = function(fetch_values) { 
 	var fl = cur_frm.fetch_dict[this.df.fieldname].fields;
+	var changed_fields = [];
 	for(var i=0; i< fl.length; i++) {
 		if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]) {
 		
@@ -681,14 +682,17 @@ LinkField.prototype.set_fetch_values = function(fetch_values) {
 				refresh_field(fl[i]);
 				
 				// call trigger on the target field
-				if(cur_frm.fields_dict[fl[i]]) // on main
-					cur_frm.fields_dict[fl[i]].run_trigger();
+				changed_fields.push(fl[i]);
 			}
 		}
 	}
 	
 	// reset doc
-	cur_frm.doc = locals[this.doctype][this.docname];
+	run triggers
+	for(i=0; i<changed_fields.length; i++) {
+		if(cur_frm.fields_dict[changed_fields[i]]) // on main
+			cur_frm.fields_dict[changed_fields[i]].run_trigger();
+	}
 	
 	// refresh grid
 	if(this.grid) this.grid.refresh();

@@ -752,9 +752,11 @@ _f.cur_grid_cell.grid.cell_deselect();if(!me.txt.value){me.run_trigger();return;
 var fetch='';if(cur_frm.fetch_dict[me.df.fieldname])
 fetch=cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');$c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options,'fetch':fetch},function(r,rt){if(selector&&selector.display)return;if(r.message=='Ok'){me.run_trigger();if(r.fetch_values)me.set_fetch_values(r.fetch_values);}else{var astr='';if(in_list(profile.can_create,me.df.options))astr=repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s',{dt:me.df.options,dtl:get_doctype_label(me.df.options)})
 msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s',{val:me.txt.value,dt:get_doctype_label(me.df.options),add:astr}));me.txt.value='';me.set('');}});}}}
-LinkField.prototype.set_fetch_values=function(fetch_values){var fl=cur_frm.fetch_dict[this.df.fieldname].fields;for(var i=0;i<fl.length;i++){if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]){locals[this.doctype][this.docname][fl[i]]=fetch_values[i];if(!this.grid){refresh_field(fl[i]);if(cur_frm.fields_dict[fl[i]])
-cur_frm.fields_dict[fl[i]].run_trigger();}}}
-cur_frm.doc=locals[this.doctype][this.docname];if(this.grid)this.grid.refresh();}
+LinkField.prototype.set_fetch_values=function(fetch_values){var fl=cur_frm.fetch_dict[this.df.fieldname].fields;var changed_fields=[];for(var i=0;i<fl.length;i++){if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]){locals[this.doctype][this.docname][fl[i]]=fetch_values[i];if(!this.grid){refresh_field(fl[i]);changed_fields.push(fl[i]);}}}
+run triggers
+for(i=0;i<changed_fields.length;i++){if(cur_frm.fields_dict[changed_fields[i]])
+cur_frm.fields_dict[changed_fields[i]].run_trigger();}
+if(this.grid)this.grid.refresh();}
 LinkField.prototype.set_get_query=function(){if(this.get_query)return;if(this.grid){var f=this.grid.get_field(this.df.fieldname);if(f.get_query)this.get_query=f.get_query;}}
 LinkField.prototype.set_disp=function(val){var t=null;if(val)t="<a href=\'javascript:loaddoc(\""+this.df.options+"\", \""+val+"\")\'>"+val+"</a>";this.set_disp_html(t);}
 function IntField(){}IntField.prototype=new DataField();IntField.prototype.validate=function(v){if(isNaN(parseInt(v)))return null;return cint(v);};IntField.prototype.format_input=function(){if(this.input.value==null)this.input.value='';}
