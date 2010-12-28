@@ -687,8 +687,7 @@ LinkField.prototype.set_fetch_values = function(fetch_values) {
 		}
 	}
 	
-	// reset doc
-	run triggers
+	// run triggers
 	for(i=0; i<changed_fields.length; i++) {
 		if(cur_frm.fields_dict[changed_fields[i]]) // on main
 			cur_frm.fields_dict[changed_fields[i]].run_trigger();
