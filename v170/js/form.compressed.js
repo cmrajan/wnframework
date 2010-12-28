@@ -53,7 +53,7 @@ var sp1=null;var sp2=null;if(doc.__islocal){label='Unsaved Draft';col='#F81';}el
 sp1=make_tag(label,col);this.set_in_recent(doc,col);return[sp1,sp2];}
 _f.FrmHeader.prototype.set_in_recent=function(doc,col){var tn=$i('rec_'+doc.doctype+'-'+doc.name);if(tn)
 $y(tn,{backgroundColor:col});}
-_f.FrmHeader.prototype.set_save_submit_color=function(doc){if(cint(doc.docstatus)==0&&this.page_head.buttons['Submit']){if(cint(doc.__unsaved)){$wid_normal(this.page_head.buttons['Save'],'green');$wid_normal(this.page_head.buttons['Submit'],'normal');}else{$wid_normal(this.page_head.buttons['Submit'],'green');$wid_normal(this.page_head.buttons['Save'],'normal');}}}
+_f.FrmHeader.prototype.set_save_submit_color=function(doc){if(cint(doc.docstatus)==0&&this.page_head.buttons['Submit']&&this.page_head.buttons['Save']){if(cint(doc.__unsaved)){$wid_normal(this.page_head.buttons['Save'],'green');$wid_normal(this.page_head.buttons['Submit'],'normal');}else{$wid_normal(this.page_head.buttons['Submit'],'green');$wid_normal(this.page_head.buttons['Save'],'normal');}}}
 _f.FrmHeader.prototype.refresh_labels=function(f){var ph=this.page_head;this.dt_area.innerHTML=get_doctype_label(f.doctype);this.dn_area.innerHTML='';if(!f.meta.issingle)
 this.dn_area.innerHTML=f.docname;var doc=locals[f.doctype][f.docname];var sl=this.get_status_tags(doc,f);this.set_save_submit_color(doc);var t=this.status_area;t.innerHTML='';t.appendChild(sl[0]);if(sl[1])t.appendChild(sl[1]);new CustomTooltip(this.timestamp_area,this.get_timestamp(doc));}
 _f.edit_record=function(dt,dn){d=_f.frm_dialog;var show_dialog=function(){var f=frms[dt];if(f.meta.istable){f.parent_doctype=cur_frm.doctype;f.parent_docname=cur_frm.docname;}

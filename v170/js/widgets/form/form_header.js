@@ -195,7 +195,7 @@ _f.FrmHeader.prototype.set_in_recent = function(doc, col) {
 
 // set the button color of save / submit
 _f.FrmHeader.prototype.set_save_submit_color = function(doc) {
-	if(cint(doc.docstatus)==0 && this.page_head.buttons['Submit']) {
+	if(cint(doc.docstatus)==0 && this.page_head.buttons['Submit'] && this.page_head.buttons['Save']) {
 		if(cint(doc.__unsaved)) {
 			$wid_normal(this.page_head.buttons['Save'], 'green');
 			$wid_normal(this.page_head.buttons['Submit'], 'normal');
