@@ -101,10 +101,11 @@ function time_to_hhmm(hh,mm,am){if(am=='AM'&&hh=='12'){hh='00';}else if(am=='PM'
 return hh+':'+mm;}
 function comment_when(dt){var cdate=dateutil.str_to_obj(dt);var diff=(new Date()-cdate)/1000;if(diff<60){return"Few moments ago"}else if(diff<600){var t=cint(diff/60);return t+" minute"+(t==1?"":"s")+" ago"}else if(diff<3600){var t=cint(diff/600);return t+" minute"+(t==1?"":"s")+" ago"}else if(diff<86400){var t=cint(diff/3600);return t+" hour"+(t==1?"":"s")+" ago"}else if(diff<604800){var t=cint(diff/86400);return t+" day"+(t==1?"":"s")+" ago"}else{return cdate.getDate()+" "+month_list[cdate.getMonth()]+" "+cdate.getFullYear();}}
 function addEvent(ev,fn){if(isIE){document.attachEvent('on'+ev,function(){fn(window.event,window.event.srcElement);});}else{document.addEventListener(ev,function(e){fn(e,e.target);},true);}}
-$wid_normal=function(ele,color){if(ele.disabled)return;fsize=ele.style.fontSize?ele.style.fontSize:'11px';$y(ele,{padding:'2px 8px',border:'1px solid #CCC',cursor:'pointer',fontSize:fsize,color:'#444'});$br(ele,'3px');$gr(ele,'#FFF','#DDD');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #4B4'});$gr(ele,'#9C9','#4A4');}}
+$wid_normal=function(ele,color){if(ele.disabled)return;fsize=ele.style.fontSize?ele.style.fontSize:'11px';$y(ele,{padding:'2px 8px',border:'1px solid #CCC',cursor:'pointer',fontSize:fsize,color:'#444'});$br(ele,'3px');$gr(ele,'#FFF','#DDD');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #4B4'});$gr(ele,'#9C9','#4A4');ele.wid_color=color;}
+if(!ele.wid_color){ele.wid_color='normal';}}
 $wid_disabled=function(ele){ele.disabled=1;$y(ele,{border:'1px solid #AAA'});$bg(ele,'#EEE');$fg(ele,'#AAA');}
-$wid_active=function(ele,color){if(ele.disabled)return;$y(ele,{border:'1px solid #000'});$gr(ele,'#FFF','#EEE');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#AFA','#7C7');}}
-$wid_pressed=function(ele,color){if(ele.disabled)return;$y(ele,{border:'1px solid #000'});$gr(ele,'#EEF','#DDF');if(color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#7C7','#2A2');}}
+$wid_active=function(ele){if(ele.disabled)return;$y(ele,{border:'1px solid #000'});$gr(ele,'#FFF','#EEE');if(ele.wid_color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#AFA','#7C7');}}
+$wid_pressed=function(ele){if(ele.disabled)return;$y(ele,{border:'1px solid #000'});$gr(ele,'#EEF','#DDF');if(ele.wid_color=='green'){$y(ele,{color:'#FFF',border:'1px solid #292'});$gr(ele,'#7C7','#2A2');}}
 $item_normal=function(ele){$y(ele,{padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal',whiteSpace:'nowrap',overflow:'hidden'});$br(ele,'3px');$bg(ele,'#FFF');$fg(ele,'#000');}
 $item_active=function(ele){$bg(ele,'#FE8');$fg(ele,'#000');}
 $item_selected=function(ele){$bg(ele,'#777');$fg(ele,'#FFF');}
@@ -119,11 +120,11 @@ function set_gradient(ele,from,to){var no_gradient=0;if(isIE)no_gradient=1;if(is
 $gr=set_gradient;$br=function(ele,r){$(ele).css('-moz-border-radius',r).css('-webkit-border-radius',r);}
 $bs=function(ele,r){$(ele).css('-moz-box-shadow',r).css('-webkit-box-shadow',r).css('box-shadow',r);}
 function $btn(parent,label,onclick,style,color,ajax){var btn=$a(parent,'button');btn.loading_img=$a(parent,'img','',{margin:'0px 4px -2px 4px',display:'none'});btn.loading_img.src='images/ui/button-load.gif';$wid_normal(btn,color);if(ajax)$y(btn,{marginRight:'24px'});btn.innerHTML=label;btn.user_onclick=onclick;btn.color=color;btn.onclick=function(){if(!this.disabled)this.user_onclick(this);}
-$(btn).hover(function(){$wid_active(this,color);},function(){$wid_normal(this,color);})
-btn.onmousedown=function(){$wid_pressed(this,color);}
-btn.onmouseup=function(){$wid_active(this,color);}
+$(btn).hover(function(){$wid_active(this);},function(){$wid_normal(this);})
+btn.onmousedown=function(){$wid_pressed(this);}
+btn.onmouseup=function(){$wid_active(this);}
 btn.set_disabled=function(){$wid_disabled(this);}
-btn.set_enabled=function(){this.disabled=0;$wid_normal(this,this.color);}
+btn.set_enabled=function(){this.disabled=0;$wid_normal(this);}
 btn.set_working=function(){this.set_disabled();$di(this.loading_img);if(ajax)$y(btn,{marginRight:'0px'});}
 btn.done_working=function(){this.set_enabled();$dh(this.loading_img);if(ajax)$y(btn,{marginRight:'24px'});}
 if(style)$y(btn,style);return btn;}

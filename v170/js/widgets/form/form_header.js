@@ -193,6 +193,18 @@ _f.FrmHeader.prototype.set_in_recent = function(doc, col) {
 		$y(tn,{backgroundColor:col}); 
 }
 
+// set the button color of save / submit
+_f.FrmHeader.prototype.set_save_submit_color = function(doc) {
+	if(cint(doc.docstatus)==0 && this.page_head.buttons['Submit']) {
+		if(cint(doc.__unsaved)) {
+			$wid_normal(this.page_head.buttons['Save'], 'green');
+			$wid_normal(this.page_head.buttons['Submit'], 'normal');
+		} else {
+			$wid_normal(this.page_head.buttons['Submit'], 'green');
+			$wid_normal(this.page_head.buttons['Save'], 'normal');			
+		}
+	}
+}
 
 // refresh the labels!
 // -------------------------------------------------------------------
@@ -214,6 +226,9 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	// get the tags
 	var sl = this.get_status_tags(doc, f);
 
+	// set save, submit color
+	this.set_save_submit_color(doc);
+
 	// add the tags
 	var t = this.status_area;
 	t.innerHTML = '';
@@ -221,8 +236,5 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	if(sl[1])t.appendChild(sl[1]);
 
 	// timestamp
-	//var ts = $a(null, 'span', '', {fontSize:'11px'});
 	new CustomTooltip(this.timestamp_area, this.get_timestamp(doc));
-	//ph.tag_area.innerHTML = '';
-	//ph.tag_area.appendChild(ts);
 }

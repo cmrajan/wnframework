@@ -16,6 +16,10 @@ $wid_normal = function(ele,color) {
 	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
 	if(color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
+		ele.wid_color = color;
+	} 
+	if(!ele.wid_color) {
+		ele.wid_color = 'normal';
 	}
 }
 $wid_disabled = function(ele) { 
@@ -23,17 +27,17 @@ $wid_disabled = function(ele) {
 	$y(ele, {border:'1px solid #AAA'}); $bg(ele,'#EEE'); $fg(ele,'#AAA');
 }
 
-$wid_active = function(ele,color) {
+$wid_active = function(ele) {
 	if(ele.disabled) return;
 	$y(ele, {border:'1px solid #000'}); $gr(ele,'#FFF','#EEE');
-	if(color=='green') {
+	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#AFA','#7C7');
 	}
 }
-$wid_pressed = function(ele,color) {
+$wid_pressed = function(ele) {
 	if(ele.disabled) return;
 	$y(ele, {border:'1px solid #000'}); $gr(ele,'#EEF','#DDF');
-	if(color=='green') {
+	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#7C7','#2A2');
 	}
 }
@@ -117,11 +121,11 @@ function $btn(parent, label, onclick, style, color, ajax) {
 
 	// color
 	$(btn).hover(
-		function() { $wid_active(this,color); },
-		function() { $wid_normal(this,color); }
+		function() { $wid_active(this); },
+		function() { $wid_normal(this); }
 	)
-	btn.onmousedown = function() { $wid_pressed(this,color); }
-	btn.onmouseup = function() { $wid_active(this,color); }
+	btn.onmousedown = function() { $wid_pressed(this); }
+	btn.onmouseup = function() { $wid_active(this); }
 
 	// disabled
 	btn.set_disabled = function() {
@@ -129,7 +133,7 @@ function $btn(parent, label, onclick, style, color, ajax) {
 	}
 	btn.set_enabled = function() {
 		this.disabled = 0;
-		$wid_normal(this, this.color);
+		$wid_normal(this);
 	}
 
 	// working
