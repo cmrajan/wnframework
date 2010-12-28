@@ -314,6 +314,7 @@ class CSVImport:
 			if obj:
 				if hasattr(obj, 'validate') : obj.validate()
 				if hasattr(obj, 'on_update') : obj.on_update()
+				if hasattr(obj, 'on_submit') : obj.on_submit()
 			sql("COMMIT")
 
 		except Exception:
