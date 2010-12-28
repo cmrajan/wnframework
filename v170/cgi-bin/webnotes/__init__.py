@@ -52,7 +52,10 @@ def msgprint(msg, small=0):
 def is_apache_user():
 	import os
 	if os.environ.get('USER') == 'apache':
-		return 1
+		return True 
+	else:
+		return (not os.environ.get('USER'))
+		# os.environ does not have user, so allows a security vulnerability,fixed now. 
 
 def get_index_path():
 	import os
@@ -107,14 +110,13 @@ def set_as_admin(db_name=None, ac_name=None):
 
 logger = None
 
+
 def setup_logging():
 	import logging
 	import logging.handlers
-
+	# Also please set umask for apache to 002.
 	global logger
 
-	LOG_FILENAME = os.path.join(defs.log_file_path,'wnframework.log')
-		
 	logger = logging.getLogger('WNLogger')
 	logger.setLevel(eval(defs.log_level))
 		
