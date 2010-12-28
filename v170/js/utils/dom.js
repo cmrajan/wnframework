@@ -14,13 +14,14 @@ $wid_normal = function(ele,color) {
 	fsize = ele.style.fontSize ? ele.style.fontSize : '11px';
 	
 	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
+	
+	if(!color && ele.wid_color) color = ele.wid_color;
+	
 	if(color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
 		ele.wid_color = color;
 	} 
-	if(!ele.wid_color) {
-		ele.wid_color = 'normal';
-	}
+	ele.wid_color = color ? color : 'normal';
 }
 $wid_disabled = function(ele) { 
 	ele.disabled = 1;
