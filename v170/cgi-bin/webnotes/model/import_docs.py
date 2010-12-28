@@ -203,14 +203,15 @@ class CSVImport:
 			if d and f:
 				dt = sql("select options, label from `tabDocField` where fieldname ='%s' and parent = '%s' " % (f, self.dt_list[0]))
 				dt, lbl = dt and dt[0][0].strip(), dt and dt[0][1].strip()
-				options = l and dt and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n') or ''
-				if options and d not in options :
-					msg = '<div style="color: RED">At Row ' + str(r) + ' and Column ' + str(c)+ ' : => Data "' + str(d) + '" in field ['+ str(lbl) +'] Not Found in '
-					msg = msg.__add__( s and  str( 'Select Options [' +str(dt.replace('\n', ',')) +']' ) or str('Master ' + str('link:' in dt and dt[5:] or dt)))
-					msg = msg.__add__('</div>\n')
-					self.msg.append(msg)
+				if dt:
+					options = l and dt and [n[0] for n in sql("select name from `tab%s` " % (('link:' in dt and dt[5:]) or dt))] or s and dt.split('\n') or ''
+					if options and d not in options :
+						msg = '<div style="color: RED">At Row ' + str(r) + ' and Column ' + str(c)+ ' : => Data "' + str(d) + '" in field ['+ str(lbl) +'] Not Found in '
+						msg = msg.__add__( s and  str( 'Select Options [' +str(dt.replace('\n', ',')) +']' ) or str('Master ' + str('link:' in dt and dt[5:] or dt)))
+						msg = msg.__add__('</div>\n')
+						self.msg.append(msg)
 
-					self.validate_success = 0
+						self.validate_success = 0
 		except Exception, e:
 			self.msg.append('<div style="color: RED"> ERROR: %s </div>' % (str(webnotes.utils.getTraceback())))
 			self.validate_success = 0
