@@ -655,10 +655,10 @@ LinkField.prototype.set_onchange = function() {
 				if(selector && selector.display) return; // selecting from popup
 				
 				if(r.message=='Ok') {
-					me.run_trigger();
-					
 					// set fetch values
 					if(r.fetch_values) me.set_fetch_values(r.fetch_values);
+					
+					me.run_trigger();
 				} else {
 					var astr = '';
 					if(in_list(profile.can_create, me.df.options)) astr = repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s', {dt:me.df.options, dtl:get_doctype_label(me.df.options)})
@@ -676,7 +676,6 @@ LinkField.prototype.set_fetch_values = function(fetch_values) {
 	var changed_fields = [];
 	for(var i=0; i< fl.length; i++) {
 		if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]) {
-		
 			locals[this.doctype][this.docname][fl[i]] = fetch_values[i];
 			if(!this.grid) {
 				refresh_field(fl[i]);
