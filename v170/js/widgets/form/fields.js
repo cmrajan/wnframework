@@ -686,6 +686,10 @@ LinkField.prototype.set_fetch_values = function(fetch_values) {
 			}
 		}
 	}
+	
+	// reset doc
+	cur_frm.doc = locals[this.doctype][this.docname];
+	
 	// refresh grid
 	if(this.grid) this.grid.refresh();
 }
