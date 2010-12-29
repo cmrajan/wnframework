@@ -227,13 +227,6 @@ _f.Frm.prototype.setup_meta = function() {
 	this.perm = get_perm(this.doctype); // for create
 	this.setup_print();
 }
-_f.set_frm_height = function() {
-	if(cur_frm && !cur_frm.meta.in_dialog && cur_frm.tray && !get_url_arg('embed')) {
-		var headerh = cur_frm.frm_head.page_head.wrapper.offsetHeight;
-		var footerh = cur_frm.footer.offsetHeight;
-		$y(cur_frm.tray.body, { height: get_window_height() - headerh - footerh + 'px', overflow:'auto' });
-	}
-}
 
 _f.Frm.prototype.setup_std_layout = function() {
 	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
@@ -273,10 +266,6 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 	// create fields
 	this.setup_fields_std();
-	
-	// set height
-	setTimeout(_f.set_frm_height, 100);
-	set_resize_observer(_f.set_frm_height)
 }
 
 // --------------------------------------------------------------------------------------
@@ -692,7 +681,6 @@ _f.Frm.prototype.refresh = function(docname) {
 		if(!this.meta.in_dialog) page_body.change_to('Forms');
 
 	} 
-	setTimeout(_f.set_frm_height, 100);
 }
 
 // --------------------------------------------------------------------------------------

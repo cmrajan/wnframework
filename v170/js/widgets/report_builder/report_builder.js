@@ -53,8 +53,7 @@ _r.ReportContainer = function() {
 			if(!f.forbidden) {
 				me.cur_rb = f;
 				me.cur_rb.mytabs.items['Result'].expand();
-				setTimeout(_r.set_rb_height, 100);
-				if(onload)onload(f);	
+				if(onload)onload(f);
 			}
 		}
 	
@@ -122,17 +121,6 @@ _r.ReportBuilder.prototype.make_tabs = function() {
 	this.mytabs.add_item('Select Columns', null, null, 1);
 	
 	this.mytabs.tabs = this.mytabs.items;
-
-	set_resize_observer(_r.set_rb_height);
-}
-
-// -------------------------------------------------------------------------------------
-
-_r.set_rb_height = function() {
-	if(_r.rb_con.cur_rb) {
-		var headerh = _r.rb_con.page_head.wrapper.offsetHeight;
-		$y(_r.rb_con.cur_rb.mytabs.body, { height: get_window_height() - headerh + 'px', overflow:'auto' });
-	}
 }
 
 // -------------------------------------------------------------------------------------

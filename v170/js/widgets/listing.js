@@ -330,6 +330,11 @@ Listing.prototype.add_filter = function(label, ftype, options, tname, fname, con
 	// create the filter
 	if(in_list(['Text', 'Small Text', 'Code', 'Text Editor'],ftype)) 
 		ftype='Data';
+	
+	// add empty option in select (if missing)
+	if(ftype=='Select' && !in_list(options.split('\n'), '')) options = '\n'+options
+	
+	
 	var inp = make_field({fieldtype:ftype, 'label':label, 'options':options, no_buttons:1}, '', d2, this, 0, 1);
 	inp.not_in_form = 1;
 	inp.report = this;

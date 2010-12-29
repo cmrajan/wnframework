@@ -10,10 +10,8 @@ ItemBrowserPage = function() {
 
 	var h = $a(this.wrapper, 'div');
 
-	this.body = $a(this.wrapper, 'div', '', {margin:'16px'});
+	this.body = $a(this.wrapper, 'div');
 
-	this.page_head = new PageHeader(h, 'List');
-	this.new_button = this.page_head.add_button('New', function() { newdoc(me.cur_dt) }, 1, 'ui-icon-plus', 1)
 	
 }
 
@@ -23,18 +21,7 @@ ItemBrowserPage.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
 	if(this.cur_list) $dh(this.cur_list.wrapper);
-	
-	// page heading
-	var l = get_doctype_label(dt)
-	this.page_head.main_head.innerHTML = (l.toLowerCase().substr(-4) == 'list') ? l : (l + ' List')
-
-	// button label
-	this.page_head.clear_toolbar();
-	if(in_list(profile.can_create,dt)) {
-		var new_button = this.page_head.add_button('New ' + l, function() { newdoc(this.dt) }, 1, 'ui-icon-plus', 1)
-		new_button.dt = dt
-	}
-	
+		
 	if(!me.lists[dt]) {
 		me.lists[dt] = new ItemBrowser(me.body, dt, label, field_list);
 	}
@@ -55,20 +42,105 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	this.tag_filter_dict = {};
 
 	this.wrapper = $a(parent, 'div', '', {display:'none'});
+	this.head = $a(this.wrapper, 'div');
+
+	// header (?)
+	var l = get_doctype_label(dt);
+	l = (l.toLowerCase().substr(-4) == 'list') ? l : (l + ' List')
+	this.page_head = new PageHeader(this.head, l); $y(this.page_head.wrapper, {marginBottom:'0px'});
+	$dh(this.page_head.separator);
 
 	// areas
-	this.no_result_area = $a(this.wrapper, 'div', '', {margin: '16px 0px'});
+	this.no_result_area = $a(this.wrapper, 'div');
 	this.no_result_message = $a(this.no_result_area,'span','',{backgroundColor:'#FFC', padding:'6px'});
 	
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
 	this.body = $a(this.wrapper, 'div');
-	this.trend_area = $a(this.body, 'div', '', {margin:'8px 16px'});
+	this.toolbar_area = $a(this.body, 'div', '', {marginBottom:'16px', padding: '4px', backgroundColor:'#EEE', border: '1px solid #CCC'});
+	$br(this.toolbar_area, '4px');
+	
+	this.trend_area = $a(this.body, 'div', '', {marginBottom:'16px', padding: '4px', backgroundColor:'#EEF', border: '1px solid #CCF', display:'none'});
+	$br(this.trend_area, '5px');
 	
 	// tag filters
 	this.tag_filters = $a(this.body, 'div', '', {marginBottom:'8px', display:'none', padding:'6px 8px 8px 8px', backgroundColor:'#FFD'});
 	var span = $a(this.tag_filters,'span','',{marginRight:'4px',color:'#444'}); span.innerHTML = '<i>Showing for:</i>';
 	this.tag_area = $a(this.tag_filters, 'span');
+	
+	this.make_toolbar();
+}
+
+// -------------------------------------------------
+
+ItemBrowser.prototype.make_toolbar = function(show_callback) {
+	var me = this;
+
+	// new button
+	if(inList(profile.can_create, this.dt)) {
+		this.new_button = $btn(this.toolbar_area, '+ New ' + get_doctype_label(this.dt), function() { newdoc(me.dt) }, {fontWeight:'bold'}, 'green');
+	}
+	
+	// search box
+	this.search_input = $a(this.toolbar_area, 'input', '', {width:'120px', marginLeft:'32px', border:'1px solid #AAA'});
+	this.search_btn = $btn(this.toolbar_area, 'Search', function() { me.lst.run(); }, {marginLeft:'4px'});
+	
+	// show hide trend
+	this.trend_on = 0; this.trend_loaded = 0;
+	this.trend_btn = $ln(this.toolbar_area, 'Show Activity', function() { me.show_activity(); }, {marginLeft:'32px'});
+
+	// show hide filters
+	this.filters_on = 0;
+	this.filter_btn = $ln(this.toolbar_area, 'Advanced Search Options', function() { me.show_filters(); }, {marginLeft:'32px'});
+
+}
+
+// -------------------------------------------------
+
+ItemBrowser.prototype.show_filters = function() {
+	if(this.filters_on) {
+		$(this.lst.filter_wrapper).slideUp();
+		this.filters_on = 0;
+		this.filter_btn.innerHTML = 'Advanced Search Options';
+	} else {
+		$(this.lst.filter_wrapper).slideDown();
+		this.filters_on = 1;
+		this.filter_btn.innerHTML = 'Hide Search Options';
+	}
+}
+
+// -------------------------------------------------
+
+ItemBrowser.prototype.show_activity = function() {
+	var me = this;
+	if(this.trend_on) {
+		$(this.trend_area).slideUp();
+		me.trend_btn.innerHTML = 'Show Activity';
+		me.trend_on = 0;
+		
+	} else {
+		
+		// show
+		if(!this.trend_loaded) {
+			// load the trend
+			var callback = function(r,rt) {
+				me.show_trend(r.message.trend);
+				$(me.trend_area).slideDown();
+				me.trend_btn.done_working();
+				me.trend_btn.innerHTML = 'Hide Activity';
+				me.trend_loaded = 1;
+				me.trend_on = 1;
+			}
+			$c_obj('Menu Control', 'get_trend', this.dt, callback);
+			me.trend_btn.set_working();
+
+		} else {
+			// slide up and dwon
+			$(this.trend_area).slideDown();
+			me.trend_btn.innerHTML = 'Hide Activity';
+			me.trend_on = 1;
+		}
+	}
 }
 
 // -------------------------------------------------
@@ -97,7 +169,6 @@ ItemBrowser.prototype.load_details = function(load_callback) {
 	var callback = function(r,rt) { 
 		me.dt_details = r.message;
 		if(r.message) {
-			me.show_trend(r.message.trend);
 			me.make_the_list(me.dt, me.body);
 			me.show_results();
 			if(load_callback) load_callback();
@@ -124,7 +195,7 @@ ItemBrowser.prototype.show_trend = function(trend) {
 	for(var key in trend) { if(trend[key]>maxval) maxval = trend[key] };
 
 	// head
-	var div = $a(this.trend_area, 'div','',{marginLeft:'32px', color:'#888'}); div.innerHTML = 'Activity in last 30 days';
+	var div = $a(this.trend_area, 'div','',{marginLeft:'32px'}); div.innerHTML = 'Activity in last 30 days';
 	var wrapper_tab = make_table(this.trend_area, 1, 2, '100%', ['20px',null], {padding:'2px 4px',fontSize:'10px',color:'#888'});
 
 	// y-label
@@ -136,11 +207,11 @@ ItemBrowser.prototype.show_trend = function(trend) {
 
 	// infogrid
 	var tab = make_table($td(wrapper_tab,0,1), 1, 30, '100%', [], 
-		{width:10/3 + '%', border:'1px solid #DDD', height:'40px', verticalAlign:'bottom', textAlign:'center', padding:'2px'});
+		{width:10/3 + '%', border:'1px solid #DDD', height:'40px', verticalAlign:'bottom', textAlign:'center', padding:'2px', backgroundColor:'#FFF'});
 		
 	// labels
 	var labtab = make_table($td(wrapper_tab,0,1), 1, 6, '100%', [], 
-		{width:100/6 + '%', border:'1px solid #FFF', height:'16px',color:'#888',textAlign:'right',fontSize:'10px'});
+		{width:100/6 + '%', border:'1px solid #EEF', height:'16px',color:'#888',textAlign:'right',fontSize:'10px'});
 	
 	for(var i=0; i<30; i++) {
 		var div = $a($td(tab,0,29-i),'div','',{backgroundColor:'#4AC', width:'50%', margin:'auto', height:(trend[i+''] ? (trend[i+'']*100/maxval) : 0) + '%'});
@@ -173,6 +244,14 @@ ItemBrowser.prototype.make_new = function(dt, label, field_list) {
 	this.make_the_list(dt, this.body);
 }
 
+// -------------------------------------------------
+
+ItemBrowser.prototype.add_search_conditions = function(q) {
+	if(this.search_input.value) {
+		q.conds += ' AND ' + q.table + '.name LIKE "%'+ this.search_input.value +'%"';
+	}
+}	
+	
 // -------------------------------------------------
 
 ItemBrowser.prototype.add_tag_conditions = function(q) {
@@ -243,6 +322,9 @@ ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		
 		// filter conditions
 		me.add_tag_conditions(q);
+
+		// filter conditions
+		me.add_search_conditions(q);
 		
 		this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
 		this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
@@ -270,7 +352,9 @@ ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 			lst.add_filter(label, ftype, fopts, dt, fname, (in_list(['Data','Text','Link'], ftype) ? 'LIKE' : ''));
 		}
 	}
-	
+
+	$dh(lst.filter_wrapper);
+			
 	// default sort
 	lst.set_default_sort('modified', 'DESC');
 	this.lst = lst;
@@ -312,6 +396,7 @@ ItemBrowserItem.prototype.make_details = function() {
 			// has status, group or type in the label
 			if(cl[i][1].indexOf('Status') != -1 || 
 				cl[i][1].indexOf('Group') != -1 || 
+				cl[i][1].indexOf('Priority') != -1 || 
 				cl[i][1].indexOf('Type') != -1) {
 					me.add_tag(me.det[i], 1, cl[i][0]);	
 			} else {

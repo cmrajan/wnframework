@@ -153,6 +153,29 @@ function $btn(parent, label, onclick, style, color, ajax) {
 	return btn;
 }
 
+// Link
+function $ln(parent, label, onclick, style, ajax) {
+	var span = $a(parent, 'span', 'link_type', style);
+	span.loading_img = $a(parent,'img','',{margin:'0px 4px -2px 4px', display:'none'});
+	span.loading_img.src= 'images/ui/button-load.gif';
+
+	span.innerHTML = label;
+	span.user_onclick = onclick;
+	span.onclick = function() { if(!this.disabled) this.user_onclick(this); }
+
+	// working
+	span.set_working = function() {
+		this.disabled = 1;
+		$di(this.loading_img);
+	}
+	span.done_working = function() {
+		this.disabled = 0;
+		$dh(this.loading_img);
+	}
+
+	return span;
+}
+
 // Select
 
 function empty_select(s) {

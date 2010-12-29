@@ -186,6 +186,7 @@ function set_resize_observer(fn) {
 	if(resize_observers.indexOf(fn)==-1) resize_observers.push(fn);	
 }
 window.onresize = function() {
+	return;
 	var ht = get_window_height();
 	for(var i=0; i< resize_observers.length; i++){
 		resize_observers[i](ht);
