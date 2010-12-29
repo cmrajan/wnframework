@@ -18,7 +18,7 @@ class AppManager:
 	def load_app_list(self, al=[]):
 		if not al:
 			self.account_conn = webnotes.db.Database(use_default=1)
-			al = [a[0] for a in self.account_conn.sql('select ac_name from tabAccount where ac_name != %s and ac_name != "ax0000523"',self.master)]
+			al = [a[0] for a in self.account_conn.sql('select ac_name from tabAccount where ac_name != %s and ac_name != "ax0000523" and ifnull(deleted, 0) = 0 ',self.master)]
 		else:
 			pass
 			# Gotta see what has to be done here. guessing it is for multitenancy case.
