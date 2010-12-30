@@ -120,7 +120,7 @@ def setup_logging():
 	logger = logging.getLogger('WNLogger')
 	logger.setLevel(eval(defs.log_level))
 		
-	log_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,maxBytes = defs.log_file_size,backupCount = defs.log_file_backup_count)
+	log_handler = logging.handlers.RotatingFileHandler(os.path.join(defs.log_file_path,defs.log_file_name),maxBytes = defs.log_file_size,backupCount = defs.log_file_backup_count)
 	
 	console_handler = logging.StreamHandler()
 	
