@@ -9,9 +9,21 @@ default_fields = ['doctype','name','owner','creation','modified','modified_by','
 def delete_doc(doctype, name):
 	import webnotes.model.meta
 	tablefields = webnotes.model.meta.get_table_fields(doctype)
-	webnotes.conn.sql("delete from `tab%s` where name='%s' limit 1" % (doctype, name))
-	for t in tablefields:
-		webnotes.conn.sql("delete from `tab%s` where parent = '%s' and parentfield='%s'" % (t[0], name, t[1]))
+	
+	# check if submitted
+	if int(webnotes.conn.sql("select docstatus from `tab%s` where name=%s" % (doctype, '%s'), name)[0][0])==1:
+		webnotes.msgprint("Submitted Record '%s' '%s' cannot be deleted" % (doctype, name))
+		raise Exception
+	
+	try:
+		webnotes.conn.sql("delete from `tab%s` where name='%s' limit 1" % (doctype, name))
+		for t in tablefields:
+			webnotes.conn.sql("delete from `tab%s` where parent = %s" % (t[0], '%s'), name)
+	except Exception, e:
+		if e.arg[0]==1451:
+			webnotes.msgprint("Cannot delete %s '%s' as it is referenced in another record. You must delete the referred record first" % (doctype, name))
+		
+		raise e
 
 #=================================================================================
 # new feature added 9-Jun-10 to allow doctypes to have labels 

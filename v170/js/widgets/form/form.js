@@ -402,21 +402,19 @@ _f.Frm.prototype.set_parent = function(parent) {
 // ======================================================================================
 
 _f.Frm.prototype.setup_print_layout = function() {
-	if(this.meta.read_only_onload) {
-		this.print_wrapper = $a(this.wrapper, 'div');
-		this.print_head = $a(this.print_wrapper, 'div');
-		this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
-		
-		var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '6px'});
-		this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
-		this.view_btn = $btn(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 
-			{marginRight:'4px'}, 'green');
+	this.print_wrapper = $a(this.wrapper, 'div');
+	this.print_head = $a(this.print_wrapper, 'div');
+	this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
+	
+	var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '6px'});
+	this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
+	this.view_btn = $btn(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 
+		{marginRight:'4px'}, 'green');
 
-		this.print_btn = $btn($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
+	this.print_btn = $btn($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
 
-		$y($td(t,0,1), {textAlign: 'right'});
-		this.print_close_btn = $btn($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); });
-	}
+	$y($td(t,0,1), {textAlign: 'right'});
+	this.print_close_btn = $btn($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); });
 }
 
 // --------------------------------------------------------------------------------------
@@ -440,6 +438,13 @@ _f.Frm.prototype.refresh_print_layout = function() {
 	} else {
 		$dh(this.view_btn_wrapper);		
 		$dh(this.print_close_btn);		
+	}
+
+	// archive
+	if(cur_frm.doc.__archived) {
+		$dh(this.view_btn_wrapper);
+	} else {
+		$ds(this.view_btn_wrapper);		
 	}
 
 	// create print format here
@@ -630,9 +635,10 @@ _f.Frm.prototype.refresh = function(docname) {
 		// editable
 		if(this.doc.__islocal) 
 			this.is_editable[this.docname] = 1; // new is editable
+
 		this.editable = this.is_editable[this.docname];
 		
-		if(this.editable || (!this.editable && this.meta.istable)) {
+		if(!this.doc.__archived && (this.editable || (!this.editable && this.meta.istable))) {
 			// show form layout (with fields etc)
 			// ----------------------------------
 			if(this.print_wrapper) {
@@ -649,6 +655,9 @@ _f.Frm.prototype.refresh = function(docname) {
 			// tabs
 			this.refresh_tabs();
 			
+			// layout
+			if(this.layout) this.layout.show();
+
 			// fields
 			this.refresh_fields();
 			
@@ -660,9 +669,6 @@ _f.Frm.prototype.refresh = function(docname) {
 
 			// footer
 			this.refresh_footer();
-			
-			// layout
-			if(this.layout) this.layout.show();
 		
 		} else {
 			// show print layout
@@ -715,6 +721,7 @@ _f.Frm.prototype.refresh_fields = function() {
 		f.perm = this.perm;
 		f.docname = this.docname;
 		if(f.refresh)f.refresh();
+		if(f.set_max_width) f.set_max_width(); // very long fields look ugly!
 	}
 
 	// cleanup activities after refresh

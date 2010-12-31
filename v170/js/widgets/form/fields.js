@@ -71,6 +71,13 @@ Field.prototype.make_body = function() {
 	if(this.onmake)this.onmake();
 }
 
+Field.prototype.set_max_width = function() {
+	var no_max = ['Code', 'Text Editor', 'Text', 'Table', 'HTML']
+	if(this.wrapper && this.layout_cell && this.layout_cell.parentNode.cells.length==1 && !in_list(no_max, this.df.fieldtype)) {
+		$y(this.wrapper, {paddingRight:'50%'})
+	}
+}
+
 Field.prototype.set_label = function() {
 	if(this.with_label && this.label_area && this.label!=this.df.label) { 
 		this.label_span.innerHTML = this.df.label;this.label = this.df.label; 
@@ -188,7 +195,7 @@ Field.prototype.refresh_display = function() {
 			
 			// read
 			if(this.show) this.show()
-			else $ds(this.wrapper);
+			else { $ds(this.wrapper); }
 
 			$dh(this.input_area);
 			$ds(this.disp_area);
@@ -1166,8 +1173,11 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 	if(hide_label) {
 		f.with_label = 0;
 	}
-	if(frm)
+	if(frm) {
 		f.frm = frm;
+		if(parent)
+			f.layout_cell = parent.parentNode;
+	}
 	if(f.init) f.init();
 	f.make_body();
 	return f;

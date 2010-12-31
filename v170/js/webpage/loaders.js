@@ -53,7 +53,7 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 
 var load_doc = loaddoc;
 
-function loaddoc(doctype, name, onload, menuitem) {
+function loaddoc(doctype, name, onload, menuitem, from_archive) {
 	doctype = get_label_doctype(doctype);
 
 	// validate
@@ -73,10 +73,10 @@ function loaddoc(doctype, name, onload, menuitem) {
 		if(!_f.frm_con && f) {
 			_f.frm_con = f; //new _f.FrmContainer();
 		}		
-		
+				
 		// case A - frm not loaded
 		if(!frms[doctype]) {
-			_f.add_frm(doctype, show_doc, name);
+			_f.add_frm(doctype, show_doc, name, from_archive);
 
 		// case B - both loaded
 		} else if(LocalDB.is_doc_loaded(doctype, name)) {
@@ -84,7 +84,7 @@ function loaddoc(doctype, name, onload, menuitem) {
 		
 		// case C - only frm loaded
 		} else {
-			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user}, show_doc, null, null);	// onload
+			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user, 'from_archive':(from_archive ? 1 : 0) }, show_doc, null, null);	// onload
 			page_body.set_status('Loading Document...');
 		}
 	}

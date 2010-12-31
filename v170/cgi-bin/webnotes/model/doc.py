@@ -17,10 +17,11 @@ class SuperDocType:
 			raise AttributeError, 'BaseDocType Attribute Error'
 
 class Document:
-	def __init__(self, doctype = '', name = '', fielddata = {}):
+	def __init__(self, doctype = '', name = '', fielddata = {}, prefix='tab'):
 		self._roles = []
 		self._perms = []
 		self._user_defaults = {}
+		self._prefix = prefix
 		
 		if fielddata: 
 			self.fields = fielddata
@@ -59,7 +60,7 @@ class Document:
 		if webnotes.model.meta.is_single(self.doctype):
 			self._loadsingle()
 		else:
-			dataset = webnotes.conn.sql('select * from `tab%s` where name="%s"' % (self.doctype, self.name.replace('"', '\"')))
+			dataset = webnotes.conn.sql('select * from `%s%s` where name="%s"' % (self._prefix, self.doctype, self.name.replace('"', '\"')))
 			if not dataset:
 				webnotes.msgprint('%s %s does not exist' % (self.doctype, self.name), 1)
 				raise Exception, '[WNF] %s %s does not exist' % (self.doctype, self.name)
@@ -281,7 +282,7 @@ class Document:
 					if link_list and link_list.get(f):
 						self.fields[f] = self._validate_link(link_list[f][0], self.fields[f])
 
-					if self.fields[f]==None:
+					if self.fields[f]==None or self.fields[f]=='':
 						update_str.append("`%s`=NULL" % f)
 						if ignore_fields:
 							try: r = webnotes.conn.sql("update `tab%s` set `%s`=NULL where name=%s" % (self.doctype, f, '%s'), self.name)
@@ -295,7 +296,6 @@ class Document:
 			if values:
 				if not ignore_fields:
 					# update all in one query
-					#webnotes.errprint(values)
 					r = webnotes.conn.sql("update `tab%s` set %s where name='%s'" % (self.doctype, ', '.join(update_str), self.name), values)
 
 	# Save values
@@ -462,21 +462,19 @@ def make_autoname(key, doctype=''):
 # -----------------------
 
 def getseries(key, digits, doctype=''):
-	ttl = webnotes.conn.get_testing_tables()
-
 	# series created ?
-	if webnotes.conn.sql("select name from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1):
+	if webnotes.conn.sql("select name from tabSeries where name='%s'" % key):
 
 		# yes, update it
-		webnotes.conn.sql("update tabSeries set current = current+1 where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		webnotes.conn.sql("update tabSeries set current = current+1 where name='%s'" % key)
 
 		# find the series counter
-		r = webnotes.conn.sql("select current from tabSeries where name='%s'" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		r = webnotes.conn.sql("select current from tabSeries where name='%s'" % key)
 		n = r[0][0]
 	else:
 	
 		# no, create it
-		webnotes.conn.sql("insert into tabSeries (name, current) values ('%s', 1)" % key, allow_testing = (doctype in ttl) and 0 or 1)
+		webnotes.conn.sql("insert into tabSeries (name, current) values ('%s', 1)" % key)
 		n = 1
 	return ('%0'+str(digits)+'d') % n
 
@@ -484,7 +482,7 @@ def getseries(key, digits, doctype=''):
 # Get Children
 # ------------
 
-def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
+def getchildren(name, childtype, field='', parenttype='', from_doctype=0, prefix='tab'):
 	import webnotes
 	
 	tmp = ''
@@ -494,8 +492,14 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0):
 	if parenttype: 
 		tmp = ' and parenttype="%s" ' % parenttype
 
-	dataset = webnotes.conn.sql("select * from `tab%s` where parent='%s' %s order by idx" % (childtype, name, tmp))
-	desc = webnotes.conn.get_description()
+	try:
+		dataset = webnotes.conn.sql("select * from `%s%s` where parent='%s' %s order by idx" % (prefix, childtype, name, tmp))
+		desc = webnotes.conn.get_description()
+	except Exception, e:
+		if prefix=='arc' and e.args[0]==1146:
+			return []
+		else:
+			raise e
 
 	l = []
 	
@@ -521,7 +525,7 @@ def check_page_perm(dn):
 # load a record and its child records and bundle it in a list - doclist
 # ---------------------------------------------------------------------
 
-def get(dt, dn='', with_children = 1, from_get_obj = 0):
+def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 	import webnotes 
 	import webnotes.model
 	import webnotes.defs
@@ -529,7 +533,7 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0):
 	dn = dn or dt
 
 	# load the main doc
-	doc = Document(dt, dn)
+	doc = Document(dt, dn, prefix=prefix)
 
 	# check permission - for doctypes, pages
 	if (dt in ('DocType', 'Page', 'Control Panel', 'Search Criteria')) or (from_get_obj and webnotes.session.get('user') != 'Guest'):
@@ -555,6 +559,6 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0):
 	# load chilren
 	doclist = [doc,]
 	for t in tablefields:
-		doclist += getchildren(doc.name, t[0], t[1], dt)
+		doclist += getchildren(doc.name, t[0], t[1], dt, prefix=prefix)
 
 	return doclist

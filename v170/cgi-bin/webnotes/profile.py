@@ -30,8 +30,8 @@ class Profile:
 	
 	def get_allow_list(self, key):
 		conn = webnotes.conn
-		role_options = ["role = '"+r+"'" for r in self.get_roles()]
-		return [r[0] for r in conn.sql('SELECT DISTINCT t1.parent FROM `tabDocPerm` t1, tabDocType t2 WHERE t1.`%s`=1 AND t1.parent not like "old_parent:%%" AND t1.parent = t2.name AND IFNULL(t2.istable,0) = 0 AND (%s) order by t1.parent' % (key, ' OR '.join(role_options)))]
+		roles = self.get_roles()
+		return [r[0] for r in conn.sql('SELECT DISTINCT t1.parent FROM `tabDocPerm` t1, tabDocType t2 WHERE t1.`%s`=1 AND t1.parent not like "old_parent:%%" AND t1.parent = t2.name AND IFNULL(t2.istable,0) = 0 AND t1.role in ("%s") order by t1.parent' % (key, '", "'.join(roles)))]
 	
 	def get_create_list(self):
 		cl = self.get_allow_list('create')
@@ -88,10 +88,8 @@ class Profile:
 		return webnotes.conn.get_value('Control Panel',None,'home_page')
 
 	def get_defaults(self):
-		
-		rl = self.get_roles() + [self.name]
-		role_options = ["parent = '"+r+"'" for r in rl]
-		res = webnotes.conn.sql('select defkey, defvalue from `tabDefaultValue` where %s' % ' OR '.join(role_options))
+		roles = self.get_roles() + [self.name]
+		res = webnotes.conn.sql('select defkey, defvalue from `tabDefaultValue` where parent in ("%s")' % '", "'.join(roles))
 	
 		self.defaults = {'owner': [self.name,]}
 

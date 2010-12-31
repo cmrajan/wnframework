@@ -9,11 +9,14 @@ function addEvent(ev, fn) {
 }
 
 // widget styles
-$wid_normal = function(ele,color) { 
+// ====================================
+
+$wid_make = function(ele,color) { 
 	if(ele.disabled) return;
 	fsize = ele.style.fontSize ? ele.style.fontSize : '11px';
 	
-	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); $br(ele,'3px'); $gr(ele,'#FFF','#DDD');
+	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); 
+	$br(ele,'3px'); $gr(ele,'#FFF','#DDD');
 	
 	if(!color && ele.wid_color) color = ele.wid_color;
 	
@@ -23,18 +26,42 @@ $wid_normal = function(ele,color) {
 	} 
 	ele.wid_color = color ? color : 'normal';
 }
+
+// disabled
+// --------------------
+
 $wid_disabled = function(ele) { 
 	ele.disabled = 1;
 	$y(ele, {border:'1px solid #AAA'}); $bg(ele,'#EEE'); $fg(ele,'#AAA');
 }
 
+// normal
+// --------------------
+
+$wid_normal = function(ele) {
+	if(ele.disabled) return;
+	$y(ele, {border:'1px solid #CCC'}); $gr(ele,'#FFF','#DDD');
+	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
+	if(ele.wid_color=='green') {
+		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
+	}
+}
+
+// active (mouseover)
+// --------------------
+
 $wid_active = function(ele) {
 	if(ele.disabled) return;
-	$y(ele, {border:'1px solid #000'}); $gr(ele,'#FFF','#EEE');
+	$y(ele, {border:'1px solid #000', color:'#444'}); $gr(ele,'#FFF','#EEE');
+	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
 	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#AFA','#7C7');
 	}
 }
+
+// pressed
+// --------------------
+
 $wid_pressed = function(ele) {
 	if(ele.disabled) return;
 	$y(ele, {border:'1px solid #000'}); $gr(ele,'#EEF','#DDF');
@@ -43,9 +70,11 @@ $wid_pressed = function(ele) {
 	}
 }
 
-// item
+// item (for tabs and triggers)
+// ====================================
+
 $item_normal = function(ele) { 
-	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden'});
+	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',marginRight:'6px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden',borderBottom:'1px solid #CCC'});
 	$br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
 }
 $item_active = function(ele) {
@@ -84,6 +113,8 @@ function set_opacity(ele, ieop) {
 }
 
 // set gradient
+// ====================================
+
 function set_gradient(ele, from, to) {
 	// gradient
 	var no_gradient=0;
@@ -103,16 +134,32 @@ function set_gradient(ele, from, to) {
 	}
 }
 $gr = set_gradient;
-$br = function(ele, r) { $(ele).css('-moz-border-radius',r).css('-webkit-border-radius',r); }
+
+// border radius
+// ====================================
+
+$br = function(ele, r, corners) {
+	if(corners) { 
+		var cl = ['top-left', 'top-right', 'bottom-right' , 'bottom-left'];
+		for(var i=0; i<4; i++) {
+			if(corners[i]) {
+				$(ele).css('-moz-border-radius-'+cl[i].replace('-',''),r).css('-webkit-'+cl[i]+'-border-radius',r); 					
+			}
+		}
+	} else {
+		$(ele).css('-moz-border-radius',r).css('-webkit-border-radius',r); 
+	}
+}
 $bs = function(ele, r) { $(ele).css('-moz-box-shadow',r).css('-webkit-box-shadow',r).css('box-shadow',r); }
 
 // Button
+// ====================================
 
 function $btn(parent, label, onclick, style, color, ajax) {
 	var btn = $a(parent, 'button');
 	btn.loading_img = $a(parent,'img','',{margin:'0px 4px -2px 4px', display:'none'});
 	btn.loading_img.src= 'images/ui/button-load.gif';
-	$wid_normal(btn,color);
+	$wid_make(btn,color);
 	if(ajax) $y(btn,{marginRight:'24px'});
 	
 	// click
@@ -153,7 +200,20 @@ function $btn(parent, label, onclick, style, color, ajax) {
 	return btn;
 }
 
+// join buttons
+// ------------------------------------
+
+function $btn_join(btn1, btn2) {
+	$br(btn1, '0px', [0,1,1,0]);
+	$br(btn2, '0px', [1,0,0,1]);
+	$y(btn1, {marginRight:'0px'});
+	$y(btn2, {marginLeft:'0px', borderLeft:'0px'});
+	btn2.no_left_border = 1;
+}
+
 // Link
+// ====================================
+
 function $ln(parent, label, onclick, style, ajax) {
 	var span = $a(parent, 'span', 'link_type', style);
 	span.loading_img = $a(parent,'img','',{margin:'0px 4px -2px 4px', display:'none'});
@@ -177,6 +237,7 @@ function $ln(parent, label, onclick, style, ajax) {
 }
 
 // Select
+// ====================================
 
 function empty_select(s) {
 	if(s.custom_select) { s.empty(); return; }

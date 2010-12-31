@@ -1,10 +1,6 @@
 # metadata
 
 import webnotes
-
-def get_index_fields(dt, index=0):
-	return webnotes.conn.sql("SELECT DISTINCT fieldname FROM tabDocField WHERE IFNULL(search_index,0)=%s and parent=%s", (index, dt))
-
 	
 #=================================================================================
 

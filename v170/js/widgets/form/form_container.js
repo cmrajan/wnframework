@@ -82,7 +82,7 @@ _f.FrmDialog = function() {
 
 // Form Factory
 // =======================================================================
-_f.add_frm = function(doctype, onload, opt_name) {	
+_f.add_frm = function(doctype, onload, opt_name, from_archive) {	
 	// dont open doctype and docname from the same session
 	if(frms['DocType'] && frms['DocType'].opendocs[doctype]) {
 		msgprint("error:Cannot create an instance of \"" + doctype+ "\" when the DocType is open.");
@@ -146,7 +146,10 @@ _f.add_frm = function(doctype, onload, opt_name) {
 	if(opt_name && !is_new) {
 		// get both
 		var args = {'name':opt_name, 'doctype':doctype, 'getdoctype':1, 'user':user};
+
 		if(get_url_arg('akey')) args['akey'] = get_url_arg('akey');
+		if(from_archive) args['from_archive'] = 1;
+
 		$c('webnotes.widgets.form.getdoc', args, callback);
 		page_body.set_status('Loading Document...')
 	} else {

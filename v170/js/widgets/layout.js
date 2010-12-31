@@ -82,13 +82,40 @@ function LayoutCell(layout, layoutRow, width) {
 	this.cell.style.verticalAlign = 'top';
 	if(width)
 		this.cell.style.width = width;
+	else
+		this.estimate_width(layoutRow.row);
 	
 	var h = $a(this.cell, 'div','',{padding:(layout.with_border ? '0px 8px' : '0px')});	
 
 	this.wrapper = $a(this.cell, 'div','',{padding:(layout.with_border ? '8px' : '8px 0px')}); 
-
+	
 	layout.cur_cell = this.wrapper;
 	layout.cur_cell.header = h;
+}
+
+// evenly distribute columns
+LayoutCell.prototype.estimate_width = function(row) {
+	var w = 100;
+	var n_cells = row.cells.length;
+	var cells_with_no_width = n_cells;
+	
+	// rows
+	row.cells[n_cells-1].estimated_width = 1;
+	
+	// get user specified width
+	for(var i=0; i<n_cells; i++) {
+		if(!row.cells[i].estimated_width) {
+			w = w - cint(row.cells[i].style.width);
+			cells_with_no_width--; 
+		}
+	}
+	
+	// evenly distribute all
+	for(var i=0; i<n_cells; i++) {
+		if(row.cells[i].estimated_width)
+			$y(row.cells[i], {width:cint(w/cells_with_no_width) + '%'})
+	}
+	
 }
 
 LayoutCell.prototype.show = function() { $ds(this.wrapper); }

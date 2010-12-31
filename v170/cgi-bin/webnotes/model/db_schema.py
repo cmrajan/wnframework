@@ -1,204 +1,88 @@
-# Set Column Types
-# ----------------
-
 import webnotes
-import webnotes.model.meta
 
-def getcoldef(ftype, length=''):
-	t=ftype.lower()
-	if t in ('date','text','time'):
-		dt = t
-	elif t == 'int':
-		dt = 'int'
-		if not length: length = '11'
-	elif t in ('currency'): 
-		dt = 'decimal'
-		if not length: length = '14,2' 
-	elif t in ('float'): 
-		dt = 'decimal' 
-		if not length: length = '14,6' 
-	elif t == 'check':
-		dt = 'int'
-		if not length: length = '1' 
-	elif t in ('small text', 'long text', 'code', 'text editor'): 
-		dt = 'text';
-	elif t in ('data', 'link', 'password', 'select', 'read only'):
-		dt = 'varchar';
-		if not length: length = '180' 
-	elif t == 'blob':
-		dt = 'longblob'
-	else: dt = ''
-	
-	if length:
-		dt += ('(%s)' % length)
-	
-	return dt
+type_map = {
+	'currency':		('decimal', '14,2')
+	,'int':			('int', '11')
+	,'float':		('decimal', '14,6')
+	,'check':		('int', '1')
+	,'small text':	('text', '')
+	,'long text':	('text', '')
+	,'code':		('text', '')
+	,'text editor':	('text', '')
+	,'date':		('date', '')
+	,'time':		('time', '')
+	,'text':		('text', '')
+	,'data':		('varchar', '180')
+	,'link':		('varchar', '180')
+	,'password':	('varchar', '180')
+	,'select':		('varchar', '180')
+	,'read only':	('varchar', '180')
+	,'blob':		('longblob', '')
+}
 
-# get fields in a doctype
-#=================================================================================
-	
-def get_dt_fields(doctype):
-	sql = webnotes.conn.sql
-	if sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
-		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, `length`, oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
-	else:
-		fl = sql(" SELECT oldfieldname, fieldname, fieldtype, '', oldfieldtype, search_index FROM tabDocField WHERE parent = '%s'" % doctype)
+default_shortcuts = ['_Login', '__user', '_Full Name', 'Today', '__today']
 
-	return fl
-	
-#=================================================================================
+schema = None
+def get_schema():
+	global schema
+	if not schema:
+		schema = DbSchema()
+	return schema
 
-def update_oldfield_values(doctype):
-	webnotes.conn.sql("UPDATE tabDocField SET oldfieldname = fieldname, oldfieldtype = fieldtype WHERE parent= '%s'" % doctype)
+# -------------------------------------------------
+# Class database schema
+# -------------------------------------------------
 
-
-# Add Columns In Database
-#=================================================================================
-
-def _validate_column_name(n):
-	n = n.replace(' ','_').strip().lower()
-	import re
-	if not re.match("[a-zA-Z_][a-zA-Z0-9_]*$", n):
-		webnotes.msgprint('err:%s is not a valid fieldname.<br>A valid name must contain letters / numbers / spaces.<br><b>Tip: </b>You can change the Label after the fieldname has been set' % n)
-		raise Exception
-	return n
-	
-def _add_column(f, dt):		
-	ftype =  getcoldef(f[2], f[3])
-	if ftype:
-		fn = _validate_column_name(f[1]) # name or label
-		# always user db
-		webnotes.conn.sql("alter table `tab%s` add `%s` %s" % (dt, fn, ftype))
-
+class DbSchema:
+	def __init__(self):
+		self.tables = None
 		
-# Update Columns In Database
-# -----------------------
+	def get_tables(self):
+		if not self.tables:
+			self.tables = [t[0] for t in webnotes.conn.sql("show tables")]
+		return self.tables
 
-def _validate_type_change(new, old):
-	if not old:
-		return
-	if ((old.lower() in ['text','small text','code','text editor']) and (new.lower() not in ['text', 'small text', 'code', 'text editor'])) or ((old.lower() in ['data','select','link']) and (new.lower() in ['date','int','currency','float','time','table'])):
-		webnotes.msgprint('Coversion from %s to %s is not allowed. Please contact your Administrator' % (new, old))
-		raise Exception		
+# -------------------------------------------------
+# Class database table
+# -------------------------------------------------
 
-def _change_column(f, dt, col_def):
-	if col_def and f[0]:
-		# always user db
-		try:
-			webnotes.conn.sql("alter table `tab%s` change `%s` `%s` %s" % (dt, f[0], _validate_column_name(f[1]), col_def))
-		except Exception, e:
-			if e.args[0] == 1054:
-				_add_column(f, dt)
-			if e.args[0] == 1060:
-				pass # duplicate column (already exists by another name)
-			else:
-				raise e
-		#webnotes.msgprint("Column Changed: `%s` to `%s` %s" % (f[0], _validate_column_name(f[1]), col_def))
-
-
-def updatecolumns(doctype):
-
-	flist = get_dt_fields(doctype)
-
-
-	# list of existing columns - always from user db
-	cur_fields = webnotes.conn.sql("DESC `tab%s`" % (doctype))
-
-	for f in flist:
-		change = 0
-
-		# not in current fields
-		if not (f[1] in [e[0] for e in cur_fields]):
-			_add_column(f, doctype)
+class DbTable:
+	def __init__(self, doctype, prefix = 'tab'):
+		self.doctype = doctype
+		self.name = prefix + doctype
+		self.columns = {}
+		self.current_columns = {}
+		self.foreign_keys = []
 		
-		# type or length has changed
-		col_def = getcoldef(f[2], f[3])
+		# lists for change
+		self.add_column = []
+		self.change_type = []
+		self.add_index = []
+		self.drop_index = []
+		self.set_foreign_key = []
+		self.set_default = []
 		
-		# find exisiting def
-		cur_def = ''
-		for e in cur_fields:
-			if e[0]==f[1]:
-				cur_def = e[1]
-				break
+		# load
+		self.get_columns_from_docfields()
+
+	def create(self):
+		add_text = ''
 		
-		# changed
-		if change or (cur_def and col_def.lower() != cur_def.lower()):
-			# validate type change
-			if f[4]:
-				_validate_type_change(f[2], f[4])				
-				_change_column(f, doctype, col_def)
+		# columns
+		t = self.get_column_definitions()
+		if t: add_text += ',\n'.join(self.get_column_definitions()) + ',\n'
+		
+		# index
+		t = self.get_index_definitions()
+		if t: add_text += ',\n'.join(self.get_index_definitions()) + ',\n'
+
+		# foreign key
+		t = self.get_foreign_key_definitions()
+		if t: add_text += ',\n'.join(self.get_foreign_key_definitions()) + ',\n'
 	
-	# update the "old" columns
-	webnotes.conn.begin()
-	update_oldfield_values(doctype)
-	webnotes.conn.commit()
-
-
-# Add Indices
-# -----------
-
-def updateindex(doctype):
-	addlist = webnotes.model.meta.get_index_fields(doctype, 1)
-	
-	# get keys
-	kl = [i[4] for i in webnotes.conn.sql("show keys from `tab%s`" % doctype)]
-
-	for f in addlist:
-		try:
-			if not f[0] in kl: # if not exists
-				webnotes.conn.sql("alter table `tab%s` add index %s(%s)" % (doctype, f[0], f[0]))
-		except:
-			pass
-
-	# remove
-	droplist = webnotes.model.meta.get_index_fields(doctype, 0)
-	for f in droplist:
-		try:
-			if f[0] in kl: # if exists
-				webnotes.conn.sql("alter table `tab%s` drop index %s" % (doctype, f[0]))
-		except:
-			pass
-
-# update engine
-# -------------
-
-def update_engine(doctype=None, engine='InnoDB'):
-	if doctype:
-		webnotes.conn.sql("ALTER TABLE `tab%s` ENGINE = '%s'" % (doctype, engine))
-	else:
-		for t in webnotes.conn.sql("show tables"):
-			webnotes.conn.sql("ALTER TABLE `%s` ENGINE = '%s'" % (t[0], engine))
-
-def create_table(dt):
-	
-	# get fields specified from docfields
-	add_fields, add_index = [], []
-	
-	# build
-	flist = get_dt_fields(dt)
-	fname_list = []
-	for f in flist:
-		ft = getcoldef(f[2], f[3])
-		if f[1] and ft and (f[1] not in ['name','creation','modified','modified_by','owner','docstatus','parent','parenttype','parentfield','idx']):
-			
-			if not f[1] in fname_list: # check for duplicate
-				add_fields.append('`' + f[1] + '` ' + ft)
-				
-				fname_list.append(f[1])
-				
-				if f[5]:
-					if not ft.startswith('text'):
-						add_index.append('index `' + f[1] + '`(`' + f[1] + '`)')
-
-	add_fields = add_fields and (', '.join(add_fields) + ', ') or ''
-	
-	# add indexes
-	add_fields += add_index and (', '.join(add_index) + ', ') or ''
-
-	# add indexes
-
-	# make the query
-	q = """create table `tab%s` (
+		# create table
+		webnotes.conn.sql("set foreign_key_checks=0")
+		webnotes.conn.sql("""create table `%s` (
 			name varchar(120) not null primary key, 
 			creation datetime, 
 			modified datetime, 
@@ -209,32 +93,178 @@ def create_table(dt):
 			parentfield varchar(120), 
 			parenttype varchar(120), 
 			idx int(8),
-			%s
-			index parent(parent)) ENGINE=InnoDB""" % (dt, add_fields)
+			%sindex parent(parent)) ENGINE=InnoDB""" % (self.name, add_text))
+		webnotes.conn.sql("set foreign_key_checks=1")
+
+	def get_columns_from_docfields(self):
+		if webnotes.conn.sql("select name from tabDocField where fieldname = 'length' and parent='DocType'"):
+			fl = webnotes.conn.sql("SELECT fieldname, fieldtype, `length`, `default`, search_index, options FROM tabDocField WHERE parent = '%s'" % self.doctype)
+		else:
+			fl = webnotes.conn.sql("SELECT fieldname, fieldtype, '', `default`, search_index, options FROM tabDocField WHERE parent = '%s'" % self.doctype)
+		for f in fl:
+			self.columns[f[0]] = DbColumn(self, f[0], f[1], f[2], f[3], f[4], f[5])
+	
+	def get_columns_from_db(self):
+		self.show_columns = webnotes.conn.sql("desc `%s`" % self.name)
+		for c in self.show_columns:
+			self.current_columns[c[0]] = {'name': c[0], 'type':c[1], 'index':c[3], 'default':c[4]}
+	
+	def get_column_definitions(self):
+		ret = []
+		for k in self.columns.keys():
+			d = self.columns[k].get_definition()
+			if d:
+				ret.append(k + ' ' + d)
+		return ret
+	
+	def get_index_definitions(self):
+		ret = []
+		for k in self.columns.keys():
+			if type_map.get(self.columns[k].fieldtype) and type_map.get(self.columns[k].fieldtype.lower())[0] not in ('text', 'blob'):
+				ret.append('index `' + k + '`(`' + k + '`)')
+		return ret
+
+	def get_foreign_key_definitions(self):
+		ret = []
+		tab_list = get_schema().get_tables()
+
+		for k in self.columns.keys():
+			if self.columns[k].fieldtype=='Link' and self.columns[k].options:
+				tab_name = "tab" + self.columns[k].options
+				if tab_name in tab_list:
+					ret.append('foreign key (%s) references `%s`(name) on update cascade' % (k, tab_name))
+		return ret
+
+	def get_foreign_keys(self):
+		if not self.foreign_keys:
+			txt = webnotes.conn.sql("show create table `%s`" % self.name)[0][1]
+			for line in txt.split('\n'):
+				if line.strip().startswith('CONSTRAINT') and line.find('FOREIGN')!=1:
+					words = line.split()
+					self.foreign_keys.append((words[4][2:-2], words[1][1:-1]))
 		
-	# execute
-	webnotes.conn.sql(q)
+		return self.foreign_keys				
+		
+	def sync(self):
+		if not self.name in get_schema().get_tables():
+			self.create()
+		else:
+			self.alter()
+	
+	def alter(self):
+		self.get_columns_from_db()
+		tab_list = get_schema().get_tables()
 
-def updatedb(dt):
-	import webnotes.widgets.auto_master
+		for col in self.columns.values():
+			col.check(self.current_columns.get(col.fieldname, None))
 
-	# if single type, nothing to do
-	if webnotes.model.meta.is_single(dt):
+		for col in self.add_column:
+			webnotes.conn.sql("alter table `%s` add column `%s` %s" % (self.name, col.fieldname, col.get_definition()))
+
+		for col in self.change_type:
+			webnotes.conn.sql("alter table `%s` change `%s` `%s` %s" % (self.name, col.fieldname, col.fieldname, col.get_definition()))
+
+		for col in self.add_index:
+			webnotes.conn.sql("alter table `%s` add index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
+
+		for col in self.drop_index:
+			webnotes.conn.sql("alter table `%s` drop index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
+
+		for col in self.set_default:
+			webnotes.conn.sql("alter table `%s` alter column `%s` set default %s" % (self.name, col.fieldname, '%s'), col.default)
+
+		if self.set_foreign_key:
+			webnotes.conn.sql("set foreign_key_checks=0")
+			for col in self.set_foreign_key:
+				if col.options:
+					tab_name = "tab" + col.options
+					if tab_name in tab_list:
+						webnotes.conn.sql("alter table `%s` add foreign key (%s) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
+			webnotes.conn.sql("set foreign_key_checks=1")
+
+# -------------------------------------------------
+# Class database column
+# -------------------------------------------------
+
+class DbColumn:
+	def __init__(self, table, fieldname, fieldtype, length, default, set_index, options):
+		self.table = table
+		self.fieldname = fieldname
+		self.fieldtype = fieldtype
+		self.length = length
+		self.set_index = set_index
+		self.default = default
+		self.options = options
+
+	def get_definition(self, with_default=1):
+		d = type_map.get(self.fieldtype.lower())
+
+		if not d:
+			return
+			
+		ret = d[0]
+		if d[1]:
+			ret += '(' + d[1] + ')'
+		if with_default and self.default and (self.default not in default_shortcuts):
+			ret += ' default "' + self.default.replace('"', '\"') + '"'
+		return ret
+		
+	def check(self, current_def):
+		column_def = self.get_definition(0)
+		# no columns
+		if not column_def:
+			return
+		
+		# to add?
+		if not current_def:
+			self.fieldname = validate_column_name(self.fieldname)
+			self.table.add_column.append(self)
+			return
+
+		# type
+		if current_def['type'] != column_def:
+			self.table.change_type.append(self)
+
+		# foreign key
+		if self.fieldtype=='Link':
+			if not self.fieldname in [f[0] for f in self.table.get_foreign_keys()]:
+				self.table.set_foreign_key.append(self)
+		
+		# index
+		else:
+			if (current_def['index'] and not self.set_index):
+				self.table.drop_index.append(self)
+			
+			if (not current_def['index'] and self.set_index):
+				self.table.add_index.append(self)
+		
+		# default
+		if (self.default and (current_def['default'] != self.default) and (self.default not in default_shortcuts)):
+			self.table.set_default.append(self)
+
+# -------------------------------------------------
+# validate column name to be code-friendly
+# -------------------------------------------------
+
+def validate_column_name(n):
+	n = n.replace(' ','_').strip().lower()
+	import re
+	if not re.match("[a-zA-Z_][a-zA-Z0-9_]*$", n):
+		webnotes.msgprint('err:%s is not a valid fieldname.<br>A valid name must contain letters / numbers / spaces.<br><b>Tip: </b>You can change the Label after the fieldname has been set' % n)
+		raise Exception
+	return n
+
+# -------------------------------------------------
+# sync table - called from form.py
+# -------------------------------------------------
+
+def updatedb(dt, archive=0):
+	if webnotes.conn.sql("select issingle from tabDocType where name=%s", dt)[0][0]:
 		return
 
-	# create table
 	webnotes.conn.commit()
-	names = [rec[0].lower() for rec in webnotes.conn.sql('SHOW TABLES')]
-	if not (('tab'+dt).lower() in names):  
-		create_table(dt)
-
-	else:
-		# update columns
-		updatecolumns(dt)
-	
-		# update index
-		updateindex(dt)
-
+	tab = DbTable(dt, archive and 'arc' or 'tab')
+	tab.sync()
 	webnotes.conn.begin()
-
-	webnotes.widgets.auto_master.create_auto_masters(dt)
+	
+	
