@@ -80,10 +80,7 @@ function LayoutCell(layout, layoutRow, width) {
 	this.cell = layoutRow.row.insertCell(cidx);
 
 	this.cell.style.verticalAlign = 'top';
-	if(width)
-		this.cell.style.width = width;
-	else
-		this.estimate_width(layoutRow.row);
+	this.set_width(layoutRow.row, width);
 	
 	var h = $a(this.cell, 'div','',{padding:(layout.with_border ? '0px 8px' : '0px')});	
 
@@ -94,13 +91,17 @@ function LayoutCell(layout, layoutRow, width) {
 }
 
 // evenly distribute columns
-LayoutCell.prototype.estimate_width = function(row) {
+LayoutCell.prototype.set_width = function(row, width) {
 	var w = 100;
 	var n_cells = row.cells.length;
 	var cells_with_no_width = n_cells;
 	
-	// rows
-	row.cells[n_cells-1].estimated_width = 1;
+	// current cell
+	if(width) {
+		$y(row.cells[n_cells-1], {width: cint(width) + '%'})
+	} else {
+		row.cells[n_cells-1].estimated_width = 1;
+	}
 	
 	// get user specified width
 	for(var i=0; i<n_cells; i++) {

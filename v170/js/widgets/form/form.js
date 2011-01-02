@@ -655,9 +655,6 @@ _f.Frm.prototype.refresh = function(docname) {
 			// tabs
 			this.refresh_tabs();
 			
-			// layout
-			if(this.layout) this.layout.show();
-
 			// fields
 			this.refresh_fields();
 			
@@ -669,6 +666,9 @@ _f.Frm.prototype.refresh = function(docname) {
 
 			// footer
 			this.refresh_footer();
+			
+			// layout
+			if(this.layout) this.layout.show();
 		
 		} else {
 			// show print layout
@@ -721,7 +721,6 @@ _f.Frm.prototype.refresh_fields = function() {
 		f.perm = this.perm;
 		f.docname = this.docname;
 		if(f.refresh)f.refresh();
-		if(f.set_max_width) f.set_max_width(); // very long fields look ugly!
 	}
 
 	// cleanup activities after refresh

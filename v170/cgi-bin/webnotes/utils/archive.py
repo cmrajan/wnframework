@@ -49,7 +49,7 @@ def archive_record(doctype, name, restore = 0):
 	try:
 		sql("delete from `%s` where name=%s limit 1" % (src_tab, '%s'), name)
 	except Exception, e:
-		if e.arg[0]==1451:
+		if e.args[0]==1451:
 			webnotes.msgprint("Cannot archive %s '%s' as it is referenced in another record. You must delete the referred record first" % (doctype, name))
 
 # insert the record

@@ -445,7 +445,9 @@ ItemBrowser.prototype.archive_items = function() {
 
 function ItemBrowserItem(parent, det, ib) {
 	this.wrapper = $a(parent, 'div');
-	this.tab = make_table(this.wrapper, 1, 2, '100%', ['24px', null]);
+	$y(this.wrapper, {borderTop:'1px solid #DDD'});
+	
+	this.tab = make_table(this.wrapper, 1, 2, '100%', [(200/7)+'%', null]);
 	this.body = $a($td(this.tab, 0, 1), 'div');
 	
 	this.det = det;
@@ -482,14 +484,14 @@ ItemBrowserItem.prototype.make_details = function() {
 	var me = this;
 	var div = $a(this.body, 'div');
 	
-	var span = $a(div, 'span', 'link_type', {fontWeight:'bold'});
+	var span = $a($td(this.tab, 0, 0), 'span', 'link_type', {fontWeight:'bold'});
 	span.innerHTML = me.dn;
 	span.onclick = function() { loaddoc(me.ib.dt, me.dn, null, null, (me.ib.show_archives ? me.ib.show_archives.checked : null)); }
 	
 	// properties
 	var tmp = [];
 	var cl = me.ib.dt_details.columns;
-
+	var first_property = 1;
 	
 	for(var i=3; i<me.det.length; i++) {
 		if(cl[i] && cl[i][1] && me.det[i]) {
@@ -502,9 +504,9 @@ ItemBrowserItem.prototype.make_details = function() {
 			} else {
 
 				// separator
-				if(i>2) {
+				if(!first_property) {
 					var span = $a(div,'span'); span.innerHTML = ',';
-				}
+				} else first_property = 0;
 				
 				// label
 				var span = $a(div,'span','',{color:'#888'});
@@ -541,7 +543,7 @@ ItemBrowserItem.prototype.make_tags = function() {
 
 ItemBrowserItem.prototype.add_timestamp = function() {
 	// time
-	var div = $a(this.body, 'div', '', {color:'#888', fontSize:'11px'});
+	var div = $a($td(this.tab, 0, 0), 'div', '', {color:'#888', fontSize:'11px'});
 	div.innerHTML = comment_when(this.det[1]);
 }
 

@@ -4,10 +4,11 @@ import webnotes.model.meta
 
 def getdoc():
 	import webnotes
+	from webnotes.utils import cint
 	
 	form = webnotes.form_dict
 	doctype, docname = form.get('doctype'), form.get('name')
-	prefix = form.get('from_archive') and 'arc' or 'tab'
+	prefix = cint(form.get('from_archive')) and 'arc' or 'tab'
 
 	if not (doctype and docname):
 		raise Exception, 'doctype and name required!'

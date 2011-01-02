@@ -74,8 +74,8 @@ $wid_pressed = function(ele) {
 // ====================================
 
 $item_normal = function(ele) { 
-	$y(ele, {padding:'4px 8px',cursor:'pointer',margin:'2px',marginRight:'6px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden',borderBottom:'1px solid #CCC'});
-	$br(ele,'3px'); $bg(ele,'#FFF'); $fg(ele,'#000');
+	$y(ele, {padding:'6px 8px',cursor:'pointer',marginRight:'8px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden',borderBottom:'1px solid #DDD'});
+	$bg(ele,'#FFF'); $fg(ele,'#000');
 }
 $item_active = function(ele) {
 	$bg(ele,'#FE8'); $fg(ele,'#000');
