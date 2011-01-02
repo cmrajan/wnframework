@@ -446,6 +446,13 @@ div.time_field select{
 	width: 45px;
 }
 
+.help_box {
+	background-color:#FFE;
+	padding: 12px;
+	margin: 12px 0px;
+	border: 1px dashed #CCC;
+}
+
 /* Grid */
 
 

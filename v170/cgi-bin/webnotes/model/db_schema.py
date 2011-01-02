@@ -135,6 +135,7 @@ class DbTable:
 					ret.append('foreign key (%s) references `%s`(name) on update cascade' % (k, tab_name))
 		return ret
 
+	# GET foreign keys
 	def get_foreign_keys(self):
 		if not self.foreign_keys:
 			txt = webnotes.conn.sql("show create table `%s`" % self.name)[0][1]
@@ -144,6 +145,18 @@ class DbTable:
 					self.foreign_keys.append((words[4][2:-2], words[1][1:-1]))
 		
 		return self.foreign_keys				
+
+	# SET foreign keys
+	def set_foreign_keys(self):
+		if self.set_foreign_key:
+			tab_list = get_schema().get_tables()
+			webnotes.conn.sql("set foreign_key_checks=0")
+			for col in self.set_foreign_key:
+				if col.options:
+					tab_name = "tab" + col.options
+					if tab_name in tab_list:
+						webnotes.conn.sql("alter table `%s` add foreign key (`%s`) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
+			webnotes.conn.sql("set foreign_key_checks=1")
 		
 	def sync(self):
 		if not self.name in get_schema().get_tables():
@@ -153,7 +166,6 @@ class DbTable:
 	
 	def alter(self):
 		self.get_columns_from_db()
-		tab_list = get_schema().get_tables()
 
 		for col in self.columns.values():
 			col.check(self.current_columns.get(col.fieldname, None))
@@ -173,14 +185,8 @@ class DbTable:
 		for col in self.set_default:
 			webnotes.conn.sql("alter table `%s` alter column `%s` set default %s" % (self.name, col.fieldname, '%s'), col.default)
 
-		if self.set_foreign_key:
-			webnotes.conn.sql("set foreign_key_checks=0")
-			for col in self.set_foreign_key:
-				if col.options:
-					tab_name = "tab" + col.options
-					if tab_name in tab_list:
-						webnotes.conn.sql("alter table `%s` add foreign key (%s) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
-			webnotes.conn.sql("set foreign_key_checks=1")
+		self.set_foreign_keys()
+
 
 # -------------------------------------------------
 # Class database column
@@ -267,4 +273,16 @@ def updatedb(dt, archive=0):
 	tab.sync()
 	webnotes.conn.begin()
 	
-	
+# -------------------------------------------------
+# patch to create foreign keys on tables
+# -------------------------------------------------
+
+def setup_foreign_keys():
+	webnotes.conn.commit()
+	for dt in webnotes.conn.sql("select name from tabDocType where ifnull(issingle,0)!=1"):
+		tab = DbTable(dt[0], 'tab')
+		tab.get_columns_from_db()
+		for col in tab.columns.values():
+			col.check(tab.current_columns.get(col.fieldname, None))
+		tab.set_foreign_keys()
+	webnotes.conn.begin()

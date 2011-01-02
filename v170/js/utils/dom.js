@@ -40,7 +40,7 @@ $wid_disabled = function(ele) {
 
 $wid_normal = function(ele) {
 	if(ele.disabled) return;
-	$y(ele, {border:'1px solid #CCC'}); $gr(ele,'#FFF','#DDD');
+	$y(ele, {border:'1px solid #CCC', color:'#444'}); $gr(ele,'#FFF','#DDD');
 	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
 	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');

@@ -58,9 +58,15 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
 	this.loading_div.innerHTML = 'Loading...';
 	this.body = $a(this.wrapper, 'div');
-	this.toolbar_area = $a(this.body, 'div', '', {padding: '4px', backgroundColor:'#EEE', border: '1px solid #CCC'});
+	
+	// toolbar
+	this.toolbar_area = $a(this.body, 'div', '', {padding: '4px', backgroundColor:'#EEE', borderTop: '1px solid #CCC', borderBottom: '1px solid #CCC'});
+	//$br(this.toolbar_area, '4px');
 	this.sub_toolbar = $a(this.body, 'div', '', {marginBottom:'8px', padding: '4px', textAlign:'right', fontSize:'11px', color:'#444'});
-	$br(this.toolbar_area, '4px');
+	
+	// archives label
+	this.archives_label = $a(this.body, 'div', '', {margin:'8px 0px', padding:'4px', fontSize:'14px', textAlign:'center', color:'#444', display:'none', backgroundColor:'#FFD'});
+	this.archives_label.innerHTML = '<i>Showing from Archives</i>';
 	
 	this.trend_area = $a(this.body, 'div', '', {marginBottom:'16px', padding: '4px', backgroundColor:'#EEF', border: '1px solid #CCF', display:'none'});
 	$br(this.trend_area, '5px');
@@ -127,8 +133,10 @@ ItemBrowser.prototype.set_archiving = function() {
 	this.show_archives.onclick = function() {
 		if(this.checked) {
 			if(me.archive_btn) me.archive_btn.innerHTML = 'Restore';
+			$(me.archives_label).slideDown();
 		} else {
 			if(me.archive_btn) me.archive_btn.innerHTML = 'Archive';
+			$(me.archives_label).slideUp();
 		}
 		me.run();
 	}

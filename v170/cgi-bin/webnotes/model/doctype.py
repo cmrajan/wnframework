@@ -156,7 +156,7 @@ class _DocType:
 			webnotes.model.meta.set_dt_value(doc.name, 'server_code_error', ' ')
 		except:
 			webnotes.msgprint('Uncaught Server Script Error in ' + doc.name + '!')
-			webnotes.msgprint(webnotes.utils.getTraceback())
+			webnotes.msgprint('<pre>'+webnotes.utils.getTraceback()+'</pre>')
 					
 		# add to cache
 		# ------------
