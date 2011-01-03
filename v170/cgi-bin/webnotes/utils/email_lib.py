@@ -98,7 +98,7 @@ class EMail:
 			# get defaults from control panel
 			cp = webnotes.model.doc.Document('Control Panel','Control Panel')
 			self.server = cp.outgoing_mail_server and cp.outgoing_mail_server or getattr(webnotes.defs,'mail_server','')
-			self.login = cp.mail_login and cp.mail_login or mail_login or getattr(webnotes.defs,'mail_login','')
+			self.login = cp.mail_login and cp.mail_login or getattr(webnotes.defs,'mail_login','')
 			self.port = cp.mail_port and cp.mail_port or getattr(webnotes.defs,'mail_port',None)
 			self.password = cp.mail_password and cp.mail_password or getattr(webnotes.defs,'mail_password','')
 			self.use_ssl = cint(cp.use_ssl)
