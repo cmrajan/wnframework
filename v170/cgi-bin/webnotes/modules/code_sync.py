@@ -4,6 +4,37 @@
 
 # check if the .svn folder is updated - if yes, clear the cache
 
+
+def get_code(module, dt, dn, extn, is_static=None):
+	from webnotes.defs import modules_path
+	from webnotes.modules import scrub
+	import os, webnotes
+	
+	# get module (if required)
+	if not module:
+		module = webnotes.conn.sql("select module from `tab%s` where name=%s" % (dt,'%s'),dn)[0][0]
+		
+	# file names
+	if dt != 'Control Panel':
+		dt, dn = scrub(dt), scrub(dn)
+
+	# get file name
+	fname = dn + '.' + extn
+	if is_static:
+		fname = dn + '_static.' + extn
+
+	# code
+	try:
+		file = open(os.path.join(modules_path, scrub(module), dt, dn, fname), 'r')
+	except IOError, e:
+		return ''
+		
+	code = file.read()
+	file.close()
+	return code
+
+#==============================================================================
+
 def check_modules_update():
 	import webnotes.defs
 	import webnotes
@@ -21,22 +52,6 @@ def check_modules_update():
 		webnotes.conn.sql("delete from __DocTypeCache")
 		webnotes.conn.set_global('modules_last_update', fs)
 		return 1
-
-# -------------------------------------------------
-
-def sync(doc):
-	import webnotes
-	
-	if doc.doctype=='DocType' and doc.name!='DocType':
-		sync_doctype(doc)
-		
-	# check if all code is updated
-	for code_field in webnotes.code_fields_dict[doc.doctype]:
-		file_timestamp = get_file_timestamp(doc, code_field)
-
-		if file_timestamp and (file_timestamp != get_system_timestamp(doc, code_field)):
-			update_code(doc, code_field, file_timestamp)
-			
 
 # -------------------------------------------------
 
@@ -91,32 +106,6 @@ def make_table():
 	import webnotes
 	webnotes.conn.sql("create table `__CodeFileTimeStamps` (name VARCHAR(120), doctype VARCHAR(120), code_field VARCHAR(120), `timestamp` VARCHAR(120))")
 	
-	
-# -------------------------------------------------
-
-def update_code(doc, code_field, file_timestamp):
-	import webnotes, os, webnotes.utils, webnotes.defs
-	
-	# get the code
-	fn = get_code_path(doc, code_field)
-	file = open(fn,'r')
-	code = file.read()
-	file.close()
-	
-	# update in database, clear cache
-	if doc.doctype=='Control Panel':
-		webnotes.conn.set_value('Control Panel',None,code_field[0],code)
-	else:
-		webnotes.conn.sql("update `tab%s` set `%s`=%s, modified=%s where name=%s" % (doc.doctype, code_field[0], '%s', '%s', '%s'), (code, webnotes.utils.now(), doc.name))
-		webnotes.conn.sql("delete from __DocTypeCache")
-
-	webnotes.conn.sql("delete from __SessionCache")
-	
-	# update in doc
-	doc.fields[code_field[0]] = code
-	
-	# update timestamp
-	update_timestamp(doc, code_field, file_timestamp)
 
 # -------------------------------------------------
 

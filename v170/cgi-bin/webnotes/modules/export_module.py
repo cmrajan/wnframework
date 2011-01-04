@@ -4,6 +4,8 @@
 
 updated_modules = []
 
+from webnotes.modules import scrub
+
 def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, verbose=1, record_module=None):
 	# Multiple doctype  and multiple modules export to be done
 	# for Module Def, right now using a hack..should consider table update in the next version
@@ -88,13 +90,19 @@ def write_module_info(mod):
 def get_module_items(mod):
 	import webnotes
 	from webnotes.modules import transfer_types
+	from webnotes.modules import scrub
 
 	dl = []
 	for dt in transfer_types:
 		try:
 			dl2 = webnotes.conn.sql('select name, modified from `tab%s` where module="%s"' % (dt,mod))
 			for e in dl2:
-				dl += [dt+','+e[0]+',0']
+				ndt, ndn = dt, e[0]
+				if dt in ['DocType','Page','Search Criteria']:
+					ndt, ndn = scrub(dt), scrub(e[0])
+
+				dl += [ndt + ',' + ndn + ',0']
+				
 				if e[0] == 'Control Panel':
 					dl += [e[0]+','+e[0]+',1']
 		except:
@@ -158,7 +166,11 @@ def write_document_file(doclist, record_module=None):
 	updated_modules.append(module)
 
 	# create the folder
-	folder = os.path.join(webnotes.defs.modules_path, module, doclist[0]['doctype'], doclist[0]['name'].replace('/', '-'))
+	code_type = doclist[0]['doctype'] in ['DocType','Page','Search Criteria'] 
+	
+	folder = os.path.join(webnotes.defs.modules_path, scrub(module), \
+		code_type and scrub(doclist[0]['doctype']) or doclist[0]['doctype'] \
+		,code_type and scrub(doclist[0]['name']) or scrub(doclist[0]['name']))
 	
 	webnotes.create_folder(folder)
 
@@ -166,7 +178,8 @@ def write_document_file(doclist, record_module=None):
 	separate_code_files(doclist, folder)
 		
 	# write the data file
-	txtfile = open(os.path.join(folder, doclist[0]['name'].replace('/', '-')+'.txt'),'w+')
+	fname = code_type and scrub(doclist[0]['name']) or doclist[0]['name']
+	txtfile = open(os.path.join(folder, fname +'.txt'),'w+')
 	txtfile.write(str(doclist))
 	txtfile.close()
 

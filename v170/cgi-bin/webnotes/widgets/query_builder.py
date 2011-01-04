@@ -212,8 +212,9 @@ def runquery(q='', ret=0, from_export=0):
 	# -----------------
 	style, header_html, footer_html, page_template = '', '', '', ''
 	if form.has_key('sc_id') and form.getvalue('sc_id'):
-		from webnotes.model.doc import Document
-		code = Document("Search Criteria", form.getvalue('sc_id')).server_script
+		from webnotes.modules import code_sync
+		
+		code = code_sync.get_code(None, 'Search Criteria', form.getvalue('sc_id'), 'py')
 		if code:
 			filter_values = form.has_key('filter_values') and eval(form.getvalue('filter_values','')) or {}
 			res, style, header_html, footer_html, page_template = exec_report(code, res, colnames, colwidths, coltypes, coloptions, filter_values, q, from_export)

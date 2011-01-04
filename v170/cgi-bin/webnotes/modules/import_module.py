@@ -48,18 +48,18 @@ def get_folder_paths(modules, record_list):
 	if record_list:
 		for record in record_list:
 			folder_list.append(os.path.join(webnotes.defs.modules_path, \
-				record[0], record[1], record[2].replace('/','-')))
+				record[0], record[1], record[2].replace('/','_')))
 
 	if modules:
 		# system modules will be transferred in a predefined order and before all other modules
-		sys_mod_ordered_list = ['Roles', 'System', 'Application Internal', 'Mapper', 'Settings']
+		sys_mod_ordered_list = ['roles', 'system', 'application_internal', 'mapper', 'settings']
 		all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
 		for module in all_mod_ordered_list:
 			mod_path = os.path.join(webnotes.defs.modules_path, module)
 			types_list = listfolders(mod_path, 1)
 			
 			# list of types
-			types_list = list(set(types_list).difference(['Control Panel']))
+			types_list = list(set(types_list).difference(['control_panel']))
 			all_transfer_types =[t for t in transfer_types if t in types_list] + list(set(types_list).difference(transfer_types))
 			
 			# build the folders
@@ -206,11 +206,11 @@ def import_control_panel():
 	import webnotes.defs
 	
 	startup_code = startup_css = ''
-	folder = os.path.join(webnotes.defs.modules_path, 'System','Control Panel','Control Panel')
+	folder = os.path.join(webnotes.defs.modules_path, 'system','control_panel','control_panel')
 	
 	# js
 	try:
-		file = open(os.path.join(folder, 'Control Panel.js'),'r')
+		file = open(os.path.join(folder, 'control_panel.js'),'r')
 		startup_code = file.read()
 		file.close()
 	except OSError, e:
@@ -218,7 +218,7 @@ def import_control_panel():
 	
 	# css
 	try:
-		file = open(os.path.join(folder, 'Control Panel.css'),'r')
+		file = open(os.path.join(folder, 'control_panel.css'),'r')
 		startup_css = file.read()
 		file.close()
 	except OSError, e:

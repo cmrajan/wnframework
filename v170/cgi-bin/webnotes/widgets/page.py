@@ -8,27 +8,20 @@ class Page:
 	def __init__(self, name):
 		self.name = name
 
-	def _page_import(self, match):
-		name = match.group('name')
-
-		content = conn.sql('select script from `tabPage` where name=%s', name)
-		return content and content[0][0] or ''
-
-	def get_script(self, script):
-		import re
-		if not script:
-			return ''
-	
-		p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
-		return p.sub(self._page_import, script)
-
 	def load(self):	
+		from webnotes.modules import compress
+		from webnotes.modules import code_sync
+		
 		doclist = webnotes.model.doc.get('Page', self.name)
 		doc = doclist[0]
 
-		doc.__script = self.get_script(doc.script)
+		doc.script = None
+		doc.fields['__script'] = compress.get_page_js(self.name)
+		doc.content = code_sync.get_code(doc.module, 'page', doc.name, 'html')
+		doc.style = code_sync.get_code(doc.module, 'page', doc.name, 'css')
+		
 		if doc.fields.get('content') and doc.content.startswith('#python'):
-			doc.__content = webnotes.model.code.execute(doc.content)
+			doc.fields['__content'] = webnotes.model.code.execute(doc.content)
 		return doclist
 
 def get(name):

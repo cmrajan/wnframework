@@ -20,13 +20,6 @@ function Page(page_name, content) {
 
 	if(content)
 		this.wrapper.innerHTML = content;
-			
-	// resize
-	this.wrapper.set_page_height = function() {
-		$y(me.wrapper, { height: get_window_height() + 'px', overflow:'auto' });
-	}
-	
-	set_resize_observer(this.wrapper.set_page_height);
 
 	if(page_name == home_page)
 		pages['_home'] = this;
@@ -53,8 +46,9 @@ function render_page(page_name, menuitem) {
 	var script = pdoc.__script ? pdoc.__script : pdoc.script;
 	p.doc = pdoc;
 
-	if(script)
-		try { eval(script); } catch(e) { submit_error(e); }		
+	if(script) {
+		try { eval(script); } catch(e) { submit_error(e); }
+	}
 
 	// change
 	page_body.change_to(page_name);	

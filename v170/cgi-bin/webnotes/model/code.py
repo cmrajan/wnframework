@@ -1,3 +1,27 @@
+custom_class = '''
+# Please edit this list and import only required elements
+import webnotes
+
+from webnotes.utils import add_days, add_months, add_years, cint, cstr, date_diff, default_fields, flt, fmt_money, formatdate, generate_hash, getTraceback, get_defaults, get_first_day, get_last_day, getdate, has_common, month_name, now, nowdate, replace_newlines, sendmail, set_default, str_esc_quote, user_format, validate_email_add
+from webnotes.model import db_exists
+from webnotes.model.doc import Document, addchild, removechild, getchildren, make_autoname, SuperDocType
+from webnotes.model.doclist import getlist, copy_doclist
+from webnotes.model.code import get_obj, get_server_obj, run_server_obj, updatedb, check_syntax
+from webnotes import session, form, is_testing, msgprint, errprint
+
+set = webnotes.conn.set
+sql = webnotes.conn.sql
+get_value = webnotes.conn.get_value
+in_transaction = webnotes.conn.in_transaction
+convert_to_lists = webnotes.conn.convert_to_lists
+	
+# -----------------------------------------------------------------------------------------
+
+class CustomDocType(DocType):
+  def __init__(self, doc, doclist):
+    DocType.__init__(self, doc, doclist)
+'''
+
 
 #=================================================================================
 
@@ -59,6 +83,36 @@ def get_recompiled_code(dt):
 #=================================================================================
 
 def get_server_obj(doc, doclist = [], basedoctype = ''):
+	# for test
+	import sys
+	import webnotes
+	import webnotes.defs
+	
+	sys.path.append(webnotes.defs.modules_path)
+
+	# get doctype details
+	dt_details = webnotes.conn.sql("select module, server_code from tabDocType where name=%s", doc.doctype)
+	
+	module = dt_details[0][0].replace(' ','_').lower()
+	dt = doc.doctype.replace(' ','_').lower()
+
+	# import
+	try:
+		exec 'from %s.doctype.%s.%s import DocType' % (module, dt, dt)
+	except ImportError, e:
+		return None
+		
+	# custom?
+	if dt_details[0][1]:
+		global custom_class
+		exec custom_class + dt_details[0][1] in locals()
+		return CustomDocType(doc, doclist)
+	else:
+		return DocType(doc, doclist)
+	
+#=================================================================================
+
+def get_server_obj_old(doc, doclist = [], basedoctype = ''):
 	import marshal
 	import webnotes
 	

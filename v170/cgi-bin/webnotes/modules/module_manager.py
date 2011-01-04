@@ -30,7 +30,7 @@ def get_module_details(m):
 def get_modified(dt, dn):
 	import webnotes
 	try:
-		return str(webnotes.conn.sql("select modified from `tab%s` where name=%s" % (dt,'%s'), dn)[0][0])
+		return str(webnotes.conn.sql("select modified from `tab%s` where replace(name,' ','_')=%s" % (dt,'%s'), dn)[0][0])
 	except:
 		pass
 
@@ -49,7 +49,7 @@ def get_module_items_from_files(m):
 			file.close()
 			
 			# append
-			items.append([item_type, doclist[0]['name'], doclist[0]['modified']])
+			items.append([item_type, item_name, doclist[0]['modified']])
 			
 	return items
 

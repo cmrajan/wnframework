@@ -53,9 +53,6 @@ class _DocType:
 		else:
 			webnotes.conn.sql("INSERT INTO `__DocTypeCache` (`name`, `modified`, `content`) VALUES (%s, %s, %s)" , (self.name, doclist[0].modified, zlib.compress(str([d.fields for d in doclist]))))
 
-		# cache the code
-		self.compile_code(doclist[0])
-
 	# read from cache
 	# =================================================================
 
@@ -65,30 +62,6 @@ class _DocType:
 		doclist = eval(zlib.decompress(webnotes.conn.sql("SELECT content from `__DocTypeCache` where name=%s", self.name)[0][0]))
 		return [webnotes.model.doc.Document(fielddata = d) for d in doclist]
 
-	# build client scripts
-	# =================================================================
-
-	def _get_client_script(self, match):		
-		name = match.group('name')
-
-		csc = str(webnotes.model.meta.get_dt_values(name, 'client_script_core')[0][0] or '')
-		cs = str(webnotes.model.meta.get_dt_values(name, 'client_script')[0][0] or '')
-
-		return csc + '\n' + cs
-		
-	def _build_client_script(self, doclist):
-		client_script = [str(doclist[0].client_script_core or ''), str(doclist[0].client_script or '')]
-
-		# make into a single script
-		client_script = '\n'.join(client_script)
-		
-		# compile for import
-		if client_script.strip():
-			import re
-			p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
-	
-			# load it in __client_script as it will not interfere with the doctype
-			doclist[0]._client_script = p.sub(self._get_client_script, client_script)
 
 	# load options for "link:" type 'Select' fields
 	# =================================================================
@@ -121,6 +94,7 @@ class _DocType:
 			if doclist[0].server_code_core: doclist[0].server_code_core = None
 			if doclist[0].client_script: doclist[0].client_script = None
 			if doclist[0].client_script_core: doclist[0].client_script_core = None
+			doclist[0].server_code_compiled = None
 
 	# write code to cache
 	#=================================================================================
@@ -131,54 +105,14 @@ class _DocType:
 			webnotes.conn.sql("UPDATE __DocTypeCache set server_code_compiled = %s, modified=%s WHERE name=%s", (marshal.dumps(code), modified, dt))
 		else:
 			webnotes.conn.sql("INSERT INTO __DocTypeCache (name, modified, server_code_compiled) VALUES (%s, %s, %s)", (dt, modified, marshal.dumps(code)))
-	
-	# compile code and write it to cache
-	#=================================================================================
-	
-	def compile_code(self, doc):
-		std_code = '''class DocType:
-		def __init__(self, d, dl):
-			self.doc, self.doclist = d, dl'''
-	
-		c = [doc.server_code_core or '', doc.server_code or '']
-	
-		# add default code if no code
-		# ---------------------------
-		if not (c[0].strip() or c[1].strip()):
-			c[0] = std_code
-	
-		code = None
-			
-		# compile code
-		# ------------
-		try:
-			code = compile('\n'.join(c), '<string>', 'exec')
-			webnotes.model.meta.set_dt_value(doc.name, 'server_code_error', ' ')
-		except:
-			webnotes.msgprint('Uncaught Server Script Error in ' + doc.name + '!')
-			webnotes.msgprint('<pre>'+webnotes.utils.getTraceback()+'</pre>')
-					
-		# add to cache
-		# ------------
-		if code:
-			try:
-				self._add_compiled_code_to_cache(code, doc.name, doc.modified)
-			except Exception, e:
-				if e.args[0]==1054:
-					# column not yet made - remove after some time
-					webnotes.conn.sql("commit")
-					webnotes.conn.sql("alter table __DocTypeCache add `server_code_compiled` text")
-					webnotes.conn.sql("start transaction")
-					
-					# retry
-					self._add_compiled_code_to_cache(code, doc.name, doc.modified)
-				else:
-					raise e
+
 		
 	# build a list of all the records required for the DocType
 	# =================================================================
 
 	def make_doclist(self):
+		from webnotes.modules import compress
+		
 		tablefields = webnotes.model.meta.get_table_fields(self.name)
 
 		if self.is_modified():
@@ -188,13 +122,11 @@ class _DocType:
 				doclist += webnotes.model.doc.get('DocType', t[0], 1)
 
 			# don't save compiled server code
-			doclist[0].server_code_compiled = None
 
-			self._build_client_script(doclist)		
-			self._update_cache(doclist)
 		else:
 			doclist = self._load_from_cache()
 	
+		doclist[0].__client_script = compress.get_doctype_js(self.name)
 		self._load_select_options(doclist)
 		self._clear_code(doclist)
 

@@ -103,6 +103,8 @@ def dump(sd, country):
 
 	webnotes.conn.sql("insert into `__SessionCache` (user, country, cache) VALUES (%s, %s, %s)", (webnotes.session['user'], country, str(sd)))
 
+# ==================================================
+
 def get_letter_heads():
 	import webnotes
 	try:
@@ -117,6 +119,15 @@ def get_letter_heads():
 		else:
 			raise Exception, e
 			
+# ==================================================
+
+def load_startup(cp):
+	from webnotes.modules import compress
+	from webnotes.modules import code_sync
+	
+	cp.startup_code = compress.get_js_code('system','Control Panel','Control Panel')
+	cp.startup_css = code_sync.get_code('system','Control Panel','Control Panel','css')
+
 # build it
 # ==================================================
 
@@ -140,6 +151,7 @@ def build():
 	doclist = []
 	doclist += webnotes.model.doc.get('Control Panel')
 	cp = doclist[0]
+	load_startup(cp)
 	
 	doclist += webnotes.model.doctype.get('Event')
 	doclist += webnotes.model.doctype.get('Search Criteria')
