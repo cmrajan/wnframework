@@ -747,7 +747,7 @@ var datepicker_active=0;function DateField(){}DateField.prototype=new Field();Da
 if(_f.cur_grid_cell)
 _f.cur_grid_cell.grid.cell_deselect();}});var me=this;me.input.onchange=function(){if(me.not_in_form)return;if(this.value==null)this.value='';me.set(dateutil.user_to_str(me.input.value));me.run_trigger();}
 me.input.set_input=function(val){if(val==null)val='';else val=dateutil.str_to_user(val);me.input.value=val;}
-me.get_value=function(){return dateutil.str_to_user(me.input.value);}}
+me.get_value=function(){return dateutil.user_to_str(me.input.value);}}
 DateField.prototype.set_disp=function(val){var v=dateutil.str_to_user(val);if(v==null)v='';this.set_disp_html(v);}
 DateField.prototype.validate=function(v){if(!v)return;var me=this;this.clear=function(){msgprint("Date must be in format "+this.user_fmt);me.input.set_input('');return'';}
 var t=v.split('-');if(t.length!=3){return this.clear();}
