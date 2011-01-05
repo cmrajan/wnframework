@@ -105,7 +105,11 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	# custom?
 	if dt_details[0][1]:
 		global custom_class
-		exec custom_class + dt_details[0][1] in locals()
+		try:
+			exec custom_class + dt_details[0][1] in locals()
+		except:
+			return None
+			
 		return CustomDocType(doc, doclist)
 	else:
 		return DocType(doc, doclist)
