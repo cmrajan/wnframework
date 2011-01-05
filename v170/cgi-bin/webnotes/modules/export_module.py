@@ -142,6 +142,41 @@ def get_module_doclist(module):
 		
 	return super_doclist
 
+# ==============================================================================
+# Create module folders
+# ==============================================================================
+
+def create_folder(module, dt, dn):
+	import os
+	from webnotes.defs import modules_path
+	from webnotes.modules import scrub
+	
+	code_type = dt in ['DocType', 'Page', 'Search Criteria']
+	
+	# module
+	if not scrub(module) in os.listdir(modules_path):
+		os.mkdir(os.path.join(modules_path, scrub(module)))
+		init = open(os.path.join(modules_path, scrub(module), '__init__.py'), 'w')
+		init.close()
+
+	if code_type:
+		dt, dn = scrub(dt), scrub(dn)
+
+	# doctype		
+	if not dt in os.listdir(os.path.join(modules_path, scrub(module))):
+		os.mkdir(os.path.join(modules_path, scrub(module), dt))
+		if dt == 'doctype':
+			init = open(os.path.join(modules_path, scrub(module), dt, '__init__.py'), 'w')
+			init.close()
+		
+	# name
+	if not dn in os.listdir(os.path.join(modules_path, scrub(module), dt)):
+		os.mkdir(os.path.join(modules_path, scrub(module), dt, dn))
+		if dt == 'doctype':
+			init = open(os.path.join(modules_path, scrub(module), dt, dn, '__init__.py'), 'w')
+			init.close()
+	
+	return os.path.join(modules_path, scrub(module), dt, dn)
 
 # ==============================================================================
 # Write doclist into file
@@ -166,14 +201,11 @@ def write_document_file(doclist, record_module=None):
 	updated_modules.append(module)
 
 	# create the folder
-	code_type = doclist[0]['doctype'] in ['DocType','Page','Search Criteria'] 
+	code_type = doclist[0]['doctype'] in ['DocType','Page','Search Criteria']
 	
-	folder = os.path.join(webnotes.defs.modules_path, scrub(module), \
-		code_type and scrub(doclist[0]['doctype']) or doclist[0]['doctype'] \
-		,code_type and scrub(doclist[0]['name']) or scrub(doclist[0]['name']))
+	# create folder
+	folder = create_folder(module, doclist[0]['doctype'], doclist[0]['name'])
 	
-	webnotes.create_folder(folder)
-
 	# separate code files
 	separate_code_files(doclist, folder, code_type)
 		

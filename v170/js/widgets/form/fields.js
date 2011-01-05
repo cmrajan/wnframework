@@ -510,7 +510,8 @@ DateField.prototype.make_input = function() {
 		me.input.value = val;
 	}
 	me.get_value = function() {
-		return dateutil.user_to_str(me.input.value);
+		if(me.input.value)
+			return dateutil.user_to_str(me.input.value);
 	}
 }
 DateField.prototype.set_disp = function(val) {
