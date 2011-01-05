@@ -14,7 +14,7 @@ sql = webnotes.conn.sql
 get_value = webnotes.conn.get_value
 in_transaction = webnotes.conn.in_transaction
 convert_to_lists = webnotes.conn.convert_to_lists
-	
+
 # -----------------------------------------------------------------------------------------
 
 class CustomDocType(DocType):
@@ -104,9 +104,10 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 
 	# custom?
 	if dt_details[0][1]:
-		global custom_class
+		global custom_class		
+		
 		try:
-			exec custom_class + dt_details[0][1] in locals()
+			exec custom_class + dt_details[0][1].replace('\t','  ') in locals()
 		except:
 			return None
 			
