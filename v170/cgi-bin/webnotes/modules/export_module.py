@@ -175,10 +175,10 @@ def write_document_file(doclist, record_module=None):
 	webnotes.create_folder(folder)
 
 	# separate code files
-	separate_code_files(doclist, folder)
+	separate_code_files(doclist, folder, code_type)
 		
 	# write the data file
-	fname = code_type and scrub(doclist[0]['name']) or doclist[0]['name']
+	fname = (code_type and scrub(doclist[0]['name'])) or doclist[0]['name']
 	txtfile = open(os.path.join(folder, fname +'.txt'),'w+')
 	txtfile.write(str(doclist))
 	txtfile.close()
@@ -187,14 +187,14 @@ def write_document_file(doclist, record_module=None):
 # Create seperate files for code
 # ==============================================================================
 
-def separate_code_files(doclist, folder):
+def separate_code_files(doclist, folder, code_type):
 	import os
 	import webnotes
 	# code will be in the parent only
 	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
 	for code_field in code_fields:
 		if doclist[0].get(code_field[0]):
-			fname = doclist[0]['name']
+			fname = (code_type and scrub(doclist[0]['name'])) or doclist[0]['name']
 			fname = fname.replace('/','-')  #Weirdly, doesn't work..using a hack instead.
 			# 2 htmls
 			if code_field[0]=='static_content':
