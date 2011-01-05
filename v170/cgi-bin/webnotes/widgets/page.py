@@ -17,8 +17,9 @@ class Page:
 
 		doc.script = None
 		doc.fields['__script'] = compress.get_page_js(self.name)
-		doc.content = code_sync.get_code(doc.module, 'page', doc.name, 'html')
-		doc.style = code_sync.get_code(doc.module, 'page', doc.name, 'css')
+		if doc.standard!='No':
+			doc.content = code_sync.get_code(doc.module, 'page', doc.name, 'html')
+			doc.style = code_sync.get_code(doc.module, 'page', doc.name, 'css')
 		
 		if doc.fields.get('content') and doc.content.startswith('#python'):
 			doc.fields['__content'] = webnotes.model.code.execute(doc.content)
