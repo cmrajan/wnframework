@@ -101,15 +101,11 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	except ImportError, e:
 		return None
 
-
 	# custom?
 	if dt_details[0][1]:
 		global custom_class		
 		
-		try:
-			exec custom_class + dt_details[0][1].replace('\t','  ') in locals()
-		except:
-			return None
+		exec custom_class + dt_details[0][1].replace('\t','  ') in locals()
 			
 		return CustomDocType(doc, doclist)
 	else:
