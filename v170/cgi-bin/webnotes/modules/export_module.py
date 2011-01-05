@@ -79,7 +79,7 @@ def write_attachments(m):
 def write_module_info(mod):
 	import webnotes.utils, os
 
-	file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'w+')
+	file = open(os.path.join(webnotes.defs.modules_path, scrub(mod), 'module.info'), 'w')
 	file.write(str({'update_date': webnotes.utils.now()}))
 	file.close()
 	
