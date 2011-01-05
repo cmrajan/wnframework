@@ -383,7 +383,7 @@ _f.Frm.prototype.add_fetch = function(link_field, src_field, tar_field) {
 _f.Frm.prototype.setup_client_script = function() {
 	// setup client obj
 
-	if(this.meta.client_script_core || this.meta.client_script || this.meta._client_script) {
+	if(this.meta.client_script_core || this.meta.client_script || this.meta.__client_script) {
 		this.runclientscript('setup', this.doctype, this.docname);
 	}
 }
@@ -997,7 +997,7 @@ _f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 
 	if(caller && caller.toLowerCase()=='setup') {
 		var doctype = get_local('DocType', this.doctype);
-		var cs = doctype._client_script ? doctype._client_script : (doctype.client_script_core + doctype.client_script);
+		var cs = doctype.__client_script ? doctype.__client_script : (doctype.client_script_core + doctype.client_script);
 		if(cs) {
 			try {
 				var tmp = eval(cs);

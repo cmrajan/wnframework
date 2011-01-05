@@ -125,8 +125,8 @@ class _DocType:
 
 		else:
 			doclist = self._load_from_cache()
-	
-		doclist[0].__client_script = compress.get_doctype_js(self.name)
+			
+		doclist[0].fields['__client_script'] = compress.get_doctype_js(self.name)
 		self._load_select_options(doclist)
 		self._clear_code(doclist)
 

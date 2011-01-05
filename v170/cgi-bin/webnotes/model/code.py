@@ -83,6 +83,7 @@ def get_recompiled_code(dt):
 #=================================================================================
 
 def get_server_obj(doc, doclist = [], basedoctype = ''):
+
 	# for test
 	import sys
 	import webnotes
@@ -99,7 +100,8 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		exec 'from %s.doctype.%s.%s import DocType' % (module, dt, dt)
 	except ImportError, e:
 		return None
-		
+
+
 	# custom?
 	if dt_details[0][1]:
 		global custom_class

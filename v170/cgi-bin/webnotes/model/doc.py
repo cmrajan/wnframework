@@ -527,10 +527,10 @@ def check_page_perm(dn):
 
 def get_report_builder_code(doc):
 	if doc.doctype=='Search Criteria':
-		from webnotes.modules import compress
+		from webnotes.modules import code_sync
 		
-		doc.report_script = compress.get_js_file(doc.module, 'Search Criteria', 'report_script')
-		doc.custom_query = compress.get_js_file(doc.module, 'Search Criteria', 'custom_query')
+		doc.report_script = code_sync.get_code(doc.module, 'Search Criteria', doc.name, 'js')
+		doc.custom_query = code_sync.get_code(doc.module, 'Search Criteria', doc.name, 'sql')
 	
 def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 	import webnotes 
