@@ -2,50 +2,32 @@
 
 def run():
 	import webnotes
+	from patches import patch
 	from webnotes.utils import cint
 	
-	# get the folder find last patch
 	next_patch = cint(webnotes.conn.get_global('next_patch'))
 	
-	patch_list = [next_patch]
-	
-	for patch in patch_list:
-		patch_code = get_patch(patch)
-		
-		# patch found?
-		if patch_code:
+	if next_patch <= patch.last_patch:
+		for i in range(next_patch, patch.last_patch+1):
 			webnotes.conn.begin()
-		
-			# execute
 			try:
-				execute_patch(patch_code, patch)
+				patch.execute(i)	
 			except Exception, e:
-				pass
-				# log
-			
-			# next
-			patch_list.append(patch+1)
-			webnotes.conn.set_global('next_patch', str(patch+1))
-			
-			# commit - each patch
-			webnotes.conn.commit()
-			
-def get_patch(patch):
-	import webnotes.defs, os
-	
-	try:
-		file = open(os.path.join(webnotes.defs.modules_path, 'patches', 'p' + str(patch) + '.py'), 'r')
-		code = file.read()
-		file.close()
-		return code
-	except IOError, e:
-		if e.args[0]==2:
-			return None # no such patch
-		else:
-			raise e
+				write_log()	
+				return
 
-def execute_patch(patch_code, patch):
-	import webnotes.model.code
+			webnotes.conn.set_global('next_patch', str(i+1))
+			webnotes.conn.commit()
+
+def write_log():
+	import os
+	import webnotes.defs
+	import webnotes
 	
-	webnotes.model.code.execute(patch_code)
+	patch_log = open(os.path.join(webnotes.defs.modules_path, 'patches', 'patch.log'), 'a')
+	patch_log.write(('\n\nError in %s:\n' % webnotes.conn.cur_db_name) + webnotes.getTraceback())
+	patch_log.close()
+	
+	webnotes.msgprint("There were errors in running patches, please call the Administrator")
+	
 	

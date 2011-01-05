@@ -86,9 +86,7 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	# for test
 	import sys
 	import webnotes
-	import webnotes.defs
 	
-	sys.path.append(webnotes.defs.modules_path)
 
 	# get doctype details
 	dt_details = webnotes.conn.sql("select module, server_code from tabDocType where name=%s", doc.doctype)

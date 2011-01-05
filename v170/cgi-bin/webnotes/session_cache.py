@@ -51,11 +51,8 @@ def get():
 	
 	# run patches
 	import webnotes.modules.patch
-	try:
-		webnotes.modules.patch.run()
-	except:
-		# write in logs
-		pass
+	webnotes.modules.patch.run()
+
 
 	# if not create it
 	sd = build()

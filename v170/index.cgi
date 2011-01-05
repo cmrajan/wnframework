@@ -11,7 +11,11 @@ try:
 	import sys, os, cgi
 
 	sys.path.append(os.getcwd()+'/cgi-bin')
+
 	import webnotes
+	import webnotes.defs
+
+	sys.path.append(webnotes.defs.modules_path)
 
 	webnotes.form = cgi.FieldStorage()
 	for each in webnotes.form.keys():

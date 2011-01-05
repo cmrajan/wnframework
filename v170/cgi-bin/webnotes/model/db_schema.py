@@ -241,7 +241,7 @@ class DbColumn:
 			if (current_def['index'] and not self.set_index):
 				self.table.drop_index.append(self)
 			
-			if (not current_def['index'] and self.set_index):
+			if (not current_def['index'] and self.set_index and not (column_def in ['text','blob'])):
 				self.table.add_index.append(self)
 		
 		# default

@@ -21,6 +21,9 @@ try:
 	import webnotes.utils
 	import webnotes.utils.file_manager
 	import webnotes.db
+	import webnotes.defs
+	
+	sys.path.append(webnotes.defs.modules_path)	
 	
 	form = cgi.FieldStorage()
 	webnotes.form_dict = {}
