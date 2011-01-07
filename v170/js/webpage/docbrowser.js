@@ -1,4 +1,10 @@
-var new_tag_dialog = null;
+_tags = {
+	dialog: null
+	,color_map: null
+	,all_tags: []
+	,colors: {'Default':'#489', 'Red':'#FF0000', 'Blue':'#000088', 'Green':'#008800', 'Orange':'#FF8800'}
+	,color_list: ['Default', 'Red', 'Blue', 'Green', 'Orange'] // for sequence
+}
 
 ItemBrowserPage = function() {
 	this.lists = {};
@@ -222,8 +228,13 @@ ItemBrowser.prototype.load_details = function(load_callback) {
 			me.show_results();
 			if(load_callback) load_callback();
 		}
+		if(r.message.color_map) {
+			_tags.color_map = r.message.color_map;
+		}
 	}
-	$c_obj('Menu Control', 'get_dt_details', this.dt + '~~~' + cstr(this.field_list), callback);
+	var with_color_map = 0;
+	if(!_tags.color_map) with_color_map = 1;
+	$c_obj('Menu Control', 'get_dt_details', JSON.stringify([this.dt, cstr(this.field_list), with_color_map]), callback);
 	this.loaded = 1;
 }
 
@@ -632,14 +643,53 @@ ItemBrowserItem.prototype.set_tag_fitler = function(tag) {
 
 // -------------------------------------------------
 
+ItemBrowserItem.prototype.make_color_picker = function(dialog) {
+	var n_cols = _tags.color_list.length;
+	var div = $a(dialog.widgets['Tag'], 'div', '', {margin:'8px 0px'});
+
+	div.tab = make_table(div, 2, n_cols, (26*n_cols) + 'px', [], {textAlign:'center'});
+	div.pickers = [];
+	for(var i=0; i<n_cols; i++) {
+		var wrapper = $a($td(div.tab, 0, i), 'div', '', {margin:'5px', border:'3px solid #FFF'})
+		var p = $a(wrapper, 'div', '', {backgroundColor: _tags.colors[_tags.color_list[i]],height:'16px', width:'16px', border:'1px solid #000', cursor:'pointer'});
+		p.wrapper = wrapper;
+		p.pick = function() {
+			$y(this.wrapper, {border:'3px solid #000'});
+			if(this.picker.picked) this.picker.picked.unpick();
+			this.picker.picked = this;
+		}
+		p.unpick = function() {
+			$y(this.wrapper, {border:'3px solid #FFF'});
+		}
+		p.onclick = function() {
+			this.pick();
+		}
+		p.picker = div;
+		div.pickers.push(p);
+		p.color_name = _tags.color_list[i];
+	}
+	
+	// pick default
+	div.pickers[0].pick();
+	
+	dialog.color_picker = div;
+}
+
+// -------------------------------------------------
+
 ItemBrowserItem.prototype.new_tag = function() {
 	var me = this;
 	
-	if(!new_tag_dialog) {
+	if(!_tags.new_tag_dialog) {
 		var d = new Dialog(400,200,'New Tag');
 		d.make_body([['HTML','Tag'],['Button','Save']])
 		d.tag_input = make_field({fieldtype:'Link', label:'New Tag', options:'Tag', no_buttons:1}, '', 
 			d.widgets['Tag'], this, 0, 1);
+			
+		// make a color picker
+		this.make_color_picker(d);
+		
+		
 		d.tag_input.not_in_form = 1;
 		d.tag_input.refresh();
 		
@@ -659,19 +709,31 @@ ItemBrowserItem.prototype.new_tag = function() {
 			}
 			
 			var callback = function(r,rt) {
-				new_tag_dialog.tag_input.txt.value= '';
-				new_tag_dialog.hide();
+				_tags.color_map[r.message] = _tags.dialog.color_picker.picked.color_name;
+				
+				_tags.dialog.tag_input.txt.value= '';
+				_tags.dialog.hide();
 
 				if(!r.message) return;
-				new_tag_dialog.ibi.add_tag(r.message, 0, '_user_tags');
+				_tags.dialog.ibi.add_tag(r.message, 0, '_user_tags');
+				me.refresh_tags();
+				
 			}
 			$c_obj('Menu Control','add_tag',JSON.stringify(
-				[new_tag_dialog.ibi.ib.dt, new_tag_dialog.ibi.dn, val]), callback);
+				[_tags.dialog.ibi.ib.dt, _tags.dialog.ibi.dn, val, _tags.dialog.color_picker.picked.color_name]), callback);
 		}
-		new_tag_dialog = d;
+		_tags.dialog = d;
 	}
-	new_tag_dialog.ibi = me;
-	new_tag_dialog.show();
+	_tags.dialog.ibi = me;
+	_tags.dialog.show();
+}
+
+// -------------------------------------------------
+
+ItemBrowserItem.prototype.refresh_tags = function() {
+	for(var i=0; i<_tags.all_tags.length; i++) {
+		_tags.all_tags[i].refresh_color();
+	}
 }
 
 // -------------------------------------------------
@@ -695,13 +757,20 @@ ItemBrowserItem.prototype.make_add_tag = function() {
 function ItemBrowserTag(parent, label, dt, dn, static) {
 	this.dt = dt; this.dn = dn; this.label = label;
 	var me = this;
+	var bg = _tags.color_map ? (_tags.color_map[label] ? _tags.color_map[label] : 'Default') : 'Default';
 	
 	// tag area
-	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor:'#489', color:'#FFF', marginRight:'4px', fontSize:'11px', cursor:'pointer'});
+	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor:_tags.colors[bg], color:'#FFF', marginRight:'4px', fontSize:'11px', cursor:'pointer'});
 	$(this.body).hover(
-		function() { $bg(this,'#4AC'); }
-		,function() { $bg(this,'#489'); }
+		function() { $op(this,60); }
+		,function() { $op(this,100); }
 	);
+
+	// refresh color
+	this.refresh_color = function() {
+		bg = _tags.color_map ? (_tags.color_map[this.label] ? _tags.color_map[this.label] : 'Default') : 'Default';
+		$y(this.body, {backgroundColor:_tags.colors[bg]});
+	}
 	
 	$br(this.body,'3px');
 
@@ -716,5 +785,6 @@ function ItemBrowserTag(parent, label, dt, dn, static) {
 		var span = $a(this.body,'span');
 		span.innerHTML = ' x'
 		span.onclick = function() { me.remove(me); }
-	}	
+	}
+	_tags.all_tags.push(this);
 }
