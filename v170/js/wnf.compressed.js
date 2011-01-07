@@ -1087,12 +1087,13 @@ var p=$a(wrapper,'div','',{backgroundColor:_tags.colors[_tags.color_list[i]],hei
 p.unpick=function(){$y(this.wrapper,{border:'3px solid #FFF'});}
 p.onclick=function(){this.pick();}
 p.picker=div;div.pickers.push(p);p.color_name=_tags.color_list[i];}
-div.pickers[0].pick();dialog.color_picker=div;}
+dialog.color_picker=div;}
 ItemBrowserItem.prototype.new_tag=function(){var me=this;if(!_tags.new_tag_dialog){var d=new Dialog(400,200,'New Tag');d.make_body([['HTML','Tag'],['Button','Save']])
 d.tag_input=make_field({fieldtype:'Link',label:'New Tag',options:'Tag',no_buttons:1},'',d.widgets['Tag'],this,0,1);this.make_color_picker(d);d.tag_input.not_in_form=1;d.tag_input.refresh();$y(d.tag_input.txt,{width:'80%'});d.widgets['Save'].onclick=function(){var val=strip(d.tag_input.txt.value);if(!val){msgprint("Please type something");return;}
 if(val.search(/^[a-z0-9\s]+$/i)==-1){msgprint("Special charaters, commas etc not allowed in tags");return;}
-var callback=function(r,rt){_tags.color_map[r.message]=_tags.dialog.color_picker.picked.color_name;_tags.dialog.tag_input.txt.value='';_tags.dialog.hide();if(!r.message)return;_tags.dialog.ibi.add_tag(r.message,0,'_user_tags');me.refresh_tags();}
-$c_obj('Menu Control','add_tag',JSON.stringify([_tags.dialog.ibi.ib.dt,_tags.dialog.ibi.dn,val,_tags.dialog.color_picker.picked.color_name]),callback);}
+var callback=function(r,rt){if(_tags.dialog.color_picker.picked){_tags.color_map[r.message]=_tags.dialog.color_picker.picked.color_name;me.refresh_tags();_tags.dialog.color_picker.picked.unpick()}
+_tags.dialog.tag_input.txt.value='';_tags.dialog.hide();if(!r.message)return;_tags.dialog.ibi.add_tag(r.message,0,'_user_tags');}
+var t=_tags.dialog.color_picker.picked?_tags.dialog.color_picker.picked.color_name:'';$c_obj('Menu Control','add_tag',JSON.stringify([_tags.dialog.ibi.ib.dt,_tags.dialog.ibi.dn,val,t]),callback);}
 _tags.dialog=d;}
 _tags.dialog.ibi=me;_tags.dialog.show();}
 ItemBrowserItem.prototype.refresh_tags=function(){for(var i=0;i<_tags.all_tags.length;i++){_tags.all_tags[i].refresh_color();}}

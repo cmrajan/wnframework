@@ -669,9 +669,6 @@ ItemBrowserItem.prototype.make_color_picker = function(dialog) {
 		p.color_name = _tags.color_list[i];
 	}
 	
-	// pick default
-	div.pickers[0].pick();
-	
 	dialog.color_picker = div;
 }
 
@@ -709,18 +706,24 @@ ItemBrowserItem.prototype.new_tag = function() {
 			}
 			
 			var callback = function(r,rt) {
-				_tags.color_map[r.message] = _tags.dialog.color_picker.picked.color_name;
+				// update tag color
+				if(_tags.dialog.color_picker.picked) {
+					_tags.color_map[r.message] = _tags.dialog.color_picker.picked.color_name;
+					me.refresh_tags();
+					_tags.dialog.color_picker.picked.unpick()
+				}
 				
+				// hide the dialog
 				_tags.dialog.tag_input.txt.value= '';
 				_tags.dialog.hide();
 
 				if(!r.message) return;
 				_tags.dialog.ibi.add_tag(r.message, 0, '_user_tags');
-				me.refresh_tags();
 				
 			}
+			var t = _tags.dialog.color_picker.picked ? _tags.dialog.color_picker.picked.color_name : '';
 			$c_obj('Menu Control','add_tag',JSON.stringify(
-				[_tags.dialog.ibi.ib.dt, _tags.dialog.ibi.dn, val, _tags.dialog.color_picker.picked.color_name]), callback);
+				[_tags.dialog.ibi.ib.dt, _tags.dialog.ibi.dn, val, t]), callback);
 		}
 		_tags.dialog = d;
 	}
