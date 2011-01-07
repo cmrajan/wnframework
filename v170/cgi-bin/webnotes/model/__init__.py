@@ -20,7 +20,7 @@ def delete_doc(doctype, name):
 		for t in tablefields:
 			webnotes.conn.sql("delete from `tab%s` where parent = %s" % (t[0], '%s'), name)
 	except Exception, e:
-		if e.arg[0]==1451:
+		if e.args[0]==1451:
 			webnotes.msgprint("Cannot delete %s '%s' as it is referenced in another record. You must delete the referred record first" % (doctype, name))
 		
 		raise e
