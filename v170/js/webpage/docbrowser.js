@@ -234,7 +234,7 @@ ItemBrowser.prototype.load_details = function(load_callback) {
 	}
 	var with_color_map = 0;
 	if(!_tags.color_map) with_color_map = 1;
-	$c_obj('Menu Control', 'get_dt_details', JSON.stringify([this.dt, cstr(this.field_list), with_color_map]), callback);
+	$c_obj('Menu Control', 'get_dt_details', JSON.stringify([this.dt, this.field_list.split('\n'), with_color_map]), callback);
 	this.loaded = 1;
 }
 
@@ -388,9 +388,10 @@ ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 
 		// filter conditions
 		me.add_search_conditions(q);
-				
+		
 		this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
 		this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
+		
 	}
 	
 	// make the columns
@@ -511,7 +512,6 @@ ItemBrowserItem.prototype.make_details = function() {
 	var tmp = [];
 	var cl = me.ib.dt_details.columns;
 	var first_property = 1;
-	
 	for(var i=3; i<me.det.length; i++) {
 		if(cl[i] && cl[i][1] && me.det[i]) {
 			// has status, group or type in the label
