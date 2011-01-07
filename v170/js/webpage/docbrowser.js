@@ -234,7 +234,8 @@ ItemBrowser.prototype.load_details = function(load_callback) {
 	}
 	var with_color_map = 0;
 	if(!_tags.color_map) with_color_map = 1;
-	$c_obj('Menu Control', 'get_dt_details', JSON.stringify([this.dt, this.field_list.split('\n'), with_color_map]), callback);
+	var fl = this.field_list ? this.field_list.split('\n') : '';
+	$c_obj('Menu Control', 'get_dt_details', JSON.stringify([this.dt, fl, with_color_map]), callback);
 	this.loaded = 1;
 }
 
