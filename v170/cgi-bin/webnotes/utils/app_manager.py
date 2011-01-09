@@ -164,11 +164,11 @@ class AppManager:
 	# create a new app
 	# ----------------------------------
 	def new_app(self, ac_name, source):
-		import setup
+		import install
 
 		# setup
 		print 'Creating new application...'
-		ret = setup.create_account(ac_name, source)
+		ret = install.create_account(ac_name, source)
 		ret, db_name = ret.split(',')
 		print ac_name + ' created !!!'
 	
