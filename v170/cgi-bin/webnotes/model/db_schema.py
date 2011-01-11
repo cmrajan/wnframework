@@ -142,7 +142,10 @@ class DbTable:
 			for line in txt.split('\n'):
 				if line.strip().startswith('CONSTRAINT') and line.find('FOREIGN')!=1:
 					words = line.split()
-					self.foreign_keys.append((words[4][2:-2], words[1][1:-1]))
+					try:
+						self.foreign_keys.append((words[4][2:-2], words[1][1:-1]))
+					except IndexError, e:
+						pass
 		
 		return self.foreign_keys				
 

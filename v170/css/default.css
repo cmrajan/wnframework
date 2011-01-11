@@ -26,9 +26,9 @@ pre { margin: 0px; padding: 0px; }
 
 button { margin: 2px; margin-left: 0px; }
 
-select { border: 1px solid #888; }
+select { border: 1px solid #AAA; }
 
-textarea { font-family: Arial, Helvetica, Sans; height: 120px; width: 90%; overflow-x: auto; border: 1px solid #AAA; font-size: 12px; }
+textarea { font-family: arial, helvetica, sans serif; height: 120px; width: 90%; overflow-x: auto; border: 1px solid #AAA; font-size: 12px; }
 
 table { padding: 0px; border-collapse: 'collapse'}
 
@@ -878,7 +878,7 @@ div.ann_body {
 .datalabelcell { padding: 2px 0px; width: 160px; vertical-align: top; }
 .datainputcell { padding: 2px 0px; }
 
-.input_area input { width: 80%; font-size: 12px; margin: 0px; border: 1px solid #888; padding: 1px;  }
+.input_area input { width: 80%; font-size: 12px; margin: 0px; border: 1px solid #AAA; padding: 1px;  }
 .input_area select { width: 80%; font-size: 12px; }
 .input_area textarea { width: 90%; font-size: 12px; }
 
