@@ -408,6 +408,16 @@ class Session:
 	# Get IP Info from ipinfodb.com
 	# -----------------------------
 	def get_ipinfo(self):
+		from threading import Thread
+		t = Thread(target=self._get_ipinfo)
+		t.start()
+		
+		# timout in 2 seconds
+		t.join(2)
+		
+		return
+
+	def _get_ipinfo(self):
 		import os,httplib,urllib
 		conn=httplib.HTTPConnection("api.ipinfodb.com")  #open connention
 		args={'ip':os.environ.get('REMOTE_ADDR'),'output':'json','key':'fbde5e1bc0cc79a17bf33f25e2fdb158218ec4177a7d0acd1853ea8d7fff0693'}
@@ -415,6 +425,7 @@ class Session:
 			conn.request("GET", "/v2/ip_query_country.php?"+urllib.urlencode(args))
 			ret = conn.getresponse().read()
 			self.data['data']['ipinfo'] = eval(ret)
+			conn.close()
 		except:
 			pass
 			

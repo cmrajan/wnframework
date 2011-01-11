@@ -170,10 +170,11 @@ function Body() {
 	}
 	
 	this.set_session_changed = function() {
+		if(this.session_message_set) return;
 		var div = $a($i('body_div').parentNode,'div','',{textAlign: 'center', fontSize:'14px', margin:'150px auto'});
 		$dh('body_div');
-		
 		div.innerHTML = 'This session has been changed. Please <span class="link_type" onclick="window.location.reload()">refresh</span> to continue';
+		this.session_message_set = 1;
 	}
 	
 	this.setup();
