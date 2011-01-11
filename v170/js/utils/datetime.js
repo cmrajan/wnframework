@@ -185,16 +185,16 @@ function comment_when(dt) {
 	if(diff < 60) {
 		return "Few moments ago"
 	} else if(diff < 600) {
-		var t = cint(diff/60);
+		var t = Math.floor(diff/60);
 		return t + " minute" + (t==1?"":"s") + " ago"
 	} else if(diff < 3600) {
-		var t = cint(diff/600);
+		var t = Math.floor(diff/600);
 		return t + " minute" + (t==1?"":"s") + " ago"
 	} else if(diff < 86400) {
-		var t = cint(diff/3600);
+		var t = Math.floor(diff/3600);
 		return t + " hour" + (t==1?"":"s") + " ago"
 	} else if(diff < 604800) {
-		var t = cint(diff/86400);
+		var t = Math.floor(diff/86400);
 		return t + " day" + (t==1?"":"s") + " ago"
 	} else {
 		return cdate.getDate() + " " + month_list[cdate.getMonth()] + " " + cdate.getFullYear();
