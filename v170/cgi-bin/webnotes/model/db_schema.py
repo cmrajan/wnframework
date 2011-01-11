@@ -59,7 +59,8 @@ class DbTable:
 		self.change_type = []
 		self.add_index = []
 		self.drop_index = []
-		self.set_foreign_key = []
+		self.add_foreign_key = []
+		self.drop_foreign_key = []
 		self.set_default = []
 		
 		# load
@@ -151,14 +152,32 @@ class DbTable:
 
 	# SET foreign keys
 	def set_foreign_keys(self):
-		if self.set_foreign_key:
+		if self.add_foreign_key:
 			tab_list = get_schema().get_tables()
 			webnotes.conn.sql("set foreign_key_checks=0")
-			for col in self.set_foreign_key:
+			for col in self.add_foreign_key:
 				if col.options:
 					tab_name = "tab" + col.options
 					if tab_name in tab_list:
 						webnotes.conn.sql("alter table `%s` add foreign key (`%s`) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
+			webnotes.conn.sql("set foreign_key_checks=1")
+
+	# Drop foreign keys
+	def drop_foreign_keys(self):
+		if not self.drop_foreign_key:
+			return
+	
+		fk_list = self.get_foreign_keys()
+		
+		# make dictionary of constraint names
+		fk_dict = {}
+		for f in fk_list:
+			fk_dict[f[0]] = f[1]
+			
+		# drop
+		for col in self.drop_foreign_key:
+			webnotes.conn.sql("set foreign_key_checks=0")
+			webnotes.conn.sql("alter table `%s` drop foreign key `%s`" % (self.name, fk_dict[col.fieldname]))
 			webnotes.conn.sql("set foreign_key_checks=1")
 		
 	def sync(self):
@@ -189,6 +208,7 @@ class DbTable:
 			webnotes.conn.sql("alter table `%s` alter column `%s` set default %s" % (self.name, col.fieldname, '%s'), col.default)
 
 		self.set_foreign_keys()
+		self.drop_foreign_keys()
 
 
 # -------------------------------------------------
@@ -236,8 +256,12 @@ class DbColumn:
 
 		# foreign key
 		if self.fieldtype=='Link':
-			if not self.fieldname in [f[0] for f in self.table.get_foreign_keys()]:
-				self.table.set_foreign_key.append(self)
+			fk_list = [f[0] for f in self.table.get_foreign_keys()]
+			if not self.fieldname in fk_list:
+				self.table.add_foreign_key.append(self)
+
+			if not self.options and (self.fieldname in fk_list):
+				self.table.drop_foreign_key.append(self)
 		
 		# index
 		else:
