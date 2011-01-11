@@ -198,8 +198,8 @@ newdoc.amendment_date=dateutil.obj_to_str(new Date());}
 this.copy_doc(fn,1);}
 _f.get_value=function(dt,dn,fn){if(locals[dt]&&locals[dt][dn])
 return locals[dt][dn][fn];}
-_f.set_value=function(dt,dn,fn,v){var d=locals[dt][dn];if(!d)
-msgprint('error:Trying to set a value for "'+dt+','+dn+'" which is not found');if(d[fn]!=v){d[fn]=v;d.__unsaved=1;var frm=frms[d.doctype];try{if(d.parent&&d.parenttype){locals[d.parenttype][d.parent].__unsaved=1;frm=frms[d.parenttype];}}catch(e){if(d.parent&&d.parenttype)
+_f.set_value=function(dt,dn,fn,v){var d=locals[dt][dn];var changed=d[fn]!=v;if(changed&&(d[fn]==null||v==null)&&(cstr(d[fn])==cstr(v)))changed=0;if(!d)
+msgprint('error:Trying to set a value for "'+dt+','+dn+'" which is not found');if(changed){d[fn]=v;d.__unsaved=1;var frm=frms[d.doctype];try{if(d.parent&&d.parenttype){locals[d.parenttype][d.parent].__unsaved=1;frm=frms[d.parenttype];}}catch(e){if(d.parent&&d.parenttype)
 errprint('Setting __unsaved error:'+d.name+','+d.parent+','+d.parenttype);}
 if(frm&&frm==cur_frm){frm.set_heading();}}}
 _f.Frm.prototype.show_comments=function(){if(!cur_frm.comments){cur_frm.comments=new Dialog(540,400,'Comments');cur_frm.comments.comment_body=$a(cur_frm.comments.body,'div','dialog_frm');$y(cur_frm.comments.body,{backgroundColor:'#EEE'});cur_frm.comments.list=new CommentList(cur_frm.comments.comment_body);}

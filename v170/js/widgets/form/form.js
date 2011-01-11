@@ -1163,10 +1163,12 @@ _f.get_value = function(dt, dn, fn) {
 
 _f.set_value = function(dt, dn, fn, v) {
 	var d = locals[dt][dn];
+	var changed = d[fn] != v;
+	if(changed && (d[fn]==null || v==null) && (cstr(d[fn])==cstr(v))) changed = 0;
 
 	if(!d) 
 		msgprint('error:Trying to set a value for "'+dt+','+dn+'" which is not found');
-	if(d[fn] != v) {
+	if(changed) {
 		d[fn] = v;
 		d.__unsaved = 1;
 		var frm = frms[d.doctype];
