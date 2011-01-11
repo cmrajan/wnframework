@@ -434,17 +434,16 @@ _f.Frm.prototype.refresh_print_layout = function() {
 	
 	if(user!='Guest') {
 		$di(this.view_btn_wrapper);
-		$di(this.print_close_btn);
+
+		// archive
+		if(cur_frm.doc.__archived) {
+			$dh(this.view_btn_wrapper);
+		} else {
+			$di(this.view_btn_wrapper);
+		}
 	} else {
 		$dh(this.view_btn_wrapper);		
 		$dh(this.print_close_btn);		
-	}
-
-	// archive
-	if(cur_frm.doc.__archived) {
-		$dh(this.view_btn_wrapper);
-	} else {
-		$ds(this.view_btn_wrapper);		
 	}
 
 	// create print format here
