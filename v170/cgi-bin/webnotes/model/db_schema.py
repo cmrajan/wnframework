@@ -202,7 +202,8 @@ class DbTable:
 			webnotes.conn.sql("alter table `%s` add index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
 
 		for col in self.drop_index:
-			webnotes.conn.sql("alter table `%s` drop index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
+			if col.fieldname != 'name': # primary key
+				webnotes.conn.sql("alter table `%s` drop index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
 
 		for col in self.set_default:
 			webnotes.conn.sql("alter table `%s` alter column `%s` set default %s" % (self.name, col.fieldname, '%s'), col.default)

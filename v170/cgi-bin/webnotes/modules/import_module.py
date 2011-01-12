@@ -92,14 +92,14 @@ def get_all_doclist(folder_list):
 			if fnmatch.fnmatch(each,'*.txt'):
 				doclist = eval(open(os.path.join(folder,each),'r').read())
 				# add code
-				all_doclist.append(add_code_from_files(doclist, folder))
+				all_doclist.append(doclist)
 	
 	return all_doclist
 	
 
 
 # ==============================================================================
-# Add code to doclist
+# Add code to doclist - deprecated
 # =============================================================================
 def add_code_from_files(doclist, folder):
 	import webnotes
@@ -152,7 +152,8 @@ def accept_module(super_doclist):
 	msg, i = [], 0
 	
 	for dl in super_doclist:
-		msg.append(transfer.set_doc(dl, 1, 1, 1))
+		if dl[0]['doctype']!='Control Panel':
+			msg.append(transfer.set_doc(dl, 1, 1, 1))
 		
 		if dl[0]['doctype']=='Module Def':
 			update_module_timestamp(dl[0]['name'])
