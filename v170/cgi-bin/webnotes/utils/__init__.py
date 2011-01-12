@@ -246,12 +246,13 @@ def set_default(key, val):
 		webnotes.conn.sql('update `tabDefaultValue` set defvalue="%s" where parent = "Control Panel" and defkey="%s"' % (val, key))
 	else:
 		from webnotes.model.doc import Document
-		from webnotes.model.doc import addchild
-		cp = Document('Control Panel', 'Control Panel')
-		d = addchild(cp, 'system_defaults', 'DefaultValue')
+		d = Document('DefaultValue')
+		d.parent = 'Control Panel'
+		d.parenttype = 'Control Panel'
+		d.parentfield = 'system_defaults'
 		d.defkey = key
 		d.defvalue = val
-		d.save()
+		d.save(1)
 
 # Clear recycle bin
 # -----------------

@@ -179,24 +179,40 @@ function time_to_hhmm(hh,mm,am) {
 
 // when
 
-function comment_when(dt) {
-	var cdate = dateutil.str_to_obj(dt);
-	var diff = (new Date() - cdate) / 1000;
-	if(diff < 60) {
-		return "Few moments ago"
-	} else if(diff < 600) {
-		var t = Math.floor(diff/60);
-		return t + " minute" + (t==1?"":"s") + " ago"
-	} else if(diff < 3600) {
-		var t = Math.floor(diff/600);
-		return t + " minute" + (t==1?"":"s") + " ago"
-	} else if(diff < 86400) {
-		var t = Math.floor(diff/3600);
-		return t + " hour" + (t==1?"":"s") + " ago"
-	} else if(diff < 604800) {
-		var t = Math.floor(diff/86400);
-		return t + " day" + (t==1?"":"s") + " ago"
+function comment_when(dt, only_days) {
+
+	if(only_days) {
+		var cdate = dateutil.str_to_obj(dt.split(' ')[0]);
+		var diff = (new Date() - cdate) / 1000;
+
+		if(diff < 604800) {
+			var t = Math.floor(diff/86400);
+			if(t==0) return "Today";
+			if(t==1) return "Yesterday";
+			return t + " days ago"
+		} else {
+			return cdate.getDate() + " " + month_list[cdate.getMonth()] + " " + cdate.getFullYear();
+		}
 	} else {
-		return cdate.getDate() + " " + month_list[cdate.getMonth()] + " " + cdate.getFullYear();
+		var cdate = dateutil.str_to_obj(dt);
+		var diff = (new Date() - cdate) / 1000;
+		
+		if(diff < 60) {
+			return "Few moments ago"
+		} else if(diff < 600) {
+			var t = Math.floor(diff/60);
+			return t + " minute" + (t==1?"":"s") + " ago"
+		} else if(diff < 3600) {
+			var t = Math.floor(diff/600);
+			return t + " minute" + (t==1?"":"s") + " ago"
+		} else if(diff < 86400) {
+			var t = Math.floor(diff/3600);
+			return t + " hour" + (t==1?"":"s") + " ago"
+		} else if(diff < 604800) {
+			var t = Math.floor(diff/86400);
+			return t + " day" + (t==1?"":"s") + " ago"
+		} else {
+			return cdate.getDate() + " " + month_list[cdate.getMonth()] + " " + cdate.getFullYear();
+		}
 	}
 }

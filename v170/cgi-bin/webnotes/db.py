@@ -201,15 +201,15 @@ class Database:
 
 	# ======================================================================================
 
-	def set_global(self, key, val):
-		res = self.sql('select defkey from `tabDefaultValue` where defkey=%s and parent = "__global"', key)
+	def set_global(self, key, val, user='__global'):
+		res = self.sql('select defkey from `tabDefaultValue` where defkey=%s and parent=%s', (key, user))
 		if res:
-			self.sql('update `tabDefaultValue` set defvalue=%s where parent = "__global" and defkey=%s', (str(val), key))
+			self.sql('update `tabDefaultValue` set defvalue=%s where parent=%s and defkey=%s', (str(val), user, key))
 		else:
-			self.sql('insert into `tabDefaultValue` (name, defkey, defvalue, parent) values (%s,%s,%s,"__global")', (key,key,str(val)))
+			self.sql('insert into `tabDefaultValue` (name, defkey, defvalue, parent) values (%s,%s,%s,%s)', (user+'_'+key, key, str(val), user))
 
-	def get_global(self, key):
-		g = self.sql("select defvalue from tabDefaultValue where defkey=%s and parent='__global'", key)
+	def get_global(self, key, user='__global'):
+		g = self.sql("select defvalue from tabDefaultValue where defkey=%s and parent=%s", (key, user))
 		return g and g[0][0] or None
 
 	# ======================================================================================

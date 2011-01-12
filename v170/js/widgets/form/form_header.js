@@ -195,14 +195,19 @@ _f.FrmHeader.prototype.set_in_recent = function(doc, col) {
 
 // set the button color of save / submit
 _f.FrmHeader.prototype.set_save_submit_color = function(doc) {
-	if(cint(doc.docstatus)==0 && this.page_head.buttons['Submit'] && this.page_head.buttons['Save']) {
+	
+	var save_btn = this.page_head.buttons['Save'];
+	var submit_btn = this.page_head.buttons['Submit'];
+	
+	if(cint(doc.docstatus)==0 && submit_btn && save_btn) {
 		if(cint(doc.__unsaved)) {
-			$wid_normal(this.page_head.buttons['Save'], 'green');
-			$wid_normal(this.page_head.buttons['Submit'], 'normal');
+			save_btn.wid_color = 'green';
+			submit_btn.wid_color = 'normal';
 		} else {
-			$wid_normal(this.page_head.buttons['Submit'], 'green');
-			$wid_normal(this.page_head.buttons['Save'], 'normal');			
+			save_btn.wid_color = 'normal';
+			submit_btn.wid_color = 'green';
 		}
+		$wid_normal(save_btn); $wid_normal(submit_btn);
 	}
 }
 

@@ -687,7 +687,6 @@ ItemBrowserItem.prototype.new_tag = function() {
 		// make a color picker
 		this.make_color_picker(d);
 		
-		
 		d.tag_input.not_in_form = 1;
 		d.tag_input.refresh();
 		
@@ -761,10 +760,13 @@ ItemBrowserItem.prototype.make_add_tag = function() {
 function ItemBrowserTag(parent, label, dt, dn, static) {
 	this.dt = dt; this.dn = dn; this.label = label;
 	var me = this;
-	var bg = _tags.color_map ? (_tags.color_map[label] ? _tags.color_map[label] : 'Default') : 'Default';
+	var bg = _tags.colors[(_tags.color_map ? (_tags.color_map[label] ? _tags.color_map[label] : 'Default') : 'Default')];
+	
+	if(label=='Submitted') bg = '#459';
+	if(label=='Draft') bg = '#4A5';
 	
 	// tag area
-	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor:_tags.colors[bg], color:'#FFF', marginRight:'4px', fontSize:'11px', cursor:'pointer'});
+	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: bg, color:'#FFF', marginRight:'4px', fontSize:'11px', cursor:'pointer'});
 	$(this.body).hover(
 		function() { $op(this,60); }
 		,function() { $op(this,100); }
