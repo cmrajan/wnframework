@@ -173,7 +173,14 @@ def accept_module(super_doclist):
 def update_module_timestamp(mod):
 	import webnotes, webnotes.defs, os
 	
-	file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
+	try:
+		file = open(os.path.join(webnotes.defs.modules_path, mod, 'module.info'), 'r')
+	except Exception, e:
+		if e.args[0]==2:
+			return # module.info
+		else:
+			raise e
+			
 	module_info = eval(file.read())
 	file.close()
 	
