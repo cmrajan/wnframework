@@ -273,7 +273,7 @@ class DbColumn:
 				self.table.add_index.append(self)
 		
 		# default
-		if (self.default and (current_def['default'] != self.default) and (self.default not in default_shortcuts)):
+		if (self.default and (current_def['default'] != self.default) and (self.default not in default_shortcuts) and not (column_def in ['text','blob'])):
 			self.table.set_default.append(self)
 
 # -------------------------------------------------
