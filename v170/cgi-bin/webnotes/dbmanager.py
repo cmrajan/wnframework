@@ -4,12 +4,16 @@ import webnotes.defs
 
 class DBManager:
 	
+	
+	def __init__(self,conn = None):
+		if conn:
+			self.conn = conn
 
 	def get_tables_list(self,conn,target):	
+		#Returns a list of tables in the given database
 		try:
-			print 
 			conn.use(target)
-			res = conn.sql("show tables")
+			res = conn.sql("SHOW TABLES")
 			table_list = []
 			for table in res:
 				table_list.append(table[0])
@@ -69,6 +73,7 @@ class DBManager:
 
 
 	def get_database_list(self,conn):
+	# Returns a list of databases present
 		try:
 			db_list = []
 			ret_db_list = conn.sql("SHOW DATABASES")
@@ -78,7 +83,12 @@ class DBManager:
 		except Exception,e:
 			raise e
 
+	
 	def restore_database(self,target,source):
+	#Restore the given database.
+	# source = full path to the db dump file(.sql)
+	# target = database name to which to restore to.(must already exist)
+	# Picks up root password from defs.py
 		try:
 			ret = os.system("mysql -u root -p%s %s < %s"%(webnotes.defs.root_password,target,source))
 			print "Restore DB Return status:",ret
@@ -86,10 +96,20 @@ class DBManager:
 			raise e
 
 	def drop_table(self,conn,table_name):
+		#Drop table if exists
 		try:
-			conn.sql("drop table %s"%(table_name))
+			conn.sql("DROP TABLE IF EXISTS %s "%(table_name))
 		except Exception,e:
 			raise e
 			
+	
+	def set_transaction_isolation_level(self,conn,scope='SESSION',level='READ COMMITTED'):
+		#Sets the transaction isolation level. scope = global/session
+		try:
+			conn.sql("SET %s TRANSACTION ISOLATION LEVEL %s"%(scope,level))
+			print "Set transaction level ",scope, level
+
+		except Exception,e:
+			raise e
 
 

@@ -1,74 +1,9 @@
-# Setup
+from webnotes.dbmanager import DBManager
+
+dbman = DBManager()
 
 
-def backup_all():
-	import os
-	# backups folder
-	dblist = sql_accounts('select db_name from tabAccount')
 
-	# backup -all in /backups folder
-	for d in dblist:
-		backup_db(d[0], 1)
-	
-	# dump all in /daily folder
-	import time, datetime
-	fname = 'daily-' + time.strftime('%Y-%m-%d') + '.tar.gz'
-	
-	# daily dump
-	os.system('tar czf ../backups/daily/%s ../backups/dumps' % fname) 
-
-	# keep only three files
-	if len(os.listdir('../backups/daily')) > 3:
-		delete_oldest_file('../backups/daily')
-
-	# if sunday, then copy to weekly
-	if datetime.datetime.now().weekday()==6:
-		os.system('cp ../backups/daily/'+fname+' ../backups/weekly/'+fname)
-	
-		# keep only three files
-		if len(os.listdir('../backups/weekly')) > 3:
-			delete_oldest_file('../backups/weekly')
-	
-def delete_oldest_file(folder):
-	import os
-	a = sorted(os.listdir(folder), key=lambda fn: os.stat(folder+'/'+fn).st_mtime, reverse=False)
-	if a:
-		os.system('rm %s/%s' % (folder, a[0]))
-
-def mysqldump(db, folder=''):
-	import webnotes.defs
-
-	mysql_path = hasattr(defs, 'mysql_path') and webnotes.defs.mysql_path or ''
-	db_password = webnotes.defs.db_password
-	
-	import os
-	os.system('%(path)smysqldump %(db)s > %(folder)s%(db)s.sql -u %(db)s -p%(pwd)s --ignore-table=%(db)s.__DocTypeCache' % {'path':mysql_path, 'db':db, 'pwd':db_password, 'folder':folder})
-
-def backup_db(db, from_all=0):
-	import os
-
-	if webnotes.defs.root_login:
-		global conn
-		conn = MySQLdb.connect(user=webnotes.defs.root_login, host='localhost', passwd=webnotes.defs.root_password)
-		
-	sql('use %s' % db)
-
-	try:
-		p = '../backups'
-		if from_all: p = '../backups/dumps'	
-		
-		os.system('rm %s/%s.tar.gz' % (p,db))
-	
-		# dump
-		mysqldump(db, p+'/')
-		
-		# zip
-		os.system('tar czf %s/%s.tar.gz %s/%s.sql' % (p, db, p, db))
-		os.system('rm %s/%s.sql' % (p, db))
-		#sql('unlock tables')
-	except Exception, e:
-		#sql('unlock tables')
-		raise e
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -92,11 +27,7 @@ def copy_db(source, target=''):
 	return target
 
 def get_db_name(conn, server_prefix):
-	res = conn.sql('SHOW DATABASES')
-	db_list = []
-	for r in res:
-		if r[0] and r[0].startswith(server_prefix):
-			db_list.append(r[0])
+	db_list = dbman.get_database_list(conn)
 	db_list.sort()
 			
 	if db_list:
@@ -105,16 +36,6 @@ def get_db_name(conn, server_prefix):
 		dbn = server_prefix + '001'
 	return dbn
 
-def delete_user(target, conn):
-	# delete user if exists
-	try:
-		conn.sql("DROP USER '%s'@'localhost'" % target)
-		conn.sql("FLUSH PRIVILEGES")
-	except Exception, e:
-		if e.args[0]==1396:
-			pass
-		else:
-			raise e
 
 def import_db(source, target='', is_accounts=0):
 	# dump source
@@ -143,23 +64,32 @@ def import_db(source, target='', is_accounts=0):
 		target = get_db_name(conn, webnotes.defs.server_prefix)
 
 	# delete user (if exists)
-	delete_user(target, conn)
+	dbman.delete_user(conn,target)
+
 
 	# create user and db
-	sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (target, webnotes.defs.db_password))
-	sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
-	sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, target))
-	sql("FLUSH PRIVILEGES")
-	sql("SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;")
+	dbman.create_user(conn,target)
+	
+	dbman.create_database(conn,target)
+
+	dbman.grant_all_privileges(conn,target,target)
+
+	dbman.flush_privileges(conn)
+
+
+	dbman.set_transaction_isolation_level(conn,'GLOBAL','READ COMMITTED')
 
 	source_path = get_source_path(source)		
 
 	# import in target
-	os.system('%smysql -u %s -p%s %s < %s' % (mysql_path, target, webnotes.defs.db_password, target, source_path))
+	dbman.restore_database(target,source_path)
+
 
 	sql("use %s;" % target)
-	sql("DROP TABLE IF EXISTS `__DocTypeCache`")
+	dbman.drop_table(conn,'__DocTypeCache')
 	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
+
+
 	sql("update tabProfile set password = password('admin') where name='Administrator'")
 	sql("update tabDocType set server_code_compiled = NULL")
 
@@ -250,8 +180,7 @@ def create_account_record(ac_name, newdb, domain=''):
 
 	webnotes.conn = webnotes.db.Database(use_default = 1)
 	
-	if not webnotes.conn.in_transaction:
-		webnotes.conn.sql("start transaction")
+	webnotes.conn.begin()
 
 	if not webnotes.session:
 		webnotes.session = {'user':'shell'}
@@ -282,11 +211,10 @@ def create_account(ac_name, ac_type='Framework'):
 	conn.use(newdb)
 	sql = conn.sql
 	
-	if not conn.in_transaction:
-		sql("start transaction")
+	conn.begin()
 	sql("update tabSingles set value=%s where doctype='Control Panel' and field='account_id'", ac_name)
 
-	sql("commit")
+	conn.commit()
 
 	# create entry in Account table in 'accounts' (default) database
 	create_account_record(ac_name, newdb)
