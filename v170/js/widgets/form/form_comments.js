@@ -19,8 +19,7 @@ CommentList.prototype.make_input = function() {
   var me = this;
   // make the input text area and button
   this.input = $a(this.input_area, 'textarea', '', {height:'60px', width:'300px', fontSize:'14px'});
-  this.btn = $a($a(this.input_area,'div','',{marginTop:'8px'}), 'button')
-  $(this.btn).html('Post').click(function() {me.add_comment();}).button();  
+  this.btn = $btn(this.input_area, 'Post', function() {me.add_comment();},{marginTop:'8px'});
 }
 
 // Add comment listing

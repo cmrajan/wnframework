@@ -58,14 +58,11 @@ Calendar.prototype.make_header = function() {
 	var me = this;
 	
 	this.view_header = $a(this.body, 'div', 'cal_month_head', {paddingTop:'8px'});
-	var tab = make_table(this.view_header, 1, 3, '50%', ['30px', null, '30px'], {verticalAlign:'middle'});
+	var tab = make_table(this.view_header, 1, 3, '50%', ['100px', null, '100px'], {verticalAlign:'middle'});
 	$y(tab, {margin:'auto'});
 	
-	var lbtn = $a($td(tab, 0, 0),'button');
-	$(lbtn).click(function() { me.cur_view.prev() }).html('Prev').button({icons:{primary:'ui-icon-triangle-1-w'}, text:false})
-
-	var rbtn = $a($td(tab, 0, 2),'button');
-	$(rbtn).click(function() { me.cur_view.next() }).html('Next').button({icons:{primary:'ui-icon-triangle-1-e'}, text:false})
+	var lbtn = $btn($td(tab, 0, 0),'&lt; Prev', function() { me.cur_view.prev() });
+	var rbtn = $btn($td(tab, 0, 2),'Next &gt;', function() { me.cur_view.next() });
 	
 	$y($td(tab, 0, 1), {fontSize:'16px', textAlign:'center'})
 	this.view_title = $td(tab, 0, 1);

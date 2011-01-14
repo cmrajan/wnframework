@@ -25,7 +25,7 @@ _f.FrmDialog = function() {
 	var d = new Dialog(640, 400, 'Edit Row');
 	this.body = $a(d.body, 'div', 'dialog_frm');
 	$y(d.body, {backgroundColor:'#EEE'});
-	d.done_btn_area = $a(d.body, 'div', 'green_buttons', {margin:'8px'});
+	d.done_btn_area = $a(d.body, 'div', '', {margin:'8px'});
 
 	// done button
 	me.on_complete = function() { 
@@ -53,7 +53,7 @@ _f.FrmDialog = function() {
 	d.onshow = function() {
 		// set the dialog title
 		d.done_btn_area.innerHTML = '';
-		d.done_btn = $a(d.done_btn_area, 'button');
+		d.done_btn = $btn(d.done_btn_area, 'Save', null, null, 'green');
 		d.done_btn.onclick = function() { me.on_complete() };
 		if(me.table_form) {
 			d.set_title("Editing Row #" + (_f.cur_grid_ridx+1));
@@ -62,7 +62,6 @@ _f.FrmDialog = function() {
 			d.set_title(cur_frm.doctype==cur_frm.doctype ? (cur_frm.doctype) : (cur_frm.doctype + ': ' + cur_frm.docname));
 			d.done_btn.innerHTML = 'Save';
 		}
-		$(d.done_btn).button();
 	}
 
 	// on hide, refresh grid or call onsave

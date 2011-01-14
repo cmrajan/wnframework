@@ -201,8 +201,3 @@ get_window_height = function() {
 	ht = ht - bannerh - toolbarh - footerh;
 	return ht;
 }
-
-// set custom tooltip
-set_custom_tooltip = function(parent,tip_content,cs){
-  new CustomTooltip(parent,tip_content,cs);
-}

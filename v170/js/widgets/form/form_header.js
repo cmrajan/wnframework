@@ -216,6 +216,7 @@ _f.FrmHeader.prototype.set_save_submit_color = function(doc) {
 
 _f.FrmHeader.prototype.refresh_labels = function(f) {
 	var ph = this.page_head;
+	var me = this;
 	
 	// main title
 	this.dt_area.innerHTML = get_doctype_label(f.doctype);
@@ -241,5 +242,5 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 	if(sl[1])t.appendChild(sl[1]);
 
 	// timestamp
-	new CustomTooltip(this.timestamp_area, this.get_timestamp(doc));
+	this.timestamp_area.onclick = function() { msgprint(me.get_timestamp(doc)) }
 }

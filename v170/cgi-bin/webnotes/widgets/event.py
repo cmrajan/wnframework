@@ -45,7 +45,4 @@ def load_month_events():
 	m_st = str(yy) + '-%.2i' % cint(mm) + '-01'
 	m_end = str(yy) + '-%.2i' % cint(mm) + '-31'
 
-	webnotes.msgprint(m_st)
-	webnotes.msgprint(m_end)
-
 	webnotes.response['docs'] = get_cal_events(m_st, m_end)

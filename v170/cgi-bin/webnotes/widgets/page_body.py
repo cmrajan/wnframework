@@ -11,15 +11,12 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   
   <title>%(title)s</title>
   <link type="text/css" rel="stylesheet" href="css/jquery-ui.css">
-  <link type="text/css" rel="stylesheet" href="css/green_buttons/jquery-ui-green.css">
   <link type="text/css" rel="stylesheet" href="css/default.css">
   <link type="text/css" rel="stylesheet" href="css/user.css">
   <link rel="Shortcut Icon" href="/favicon.ico">
   
   <script language="JavaScript" src="js/jquery/jquery.min.js"></script>
   <script language="JavaScript" src="js/jquery/jquery-ui.min.js"></script>
-  <script language="JavaScript" src="js/jquery/jquery.tools.min.js"></script>
-  <script language="JavaScript" src="js/jquery/jquery.corners.min.js"></script>
   <script language="JavaScript" src="js/wnf.compressed.js"></script>
   <script language="JavaScript" src="js/form.compressed.js"></script>
   <script language="JavaScript">var _startup_data = %(startup_data)s;</script>

@@ -18,6 +18,7 @@ in_files_main = [
        ,'widgets/autosuggest.js'
        ,'widgets/select.js'
        ,'widgets/export_query.js'
+       ,'widgets/list_selector.js'
        ,'widgets/form/fields.js'
        ,'webpage/wntoolbar.js'
        ,'webpage/history.js'
@@ -36,8 +37,6 @@ in_files_main = [
        ,'app.js'
        ,'tiny_mce/tiny_mce_gzip.js'
        ,'widgets/calendar.js'
-       ,'widgets/tooltip.js'
-       ,'widgets/content_tip.js'
      ]
 
 out_file_main = 'wnf.compressed.js'

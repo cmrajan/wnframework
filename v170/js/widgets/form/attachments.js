@@ -27,9 +27,7 @@ _f.Frm.prototype.setup_attach = function() {
 	$a(d, 'span').innerHTML = '<h4>File Attachments:</h4>';
 	
 	// button
-	var btn_add_attach = $a(this.btn_area, 'button');
-	btn_add_attach.innerHTML = 'Add';
-	$(btn_add_attach).button();
+	var btn_add_attach = $btn(this.btn_area, '+ Add');
 	
 	btn_add_attach.onclick = function() {
 		me.add_attachment();

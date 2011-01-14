@@ -1,10 +1,9 @@
 
 _f.FrmContainer=function(){this.wrapper=page_body.add_page("Forms",function(){},function(){});this.last_displayed=null;$dh(this.wrapper);this.body=$a(this.wrapper,'div');_f.frm_dialog=new _f.FrmDialog();}
-_f.frm_dialog=null;_f.calling_doc_stack=[];_f.temp_access={};_f.FrmDialog=function(){var me=this;this.last_displayed=null;var d=new Dialog(640,400,'Edit Row');this.body=$a(d.body,'div','dialog_frm');$y(d.body,{backgroundColor:'#EEE'});d.done_btn_area=$a(d.body,'div','green_buttons',{margin:'8px'});me.on_complete=function(){if(me.table_form){me.dialog.hide();}else{var callback=function(r){if(me.on_save_callback)
+_f.frm_dialog=null;_f.calling_doc_stack=[];_f.temp_access={};_f.FrmDialog=function(){var me=this;this.last_displayed=null;var d=new Dialog(640,400,'Edit Row');this.body=$a(d.body,'div','dialog_frm');$y(d.body,{backgroundColor:'#EEE'});d.done_btn_area=$a(d.body,'div','',{margin:'8px'});me.on_complete=function(){if(me.table_form){me.dialog.hide();}else{var callback=function(r){if(me.on_save_callback)
 me.on_save_callback(cur_frm.docname);if(!r.exc){me.dialog.hide();}}
 cur_frm.save('Save',callback);}}
-d.onshow=function(){d.done_btn_area.innerHTML='';d.done_btn=$a(d.done_btn_area,'button');d.done_btn.onclick=function(){me.on_complete()};if(me.table_form){d.set_title("Editing Row #"+(_f.cur_grid_ridx+1));d.done_btn.innerHTML='Done Editing';}else{d.set_title(cur_frm.doctype==cur_frm.doctype?(cur_frm.doctype):(cur_frm.doctype+': '+cur_frm.docname));d.done_btn.innerHTML='Save';}
-$(d.done_btn).button();}
+d.onshow=function(){d.done_btn_area.innerHTML='';d.done_btn=$btn(d.done_btn_area,'Save',null,null,'green');d.done_btn.onclick=function(){me.on_complete()};if(me.table_form){d.set_title("Editing Row #"+(_f.cur_grid_ridx+1));d.done_btn.innerHTML='Done Editing';}else{d.set_title(cur_frm.doctype==cur_frm.doctype?(cur_frm.doctype):(cur_frm.doctype+': '+cur_frm.docname));d.done_btn.innerHTML='Save';}}
 d.onhide=function(){if(_f.cur_grid)
 _f.cur_grid.refresh_row(_f.cur_grid_ridx,me.dn);if(page_body.cur_page_label='Forms'){cur_frm=_f.frm_con.cur_frm;}}
 this.dialog=d;}
@@ -55,8 +54,8 @@ _f.FrmHeader.prototype.set_in_recent=function(doc,col){var tn=$i('rec_'+doc.doct
 $y(tn,{backgroundColor:col});}
 _f.FrmHeader.prototype.set_save_submit_color=function(doc){var save_btn=this.page_head.buttons['Save'];var submit_btn=this.page_head.buttons['Submit'];if(cint(doc.docstatus)==0&&submit_btn&&save_btn){if(cint(doc.__unsaved)){save_btn.wid_color='green';submit_btn.wid_color='normal';}else{save_btn.wid_color='normal';submit_btn.wid_color='green';}
 $wid_normal(save_btn);$wid_normal(submit_btn);}}
-_f.FrmHeader.prototype.refresh_labels=function(f){var ph=this.page_head;this.dt_area.innerHTML=get_doctype_label(f.doctype);this.dn_area.innerHTML='';if(!f.meta.issingle)
-this.dn_area.innerHTML=f.docname;var doc=locals[f.doctype][f.docname];var sl=this.get_status_tags(doc,f);this.set_save_submit_color(doc);var t=this.status_area;t.innerHTML='';t.appendChild(sl[0]);if(sl[1])t.appendChild(sl[1]);new CustomTooltip(this.timestamp_area,this.get_timestamp(doc));}
+_f.FrmHeader.prototype.refresh_labels=function(f){var ph=this.page_head;var me=this;this.dt_area.innerHTML=get_doctype_label(f.doctype);this.dn_area.innerHTML='';if(!f.meta.issingle)
+this.dn_area.innerHTML=f.docname;var doc=locals[f.doctype][f.docname];var sl=this.get_status_tags(doc,f);this.set_save_submit_color(doc);var t=this.status_area;t.innerHTML='';t.appendChild(sl[0]);if(sl[1])t.appendChild(sl[1]);this.timestamp_area.onclick=function(){msgprint(me.get_timestamp(doc))}}
 _f.edit_record=function(dt,dn){d=_f.frm_dialog;var show_dialog=function(){var f=frms[dt];if(f.meta.istable){f.parent_doctype=cur_frm.doctype;f.parent_docname=cur_frm.docname;}
 d.cur_frm=f;d.dn=dn;d.table_form=f.meta.istable;f.refresh(dn);}
 if(!frms[dt]){_f.add_frm(dt,show_dialog,null);}else{show_dialog();}}
@@ -435,7 +434,7 @@ as.createList(as.aSug);}
 $c('webnotes.utils.email_lib.get_contact_list',{'select':_e.email_as_field,'from':_e.email_as_dt,'where':_e.email_as_in,'txt':(last_txt?strip(last_txt):'%')},call_back);return;}
 var sel;_e.dialog=d;}
 _f.Frm.prototype.setup_attach=function(){var me=this;this.attach_area=$a(this.layout?this.layout.cur_row.wrapper:this.body,'div','attach_area');$(this.attach_area).css('-moz-border-radius','5px').css('-webkit-border-radius','5px');if(!this.meta.max_attachments)
-this.meta.max_attachments=10;var tab=$a($a(this.attach_area,'div'),'table');tab.insertRow(0);var label_area=tab.rows[0].insertCell(0);var main_area=tab.rows[0].insertCell(1);this.files_area=$a(main_area,'div');this.btn_area=$a(main_area,'div');$w(label_area,"33%");var d=$a(label_area,'div');$a(d,'span').innerHTML='<h4>File Attachments:</h4>';var btn_add_attach=$a(this.btn_area,'button');btn_add_attach.innerHTML='Add';$(btn_add_attach).button();btn_add_attach.onclick=function(){me.add_attachment();me.sync_attachments(me.docname);me.refresh_attachments();}}
+this.meta.max_attachments=10;var tab=$a($a(this.attach_area,'div'),'table');tab.insertRow(0);var label_area=tab.rows[0].insertCell(0);var main_area=tab.rows[0].insertCell(1);this.files_area=$a(main_area,'div');this.btn_area=$a(main_area,'div');$w(label_area,"33%");var d=$a(label_area,'div');$a(d,'span').innerHTML='<h4>File Attachments:</h4>';var btn_add_attach=$btn(this.btn_area,'+ Add');btn_add_attach.onclick=function(){me.add_attachment();me.sync_attachments(me.docname);me.refresh_attachments();}}
 _f.Frm.prototype.refresh_attachments=function(){var nattach=0;for(var dn in this.attachments){for(var i in this.attachments[dn]){var a=this.attachments[dn][i];if(a.docname!=this.docname)
 a.hide();else{a.show();nattach++;if(this.perm[0][WRITE]&&this.editable&&this.doc.docstatus<1){$ds(a.delbtn);}
 else{$dh(a.delbtn);}}}}
@@ -479,8 +478,7 @@ if(cur_frm){if(n.substr)_hide_field(n,0);else{for(var i in n)_hide_field(n[i],0)
 get_field_obj=function(fn){return cur_frm.fields_dict[fn];}
 CommentList=function(parent,dt,dn){this.wrapper=$a(parent,'div','',{margin:'16px'});this.input_area=$a(this.wrapper,'div','',{margin:'2px'});this.lst_area=$a(this.wrapper,'div','',{margin:'2px'});this.make_input();this.make_lst();this.dt;this.dn;}
 CommentList.prototype.run=function(){this.lst.run();}
-CommentList.prototype.make_input=function(){var me=this;this.input=$a(this.input_area,'textarea','',{height:'60px',width:'300px',fontSize:'14px'});this.btn=$a($a(this.input_area,'div','',{marginTop:'8px'}),'button')
-$(this.btn).html('Post').click(function(){me.add_comment();}).button();}
+CommentList.prototype.make_input=function(){var me=this;this.input=$a(this.input_area,'textarea','',{height:'60px',width:'300px',fontSize:'14px'});this.btn=$btn(this.input_area,'Post',function(){me.add_comment();},{marginTop:'8px'});}
 CommentList.prototype.add_comment=function(){var me=this;var args={};args.comment=this.input.value;args.comment_by=user;args.comment_doctype=this.dt;args.comment_docname=this.dn;$c_obj('Widget Control','add_comment',docstring(args),function(r,rt){me.lst.run();me.input.value='';cur_frm.n_comments[cur_frm.doc.name]=cint(cur_frm.n_comments[cur_frm.doc.name])+1;cur_frm.frm_head.refresh_comments();});}
 CommentList.prototype.make_lst=function(){if(!this.lst){var l=new Listing('Comments',1);var me=this;l.colwidths=['100%'];l.opts.hide_export=1;l.opts.hide_print=1;l.opts.hide_refresh=1;l.opts.no_border=1;l.opts.hide_rec_label=0;l.opts.show_calc=0;l.opts.round_corners=0;l.opts.alt_cell_style={};l.opts.cell_style={padding:'3px'};l.no_rec_message='No comments yet. Be the first one to comment!';l.get_query=function(){this.query=repl("select t1.name, t1.comment, t1.comment_by, '', t1.creation, t1.comment_doctype, t1.comment_docname, ifnull(concat_ws(' ',ifnull(t2.first_name,''),ifnull(t2.middle_name,''),ifnull(t2.last_name,'')),''), '', DAYOFMONTH(t1.creation), MONTHNAME(t1.creation), YEAR(t1.creation), hour(t1.creation), minute(t1.creation), second(t1.creation) from `tabComment Widget Record` t1, `tabProfile` t2 where t1.comment_doctype = '%(dt)s' and t1.comment_docname = '%(dn)s' and t1.comment_by = t2.name order by t1.creation desc",{dt:me.dt,dn:me.dn});this.query_max=repl("select count(name) from `tabComment Widget Record` where comment_doctype='%(dt)s' and comment_docname='%(dn)s'",{'dt':me.dt,'dn':me.dn});}
 l.show_cell=function(cell,ri,ci,d){new CommentItem(cell,ri,ci,d,me)}

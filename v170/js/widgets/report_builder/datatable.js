@@ -98,11 +98,8 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
   var div = $a($td(ht,0,0), 'div');
   
 	var make_btn = function(label,icon,onclick,bold) {
-		var btn = $a(div,'button');
+		var btn = $btn(div,label,onclick);
 		if(bold)$y(btn,{fontWeight: 'bold'});
-		btn.innerHTML = label;
-		btn.onclick = onclick;
-		$(btn).button({icons:{ primary: icon }});
 	}
 	
 	
@@ -118,7 +115,6 @@ _r.DataTable.prototype.make_toolbar = function(parent) {
 	// print
 	make_btn('Calc','ui-icon-calculator',function() {me.do_calc();}); 
 
-	$(div).buttonset();
   // sort select
   var t = make_table($td(ht,0,1),1,6,null,[null,null,null,'20px',null,null],{verticalAlign:'middle'});
 

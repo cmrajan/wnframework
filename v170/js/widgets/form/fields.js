@@ -73,8 +73,9 @@ Field.prototype.make_body = function() {
 
 Field.prototype.set_max_width = function() {
 	var no_max = ['Code', 'Text Editor', 'Text', 'Table', 'HTML']
-	if(this.wrapper && this.layout_cell && this.layout_cell.parentNode.cells.length==1 && !in_list(no_max, this.df.fieldtype)) {
-		$y(this.wrapper, {paddingRight:'50%'})
+	if(this.wrapper && this.layout_cell && this.layout_cell.parentNode.cells 
+		&& this.layout_cell.parentNode.cells.length==1 && !in_list(no_max, this.df.fieldtype)) {
+			$y(this.wrapper, {paddingRight:'50%'});
 	}
 }
 
@@ -90,8 +91,7 @@ Field.prototype.set_comment = function() {
 	if(this.df.description) {
 		if(this.help_icon) {
 			$ds(this.help_icon);
-			this.help_icon.title = me.df.description;
-			$(this.help_icon).tooltip();
+			this.help_icon.setAttribute('title', me.df.description);
 		} 
 	} else {
 		if(this.help_icon) 	$dh(this.help_icon);
@@ -232,6 +232,8 @@ Field.prototype.refresh = function() {
 
 	if(!this.not_in_form)
 		this.set_input(_f.get_value(this.doctype,this.docname,this.df.fieldname));
+		
+	this.set_max_width();
 }
 
 Field.prototype.refresh_label_icon = function() {
@@ -488,7 +490,7 @@ DateField.prototype.make_input = function() {
 			datepicker_active = 1 
 		},
 		onClose: function(dateText, inst) { 
-			datepicker_active = 0 
+			datepicker_active = 0;
 			if(_f.cur_grid_cell)
 				_f.cur_grid_cell.grid.cell_deselect();	
 		}
@@ -997,7 +999,10 @@ SelectField.prototype.make_input = function() {
 			return l;
 		} else {
 			if(me.txt.options) {
-				return sel_val(me.txt);
+				var val = sel_val(me.txt);
+				if(!val && !me.txt.selectedIndex)
+					val = me.txt.options[0].value;
+				return val;
 			}
 			return me.txt.value;
 		}
