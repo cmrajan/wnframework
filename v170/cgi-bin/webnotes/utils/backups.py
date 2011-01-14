@@ -96,7 +96,6 @@ def get_backup():
 		if os.path.exists(folder):
 			fl = sorted(os.listdir(folder), key=lambda fn: os.stat(os.path.join(folder,fn)).st_mtime, reverse=True)
 			os.system('cp '+ folder + fl[0] + ' ./' + new_name)
-			#ret = os.system('rename ' + fl[0] + ' ' + new_name + ' ' + fl[0])
 		
 			webnotes.msgprint('Your nightly backup is available for download by <a href="'+download_folder+'/' + new_name + '">clicking here</a> (only for the next few hours)')
 	
