@@ -1,9 +1,3 @@
-from webnotes.dbmanager import DBManager
-
-dbman = DBManager()
-
-
-
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -38,12 +32,16 @@ def get_db_name(conn, server_prefix):
 
 
 def import_db(source, target='', is_accounts=0):
+
 	# dump source
 
 	import webnotes
 	import webnotes.db
 	import webnotes.defs
 	import os
+	
+	from webnotes.dbmanager import DBManager
+	dbman = DBManager()
 
 	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
 
@@ -64,7 +62,7 @@ def import_db(source, target='', is_accounts=0):
 		target = get_db_name(conn, webnotes.defs.server_prefix)
 
 	# delete user (if exists)
-	dbman.delete_user(conn,target)
+	dbman.delete_user(target, conn)
 
 
 	# create user and db
@@ -74,7 +72,7 @@ def import_db(source, target='', is_accounts=0):
 
 	dbman.grant_all_privileges(conn,target,target)
 
-	dbman.flush_privileges(conn)
+	dbman.flush_privileges(conn,target)
 
 
 	dbman.set_transaction_isolation_level(conn,'GLOBAL','READ COMMITTED')
