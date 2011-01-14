@@ -91,7 +91,7 @@ def get_backup():
 		from random import choice
 		lnd='0123456789'
 		new_name = ''.join(map(lambda x,y=lnd: choice(y), range(8))) + '.tar.gz'
-		folder = backup_folder + '/archives/' + webnotes.conn.cur_db_name
+		folder = backup_folder + '/archives/' + webnotes.conn.cur_db_name + '/'
 		# get the newest file
 		if os.path.exists(folder):
 			fl = sorted(os.listdir(folder), key=lambda fn: os.stat(os.path.join(folder,fn)).st_mtime, reverse=True)
