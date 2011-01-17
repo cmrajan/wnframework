@@ -67,6 +67,8 @@ password: admin
 
 
 
+You can install webnotes by running easy_install webnotes_core
+
 
 
 
