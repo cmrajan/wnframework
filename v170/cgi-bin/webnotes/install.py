@@ -44,25 +44,18 @@ def import_db(source, target='', is_accounts=0):
 	dbman = DBManager()
 
 	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
-
-	# default, use current user id
-	if webnotes.conn:
-		conn = webnotes.conn
-
-		if conn.in_transaction:
-			conn.sql('COMMIT')
-
+	conn = None	
+	
 	# login as root (if set)
 	if webnotes.defs.root_login:
 		conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
-	sql = conn.sql
-
+	
 	# get database number
 	if not target:
 		target = get_db_name(conn, webnotes.defs.server_prefix)
 
 	# delete user (if exists)
-	dbman.delete_user(target, conn)
+	dbman.delete_user(conn,target)
 
 
 	# create user and db
@@ -72,7 +65,7 @@ def import_db(source, target='', is_accounts=0):
 
 	dbman.grant_all_privileges(conn,target,target)
 
-	dbman.flush_privileges(conn,target)
+	dbman.flush_privileges(conn)
 
 
 	dbman.set_transaction_isolation_level(conn,'GLOBAL','READ COMMITTED')
@@ -83,18 +76,18 @@ def import_db(source, target='', is_accounts=0):
 	dbman.restore_database(target,source_path)
 
 
-	sql("use %s;" % target)
+	conn.use(target)
 	dbman.drop_table(conn,'__DocTypeCache')
-	sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
+	conn.sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
 
 
-	sql("update tabProfile set password = password('admin') where name='Administrator'")
-	sql("update tabDocType set server_code_compiled = NULL")
+	conn.sql("update tabProfile set password = password('admin') where name='Administrator'")
+	conn.sql("update tabDocType set server_code_compiled = NULL")
 
 	# temp
- 	sql("alter table tabSessions change sessiondata sessiondata longtext")
+ 	conn.sql("alter table tabSessions change sessiondata sessiondata longtext")
 	try: 	
-		sql("alter table tabSessions add index sid(sid)")
+		conn.sql("alter table tabSessions add index sid(sid)")
 	except Exception, e:
 		if e.args[0]==1061:
 			pass
@@ -122,12 +115,15 @@ def get_source_path(s):
 		raise Exception, "Target file '%s' does not exist" % f
 
 
-def create_account_doctype():
+def create_account_doctype(conn,target):
 	# update accounts
 	import webnotes.db
+	import webnotes.defs
 
-	webnotes.conn = webnotes.db.Database(use_default = 1)
+	#webnotes.conn = webnotes.db.Database(user = webnotes.defs.root_login,password = webnotes.defs.root_password) 
 	webnotes.session = {'user':'setup.py'}	
+	conn.use(target)
+
 
 	from webnotes.model.doc import Document
 	import webnotes.model.db_schema
