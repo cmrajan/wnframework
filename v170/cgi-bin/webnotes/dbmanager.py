@@ -78,7 +78,8 @@ class DBManager:
 			db_list = []
 			ret_db_list = conn.sql("SHOW DATABASES")
 			for db in ret_db_list:
-				db_list.append(db[0])
+				if db not in ['test', 'information_schema', 'mysql', 'accounts']:
+					db_list.append(db[0])
 			return db_list
 		except Exception,e:
 			raise e
