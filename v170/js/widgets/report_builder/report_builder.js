@@ -575,9 +575,10 @@ _r.ReportBuilder.prototype.reset_report = function() {
 	this.report_filters.refresh();
 	this.column_picker.refresh();
 	
-	this.set_filter(this.doctype, 'Saved', 1);
-	this.set_filter(this.doctype, 'Submitted', 1);
-	this.set_filter(this.doctype, 'Cancelled', 0);
+	var	dt = this.parent_dt?this.parent_dt: this.doctype;
+	this.set_filter(dt, 'Saved', 1);
+	this.set_filter(dt, 'Submitted', 1);
+	this.set_filter(dt, 'Cancelled', 0);
 	
 	this.column_picker.set_defaults();
 
