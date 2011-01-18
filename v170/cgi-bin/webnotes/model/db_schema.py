@@ -22,12 +22,8 @@ type_map = {
 
 default_shortcuts = ['_Login', '__user', '_Full Name', 'Today', '__today']
 
-schema = None
 def get_schema():
-	global schema
-	if not schema:
-		schema = DbSchema()
-	return schema
+	return DbSchema()
 
 # -------------------------------------------------
 # Class database schema
