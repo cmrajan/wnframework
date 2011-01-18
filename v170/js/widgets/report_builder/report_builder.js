@@ -322,7 +322,7 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 	// ----------
 	this.column_picker.clear();
 
-	var cl = this.sc.columns.split(',');
+	var cl = this.sc.columns ? this.sc.columns.split(',') : [];
 	for(var c=0;c<cl.length;c++) {
 		var key = cl[c].split('\1');
 		this.select_column(key[0], key[1], 1);
