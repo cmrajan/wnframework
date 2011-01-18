@@ -539,7 +539,7 @@ DateField.prototype.validate = function(v) {
 // ======================================================================================
 
 // for ensuring in AutoSuggest that 2 values are not set in quick succession due to un intentional event call
-var _last_link_value = null;
+var _link_onchange_flag = null;
 
 // reference when a new record is created via link
 function LinkField() { } LinkField.prototype = new Field();
@@ -623,10 +623,12 @@ LinkField.prototype.setup_buttons = function() {
 
 LinkField.prototype.set_onchange = function() { 
 	var me = this;
-	me.txt.onchange = function() { 
+	me.txt.onchange = function(e) { 
 		// check values are not set in quick succession due to un-intentional event call
-		if(_last_link_value) return
-			
+		
+		if(_link_onchange_flag) { return;}
+		_link_onchange_flag = 1;
+		
 		// not in form, do nothing
 		if(me.not_in_form) return;
 		
@@ -634,51 +636,49 @@ LinkField.prototype.set_onchange = function() {
 		if(cur_frm) {
 			if(me.txt.value == locals[me.doctype][me.docname][me.df.fieldname]) { 
 				me.set(me.txt.value); // one more time, grid bug?
+				me.run_trigger(); // wanted - called as refresh?
+				setTimeout('_link_onchange_flag = 0', 500);
 				return; 
 			}
 		}
 		
-		if(me.as && me.as.ul) {
-			// still setting value
-		} else {
-			me.set(me.txt.value);
-			
-			_last_link_value = me.txt.value;
-			setTimeout('_last_link_value=null', 500);
-			
-			// deselect cell if in grid
-			if(_f.cur_grid_cell)
-				_f.cur_grid_cell.grid.cell_deselect();
-			
-			// run trigger if value is cleared
-			if(!me.txt.value) {
-				me.run_trigger();
-				return;
-			}
 
-			// validate the value just entered
-			var fetch = '';
-			if(cur_frm.fetch_dict[me.df.fieldname])
-				fetch = cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');
-				
-			$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options, 'fetch': fetch}, function(r,rt) { 
-				if(selector && selector.display) return; // selecting from popup
-				
-				if(r.message=='Ok') {
-					// set fetch values
-					if(r.fetch_values) me.set_fetch_values(r.fetch_values);
+		me.set(me.txt.value);
 					
-					me.run_trigger();
-				} else {
-					var astr = '';
-					if(in_list(profile.can_create, me.df.options)) astr = repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s', {dt:me.df.options, dtl:get_doctype_label(me.df.options)})
-					msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s', {val:me.txt.value, dt:get_doctype_label(me.df.options), add:astr})); 
-					me.txt.value = ''; 
-					me.set('');
-				}
-			});
-			
+		// deselect cell if in grid
+		if(_f.cur_grid_cell)
+			_f.cur_grid_cell.grid.cell_deselect();
+		
+		// run trigger if value is cleared
+		if(!me.txt.value) {
+			me.run_trigger();
+			setTimeout('_link_onchange_flag = 0', 500);
+			return;
 		}
+
+		// validate the value just entered
+		var fetch = '';
+		if(cur_frm.fetch_dict[me.df.fieldname])
+			fetch = cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');
+			
+		$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options, 'fetch': fetch}, function(r,rt) { 
+			if(selector && selector.display) return; // selecting from popup
+			
+			if(r.message=='Ok') {
+				// set fetch values
+				if(r.fetch_values) me.set_fetch_values(r.fetch_values);
+				
+				me.run_trigger();
+			} else {
+				var astr = '';
+				if(in_list(profile.can_create, me.df.options)) astr = repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s', {dt:me.df.options, dtl:get_doctype_label(me.df.options)})
+				msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s', {val:me.txt.value, dt:get_doctype_label(me.df.options), add:astr})); 
+				me.txt.value = ''; 
+				me.set('');
+			}
+			setTimeout('_link_onchange_flag = 0', 500);
+		});
+		
 	}
 }
 LinkField.prototype.set_fetch_values = function(fetch_values) { 

@@ -608,8 +608,7 @@ div.appendChild(ul);var mywid=cint(this.fld.offsetWidth);if(this.oP.fixed_option
 if(cint(mywid)<100)mywid=100;var left=pos.x-((mywid-this.fld.offsetWidth)/2);if(left<0){mywid=mywid+(left/2);left=0;}
 div.style.left=left+"px";div.style.top=(pos.y+this.fld.offsetHeight+this.oP.offsety)+"px";div.style.width=mywid+'px';div.onmouseover=function(){me.killTimeout()};div.onmouseout=function(){me.resetTimeout()};popup_cont.appendChild(div);if(cint(div.clientHeight)>=this.oP.maxheight){div.original_height=cint(div.clientHeight);$y(div,{height:this.oP.maxheight+'px',overflowY:'auto'});div.scrollbars=true;}
 this.body=div;if(isIE){$y(div,{border:'1px solid #444'});}
-this.iHigh=0;if(this.oP.fixed_options&&this.fld.value){for(var i=0;i<this.aSug.length;i++){if(this.aSug[i].value==this.fld.value){this.iHigh=i;break;}}}
-if(!this.iHigh)
+this.iHigh=0;if(!this.iHigh)
 this.changeHighlight(40);this.resetTimeout();};AutoSuggest.prototype.changeHighlight=function(key)
 {var list=this.ul;if(!list){if(this.aSug)
 this.createList(this.aSug);return false;}
@@ -624,18 +623,15 @@ this.clearHighlight();this.iHigh=Number(n);var ele=list.childNodes[this.iHigh-1]
 cur_y+=(isIE?list.childNodes[i].offsetHeight:list.childNodes[i].clientHeight);if(cur_y<this.body.scrollTop)
 this.body.scrollTop=cur_y;ff_delta=(isFF?cint(this.iHigh/2):0);var h=(isIE?ele.offsetHeight:ele.clientHeight);if(cur_y>=(this.body.scrollTop+this.oP.maxheight-h))
 this.body.scrollTop=cur_y-this.oP.maxheight+h+ff_delta;}
-if(this.oP.fixed_options){this.fld.value=this.aSug[this.iHigh-1].value;}};AutoSuggest.prototype.clearHighlight=function()
+this.fld.value=this.aSug[this.iHigh-1].value;};AutoSuggest.prototype.clearHighlight=function()
 {var list=this.ul;if(!list)
 return false;if(this.iHigh>0){list.childNodes[this.iHigh-1].className="";this.iHigh=0;}};AutoSuggest.prototype.setHighlightedValue=function()
-{if(this.iHigh){if(this.custom_select)
-this.sInp=this.custom_select(this.fld.value,this.aSug[this.iHigh-1].value);else
-this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selectionStart)
+{if(this.iHigh){this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selectionStart)
 this.fld.setSelectionRange(this.sInp.length,this.sInp.length);}catch(e){return;}
-this.fld.value=this.sInp;this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
-this.oP.callback(this.aSug[this.iHigh-1]);}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions();},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
-if(this.ul)
-delete this.ul;this.iHigh=0;if(this.oP.fixed_options){if(this.fld.field_object&&this.fld.field_object.docname){var d=locals[this.fld.field_object.doctype][this.fld.field_object.docname];if(this.fld.fieldname){this.fld.value=d[this.fld.fieldname];}}else{}}
-if(this.fld.field_object&&!this.oP.fixed_options){this.fld.onchange();}}
+this.fld.value=this.sInp;this.fld.onchange();this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
+this.oP.callback(this.aSug[this.iHigh-1]);}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions(1);},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(from_timeout){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
+if(!this.ul)return;if(this.ul)
+delete this.ul;this.iHigh=0;if(from_timeout&&this.fld.field_object&&!this.oP.fixed_options){this.fld.onchange();}}
 $ce=function(type,attr,cont,html)
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.inp=$a(parent,'select');if(options)add_sel_options(this.inp,options);if(width)$y(this.inp,{width:width});this.set_width=function(w){$y(this.inp,{width:w})};this.set_options=function(o){add_sel_options(this.inp,o);}
 this.inp.onchange=function(){if(me.onchange)me.onchange(this);}
@@ -749,7 +745,7 @@ DateField.prototype.validate=function(v){if(!v)return;var me=this;this.clear=fun
 var t=v.split('-');if(t.length!=3){return this.clear();}
 else if(cint(t[1])>12||cint(t[1])<1){return this.clear();}
 else if(cint(t[2])>31||cint(t[2])<1){return this.clear();}
-return v;};var _last_link_value=null;function LinkField(){}LinkField.prototype=new Field();LinkField.prototype.with_label=1;LinkField.prototype.make_input=function(){var me=this;if(me.df.no_buttons){this.txt=$a(this.input_area,'input');this.input=this.txt;}else{makeinput_popup(this,'ic-zoom','ic-sq_next','ic-sq_plus');me.setup_buttons();me.onrefresh=function(){if(me.can_create&&cur_frm.doc.docstatus==0)$ds(me.btn2);else $dh(me.btn2);}}
+return v;};var _link_onchange_flag=null;function LinkField(){}LinkField.prototype=new Field();LinkField.prototype.with_label=1;LinkField.prototype.make_input=function(){var me=this;if(me.df.no_buttons){this.txt=$a(this.input_area,'input');this.input=this.txt;}else{makeinput_popup(this,'ic-zoom','ic-sq_next','ic-sq_plus');me.setup_buttons();me.onrefresh=function(){if(me.can_create&&cur_frm.doc.docstatus==0)$ds(me.btn2);else $dh(me.btn2);}}
 me.txt.field_object=this;me.set_onchange();me.input.set_input=function(val){if(val==undefined)val='';me.txt.value=val;}
 me.get_value=function(){return me.txt.value;}
 var opts={script:'',json:true,maxresults:10,link_field:me};this.as=new AutoSuggest(me.txt,opts);}
@@ -757,13 +753,14 @@ LinkField.prototype.setup_buttons=function(){var me=this;me.btn.onclick=function
 if(me.btn1)me.btn1.onclick=function(){if(me.txt.value&&me.df.options){loaddoc(me.df.options,me.txt.value);}}
 me.can_create=0;if((!me.not_in_form)&&in_list(profile.can_create,me.df.options)){me.can_create=1;me.btn2.onclick=function(){var on_save_callback=function(new_rec){if(new_rec){var d=_f.calling_doc_stack.pop();locals[d[0]][d[1]][me.df.fieldname]=new_rec;me.refresh();if(me.grid)me.grid.refresh();}}
 _f.calling_doc_stack.push([me.doctype,me.docname]);new_doc(me.df.options,null,1,on_save_callback,me.doctype,me.docname,me.frm.not_in_container);}}else{$dh(me.btn2);$y($td(me.tab,0,2),{width:'0px'});}}
-LinkField.prototype.set_onchange=function(){var me=this;me.txt.onchange=function(){if(_last_link_value)return
-if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[me.doctype][me.docname][me.df.fieldname]){me.set(me.txt.value);return;}}
-if(me.as&&me.as.ul){}else{me.set(me.txt.value);_last_link_value=me.txt.value;setTimeout('_last_link_value=null',500);if(_f.cur_grid_cell)
-_f.cur_grid_cell.grid.cell_deselect();if(!me.txt.value){me.run_trigger();return;}
+LinkField.prototype.set_onchange=function(){var me=this;me.txt.onchange=function(e){if(_link_onchange_flag){msgprint(me.txt.value);return;}
+_link_onchange_flag=1;if(me.not_in_form)return;if(cur_frm){if(me.txt.value==locals[me.doctype][me.docname][me.df.fieldname]){me.set(me.txt.value);me.run_trigger();setTimeout('_link_onchange_flag = 0',500);return;}}
+me.set(me.txt.value);if(_f.cur_grid_cell)
+_f.cur_grid_cell.grid.cell_deselect();if(!me.txt.value){me.run_trigger();setTimeout('_link_onchange_flag = 0',500);return;}
 var fetch='';if(cur_frm.fetch_dict[me.df.fieldname])
 fetch=cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');$c('webnotes.widgets.form.validate_link',{'value':me.txt.value,'options':me.df.options,'fetch':fetch},function(r,rt){if(selector&&selector.display)return;if(r.message=='Ok'){if(r.fetch_values)me.set_fetch_values(r.fetch_values);me.run_trigger();}else{var astr='';if(in_list(profile.can_create,me.df.options))astr=repl('<br><br><span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create a new %(dtl)s',{dt:me.df.options,dtl:get_doctype_label(me.df.options)})
-msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s',{val:me.txt.value,dt:get_doctype_label(me.df.options),add:astr}));me.txt.value='';me.set('');}});}}}
+msgprint(repl('error:<b>%(val)s</b> is not a valid %(dt)s.<br><br>You must first create a new %(dt)s <b>%(val)s</b> and then select its value. To find an existing %(dt)s, click on the magnifying glass next to the field.%(add)s',{val:me.txt.value,dt:get_doctype_label(me.df.options),add:astr}));me.txt.value='';me.set('');}
+setTimeout('_link_onchange_flag = 0',500);});}}
 LinkField.prototype.set_fetch_values=function(fetch_values){var fl=cur_frm.fetch_dict[this.df.fieldname].fields;var changed_fields=[];for(var i=0;i<fl.length;i++){if(locals[this.doctype][this.docname][fl[i]]!=fetch_values[i]){locals[this.doctype][this.docname][fl[i]]=fetch_values[i];if(!this.grid){refresh_field(fl[i]);changed_fields.push(fl[i]);}}}
 for(i=0;i<changed_fields.length;i++){if(cur_frm.fields_dict[changed_fields[i]])
 cur_frm.fields_dict[changed_fields[i]].run_trigger();}

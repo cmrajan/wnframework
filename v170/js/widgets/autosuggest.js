@@ -407,15 +407,6 @@ AutoSuggest.prototype.createList = function(arr) {
 	
 	// if value, then hilight value
 	this.iHigh = 0;
-	if(this.oP.fixed_options && this.fld.value) {
-		for(var i=0; i<this.aSug.length; i++) {
-			if(this.aSug[i].value == this.fld.value) {
-				this.iHigh = i;
-				break;
-			}
-		}
-	}
-		
 		
 	if(!this.iHigh)
 		this.changeHighlight(40); // hilight first
@@ -481,9 +472,7 @@ AutoSuggest.prototype.setHighlight = function(n)
 	}
 
 	// set it the field (but do not call onchange as this field still has focus)
-	if(this.oP.fixed_options) {
-		this.fld.value = this.aSug[this.iHigh-1 ].value;
-	}
+	this.fld.value = this.aSug[this.iHigh-1 ].value;
 	
 };
 
@@ -502,10 +491,7 @@ AutoSuggest.prototype.clearHighlight = function()
 AutoSuggest.prototype.setHighlightedValue = function ()
 {
 	if (this.iHigh) {
-		if(this.custom_select)
-			this.sInp = this.custom_select(this.fld.value, this.aSug[ this.iHigh-1 ].value);
-		else
-			this.sInp = this.aSug[ this.iHigh-1 ].value;
+		this.sInp = this.aSug[ this.iHigh-1 ].value;
 		
 		// move cursor to end of input (safari)
 		//
@@ -518,6 +504,7 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 		}
 
 		this.fld.value = this.sInp;
+		this.fld.onchange();
 
 		this.clearSuggestions();
 		this.killTimeout();
@@ -539,33 +526,24 @@ AutoSuggest.prototype.resetTimeout = function() {
 	cur_autosug = this;
 	clearTimeout(this.toID);
 	clearTimeout(this.clear_timer);
-	this.toID = setTimeout(function () { if(cur_autosug)cur_autosug.clearSuggestions(); }, this.oP.timeout);
+	this.toID = setTimeout(function () { if(cur_autosug)cur_autosug.clearSuggestions(1); }, this.oP.timeout);
 };
 
-AutoSuggest.prototype.clearSuggestions = function () {
+AutoSuggest.prototype.clearSuggestions = function (from_timeout) {
 	this.killTimeout();
 	cur_autosug = null;
 	var me = this;
 	if (this.body) { $dh(this.body); delete this.body; }
+	
+	if(!this.ul) return;
+	
 	if(this.ul)
 		delete this.ul;
 	this.iHigh = 0;
 	
-	// refresh field value (in case not seleted and the suggestions timeout)
-	if(this.oP.fixed_options) {
-		if(this.fld.field_object && this.fld.field_object.docname) {
-			var d = locals[this.fld.field_object.doctype][this.fld.field_object.docname];
-
-			if(this.fld.fieldname) {
-				this.fld.value = d[this.fld.fieldname]; // refresh the value
-			}
-		} else {
-
-		}
-	}
 	
 	// accept the value
-	if(this.fld.field_object && !this.oP.fixed_options) {
+	if(from_timeout && this.fld.field_object && !this.oP.fixed_options) {
 		// call onchange
 		// we do not call onchange from the link field if autosuggest options are open
 		this.fld.onchange();
