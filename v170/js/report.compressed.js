@@ -28,7 +28,7 @@ loaddoc('Search Criteria',me.cur_rb.sc_dict[me.cur_rb.current_loaded]);}};var ad
 this.set_dt=function(dt,onload){my_onload=function(f){if(!f.forbidden){me.cur_rb=f;me.cur_rb.mytabs.items['Result'].expand();if(onload)onload(f);}}
 if(me.cur_rb)
 me.cur_rb.hide();if(me.rb_dict[dt]){me.rb_dict[dt].show(my_onload);}else{me.rb_dict[dt]=new _r.ReportBuilder(me.rb_area,dt,my_onload);}}}
-_r.ReportBuilder=function(parent,doctype,onload){this.menuitems={};this.has_primary_filters=false;this.doctype=doctype;this.forbidden=0;this.filter_fields=[];this.filter_fields_dict={};var me=this;this.fn_list=['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];this.wrapper=$a(parent,'div','finder_wrapper');this.make_tabs();this.current_loaded=null;this.setup_doctype(onload);this.hide=function(){$dh(me.wrapper);}
+_r.ReportBuilder=function(parent,doctype,onload){this.menuitems={};this.has_primary_filters=false;this.doctype=doctype;this.forbidden=0;this.filter_fields=[];this.filter_fields_dict={};var me=this;this.fn_list=['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters','get_query'];this.wrapper=$a(parent,'div','finder_wrapper');this.make_tabs();this.current_loaded=null;this.setup_doctype(onload);this.hide=function(){$dh(me.wrapper);}
 this.show=function(my_onload){$ds(me.wrapper);this.set_main_title('Report: '+get_doctype_label(me.doctype));if(my_onload)my_onload(me);}}
 _r.ReportBuilder.prototype.make_tabs=function(){this.tab_wrapper=$a(this.wrapper,'div','finder_tab_area');this.mytabs=new TrayPage(this.tab_wrapper);this.mytabs.add_item('Result',null,null,1);this.mytabs.add_item('More Filters',null,null,1);this.mytabs.add_item('Select Columns',null,null,1);this.mytabs.tabs=this.mytabs.items;}
 _r.ReportBuilder.prototype.make_body=function(){this.set_main_title('Report: '+get_doctype_label(this.doctype));var me=this;this.make_save_criteria();this.column_picker=new _r.ReportColumnPicker(this);this.report_filters=new _r.ReportFilters(this);}
@@ -44,8 +44,8 @@ var me=this;var fn=function(r){me.sc_dict[criteria_name]=r.main_doc_name;me.set_
 if(this.current_loaded&&overwrite){msgprint('Filters and Columns Synchronized. You must also "Save" the Search Criteria to update');loaddoc('Search Criteria',this.sc_dict[this.current_loaded]);}else{save_doclist(doc.doctype,doc.name,'Save',fn);}}
 _r.ReportBuilder.prototype.hide_all_filters=function(){for(var i=0;i<this.filter_fields.length;i++){this.filter_fields[i].df.filter_hide=1;}}
 _r.ReportBuilder.prototype.run=function(){this.dt.run();}
-_r.ReportBuilder.prototype.clear_criteria=function(){this.column_picker.clear();this.column_picker.set_defaults();for(var i=0;i<this.filter_fields.length;i++){this.filter_fields[i].df.filter_hide=0;this.filter_fields[i].df.ignore=0;if(this.filter_fields[i].df.custom)
-this.filter_fields[i].df.filter_hide=1;this.filter_fields[i].set_input(null);}
+_r.ReportBuilder.prototype.clear_criteria=function(){this.column_picker.clear();this.column_picker.set_defaults();for(var i=0;i<this.filter_fields.length;i++){this.filter_fields[i].df.filter_hide=0;this.filter_fields[i].df.ignore=0;if(this.filter_fields[i].is_custom){this.filter_fields[i].df.filter_hide=1;this.filter_fields[i].df.ignore=1;}
+this.filter_fields[i].set_input(null);}
 this.set_sort_options();this.set_main_title('Report: '+get_doctype_label(this.doctype));this.current_loaded=null;this.customized_filters=null;this.sc=null;this.has_index=1;this.has_headings=1;for(var i in this.fn_list)this[this.fn_list[i]]=null;}
 _r.ReportBuilder.prototype.set_main_title=function(t,t1){_r.rb_con.page_head.main_head.innerHTML=t;_r.rb_con.page_head.sub_head.innerHTML=(t1?t1:'');set_title(t);}
 _r.ReportBuilder.prototype.select_column=function(dt,label,value){if(value==null)value=1;this.column_picker.set(dt,label,value);}
@@ -70,7 +70,7 @@ var me=this;var dt=me.parent_dt?me.parent_dt:me.doctype;var fl=[{'fieldtype':'Da
 me.make_datatable();me.orig_sort_list=[];if(me.parent_dt){me.setup_dt_filters_and_cols(fl,me.parent_dt);var fl=[];}
 me.setup_dt_filters_and_cols(fl,me.doctype);if(!this.has_primary_filters)
 $dh(this.report_filters.first_page_filter);this.column_picker.refresh();$ds(me.body);}
-_r.ReportBuilder.prototype.add_filter=function(f){if(this.filter_fields_dict[f.parent+'\1'+f.label]){this.filter_fields_dict[f.parent+'\1'+f.label].df=f;}else{f.custom=1;this.report_filters.add_field(f,f.parent);}}
+_r.ReportBuilder.prototype.add_filter=function(f){if(this.filter_fields_dict[f.parent+'\1'+f.label]){this.filter_fields_dict[f.parent+'\1'+f.label].df=f;}else{this.report_filters.add_field(f,f.parent);this.filter_fields_dict[f.parent+'\1'+f.label].is_custom=1;}}
 _r.ReportBuilder.prototype.setup_dt_filters_and_cols=function(fl,dt){var me=this;var lab=$a(me.filter_area,'div','filter_dt_head');lab.innerHTML='Filters for '+get_doctype_label(dt);var lab=$a(me.picker_area,'div','builder_dt_head');lab.innerHTML='Select columns for '+get_doctype_label(dt);var dt_fields=fields_list[dt];for(var i=0;i<dt_fields.length;i++){fl[fl.length]=dt_fields[i];}
 var sf_list=locals.DocType[dt].search_fields?locals.DocType[dt].search_fields.split(','):[];for(var i in sf_list)sf_list[i]=strip(sf_list[i]);for(var i=0;i<fl.length;i++){var f=fl[i];if(f&&cint(f.in_filter)){me.report_filters.add_field(f,dt,in_list(sf_list,f.fieldname));}
 if(f&&!in_list(no_value_fields,f.fieldtype)&&f.fieldname!='docstatus'&&(!f.report_hide)){me.column_picker.add_field(f);}}
@@ -80,15 +80,16 @@ for(var i=0;i<sl.length;i++){this.dt.add_sort_option(sl[i][0],sl[i][1]);}}
 _r.ReportBuilder.prototype.validate_permissions=function(onload){this.perm=get_perm(this.parent_dt?this.parent_dt:this.doctype);if(!this.perm[0][READ]){this.forbidden=1;if(user=='Guest'){msgprint('You must log in to view this page');}else{msgprint('No Read Permission');}
 nav_obj.show_last_open();return 0;}
 return 1;}
-_r.ReportBuilder.prototype.setup_doctype=function(onload){var me=this;if(!locals['DocType'][this.doctype]){$c('webnotes.widgets.form.getdoctype',args={'doctype':this.doctype,'with_parent':1},function(r,rt){if(r.parent_dt)me.parent_dt=r.parent_dt;if(!me.validate_permissions())
-return;me.make_body();me.setup_filters_and_cols();if(onload)onload(me);});}else{for(var key in locals.DocField){var f=locals.DocField[key];if(f.fieldtype=='Table'&&f.options==this.doctype)
+_r.ReportBuilder.prototype.setup_doctype=function(onload){var me=this;if(!locals['DocType'][this.doctype]){this.load_doctype_from_server(onload);}else{for(var key in locals.DocField){var f=locals.DocField[key];if(f.fieldtype=='Table'&&f.options==this.doctype)
 this.parent_dt=f.parent;}
 if(!me.validate_permissions())
 return;me.validate_permissions();me.make_body();me.setup_filters_and_cols();if(onload)onload(me);}}
-_r.ReportBuilder.prototype.reset_report=function(){this.clear_criteria();this.report_filters.refresh();this.column_picker.refresh();this.set_filter(this.doctype,'Saved',1);this.set_filter(this.doctype,'Submitted',1);this.set_filter(this.doctype,'Cancelled',0);this.column_picker.set_defaults();this.dt.clear_all();this.dt.sort_sel.value='ID';this.dt.page_len_sel.inp.value='50';this.dt.set_no_limit(0);this.dt.set_desc();}
+_r.ReportBuilder.prototype.load_doctype_from_server=function(onload){var me=this;$c('webnotes.widgets.form.getdoctype',args={'doctype':this.doctype,'with_parent':1},function(r,rt){if(r.parent_dt)me.parent_dt=r.parent_dt;if(!me.validate_permissions())
+return;me.make_body();me.setup_filters_and_cols();if(onload)onload(me);});}
+_r.ReportBuilder.prototype.reset_report=function(){this.clear_criteria();this.mytabs.items['Select Columns'].show();this.mytabs.items['More Filters'].show();this.report_filters.refresh();this.column_picker.refresh();this.set_filter(this.doctype,'Saved',1);this.set_filter(this.doctype,'Submitted',1);this.set_filter(this.doctype,'Cancelled',0);this.column_picker.set_defaults();this.dt.clear_all();this.dt.sort_sel.value='ID';this.dt.page_len_sel.inp.value='50';this.dt.set_no_limit(0);this.dt.set_desc();}
 _r.ReportBuilder.prototype.make_datatable=function(){var me=this;this.dt_area=$a(this.mytabs.items['Result'].body,'div');var clear_area=$a(this.mytabs.items['Result'].body,'div');clear_area.style.marginTop='8px';clear_area.style.textAlign='right';this.clear_btn=$a($a(clear_area,'span'),'button');this.clear_btn.innerHTML='Clear Settings';this.clear_btn.onclick=function(){me.reset_report();}
-var d=$a(clear_area,'span','',{marginLeft:'16px'});d.innerHTML='<span>Show Query: </span>';this.show_query=$a_input(d,'checkbox');this.show_query.checked=false;this.dt=new _r.DataTable(this.dt_area,'');this.dt.finder=this;this.dt.make_query=function(){var report=me;if(me.current_loaded&&me.sc_dict[me.current_loaded])
-var sc=get_local('Search Criteria',me.sc_dict[me.current_loaded]);if(sc)me.dt.search_criteria=sc;else me.dt.search_criteria=null;if(sc&&sc.server_script)me.dt.server_script=sc.server_script;else me.dt.server_script=null;for(var i=0;i<me.fn_list.length;i++){if(me[me.fn_list[i]])me.dt[me.fn_list[i]]=me[me.fn_list[i]];else me.dt[me.fn_list[i]]=null;}
+var d=$a(clear_area,'span','',{marginLeft:'16px'});d.innerHTML='<span>Show Query: </span>';this.show_query=$a_input(d,'checkbox');this.show_query.checked=false;this.dt=new _r.DataTable(this.dt_area,'');this.dt.finder=this;this.dt.make_query=function(){var report=me;if(me.current_loaded&&me.sc_dict[me.current_loaded]){var sc=get_local('Search Criteria',me.sc_dict[me.current_loaded]);}
+if(sc)me.dt.search_criteria=sc;else me.dt.search_criteria=null;if(sc&&sc.server_script)me.dt.server_script=sc.server_script;else me.dt.server_script=null;for(var i=0;i<me.fn_list.length;i++){if(me[me.fn_list[i]])me.dt[me.fn_list[i]]=me[me.fn_list[i]];else me.dt[me.fn_list[i]]=null;}
 var fl=[];var docstatus_cl=[];var cl=[];var table_name=function(t){return'`tab'+t+'`';}
 var dis_filters_list=[];if(sc&&sc.dis_filters)
 var dis_filters_list=sc.dis_filters.split('\n');var t=me.column_picker.get_selected();for(var i=0;i<t.length;i++){fl.push(table_name(t[i].parent)+'.`'+t[i].fieldname+'`');}
@@ -123,7 +124,7 @@ for(var i=0;i<fl.length;i++){var f=fl[i];if(f.df.filter_hide){$dh(f.wrapper);}el
 if(f.df.bold){if(f.label_cell)
 $y(f.label_cell,{fontWeight:'bold'})}else{if(f.label_cell)$y(f.label_cell,{fontWeight:'normal'})}
 if(f.df['report_default'])
-f.set_input(f.df['report_default']);if(f.df.in_first_page){f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);this.first_page_filter.appendChild(f.df.filter_cell);this.rb.has_primary_filters=1;$ds(this.first_page_filter);}}}
+f.set_input(f.df['report_default']);if(f.df.in_first_page&&f.df.filter_cell){f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);this.first_page_filter.appendChild(f.df.filter_cell);this.rb.has_primary_filters=1;$ds(this.first_page_filter);}}}
 _r.ReportFilters.prototype.add_date_field=function(cell,f,dt){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label='From '+f1.label;var tmp1=this.make_field_obj(f1,dt,my_div);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label='To '+f2.label;var tmp2=this.make_field_obj(f2,dt,my_div);tmp2.sql_condition='<=';tmp2.bound='upper';}
 _r.ReportFilters.prototype.add_numeric_field=function(cell,f,dt){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label=f1.label+' >=';var tmp1=this.make_field_obj(f1,dt,my_div);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label=f2.label+' <=';var tmp2=this.make_field_obj(f2,dt,my_div);tmp2.sql_condition='<=';tmp2.bound='upper';}
 _r.ReportFilters.prototype.make_field_obj=function(f,dt,parent){var tmp=make_field(f,dt,parent,this.rb,false);tmp.not_in_form=true;tmp.refresh();this.rb.filter_fields[this.rb.filter_fields.length]=tmp;this.rb.filter_fields_dict[f.parent+'\1'+f.label]=tmp;return tmp;}

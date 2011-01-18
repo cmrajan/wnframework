@@ -339,7 +339,7 @@ this.make_paging_area('bottom',this.bottom_div);}}
 Listing.prototype.make_toolbar=function(){var me=this;this.buttons={};var make_btn=function(label,icon,onclick,bold){var btn=$btn(me.btn_area,label,onclick,{marginRight:'4px'});if(bold)$y(btn,{fontWeight:'bold'});me.buttons[label]=btn;}
 if(!this.opts.hide_refresh){make_btn('Refresh','ui-icon-refresh',function(btn){me.run();},1);}
 if(this.opts.show_new){make_btn('New ','ui-icon-document',function(){new_doc(me.dt);},1);}
-if(this.opts.show_report){make_btn('Report Builder','ui-icon-clipboard',function(){loadreport(me.dt);},0);}
+if(this.opts.show_report){make_btn('Report Builder','ui-icon-clipboard',function(){loadreport(me.dt,null,null,null,1);},0);}
 if(!this.opts.hide_export){make_btn('Export','ui-icon-circle-arrow-e',function(){me.do_export();});}
 if(!this.opts.hide_print){make_btn('Print','ui-icon-print',function(){me.do_print();});}
 if(this.opts.show_calc){make_btn('Calc','ui-icon-calculator',function(){me.do_calc();});$dh(me.buttons['Calc'])}
@@ -865,8 +865,8 @@ this.menu.add_item('Tools','About <b>Web Notes</b>',function(){show_about();});}
 this.setup_new=function(){me.menu.add_top_menu('New',function(){me.show_new();},'sprite-new');me.show_new=function(){if(!me.new_dialog){var d=new Dialog(240,140,"Create a new record");d.make_body([['HTML','Select'],['Button','Go',function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}]]);d.onshow=function(){me.new_sel.inp.focus();}
 me.new_dialog=d;var nl=profile.can_create.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.new_sel=new SelectWidget(d.widgets['Select'],nl.sort(),'200px');me.new_sel.onchange=function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}}
 me.new_dialog.show();}}
-this.setup_report_builder=function(){me.menu.add_top_menu('Report',function(){me.show_rb();},'sprite-report');me.show_rb=function(){if(!me.rb_dialog){var d=new Dialog(240,140,"Build a report for");d.make_body([['HTML','Select'],['Button','Go',function(){me.rb_dialog.hide();loadreport(me.rb_sel.inp.value,null,null,1);}]]);d.onshow=function(){me.rb_sel.inp.focus();}
-me.rb_dialog=d;var nl=profile.can_get_report.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.rb_sel=new SelectWidget(d.widgets['Select'],nl.sort(),'200px');me.rb_sel.onchange=function(){me.rb_dialog.hide();loadreport(me.rb_sel.inp.value,null,null,1);};}
+this.setup_report_builder=function(){me.menu.add_top_menu('Report',function(){me.show_rb();},'sprite-report');me.show_rb=function(){if(!me.rb_dialog){var d=new Dialog(240,140,"Build a report for");d.make_body([['HTML','Select'],['Button','Go',function(){me.rb_dialog.hide();loadreport(me.rb_sel.inp.value,null,null,null,1);}]]);d.onshow=function(){me.rb_sel.inp.focus();}
+me.rb_dialog=d;var nl=profile.can_get_report.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.rb_sel=new SelectWidget(d.widgets['Select'],nl.sort(),'200px');me.rb_sel.onchange=function(){me.rb_dialog.hide();loadreport(me.rb_sel.inp.value,null,null,null,1);};}
 me.rb_dialog.show();}}
 this.setup_search=function(){me.menu.add_top_menu('Search',function(){me.search_dialog.show();},'sprite-search');var d=new Dialog(240,140,"Quick Search");d.make_body([['HTML','Select'],['Button','Go',function(){me.open_quick_search();}]]);d.onshow=function(){me.search_sel.inp.focus();}
 me.search_dialog=d;keypress_observers.push({notify_keypress:function(ev,keycode){if(keycode==13&&me.search_dialog.display)me.open_quick_search();}});me.search_sel=new SelectWidget(d.widgets['Select'],[],'120px');me.search_sel.inp.value='Select...';me.open_quick_search=function(){me.search_dialog.hide();var v=sel_val(me.search_sel);if(v)selector.set_search(v);me.search_sel.disabled=1;selector.show();}
@@ -959,10 +959,9 @@ d.make_body([['HTML','info']]);d.rows['info'].innerHTML="<div style='padding: 16
 about_dialog.show();}
 function loadreport(dt,rep_name,onload,menuitem,reset_report){dt=get_label_doctype(dt);var show_report_builder=function(rb_con){if(!_r.rb_con){_r.rb_con=rb_con;}
 _r.rb_con.set_dt(dt,function(rb){if(rep_name){var t=rb.current_loaded;rb.load_criteria(rep_name);if(onload)
-onload(rb);if(menuitem)rb.menuitems[rep_name]=menuitem;if(reset_report){rb.reset_report();}
-if((rb.dt)&&(!rb.dt.has_data()||rb.current_loaded!=t))
+onload(rb);if(menuitem)rb.menuitems[rep_name]=menuitem;if((rb.dt)&&(!rb.dt.has_data()||rb.current_loaded!=t))
 rb.dt.run();if(rb.menuitems[rep_name])
-rb.menuitems[rep_name].show_selected();}
+rb.menuitems[rep_name].show_selected();}else{if(reset_report){rb.reset_report();}}
 if(!rb.forbidden){page_body.change_to('Report Builder');nav_obj.open_notify('Report',dt,rep_name);}});}
 new_widget('_r.ReportContainer',show_report_builder,1);}
 var load_doc=loaddoc;function loaddoc(doctype,name,onload,menuitem,from_archive){doctype=get_label_doctype(doctype);if(frms['DocType']&&frms['DocType'].opendocs[doctype]){msgprint("Cannot open an instance of \""+doctype+"\" when the DocType is open.");return;}

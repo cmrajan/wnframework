@@ -88,7 +88,7 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 	
 	var me = this;
 
-	this.fn_list = ['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters'];
+	this.fn_list = ['beforetableprint','beforerowprint','afterrowprint','aftertableprint','customize_filters','get_query'];
 
 	this.wrapper = $a(parent, 'div', 'finder_wrapper');
 
@@ -252,8 +252,12 @@ _r.ReportBuilder.prototype.clear_criteria = function() {
 		// reset filters
 		this.filter_fields[i].df.filter_hide = 0;
 		this.filter_fields[i].df.ignore = 0;
-		if(this.filter_fields[i].df.custom) // hide customized filters
+		if(this.filter_fields[i].is_custom) {
+		
+			// hide+ignore customized filters
 			this.filter_fields[i].df.filter_hide = 1;
+			this.filter_fields[i].df.ignore = 1;
+		}
 		
 		this.filter_fields[i].set_input(null);
 	}
@@ -444,8 +448,8 @@ _r.ReportBuilder.prototype.add_filter = function(f) {
 		// exists
 		this.filter_fields_dict[f.parent + '\1' + f.label].df = f; // reset properties
 	} else {
-		f.custom = 1;
 		this.report_filters.add_field(f, f.parent);
+		this.filter_fields_dict[f.parent + '\1' + f.label].is_custom = 1;
 	}
 }
 
@@ -529,15 +533,7 @@ _r.ReportBuilder.prototype.setup_doctype = function(onload) {
 	var me = this;
 	
 	if(!locals['DocType'][this.doctype]) {
-		$c('webnotes.widgets.form.getdoctype', args = {'doctype': this.doctype, 'with_parent':1 }, 
-			function(r,rt) { 
-				if(r.parent_dt)me.parent_dt = r.parent_dt;
-				if(!me.validate_permissions()) 
-					return;
-				me.make_body();
-				me.setup_filters_and_cols();
-				if(onload)onload(me);
-			} );
+		this.load_doctype_from_server(onload);
 	} else {
 		// find parent dt if required
 		for(var key in locals.DocField) {
@@ -554,11 +550,28 @@ _r.ReportBuilder.prototype.setup_doctype = function(onload) {
 	}
 }
 
+_r.ReportBuilder.prototype.load_doctype_from_server = function(onload) {
+	var me = this;
+	$c('webnotes.widgets.form.getdoctype', args = {'doctype': this.doctype, 'with_parent':1 }, 
+		function(r,rt) { 
+			if(r.parent_dt)me.parent_dt = r.parent_dt;
+			if(!me.validate_permissions()) 
+				return;
+			me.make_body();
+			me.setup_filters_and_cols();
+			if(onload)onload(me);
+		} 
+	);
+}
 // -------------------------------------------------------------------------------------
 
 _r.ReportBuilder.prototype.reset_report = function() {
 	this.clear_criteria();
 	
+	// show column picker if find
+	this.mytabs.items['Select Columns'].show();
+	this.mytabs.items['More Filters'].show();
+  	
 	this.report_filters.refresh();
 	this.column_picker.refresh();
 	
@@ -608,8 +621,9 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		var report = me;
 		
 		// get search criteria
-		if(me.current_loaded && me.sc_dict[me.current_loaded])
+		if(me.current_loaded && me.sc_dict[me.current_loaded]) {
 			var sc = get_local('Search Criteria', me.sc_dict[me.current_loaded]);
+		}
 		
 		if(sc) me.dt.search_criteria = sc;
 		else me.dt.search_criteria = null;
@@ -877,12 +891,14 @@ _r.ReportFilters.prototype.refresh = function() {
 			f.set_input(f.df['report_default']);
 			
 		// show in first page?
-		if(f.df.in_first_page) {
+		if(f.df.in_first_page && f.df.filter_cell) {
 			f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);
 			this.first_page_filter.appendChild(f.df.filter_cell);
 			this.rb.has_primary_filters = 1;
 			$ds(this.first_page_filter);
 		}
+		
+		// clear / hide all custom added filters
 	}
 }
 

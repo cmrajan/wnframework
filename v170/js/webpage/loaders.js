@@ -22,11 +22,6 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 				// set menu item
 				if(menuitem) rb.menuitems[rep_name] = menuitem;
 
-				// reset if from toolbar
-				if(reset_report) {
-					rb.reset_report();
-				}
-
 				// if loaded, then run
 				if((rb.dt) && (!rb.dt.has_data() || rb.current_loaded!=t))
 					rb.dt.run();
@@ -35,6 +30,11 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 				if(rb.menuitems[rep_name]) 
 					rb.menuitems[rep_name].show_selected();
 
+			} else {
+				// reset if from toolbar
+				if(reset_report) {
+					rb.reset_report();
+				}
 			}
 			
 			// show

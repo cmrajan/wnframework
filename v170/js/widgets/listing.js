@@ -140,7 +140,7 @@ Listing.prototype.make_toolbar = function() {
 
 	// report
 	if(this.opts.show_report) {
-		make_btn('Report Builder','ui-icon-clipboard',function() { loadreport(me.dt); },0);
+		make_btn('Report Builder','ui-icon-clipboard',function() { loadreport(me.dt, null, null, null, 1); },0);
 	}
 	
 	// export

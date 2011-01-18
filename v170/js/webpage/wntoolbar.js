@@ -174,7 +174,7 @@ function WNToolbar(parent) {
 				var d = new Dialog(240, 140, "Build a report for");
 				d.make_body(
 					[['HTML','Select']
-					,['Button','Go', function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); }]]);
+					,['Button','Go', function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, null, 1); }]]);
 				d.onshow = function(){
 					me.rb_sel.inp.focus();	
 				}
@@ -185,7 +185,7 @@ function WNToolbar(parent) {
 				for(var i=0;i<nl.length;i++) nl[i]=get_doctype_label(nl[i]);
 				
 				me.rb_sel = new SelectWidget(d.widgets['Select'], nl.sort(), '200px');
-				me.rb_sel.onchange = function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, 1); };
+				me.rb_sel.onchange = function() { me.rb_dialog.hide(); loadreport(me.rb_sel.inp.value, null, null, null, 1); };
 			}
 			me.rb_dialog.show();
 		}
