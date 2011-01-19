@@ -34,6 +34,9 @@ debug_log, message_log = [], []
 import os
 import defs
 
+import sys
+sys.path.append(getattr(defs,'modules_path'))
+
 def getTraceback():
 	import sys, traceback, string
 	type, value, tb = sys.exc_info()
