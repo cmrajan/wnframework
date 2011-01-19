@@ -66,7 +66,7 @@ class Database:
 			self.transaction_writes += 1
 			if self.transaction_writes > 5000:
 				raise Exception, 'Bad Query!!! Too many writes'
-				self.sql("ROLLBACK")
+				self.rollback()
 	
 	def fetch_as_dict(self):
 		result = self._cursor.fetchall()
@@ -220,6 +220,10 @@ class Database:
 	
 	def commit(self):
 		self.sql("commit")
+
+
+	def rollback(self):
+		self.sql("ROLLBACK")
 
 	# ======================================================================================
 
