@@ -641,13 +641,8 @@ Listing.prototype.make_result_tab = function(nr) {
 		}
 	}
 	
-	for(var ri=(has_headrow?1:0); ri<t.rows.length; ri++) {
-		for(var ci=0; ci<t.rows[ri].cells.length; ci++) {
-			if(this.opts.cell_style)$y($td(t,ri,ci), this.opts.cell_style);
-			if(this.opts.alt_cell_style && (ri % 2))$y($td(t,ri,ci), this.opts.alt_cell_style);	
-			if(this.opts.show_empty_tab)$td(t, ri, ci).innerHTML = '&nbsp;';
-		}
-	}
+	// style
+	this.set_table_style();
 
 	if(this.opts.no_border == 1) {
 		$y(t,{border:'0px'});
@@ -658,8 +653,28 @@ Listing.prototype.make_result_tab = function(nr) {
 
 // -------------------------------------------------------
 
+Listing.prototype.set_table_style = function() {
+	// set style
+	var t = this.result_tab;
+	for(var ri=(this.colnames?1:0); ri<t.rows.length; ri++) {
+		for(var ci=0; ci<t.rows[ri].cells.length; ci++) {
+			// default style
+			if(this.opts.cell_style)$y($td(t,ri,ci), this.opts.cell_style);
+			
+			// color alternate rows (itunes style)
+			if(this.opts.alt_cell_style && (ri % 2))$y($td(t,ri,ci), this.opts.alt_cell_style);	
+			
+			// show blank empty cells
+			if(this.opts.show_empty_tab && !$td(t, ri, ci).innerHTML)$td(t, ri, ci).innerHTML = '&nbsp;';
+		}
+	}
+}
+
+// -------------------------------------------------------
+
 Listing.prototype.append_rows = function(nr) {
 	for(var i=0; i<nr; i++) { append_row(this.result_tab); }
+	this.set_table_style();
 }
 
 // -------------------------------------------------------
@@ -726,11 +741,11 @@ Listing.prototype.refresh = function(nr, nc, d) {
 				
 				// columns
 				for(var ci=0 ; ci<nc ; ci++) {
-					var c = $td(this.result_tab,ri,ci+(this.no_index?0:1));
+					var c = $td(this.result_tab, ri, ci+(this.no_index?0:1));
 					if(c) {
 						c.innerHTML = ''; // clear
 						if(this.show_cell) this.show_cell(c, ri-start, ci, d);
-						else this.std_cell(d, ri-start, ci);
+						else this.std_cell(c, ri-start, ci, d);
 					}
 				}
 			}
@@ -741,11 +756,10 @@ Listing.prototype.refresh = function(nr, nc, d) {
 
 Listing.prototype.refresh_more_button = function(nr) {
 	var me = this;
+	if(this.more_btn) $dh(this.more_btn);	
 	if((this.start + nr) == this.max_len) {
-
 		// all records shown
-		if(this.more_btn) $dh(this.more_btn);	
-	} else {
+	} else if(nr) {
 		if(!this.more_btn) {
 
 			// make button
@@ -787,12 +801,11 @@ Listing.prototype.make_headings = function(t,nr,nc) {
 
 // -------------------------------------------------------
 
-Listing.prototype.std_cell = function(d, ri, ci) {
+Listing.prototype.std_cell = function(cell, ri, ci, d) {
 	var has_headrow = this.colnames ? 1 : 0;
-	var c = $td(this.result_tab,ri+has_headrow,ci+(this.no_index?0:1));
-	c.div = $a(c, 'div');
+	cell.div = $a(cell, 'div');
 	$s(
-		c.div, 
+		cell.div, 
 		d[ri][ci], 
 		this.coltypes ? this.coltypes[ci+(this.no_index?0:1)] : null, 
 		this.coloptions ? this.coloptions[ci+(this.no_index?0:1)] : null

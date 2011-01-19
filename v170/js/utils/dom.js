@@ -410,14 +410,12 @@ function make_table(parent, nr, nc, table_width, widths, cell_style) {
 	return t;
 }
 
-function append_row(t, at) {
+function append_row(t, at, style) {
 	var r = t.insertRow(at ? at : t.rows.length);
 	if(t.rows.length>1) {
 		for(var i=0;i<t.rows[0].cells.length;i++) {
 			var c = r.insertCell(i);
-			if(t.cell_style) {
-				for(var s in t.cell_style) c.style[s] = t.cell_style[s];
-			}
+			if(style) $y(c, style);
 		}
 	}
 	return r
