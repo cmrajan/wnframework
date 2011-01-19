@@ -4,34 +4,34 @@
 # 
 # After "accounts" is created, login and pwd should point to accounts db
 
-db_name = 's3u001'
-db_login = 's3u001'
-db_password = 'ac_user09'
+db_name = <Your DB Name>
+db_login = <Your DB Login>
+db_password = <Your DB Password>
 
 # root
-root_login = 'root'
-root_password = 'route'
+root_login = <Your mysql root login>
+root_password = <Your mysql root password>
 	
 # default mail server
-mail_server = 'localhost'
-mail_login = 'test'
-mail_password = 'test'
+mail_server = <Your mail server>
+mail_login = <Your mail login>
+mail_password = <Your mail password>
 
 # new accounts will be created with this prefix
-server_prefix = 's3u'
+server_prefix = <prefix you want to be used for new databases>
 
-mysql_path = ''
-files_path = ''
+mysql_path = <path where mysql is installed,blank for default>
+files_path = <path to store user files>
 
 #LOG SETTINGS
-#log_file_path = '/home/anand/workspace/webnotes/wnframework/trunk/v170/log'
-#debug_log_dbs = ['accounts','s3u001']
-#log_level = 'logging.INFO' #possible values: logging.critical,error,warning,info,debug,notset
-#log_file_size = 1000 #In max bytes
+#log_file_path = <Path where you want the framework to store log files>
+#debug_log_dbs = <Dbs to actually log>
+#log_level = <logging level> #possible values: logging.critical,error,warning,info,debug,notset
+#log_file_size = <log file size> #In max bytes
 #log_file_backup_count = 5 #It is a rotating file handler. keeps upto 5 files
 
 
 #MODULE MANAGER SETTINGS
-modules_path = '/home/anand/workspace/webnotes/wnframework-modules/trunk'
+modules_path = <path where you have the erp modules checked out>
 developer_mode = 1
 user_timezone = 'Asia/Calcutta'
