@@ -4,7 +4,7 @@
 list_opts = {
 	cell_style : {padding:'3px 2px'},
 	alt_cell_style : {},
-	head_style : {height:'20px',overflow:'hidden',verticalAlign:'middle',textAlign:'center',fontWeight:'bold',padding:'1px',fontSize:'13px'},
+	head_style : {height:'20px',overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'1px',fontSize:'13px'},
 	head_main_style : {padding:'0px'},
 	hide_export : 1,
 	hide_print : 1,
