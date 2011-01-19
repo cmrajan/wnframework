@@ -1,3 +1,5 @@
+from webnotes.dbmanager import DBManager
+dbman = DBManager()
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -23,7 +25,8 @@ def copy_db(source, target=''):
 def get_db_name(conn, server_prefix):
 	db_list = dbman.get_database_list(conn)
 	db_list.sort()
-			
+	if not server_prefix:
+		server_prefix = db_list[-1][:3]
 	if db_list:
 		dbn = server_prefix + ('%.3i' % (int(db_list[-1][-3:]) + 1))
 	else:
@@ -39,9 +42,6 @@ def import_db(source, target='', is_accounts=0):
 	import webnotes.db
 	import webnotes.defs
 	import os
-	
-	from webnotes.dbmanager import DBManager
-	dbman = DBManager()
 
 	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
 	conn = None	
