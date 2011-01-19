@@ -472,8 +472,11 @@ AutoSuggest.prototype.setHighlight = function(n)
 	}
 
 	// set it the field (but do not call onchange as this field still has focus)
-	this.fld.value = this.aSug[this.iHigh-1 ].value;
-	
+	if(this.set_input_value) {
+		this.set_input_value(this.aSug[this.iHigh-1 ].value);
+	} else {
+		this.fld.value = this.aSug[this.iHigh-1 ].value;
+	}
 };
 
 
@@ -503,8 +506,13 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 			return; // pass
 		}
 
-		this.fld.value = this.sInp;
-		this.fld.onchange();
+		if(this.set_input_value) {
+			this.set_input_value(this.sInp);
+		} else {
+			this.fld.value = this.sInp;
+		}
+		
+		if(this.fld.onchange)this.fld.onchange();
 
 		this.clearSuggestions();
 		this.killTimeout();
@@ -546,7 +554,7 @@ AutoSuggest.prototype.clearSuggestions = function (from_timeout) {
 	if(from_timeout && this.fld.field_object && !this.oP.fixed_options) {
 		// call onchange
 		// we do not call onchange from the link field if autosuggest options are open
-		this.fld.onchange();
+		if(this.fld.onchange)this.fld.onchange();
 	}
 }
 

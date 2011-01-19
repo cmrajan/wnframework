@@ -98,6 +98,19 @@ _e.make = function() {
       return r;
     }
     
+    var emailto = d.widgets['To']
+
+    as.set_input_value = function(new_txt) {
+      if(emailto.value && emailto.value.indexOf(',')!=-1) {
+        var txt = emailto.value.split(',');
+        txt.splice(txt.length - 1, 1, new_txt);
+        for(var i=0;i<txt.length-1;i++) txt[i] = strip(txt[i]);
+        emailto.value = txt.join(', ');
+      } else {
+        emailto.value = new_txt;	
+      }
+    }
+    
     // ---- override server call ---- 
     as.doAjaxRequest = function(txt) {
       var pointer = as; var q = '';

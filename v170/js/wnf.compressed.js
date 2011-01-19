@@ -623,15 +623,16 @@ this.clearHighlight();this.iHigh=Number(n);var ele=list.childNodes[this.iHigh-1]
 cur_y+=(isIE?list.childNodes[i].offsetHeight:list.childNodes[i].clientHeight);if(cur_y<this.body.scrollTop)
 this.body.scrollTop=cur_y;ff_delta=(isFF?cint(this.iHigh/2):0);var h=(isIE?ele.offsetHeight:ele.clientHeight);if(cur_y>=(this.body.scrollTop+this.oP.maxheight-h))
 this.body.scrollTop=cur_y-this.oP.maxheight+h+ff_delta;}
-this.fld.value=this.aSug[this.iHigh-1].value;};AutoSuggest.prototype.clearHighlight=function()
+if(this.set_input_value){this.set_input_value(this.aSug[this.iHigh-1].value);}else{this.fld.value=this.aSug[this.iHigh-1].value;}};AutoSuggest.prototype.clearHighlight=function()
 {var list=this.ul;if(!list)
 return false;if(this.iHigh>0){list.childNodes[this.iHigh-1].className="";this.iHigh=0;}};AutoSuggest.prototype.setHighlightedValue=function()
 {if(this.iHigh){this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selectionStart)
 this.fld.setSelectionRange(this.sInp.length,this.sInp.length);}catch(e){return;}
-this.fld.value=this.sInp;this.fld.onchange();this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
+if(this.set_input_value){this.set_input_value(this.sInp);}else{this.fld.value=this.sInp;}
+if(this.fld.onchange)this.fld.onchange();this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
 this.oP.callback(this.aSug[this.iHigh-1]);}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions(1);},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(from_timeout){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
 if(!this.ul)return;if(this.ul)
-delete this.ul;this.iHigh=0;if(from_timeout&&this.fld.field_object&&!this.oP.fixed_options){this.fld.onchange();}}
+delete this.ul;this.iHigh=0;if(from_timeout&&this.fld.field_object&&!this.oP.fixed_options){if(this.fld.onchange)this.fld.onchange();}}
 $ce=function(type,attr,cont,html)
 {var ne=document.createElement(type);if(!ne)return 0;for(var a in attr)ne[a]=attr[a];var t=typeof(cont);if(t=="string"&&!html)ne.appendChild(document.createTextNode(cont));else if(t=="string"&&html)ne.innerHTML=cont;else if(t=="object")ne.appendChild(cont);return ne;};function SelectWidget(parent,options,width,editable,bg_color){var me=this;this.inp=$a(parent,'select');if(options)add_sel_options(this.inp,options);if(width)$y(this.inp,{width:width});this.set_width=function(w){$y(this.inp,{width:w})};this.set_options=function(o){add_sel_options(this.inp,o);}
 this.inp.onchange=function(){if(me.onchange)me.onchange(this);}
