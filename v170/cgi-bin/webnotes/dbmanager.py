@@ -2,13 +2,13 @@ import os
 import webnotes.defs
 
 class DBManager:
-"""
+	"""
 	Basically, a wrapper for oft-used mysql commands. like show tables. 
 
 	#TODO:
 		1. Setter and getter for different mysql variables.
-		2.
-"""	
+		2. 
+	"""	
 	def __init__(self,conn = None):
  		if conn:
  			self.conn = conn
