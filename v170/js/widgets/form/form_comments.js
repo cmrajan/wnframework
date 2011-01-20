@@ -19,7 +19,7 @@ CommentList.prototype.make_input = function() {
   var me = this;
   // make the input text area and button
   this.input = $a(this.input_area, 'textarea', '', {height:'60px', width:'300px', fontSize:'14px'});
-  this.btn = $btn(this.input_area, 'Post', function() {me.add_comment();},{marginTop:'8px'});
+  this.btn = $btn($a(this.input_area, 'div'), 'Post', function() {me.add_comment();},{marginTop:'8px'});
 }
 
 // Add comment listing
@@ -30,6 +30,7 @@ CommentList.prototype.add_comment = function() {
   var args = {};
   args.comment = this.input.value;
   args.comment_by = user;
+  args.comment_by_fullname = user_fullname;
   args.comment_doctype = this.dt;
   args.comment_docname = this.dn;
   $c_obj('Widget Control', 'add_comment', docstring(args), function(r,rt){
@@ -120,7 +121,7 @@ CommentItem.prototype.cmt_delete = function(cell, ri, ci, d) {
     del = $a(cell,'div','wn-icon ic-trash',{cursor:'pointer'});
     del.cmt_id = d[ri][0];
     del.onclick = function(){ 
-      $c_obj('Widget Control','remove_comment',this.cmt_id,function(r,rt){
+      $c_obj('Widget Control','remove_comment',JSON.stringify({id:this.cmt_id, dt:cur_frm.doctype, dn:cur_frm.docname}),function(r,rt){
       	cur_frm.no_of_comments = cur_frm.no_of_comments - 1;
       	cur_frm.frm_head.refresh_comments();
         me.comment.lst.run();
