@@ -2,12 +2,25 @@ import os
 import webnotes.defs
 
 class DBManager:
+"""
+	Basically, a wrapper for oft-used mysql commands. like show tables. 
+
+	#TODO:
+		1. Setter and getter for different mysql variables.
+		2.
+"""	
+	def __init__(self,conn = None):
+ 		if conn:
+ 			self.conn = conn
+
+#	def check_foreign_key(self,conn):
+#		conn.sql("SET FOREIGN_KEY_CHECKS = %i"%val)
 	
 
 	def get_tables_list(self,conn,target):	
 		try:
 			conn.use(target)
-			res = conn.sql("show tables")
+			res = conn.sql("SHOW TABLES")
 			table_list = []
 			for table in res:
 				table_list.append(table[0])
@@ -86,8 +99,18 @@ class DBManager:
 
 	def drop_table(self,conn,table_name):
 		try:
+			print "Dropping table %s" %(table_name)
 			conn.sql("DROP TABLE IF EXISTS %s "%(table_name))
 		except Exception,e:
 			raise e	
+
+	def set_transaction_isolation_level(self,conn,scope='SESSION',level='READ COMMITTED'):
+                #Sets the transaction isolation level. scope = global/session
+                try:
+                        conn.sql("SET %s TRANSACTION ISOLATION LEVEL %s"%(scope,level))
+                        print "Set transaction level ",scope, level
+
+                except Exception,e:
+                        raise e
 
 
