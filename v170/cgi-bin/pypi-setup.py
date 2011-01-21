@@ -1,5 +1,9 @@
-#!/usr/bin/python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# Script for creating the pypi packages
+# Works only for python 2.6+
+
 
 import os
 
