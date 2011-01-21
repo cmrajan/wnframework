@@ -473,9 +473,9 @@ AutoSuggest.prototype.setHighlight = function(n)
 
 	// set it the field (but do not call onchange as this field still has focus)
 	if(this.set_input_value) {
-		this.set_input_value(this.aSug[this.iHigh-1 ].value);
+		this.set_input_value(this.aSug[this.iHigh-1].value);
 	} else {
-		this.fld.value = this.aSug[this.iHigh-1 ].value;
+		this.fld.value = this.aSug[this.iHigh-1].value;
 	}
 };
 

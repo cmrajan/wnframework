@@ -624,13 +624,15 @@ LinkField.prototype.setup_buttons = function() {
 LinkField.prototype.set_onchange = function() { 
 	var me = this;
 	me.txt.onchange = function(e) { 
-		// check values are not set in quick succession due to un-intentional event call
-		
+		// check values are not set in quick succession due to un-intentional event call				
 		if(_link_onchange_flag) { return;}
 		_link_onchange_flag = 1;
-		
+				
 		// not in form, do nothing
-		if(me.not_in_form) return;
+		if(me.not_in_form) {
+			 return;
+			_link_onchange_flag = 0;	 
+		}
 		
 		// same value, do nothing
 		if(cur_frm) {
@@ -642,7 +644,6 @@ LinkField.prototype.set_onchange = function() {
 			}
 		}
 		
-
 		me.set(me.txt.value);
 					
 		// deselect cell if in grid
@@ -662,6 +663,8 @@ LinkField.prototype.set_onchange = function() {
 			fetch = cur_frm.fetch_dict[me.df.fieldname].columns.join(', ');
 			
 		$c('webnotes.widgets.form.validate_link', {'value':me.txt.value, 'options':me.df.options, 'fetch': fetch}, function(r,rt) { 
+			setTimeout('_link_onchange_flag = 0', 500);
+
 			if(selector && selector.display) return; // selecting from popup
 			
 			if(r.message=='Ok') {
@@ -676,7 +679,6 @@ LinkField.prototype.set_onchange = function() {
 				me.txt.value = ''; 
 				me.set('');
 			}
-			setTimeout('_link_onchange_flag = 0', 500);
 		});
 		
 	}
