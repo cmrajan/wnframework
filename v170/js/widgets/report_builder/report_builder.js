@@ -312,7 +312,11 @@ _r.ReportBuilder.prototype.load_criteria = function(criteria_name) {
 
 	// execute the customize_filters method from Search Criteria
 	if(report.customize_filters) {
-		report.customize_filters(this);
+		try {
+			report.customize_filters(this);
+		} catch(err) {
+			errprint('Error in "customize_filters":\n' + err);
+		}
 	}
 
 	// refresh fiters
@@ -448,8 +452,7 @@ _r.ReportBuilder.prototype.add_filter = function(f) {
 		// exists
 		this.filter_fields_dict[f.parent + '\1' + f.label].df = f; // reset properties
 	} else {
-		this.report_filters.add_field(f, f.parent);
-		this.filter_fields_dict[f.parent + '\1' + f.label].is_custom = 1;
+		this.report_filters.add_field(f, f.parent, null, 1);
 	}
 }
 
@@ -905,57 +908,58 @@ _r.ReportFilters.prototype.refresh = function() {
 
 // -------------------------------------------------------------------------------------
 
-_r.ReportFilters.prototype.add_date_field = function(cell, f, dt) {
+_r.ReportFilters.prototype.add_date_field = function(cell, f, dt, is_custom) {
 	var my_div = $a(cell,'div','',{});
 	
 	// from date
 	var f1 = copy_dict(f);
 	f1.label = 'From ' + f1.label;
-	var tmp1 = this.make_field_obj(f1, dt, my_div);
+	var tmp1 = this.make_field_obj(f1, dt, my_div, is_custom);
 	tmp1.sql_condition = '>=';
 	tmp1.bound = 'lower';
 
 	// to date
 	var f2 = copy_dict(f);
 	f2.label = 'To ' + f2.label;
-	var tmp2 = this.make_field_obj(f2, dt, my_div);
+	var tmp2 = this.make_field_obj(f2, dt, my_div, is_custom);
 	tmp2.sql_condition = '<=';
 	tmp2.bound = 'upper';
 }
 
 // -------------------------------------------------------------------------------------
 
-_r.ReportFilters.prototype.add_numeric_field = function(cell, f, dt) {
+_r.ReportFilters.prototype.add_numeric_field = function(cell, f, dt, is_custom) {
 	var my_div = $a(cell,'div','',{});
 	
 	// from value
 	var f1 = copy_dict(f);
 	f1.label = f1.label + ' >=';
-	var tmp1 = this.make_field_obj(f1, dt, my_div);
+	var tmp1 = this.make_field_obj(f1, dt, my_div, is_custom);
 	tmp1.sql_condition = '>=';
 	tmp1.bound = 'lower';
 
 	// to value
 	var f2 = copy_dict(f);
 	f2.label = f2.label + ' <=';
-	var tmp2 = this.make_field_obj(f2, dt, my_div);
+	var tmp2 = this.make_field_obj(f2, dt, my_div, is_custom);
 	tmp2.sql_condition = '<=';
 	tmp2.bound = 'upper';		
 }
 
 // make a field object
-_r.ReportFilters.prototype.make_field_obj = function(f, dt, parent) {
+_r.ReportFilters.prototype.make_field_obj = function(f, dt, parent, is_custom) {
 	var tmp = make_field(f, dt, parent, this.rb, false);
 	tmp.not_in_form = true;
 	tmp.refresh();
 	this.rb.filter_fields[this.rb.filter_fields.length] = tmp;
 	this.rb.filter_fields_dict[f.parent + '\1' + f.label] = tmp;
+	if(is_custom) tmp.is_custom = 1;
 	return tmp;	
 }
 
 // -------------------------------------------------------------------------------------
 
-_r.ReportFilters.prototype.add_field = function(f, dt, in_primary) {
+_r.ReportFilters.prototype.add_field = function(f, dt, in_primary, is_custom) {
 	var me = this;
 		
 	// insert in (parent element)
@@ -993,7 +997,7 @@ _r.ReportFilters.prototype.add_field = function(f, dt, in_primary) {
 		// numeric
 		this.add_numeric_field(cell, f, dt);
 	} else {
-		var tmp = this.make_field_obj(f, dt, cell);
+		var tmp = this.make_field_obj(f, dt, cell, is_custom);
 	}
 	
 	// add to datatable sort

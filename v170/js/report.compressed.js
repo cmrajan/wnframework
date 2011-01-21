@@ -52,7 +52,7 @@ _r.ReportBuilder.prototype.select_column=function(dt,label,value){if(value==null
 _r.ReportBuilder.prototype.set_filter=function(dt,label,value){if(this.filter_fields_dict[dt+'\1'+label])
 this.filter_fields_dict[dt+'\1'+label].set_input(value);}
 _r.ReportBuilder.prototype.load_criteria=function(criteria_name){this.clear_criteria();if(!this.sc_dict[criteria_name]){alert(criteria_name+' could not be loaded. Please Refresh and try again');}
-this.sc=locals['Search Criteria'][this.sc_dict[criteria_name]];var report=this;if(this.sc&&this.sc.report_script)eval(this.sc.report_script);this.large_report=0;if(report.customize_filters){report.customize_filters(this);}
+this.sc=locals['Search Criteria'][this.sc_dict[criteria_name]];var report=this;if(this.sc&&this.sc.report_script)eval(this.sc.report_script);this.large_report=0;if(report.customize_filters){try{report.customize_filters(this);}catch(err){errprint('Error in "customize_filters":\n'+err);}}
 this.report_filters.refresh();this.column_picker.clear();var cl=this.sc.columns?this.sc.columns.split(','):[];for(var c=0;c<cl.length;c++){var key=cl[c].split('\1');this.select_column(key[0],key[1],1);}
 var fl=eval('var a='+this.sc.filters+';a');for(var n in fl){if(fl[n]){var key=n.split('\1');if(key[1]=='docstatus'){}
 this.set_filter(key[0],key[1],fl[n]);}}
@@ -70,7 +70,7 @@ var me=this;var dt=me.parent_dt?me.parent_dt:me.doctype;var fl=[{'fieldtype':'Da
 me.make_datatable();me.orig_sort_list=[];if(me.parent_dt){me.setup_dt_filters_and_cols(fl,me.parent_dt);var fl=[];}
 me.setup_dt_filters_and_cols(fl,me.doctype);if(!this.has_primary_filters)
 $dh(this.report_filters.first_page_filter);this.column_picker.refresh();$ds(me.body);}
-_r.ReportBuilder.prototype.add_filter=function(f){if(this.filter_fields_dict[f.parent+'\1'+f.label]){this.filter_fields_dict[f.parent+'\1'+f.label].df=f;}else{this.report_filters.add_field(f,f.parent);this.filter_fields_dict[f.parent+'\1'+f.label].is_custom=1;}}
+_r.ReportBuilder.prototype.add_filter=function(f){if(this.filter_fields_dict[f.parent+'\1'+f.label]){this.filter_fields_dict[f.parent+'\1'+f.label].df=f;}else{this.report_filters.add_field(f,f.parent,null,1);}}
 _r.ReportBuilder.prototype.setup_dt_filters_and_cols=function(fl,dt){var me=this;var lab=$a(me.filter_area,'div','filter_dt_head');lab.innerHTML='Filters for '+get_doctype_label(dt);var lab=$a(me.picker_area,'div','builder_dt_head');lab.innerHTML='Select columns for '+get_doctype_label(dt);var dt_fields=fields_list[dt];for(var i=0;i<dt_fields.length;i++){fl[fl.length]=dt_fields[i];}
 var sf_list=locals.DocType[dt].search_fields?locals.DocType[dt].search_fields.split(','):[];for(var i in sf_list)sf_list[i]=strip(sf_list[i]);for(var i=0;i<fl.length;i++){var f=fl[i];if(f&&cint(f.in_filter)){me.report_filters.add_field(f,dt,in_list(sf_list,f.fieldname));}
 if(f&&!in_list(no_value_fields,f.fieldtype)&&f.fieldname!='docstatus'&&(!f.report_hide)){me.column_picker.add_field(f);}}
@@ -125,13 +125,13 @@ if(f.df.bold){if(f.label_cell)
 $y(f.label_cell,{fontWeight:'bold'})}else{if(f.label_cell)$y(f.label_cell,{fontWeight:'normal'})}
 if(f.df['report_default'])
 f.set_input(f.df['report_default']);if(f.df.in_first_page&&f.df.filter_cell){f.df.filter_cell.parentNode.removeChild(f.df.filter_cell);this.first_page_filter.appendChild(f.df.filter_cell);this.rb.has_primary_filters=1;$ds(this.first_page_filter);}}}
-_r.ReportFilters.prototype.add_date_field=function(cell,f,dt){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label='From '+f1.label;var tmp1=this.make_field_obj(f1,dt,my_div);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label='To '+f2.label;var tmp2=this.make_field_obj(f2,dt,my_div);tmp2.sql_condition='<=';tmp2.bound='upper';}
-_r.ReportFilters.prototype.add_numeric_field=function(cell,f,dt){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label=f1.label+' >=';var tmp1=this.make_field_obj(f1,dt,my_div);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label=f2.label+' <=';var tmp2=this.make_field_obj(f2,dt,my_div);tmp2.sql_condition='<=';tmp2.bound='upper';}
-_r.ReportFilters.prototype.make_field_obj=function(f,dt,parent){var tmp=make_field(f,dt,parent,this.rb,false);tmp.not_in_form=true;tmp.refresh();this.rb.filter_fields[this.rb.filter_fields.length]=tmp;this.rb.filter_fields_dict[f.parent+'\1'+f.label]=tmp;return tmp;}
-_r.ReportFilters.prototype.add_field=function(f,dt,in_primary){var me=this;if(f.in_first_page)in_primary=true;var fparent=this.filter_fields_area;if(in_primary){fparent=this.first_page_filter;this.rb.has_primary_filters=1;}
+_r.ReportFilters.prototype.add_date_field=function(cell,f,dt,is_custom){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label='From '+f1.label;var tmp1=this.make_field_obj(f1,dt,my_div,is_custom);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label='To '+f2.label;var tmp2=this.make_field_obj(f2,dt,my_div,is_custom);tmp2.sql_condition='<=';tmp2.bound='upper';}
+_r.ReportFilters.prototype.add_numeric_field=function(cell,f,dt,is_custom){var my_div=$a(cell,'div','',{});var f1=copy_dict(f);f1.label=f1.label+' >=';var tmp1=this.make_field_obj(f1,dt,my_div,is_custom);tmp1.sql_condition='>=';tmp1.bound='lower';var f2=copy_dict(f);f2.label=f2.label+' <=';var tmp2=this.make_field_obj(f2,dt,my_div,is_custom);tmp2.sql_condition='<=';tmp2.bound='upper';}
+_r.ReportFilters.prototype.make_field_obj=function(f,dt,parent,is_custom){var tmp=make_field(f,dt,parent,this.rb,false);tmp.not_in_form=true;tmp.refresh();this.rb.filter_fields[this.rb.filter_fields.length]=tmp;this.rb.filter_fields_dict[f.parent+'\1'+f.label]=tmp;if(is_custom)tmp.is_custom=1;return tmp;}
+_r.ReportFilters.prototype.add_field=function(f,dt,in_primary,is_custom){var me=this;if(f.in_first_page)in_primary=true;var fparent=this.filter_fields_area;if(in_primary){fparent=this.first_page_filter;this.rb.has_primary_filters=1;}
 if(f.on_top){var cell=document.createElement('div');fparent.insertBefore(cell,fparent.firstChild);$y(cell,{width:'70%'});}else if(f.insert_before){var cell=document.createElement('div');fparent.insertBefore(cell,fparent[f.df.insert_before].filter_cell);$y(cell,{width:'70%'});}
 else
-var cell=$a(fparent,'div','',{width:'70%'});f.filter_cell=cell;if(f.fieldtype=='Date'){this.add_date_field(cell,f,dt);}else if(in_list(['Currency','Int','Float'],f.fieldtype)){this.add_numeric_field(cell,f,dt);}else{var tmp=this.make_field_obj(f,dt,cell);}
+var cell=$a(fparent,'div','',{width:'70%'});f.filter_cell=cell;if(f.fieldtype=='Date'){this.add_date_field(cell,f,dt);}else if(in_list(['Currency','Int','Float'],f.fieldtype)){this.add_numeric_field(cell,f,dt);}else{var tmp=this.make_field_obj(f,dt,cell,is_custom);}
 if(f.fieldname!='docstatus')
 me.rb.orig_sort_list.push([f.label,'`tab'+f.parent+'`.`'+f.fieldname+'`']);if(f.def_filter)
 tmp.input.checked=true;}

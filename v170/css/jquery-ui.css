@@ -377,4 +377,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
     height: 200px; /*must have*/
 }
 
-
+/* There must be a better way to do this - Rushabh */
+#ui-datepicker-div {
+	z-index: 9999;
+}
