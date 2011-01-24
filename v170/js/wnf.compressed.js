@@ -508,14 +508,14 @@ function Layout(parent,width){if(parent&&parent.substr){parent=$i(parent);}
 this.wrapper=$a(parent,'div','',{display:'none'});if(width){this.width=this.wrapper.style.width;}
 this.myrows=[];}
 Layout.prototype.addrow=function(){this.cur_row=new LayoutRow(this,this.wrapper);this.myrows[this.myrows.length]=this.cur_row;return this.cur_row}
-Layout.prototype.addsubrow=function(){this.cur_row=new LayoutRow(this,this.cur_row.wrapper);this.myrows[this.myrows.length]=this.cur_row;return this.cur_row}
+Layout.prototype.addsubrow=function(){this.cur_row=new LayoutRow(this,this.cur_row.main_body);this.myrows[this.myrows.length]=this.cur_row;return this.cur_row}
 Layout.prototype.addcell=function(width){return this.cur_row.addCell(width);}
 Layout.prototype.setcolour=function(col){$bg(cc,col);}
 Layout.prototype.show=function(){$ds(this.wrapper);}
 Layout.prototype.hide=function(){$dh(this.wrapper);}
 Layout.prototype.close_borders=function(){if(this.with_border){this.myrows[this.myrows.length-1].wrapper.style.borderBottom='1px solid #000';}}
-function LayoutRow(layout,parent){this.layout=layout;this.wrapper=$a(parent,'div');this.sub_wrapper=$a(this.wrapper,'div');if(layout.with_border){this.wrapper.style.border='1px solid #000';this.wrapper.style.borderBottom='0px';}
-this.header=$a(this.sub_wrapper,'div','',{padding:(layout.with_border?'0px 8px':'0px')});this.body=$a(this.sub_wrapper,'div');this.table=$a(this.body,'table','',{width:'100%',borderCollapse:'collapse'});this.row=this.table.insertRow(0);this.mycells=[];}
+function LayoutRow(layout,parent){this.layout=layout;this.wrapper=$a(parent,'div');this.main_head=$a(this.wrapper,'div');this.main_body=$a(this.wrapper,'div');if(layout.with_border){this.wrapper.style.border='1px solid #000';this.wrapper.style.borderBottom='0px';}
+this.header=$a(this.main_body,'div','',{padding:(layout.with_border?'0px 8px':'0px')});this.body=$a(this.main_body,'div');this.table=$a(this.body,'table','',{width:'100%',borderCollapse:'collapse'});this.row=this.table.insertRow(0);this.mycells=[];}
 LayoutRow.prototype.hide=function(){$dh(this.wrapper);}
 LayoutRow.prototype.show=function(){$ds(this.wrapper);}
 LayoutRow.prototype.addCell=function(wid){var lc=new LayoutCell(this.layout,this,wid);this.mycells[this.mycells.length]=lc;return lc;}
@@ -624,14 +624,11 @@ this.clearHighlight();this.iHigh=Number(n);var ele=list.childNodes[this.iHigh-1]
 cur_y+=(isIE?list.childNodes[i].offsetHeight:list.childNodes[i].clientHeight);if(cur_y<this.body.scrollTop)
 this.body.scrollTop=cur_y;ff_delta=(isFF?cint(this.iHigh/2):0);var h=(isIE?ele.offsetHeight:ele.clientHeight);if(cur_y>=(this.body.scrollTop+this.oP.maxheight-h))
 this.body.scrollTop=cur_y-this.oP.maxheight+h+ff_delta;}
-if(this.set_input_value){this.set_input_value(this.aSug[this.iHigh-1].value);}else{this.fld.value=this.aSug[this.iHigh-1].value;}};AutoSuggest.prototype.clearHighlight=function()
+if(!this.aSug[this.iHigh-1])return;if(this.set_input_value){this.set_input_value(this.aSug[this.iHigh-1].value);}else{this.fld.value=this.aSug[this.iHigh-1].value;}};AutoSuggest.prototype.clearHighlight=function()
 {var list=this.ul;if(!list)
 return false;if(this.iHigh>0){list.childNodes[this.iHigh-1].className="";this.iHigh=0;}};AutoSuggest.prototype.setHighlightedValue=function()
-{if(this.iHigh){this.sInp=this.aSug[this.iHigh-1].value;try{this.fld.focus();if(this.fld.selectionStart)
-this.fld.setSelectionRange(this.sInp.length,this.sInp.length);}catch(e){return;}
-if(this.set_input_value){this.set_input_value(this.sInp);}else{this.fld.value=this.sInp;}
-if(this.fld.onchange)this.fld.onchange();this.clearSuggestions();this.killTimeout();if(typeof(this.oP.callback)=="function")
-this.oP.callback(this.aSug[this.iHigh-1]);}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions(1);},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(from_timeout){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
+{if(this.iHigh){this.sInp=this.aSug[this.iHigh-1].value;if(this.set_input_value){this.set_input_value(this.sInp);}else{this.fld.value=this.sInp;}
+this.clearSuggestions();this.killTimeout();if(this.fld.onchange)this.fld.onchange();}};AutoSuggest.prototype.killTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);};AutoSuggest.prototype.resetTimeout=function(){cur_autosug=this;clearTimeout(this.toID);clearTimeout(this.clear_timer);this.toID=setTimeout(function(){if(cur_autosug)cur_autosug.clearSuggestions(1);},this.oP.timeout);};AutoSuggest.prototype.clearSuggestions=function(from_timeout){this.killTimeout();cur_autosug=null;var me=this;if(this.body){$dh(this.body);delete this.body;}
 if(!this.ul)return;if(this.ul)
 delete this.ul;this.iHigh=0;if(from_timeout&&this.fld.field_object&&!this.oP.fixed_options){if(this.fld.onchange)this.fld.onchange();}}
 $ce=function(type,attr,cont,html)
@@ -664,7 +661,7 @@ $(this.body).draggable({opacity:0.6,helper:'clone',containment:'parent',scroll:f
 var no_value_fields=['Section Break','Column Break','HTML','Table','FlexTable','Button','Image'];var codeid=0;var code_editors={};function Field(){}
 Field.prototype.make_body=function(){var ischk=(this.df.fieldtype=='Check'?1:0);if(this.parent)
 this.wrapper=$a(this.parent,'div');else
-this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div','',{margin:'4px 0px 2px 0px'});if(ischk&&!this.in_grid){this.input_area=$a(this.label_area,'span','',{marginRight:'4px'});this.disp_area=$a(this.label_area,'span','',{marginRight:'4px'});}
+this.wrapper=document.createElement('div');this.label_area=$a(this.wrapper,'div','',{margin:'8px 0px 2px 0px'});if(ischk&&!this.in_grid){this.input_area=$a(this.label_area,'span','',{marginRight:'4px'});this.disp_area=$a(this.label_area,'span','',{marginRight:'4px'});}
 if(this.with_label){this.label_span=$a(this.label_area,'span','',{marginRight:'4px',fontSize:'11px'})
 this.help_icon=$a(this.label_area,'img','',{cursor:'pointer',margin:'-3px 4px -3px 0px'});$dh(this.help_icon);this.help_icon.src='images/icons/help.gif';this.label_icon=$a(this.label_area,'img','',{marginRight:'4px',margin:'-3px 4px -3px 0px'});$dh(this.label_icon);this.label_icon.src='images/icons/error.gif';this.label_icon.title='Mandatory value needs to be entered';this.suggest_icon=$a(this.label_area,'img','',{marginRight:'4px',margin:'-3px 4px -3px 0px'});$dh(this.suggest_icon);this.suggest_icon.src='images/icons/bullet_arrow_down.png';this.suggest_icon.title='With suggestions';}else{this.label_span=$a(this.label_area,'span','',{marginRight:'4px'})
 $dh(this.label_area);}

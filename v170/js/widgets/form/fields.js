@@ -24,7 +24,7 @@ Field.prototype.make_body = function() {
 	else
 		this.wrapper = document.createElement('div');
 
-	this.label_area = $a(this.wrapper, 'div', '', {margin:'4px 0px 2px 0px'});
+	this.label_area = $a(this.wrapper, 'div', '', {margin:'8px 0px 2px 0px'});
 
 	if(ischk && !this.in_grid) {
 		this.input_area = $a(this.label_area, 'span', '', {marginRight:'4px'});

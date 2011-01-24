@@ -471,6 +471,9 @@ AutoSuggest.prototype.setHighlight = function(n)
 			this.body.scrollTop = cur_y - this.oP.maxheight + h + ff_delta;
 	}
 
+	// no values returned
+	if(!this.aSug[this.iHigh-1]) return;
+
 	// set it the field (but do not call onchange as this field still has focus)
 	if(this.set_input_value) {
 		this.set_input_value(this.aSug[this.iHigh-1].value);
@@ -495,16 +498,6 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 {
 	if (this.iHigh) {
 		this.sInp = this.aSug[ this.iHigh-1 ].value;
-		
-		// move cursor to end of input (safari)
-		//
-		try {
-			this.fld.focus();
-			if (this.fld.selectionStart)
-				this.fld.setSelectionRange(this.sInp.length, this.sInp.length);
-		} catch(e) { 
-			return; // pass
-		}
 
 		if(this.set_input_value) {
 			this.set_input_value(this.sInp);
@@ -512,15 +505,10 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 			this.fld.value = this.sInp;
 		}
 		
-		if(this.fld.onchange)this.fld.onchange();
-
 		this.clearSuggestions();
 		this.killTimeout();
-		
-		// pass selected object to callback function, if exists
-		//
-		if (typeof(this.oP.callback) == "function")
-			this.oP.callback( this.aSug[this.iHigh-1] );			
+
+		if(this.fld.onchange)this.fld.onchange();	
 	}
 };
 

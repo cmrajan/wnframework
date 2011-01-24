@@ -53,6 +53,7 @@ _f.Frm = function(doctype, parent) {
 	this.cur_section = {};
 	this.sections = [];
 	this.sections_by_label = {};
+	this.section_count;
 	this.grids = [];
 	this.cscript = {};
 	this.pformat = {};
@@ -233,8 +234,9 @@ _f.Frm.prototype.setup_std_layout = function() {
 
 	// only tray
 	if(this.meta.section_style=='Tabbed') this.meta.section_style='Tray';
+	this.meta.section_style='Simple';
 
-	// build the sidebar
+	/* build the sidebar
 	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
 		this.tray = new TrayPage(this.form_wrapper,null,100/8 + '%',700/8 + '%');
 		$y(this.tray.tab,{tableLayout:'fixed'});
@@ -242,8 +244,9 @@ _f.Frm.prototype.setup_std_layout = function() {
 		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px', marginLeft:'0px'});
 	} else {
 		this.body = $a(this.form_wrapper, 'div', 'frm_body',{margin:'4px'});
-	}
+	}*/
 	
+	this.body = $a(this.form_wrapper, 'div', '');
 
 	// layout
 	this.layout = new Layout(this.body, '100%');

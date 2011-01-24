@@ -50,50 +50,55 @@ _f.SectionBreak = function() {
 }
 
 _f.SectionBreak.prototype.make_row = function() {
-	this.row = this.frm.layout.addrow();
+	this.row = this.df.label ? this.frm.layout.addrow() : this.frm.layout.addsubrow();
 }
 
 _f.SectionBreak.prototype.make_collapsible = function(head) {
 	var me = this;
 
-	var t = make_table($a(head,'div','',{padding:'4px 8px', borderBottom:'1px solid #AAA'}), 1,2, '100%', [null, '60px'], {verticalAlign:'middle'});
-	$y(t,{borderCollapse:'collapse'});
-		
-	this.label = $a($td(t,0,0), 'div', 'sectionHeading');
+	var div = $a(head,'div','',{padding:'4px 8px', borderBottom:'1px solid #AAA', backgroundColor:'#EEE'});
+	
+	// checkbox
+	this.chk = $a_input(div, 'checkbox',null,{marginRight:'8px'})
+	
+	// label
+	this.label = $a(div, 'span', '', {fontSize:'14px', fontWeight:'bold'});
 	this.label.innerHTML = this.df.label?this.df.label:'';
 	
-	// indent
-	$y(this.row.body, { margin:'8px' });
+	// description
+	var d = this.df.description;
+	if(d) {
+		this.desc_area = $a(div, 'span', '', {color:'#888', marginLeft:'8px'});
+		this.desc_area.innerHTML = d.substr(0,80) + (d.length > 80 ? '...' : '');
+	}
 
 	// exp / collapse
-	$y($td(t,0,1),{textAlign:'right'});
-	this.exp_icon = $a($td(t,0,1),'div','wn-icon ic-rnd_br_up', {cssFloat:'right'});
-	this.exp_icon.onclick = function() { 
-		if(me.row.body.style.display.toLowerCase()=='none') me.exp_icon.expand(); 
-		else me.exp_icon.collapse(); 
-	}
-	this.exp_icon.expand = function() { 
-		$ds(me.row.body) 
-		$ds(me.row.header.head.desc_area);
-		me.exp_icon.className = 'wn-icon ic-rnd_br_up';
-	}
-	this.exp_icon.collapse = function() { 
-		$dh(me.row.body) 
-		$dh(me.row.header.head.desc_area);
-		me.exp_icon.className = 'wn-icon ic-rnd_br_down';
-	}
-	$y(head,{padding:'2px', margin:'8px'});
-		
-	// callable functions
-	this.collapse = this.exp_icon.collapse;
-	this.expand = this.exp_icon.expand;
 
+	this.chk.onclick = function() { 
+		if(this.checked) me.expand(); 
+		else me.collapse(); 
+	}
+	
+	this.expand = function() { 
+		$(me.row.main_body).slideDown();
+	}
+	
+	this.collapse = function() { 
+		$(me.row.main_body).slideUp();
+	}
+	
+	// hide by default
+	if(me.frm.section_count) {
+		$dh(this.row.main_body);
+	} else {
+		this.chk.checked = true;
+	}
 }
 
 // ======================================================================================
 
-_f.SectionBreak.prototype.make_simple_section = function(with_header, collapsible) {
-	var head = $a(this.row.header, 'div', '', {margin:'8px', marginBottom: '8px'});
+_f.SectionBreak.prototype.make_simple_section = function(with_header) {
+	var head = $a(this.row.main_head, 'div', '', {margin:'8px'});
 	this.row.header.head = head;
 	var me = this;
 
@@ -108,30 +113,17 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header, collapsibl
 	}
 	
 	if(with_header) {
-		if(collapsible) {
-			if(this.df.label) {
-				this.make_collapsible(head);
-				
-			} else if(!has_col) {
-				// divider
-				$y(head,{margin:'8px', borderBottom:'1px solid #AAA'});
-			}
-		} else {
-			this.label = $a(head, 'div', 'sectionHeading', { margin:'0px'});
-			this.label.innerHTML = this.df.label?this.df.label:'';
+		if(this.df.label) {
+			this.make_collapsible(head);
+		} else if(!has_col) {
+			// divider
+			$y(head,{borderBottom:'1px solid #AAA'});
 		}
 	}
 
-	// description
-	if(this.df.description) {
-		head.desc_area = $a(head, 'div', '', {margin:'0px', padding:'8px 0px', color:'#222', fontSize:'12px'});
-		if(this.df.description.length > 240) {
-			$($a(head.desc_area, 'div', 'comment')).html(replace_newlines(this.df.description.substr(0,240)) + '...');
-			$($a(head.desc_area, 'div', 'link_type', {fontSize:'11px'})).html('more').click(function() { msgprint(me.df.description) });
-		} else {
-			$($a(head.desc_area, 'div')).html(replace_newlines(this.df.description));
-		}
-	}
+	// indent
+	$y(this.row.body, { marginLeft:100/9 + '%' });
+
 }
 
 // ======================================================================================
@@ -208,7 +200,7 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.make_simple_section(1, 1);
 		}
 	} else if(this.df){
-		this.row = this.frm.layout.addrow();
+		this.make_row();
 		this.make_simple_section(1, 1);
 	}	
 }

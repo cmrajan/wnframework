@@ -1,3 +1,16 @@
+/*
++ Layout
+	+ wrapper
+		+ LayoutRow
+			+ main_head
+			+ main_body
+				+ header
+				+ body
+				..
+				..
+				+ subrows
+
+*/
 function Layout(parent, width) { 
 	if(parent&&parent.substr) { parent = $i(parent); }
 
@@ -18,7 +31,7 @@ Layout.prototype.addrow = function() {
 }
 
 Layout.prototype.addsubrow = function() {
-	this.cur_row = new LayoutRow(this, this.cur_row.wrapper);
+	this.cur_row = new LayoutRow(this, this.cur_row.main_body);
 	this.myrows[this.myrows.length] = this.cur_row;
 	return this.cur_row
 }
@@ -41,16 +54,19 @@ function LayoutRow(layout, parent) {
 	this.layout = layout;
 	this.wrapper = $a(parent,'div');
 	
-	// for sub rows
-	this.sub_wrapper = $a(this.wrapper,'div');
+	// main head
+	this.main_head = $a(this.wrapper, 'div');
+
+	// main head
+	this.main_body = $a(this.wrapper, 'div');
 
 	if(layout.with_border) {
 		this.wrapper.style.border = '1px solid #000';
 		this.wrapper.style.borderBottom = '0px';
 	}
 	
-	this.header = $a(this.sub_wrapper, 'div','',{padding:(layout.with_border ? '0px 8px' : '0px')});
-	this.body = $a(this.sub_wrapper,'div');
+	this.header = $a(this.main_body, 'div','',{padding:(layout.with_border ? '0px 8px' : '0px')});
+	this.body = $a(this.main_body,'div');
 	this.table = $a(this.body, 'table', '', {width:'100%', borderCollapse: 'collapse'});
 	this.row = this.table.insertRow(0);
 	
