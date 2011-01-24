@@ -1,5 +1,3 @@
-import webnotes
-import webnotes.defs
 import os
 
 type_map = {
@@ -278,7 +276,7 @@ class DbColumn:
 
 
 
-class DBManager:
+class DbManager:
 	"""
 	Basically, a wrapper for oft-used mysql commands. like show tables,databases, variables etc... 
 
@@ -289,13 +287,14 @@ class DBManager:
 	def __init__(self,conn = None):
  		if conn:
  			self.conn = conn
-		else:
-			self.conn = webnotes.conn
 
-	def get_tables_list(self,conn,target):	
+	def get_tables_list(self,target):	
+		"""
+		
+		"""
 		try:
-			conn.use(target)
-			res = conn.sql("SHOW TABLES")
+			self.conn.use(target)
+			res = self.conn.sql("SHOW TABLES")
 			table_list = []
 			for table in res:
 				table_list.append(table[0])
@@ -304,61 +303,61 @@ class DBManager:
 		except Exception,e:
 			raise e
 
-	def create_user(self,conn,user):
+	def create_user(self,user,default_db_pwd):
 		#Create user if it doesn't exist.
 		try:
 			print "Creating user %s" %user
-			conn.sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (user, webnotes.defs.db_password))
+			self.conn.sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (user, default_db_pwd))
 		except Exception, e:
 			raise e
 
 
-	def delete_user(self,conn,target):
+	def delete_user(self,target):
 	# delete user if exists
 		try:
 			print "Dropping user " ,target
-			conn.sql("DROP USER '%s'@'localhost'" % target)
+			self.conn.sql("DROP USER '%s'@'localhost'" % target)
 		except Exception, e:
 			if e.args[0]==1396:
 				pass
 			else:
 				raise e
 
-	def create_database(self,conn,target):
+	def create_database(self,target):
 		
 		try:
 			print "Creating Database", target
-			conn.sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
+			self.conn.sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
 		except Exception,e:
 			raise e
 
 
-	def drop_database(self,conn,target):
+	def drop_database(self,target):
 		try:
 			print "Dropping Database:",target
-			conn.sql("DROP DATABASE IF EXISTS `%s`;"%target)
+			self.conn.sql("DROP DATABASE IF EXISTS `%s`;"%target)
 		except Exception,e:
 			raise e
 
-	def grant_all_privileges(self,conn,target,user):
+	def grant_all_privileges(self,target,user):
 		try:
 			print "Granting all privileges on %s to %s@localhost" %(target,user)
-			conn.sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, user))
+			self.conn.sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, user))
 		except Exception,e:
 			raise e
 
-	def flush_privileges(self,conn):
+	def flush_privileges(self):
 		try:
 			print "Flushing privileges"
-			conn.sql("FLUSH PRIVILEGES")
+			self.conn.sql("FLUSH PRIVILEGES")
 		except Exception,e:
 			raise e
 
 
-	def get_database_list(self,conn):
+	def get_database_list(self):
 		try:
 			db_list = []
-			ret_db_list = conn.sql("SHOW DATABASES")
+			ret_db_list = self.conn.sql("SHOW DATABASES")
 			for db in ret_db_list:
 				if db[0] not in ['information_schema', 'mysql', 'test', 'accounts']:
 					db_list.append(db[0])
@@ -366,24 +365,24 @@ class DBManager:
 		except Exception,e:
 			raise e
 
-	def restore_database(self,target,source):
+	def restore_database(self,target,source,root_password):
 		try:
-			ret = os.system("mysql -u root -p%s %s < %s"%(webnotes.defs.root_password,target,source))
+			ret = os.system("mysql -u root -p%s %s < %s"%(root_password,target,source))
 			print "Restore DB Return status:",ret
 		except Exception,e:
 			raise e
 
-	def drop_table(self,conn,table_name):
+	def drop_table(self,table_name):
 		try:
 			print "Dropping table %s" %(table_name)
-			conn.sql("DROP TABLE IF EXISTS %s "%(table_name))
+			self.conn.sql("DROP TABLE IF EXISTS %s "%(table_name))
 		except Exception,e:
 			raise e	
 
-	def set_transaction_isolation_level(self,conn,scope='SESSION',level='READ COMMITTED'):
+	def set_transaction_isolation_level(self,scope='SESSION',level='READ COMMITTED'):
 		#Sets the transaction isolation level. scope = global/session
 		try:
-			conn.sql("SET %s TRANSACTION ISOLATION LEVEL %s"%(scope,level))
+			self.conn.sql("SET %s TRANSACTION ISOLATION LEVEL %s"%(scope,level))
 			print "Set transaction level ",scope, level
 
 		except Exception,e:
