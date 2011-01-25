@@ -30,9 +30,16 @@ def cleanup_docs():
 	if webnotes.response.get('docs') and type(webnotes.response['docs'])!=dict:
 		webnotes.response['docs'] = webnotes.model.doclist.compress(webnotes.response['docs'])
 
+# server calls
+# ------------------------------------------------------------------------------------
+
 def runserverobj():
 	import webnotes.widgets.form
 	webnotes.widgets.form.runserverobj()
+
+def execute_page_method():
+	from webnotes.model.code import execute_page_method
+	execute_page_method(webnotes.form_dict['module'], webnotes.form_dict['page'], webnotes.form_dict['method'], webnotes.form_dict.get('arg', None))
 
 def logout():
 	webnotes.login_manager.logout()
