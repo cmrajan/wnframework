@@ -24,6 +24,8 @@ class CustomDocType(DocType):
 
 
 #=================================================================================
+# execute a script with a lot of globals - deprecated
+#=================================================================================
 
 def execute(code, doc=None, doclist=[]):
 
@@ -67,19 +69,7 @@ def execute(code, doc=None, doclist=[]):
 		return out
 
 #=================================================================================
-
-def get_recompiled_code(dt):
-	# clear from cache
-	import webnotes
-	webnotes.conn.sql("delete from __DocTypeCache where name=%s", dt)
-	
-	# compile
-	import webnotes.model.doctype
-	webnotes.model.doctype.get(dt)
-
-	# load
-	return webnotes.conn.sql("select server_code_compiled from __DocTypeCache where name=%s", dt)[0][0]
-
+# load the DocType class from module & return an instance
 #=================================================================================
 
 def get_server_obj(doc, doclist = [], basedoctype = ''):
@@ -114,7 +104,23 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		return CustomDocType(doc, doclist)
 	else:
 		return DocType(doc, doclist)
-		
+
+#=================================================================================
+# run a page method
+#=================================================================================
+
+def execute_page_method(module, page, method, arg=''):
+	import webnotes
+
+	# import module
+	exec 'from %s.page.%s import %s' % (module, page, page)
+
+	# run the method		
+	if getattr(locals()[page], method):
+		webnotes.response['message']  = getattr(locals()[page], method)(arg)
+
+#=================================================================================
+# get object (from dt and/or dn or doclist)
 #=================================================================================
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
@@ -130,7 +136,9 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 		return get_server_obj(doclist[0], doclist)
 	else:
 		return get_server_obj(doc, doclist)
-
+		
+#=================================================================================
+# get object and run method
 #=================================================================================
 
 def run_server_obj(server_obj, method_name, arg=None):
@@ -140,7 +148,7 @@ def run_server_obj(server_obj, method_name, arg=None):
 		else:
 			return getattr(server_obj, method_name)()
 
-
+#=================================================================================
 # deprecated methods to keep v160 apps happy
 #=================================================================================
 
