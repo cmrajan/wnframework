@@ -55,7 +55,7 @@ def import_db(source, target='', is_accounts=0):
 
 
 	# create user and db
-	dbman.create_user(target,getattr(defs,'root_password',None))
+	dbman.create_user(target,getattr(defs,'db_password',None))
 	
 	dbman.create_database(target)
 
