@@ -37,23 +37,28 @@ c. Add "index.cgi" to DirectoryIndex
 ------------------------------------------------------------------------
 2. Setup your MySQL passwords
 
-Set your root password in the file
-cgi-bin/webnotes/defs.py
+Set the variables in the defs file. (cgi-bin/webnotes/defs)
 
+This will be copied to 
+	cgi-bin/webnotes/defs.py
 
 ------------------------------------------------------------------------
 3. Setting up your first app
 
-The first app in your server must also act as a directory for all other apps on your server.
-Hence we call this app "accounts". To setup the accounts app, you must first set your MySQL password
+The first app in your server must also acts as a router for all other apps on your server.
+Hence we call this app "accounts". To setup the accounts app, you can do either step mentioned below:
 
-Run the setup file in the cgi-bin folder, or run the following form the python shell
+	a, Run the install file in the cgi-bin folder like:
+		python install.py install
+	
+		OR
+	b,run the following from the python shell
 
-import webnotes
-import setup
+		>>>import webnotes
+		>>>import setup
 
-setup.import_db('Framework','accounts')
-setup.create_account_doctype()
+		>>>setup.import_db('Framework','accounts')
+		>>>setup.create_account_doctype()
 
 ------------------------------------------------------------------------
 4. Login to application
@@ -64,12 +69,6 @@ The default logins are:
 
 login: Administrator
 password: admin
-
-
-
-You can install webnotes by running easy_install webnotes_core
-
-
 
 
 Step by step instructions on CentOS/Fedora:
@@ -87,3 +86,6 @@ Step by step instructions on CentOS/Fedora:
 
 	11. Edit /etc/httpd/conf/httpd.conf and add the options as mentioned above.	11a, If you enable logging set apache umask to 002
 	12. from the trunk/v170/cgi-bin folder run python setup.py install
+
+
+

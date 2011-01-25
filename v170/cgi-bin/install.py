@@ -1,5 +1,4 @@
-from webnotes.model.db_schema import DbManager
-dbman = DbManager()
+
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -23,7 +22,8 @@ def copy_db(source, target=''):
 	return target
 
 def get_db_name(conn, server_prefix):
-	db_list = dbman.get_database_list(conn)
+	global dbman
+	db_list = dbman.get_database_list()
 	db_list.sort()
 	if not server_prefix:
 		server_prefix = db_list[-1][:3]
@@ -42,42 +42,38 @@ def import_db(source, target='', is_accounts=0):
 	import webnotes.db
 	import webnotes.defs
 	import os
+	
 
 	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
-	conn = None	
-	
-	# login as root (if set)
-	if webnotes.defs.root_login:
-		conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 	
 	# get database number
 	if not target:
 		target = get_db_name(conn, webnotes.defs.server_prefix)
 
 	# delete user (if exists)
-	dbman.delete_user(conn,target)
+	dbman.delete_user(target)
 
 
 	# create user and db
-	dbman.create_user(conn,target)
+	dbman.create_user(target,getattr(defs,'root_password',None))
 	
-	dbman.create_database(conn,target)
+	dbman.create_database(target)
 
-	dbman.grant_all_privileges(conn,target,target)
+	dbman.grant_all_privileges(target,target)
 
-	dbman.flush_privileges(conn)
+	dbman.flush_privileges()
 
 
-	dbman.set_transaction_isolation_level(conn,'GLOBAL','READ COMMITTED')
+	dbman.set_transaction_isolation_level('GLOBAL','READ COMMITTED')
 
 	source_path = get_source_path(source)		
 
 	# import in target
-	dbman.restore_database(target,source_path)
+	dbman.restore_database(target,source_path,getattr(defs,'root_password',None))
 
 
 	conn.use(target)
-	dbman.drop_table(conn,'__DocTypeCache')
+	dbman.drop_table('__DocTypeCache')
 	conn.sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
 
 
@@ -118,12 +114,12 @@ def get_source_path(s):
 def create_account_doctype(conn,target):
 	# update accounts
 	import webnotes.db
-	import webnotes.defs
+	import webnotes
 
-	#webnotes.conn = webnotes.db.Database(user = webnotes.defs.root_login,password = webnotes.defs.root_password) 
+	
 	webnotes.session = {'user':'setup.py'}	
 	conn.use(target)
-
+	webnotes.conn = conn
 
 	from webnotes.model.doc import Document
 	import webnotes.model.db_schema
@@ -252,29 +248,42 @@ if __name__=='__main__':
 	import sys,os
 	# set path
 	sys.path.append(os.path.abspath(os.path.dirname(sys.argv[0]) + '/../../'))	
-	
-	print "Creating defs.py"	
-	copy_defs_py()
 
-#	from webnotes import defs
+	if not os.path.exists(os.path.join(os.getcwd(),'webnotes','defs.py')):
+
+		print "Creating defs.py"	
+		copy_defs_py()
+
+	from webnotes import defs
 	
-#	print "Creating log folder and file..."
-#	log_path = getattr(defs,log_file_path,None)
-#	if log_path:
-#		create_log_folder(os.path.dirname(log_path))
+	print "Creating log folder and file..."
+	log_path = getattr(defs,'log_file_path',None)
+	if log_path:
+		create_log_folder(os.path.dirname(log_path))
 
 
 	import webnotes	 #Should be here since it requires defs.py
 	
 	if sys.argv[1]=='install':
 		# create the first account
+		from webnotes.model.db_schema import DbManager
+		import webnotes.db
+		import webnotes.defs
+
+		conn = None
+		# login as root (if set)
+		if webnotes.defs.root_login:
+			conn = webnotes.db.Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 	
+		dbman = DbManager(conn)
+
+		print conn
 		
 		print "Importing Framework.sql..." 
 		import_db("Framework", "accounts")
 		
 		print "Setting up Account..."
-		create_account_doctype()
+		create_account_doctype(conn,'accounts')
 	
 		
 
