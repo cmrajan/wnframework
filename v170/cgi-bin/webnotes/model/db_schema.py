@@ -1,4 +1,5 @@
 import os
+import webnotes
 
 type_map = {
 	'currency':		('decimal', '14,2')
