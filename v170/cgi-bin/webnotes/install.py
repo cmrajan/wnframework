@@ -1,5 +1,5 @@
-from webnotes.model.db_schema import DBManager
-dbman = DBManager()
+from webnotes.model.db_schema import DbManager
+dbman = DbManager()
 
 def copy_db(source, target=''):
 	import webnotes.defs
