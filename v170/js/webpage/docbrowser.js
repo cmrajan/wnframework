@@ -66,8 +66,9 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	this.body = $a(this.wrapper, 'div');
 	
 	// toolbar
-	this.toolbar_area = $a(this.body, 'div', '', {padding: '4px', backgroundColor:'#EEE', borderTop: '1px solid #CCC', borderBottom: '1px solid #CCC'});
-	//$br(this.toolbar_area, '4px');
+	this.toolbar_area = $a(this.body, 'div', '', {padding: '4px', backgroundColor:'#EEE'});
+	$br(this.toolbar_area, '4px'); $gr(this.toolbar_area, '#DDD', '#CCC');
+	
 	this.sub_toolbar = $a(this.body, 'div', '', {marginBottom:'8px', padding: '4px', textAlign:'right', fontSize:'11px', color:'#444'});
 	
 	// archives label

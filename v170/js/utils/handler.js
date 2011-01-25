@@ -112,6 +112,15 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 	}
 }
 
+// For call a page metho
+function $c_page(module, page, method, arg, call_back, no_spinner, freeze_msg) {
+	$c('execute_page_method',{
+		'module':module,
+		'page':page,
+		'method':method, 
+		'arg':arg}, call_back, null, no_spinner, freeze_msg);
+}
+
 // For calling an for output as csv
 function $c_obj_csv(doclist, method, arg) {
 	// single
