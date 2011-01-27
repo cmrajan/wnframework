@@ -56,7 +56,8 @@ _f.SectionBreak.prototype.make_row = function() {
 _f.SectionBreak.prototype.make_collapsible = function(head) {
 	var me = this;
 
-	var div = $a(head,'div','',{padding:'4px 8px', borderBottom:'1px solid #AAA', backgroundColor:'#EEE'});
+	var div = $a(head,'div','',{padding:'4px 4px', backgroundColor:'#EEE'});
+	$gr(div, '#DDD', '#CCC'); $br(div, '3px');
 	
 	// checkbox
 	this.chk = $a_input(div, 'checkbox',null,{marginRight:'8px'})
@@ -122,7 +123,7 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header) {
 	}
 
 	// indent
-	$y(this.row.body, { marginLeft:100/9 + '%' });
+	$y(this.row.body, { marginLeft:100/11 + '%' });
 
 }
 
@@ -143,7 +144,7 @@ _f.SectionBreak.prototype.make_body = function() {
 	var me = this;
 
 	// header
-	if(this.frm.meta.section_style=='Tabbed') {
+	/*if(this.frm.meta.section_style=='Tabbed') {
 		if(this.df.options!='Simple') {
 			// IE full page ??
 			
@@ -199,7 +200,7 @@ _f.SectionBreak.prototype.make_body = function() {
 			this.row = this.frm.layout.addsubrow();
 			this.make_simple_section(1, 1);
 		}
-	} else if(this.df){
+	} else */ if(this.df){
 		this.make_row();
 		this.make_simple_section(1, 1);
 	}	

@@ -16,7 +16,7 @@ $wid_make = function(ele,color) {
 	fsize = ele.style.fontSize ? ele.style.fontSize : '11px';
 	
 	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); 
-	$br(ele,'3px'); $gr(ele,'#FFF','#DDD');
+	$br(ele,'3px'); $gr(ele,'#FFF','#DDD'); $bs(ele, '0.5px 0.5px 2px #EEE');
 	
 	if(!color && ele.wid_color) color = ele.wid_color;
 	
@@ -52,7 +52,7 @@ $wid_normal = function(ele) {
 
 $wid_active = function(ele) {
 	if(ele.disabled) return;
-	$y(ele, {border:'1px solid #000', color:'#444'}); $gr(ele,'#FFF','#EEE');
+	$y(ele, {border:'1px solid #444', color:'#444'}); $gr(ele,'#FFF','#EEE');
 	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
 	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#AFA','#7C7');
@@ -64,7 +64,7 @@ $wid_active = function(ele) {
 
 $wid_pressed = function(ele) {
 	if(ele.disabled) return;
-	$y(ele, {border:'1px solid #000'}); $gr(ele,'#EEF','#DDF');
+	$y(ele, {border:'1px solid #444'}); $gr(ele,'#EEF','#DDF');
 	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#7C7','#2A2');
 	}
@@ -74,7 +74,7 @@ $wid_pressed = function(ele) {
 // ====================================
 
 $item_normal = function(ele) { 
-	$y(ele, {padding:'6px 8px',cursor:'pointer',marginRight:'8px',fontWeight:'normal', whiteSpace:'nowrap',overflow:'hidden',borderBottom:'1px solid #DDD'});
+	$y(ele, {padding:'6px 8px',cursor:'pointer',marginRight:'8px', whiteSpace:'nowrap',overflow:'hidden',borderBottom:'1px solid #DDD'});
 	$bg(ele,'#FFF'); $fg(ele,'#000');
 }
 $item_active = function(ele) {
@@ -298,13 +298,14 @@ function set_title(t) {
 	document.title = (title_prefix ? (title_prefix + ' - ') : '') + t;
 }
 
-function $a(parent, newtag, className, cs) {
+function $a(parent, newtag, className, cs, innerHTML) {
 	if(parent && parent.substr)parent = $i(parent);
 	var c = document.createElement(newtag);
 	if(parent)
 		parent.appendChild(c);
 	if(className)c.className = className;
 	if(cs)$y(c,cs);
+	if(innerHTML) c.innerHTML = innerHTML;
 	return c;
 }
 function $a_input(p, in_type, attributes, cs) {
@@ -388,7 +389,7 @@ function set_style(txt) {
 
 // Make table
 
-function make_table(parent, nr, nc, table_width, widths, cell_style) {
+function make_table(parent, nr, nc, table_width, widths, cell_style, table_style) {
 	var t = $a(parent, 'table');
 	t.style.borderCollapse = 'collapse';
 	if(table_width) t.style.width = table_width;
@@ -407,6 +408,7 @@ function make_table(parent, nr, nc, table_width, widths, cell_style) {
 		}
 	}
 	t.append_row = function() { return append_row(this); }
+	if(table_style) $y(t, table_style);
 	return t;
 }
 

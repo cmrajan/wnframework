@@ -207,7 +207,7 @@ def write_document_file(doclist, record_module=None):
 	folder = create_folder(module, doclist[0]['doctype'], doclist[0]['name'])
 	
 	# separate code files
-	separate_code_files(doclist, folder, code_type)
+	#separate_code_files(doclist, folder, code_type)
 		
 	# write the data file
 	fname = (code_type and scrub(doclist[0]['name'])) or doclist[0]['name']
@@ -220,6 +220,8 @@ def write_document_file(doclist, record_module=None):
 # ==============================================================================
 
 def separate_code_files(doclist, folder, code_type):
+	return
+	
 	import os
 	import webnotes
 	# code will be in the parent only

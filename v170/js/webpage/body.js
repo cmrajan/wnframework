@@ -88,7 +88,7 @@ function Body() {
 			if(this.cp.custom_startup_code)
 				eval(this.cp.custom_startup_code);
 		} catch(e) {
-			// pass
+			errprint(e);
 		}
 	}
 	

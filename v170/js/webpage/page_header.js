@@ -14,7 +14,7 @@
 
 var def_ph_style = {
 	wrapper: {marginBottom:'16px', backgroundColor:'#EEE'}
-	,main_heading: { fontSize:'18px', padding: '4px 0px', fontWeight:'bold'}
+	,main_heading: { fontSize:'20px', padding: '4px 0px', fontWeight:'bold'}
 	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555', display:'none' }
 	,separator: { borderTop:'3px solid #444' } // show this when there is no toolbar
 	,toolbar_area: { padding:'3px 0px', display:'none',borderBottom:'1px solid #AAA'}

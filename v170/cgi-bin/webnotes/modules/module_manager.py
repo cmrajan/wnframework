@@ -1,4 +1,6 @@
 #==============================================================================
+# script to change the module name in the database & update svn
+#==============================================================================
 
 def change_module(dt, dn, from_module, to_module):
 	import os, webnotes.defs

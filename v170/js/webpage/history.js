@@ -6,41 +6,56 @@ nav_obj.observers = [];
 nav_obj.add_observer = function(o) { nav_obj.observers.push(o); }
 
 nav_obj.ol = [];
-nav_obj.open_notify = function(t, dt, dn) {
+nav_obj.open_notify = function(t, dt, dn, no_history) {
 	// last should not be this (refresh)
-	if(nav_obj.length) {
-		var tmp = nav_obj[nav_obj.length-1];
-		if(tmp[0]==t && tmp[1]==dt && tmp[2]==dn) return;
+	if(nav_obj.ol.length) {
+		var tmp = nav_obj.ol[nav_obj.ol.length-1];
+		if(tmp && tmp[0]==t && tmp[1]==dt && tmp[2]==dn) return;
 	}
 
-	// remove from list (if exists)
-	var tmp = [];
-	for(var i in nav_obj.ol)
-		if(!(nav_obj.ol[i][0]==t && nav_obj.ol[i][1]==dt && nav_obj.ol[i][2]==dn)) tmp.push(nav_obj.ol[i]);
-	nav_obj.ol = tmp;
+	if(!no_history) {
 
-	// add to top
-	nav_obj.ol.push([t, dt, dn])	
+		// remove from history (if exists so that we can put it back on top)
+		var tmp = [];
+		for(var i in nav_obj.ol)
+			if(!(nav_obj.ol[i][0]==t && nav_obj.ol[i][1]==dt && nav_obj.ol[i][2]==dn)) tmp.push(nav_obj.ol[i]);
+		nav_obj.ol = tmp;
 	
-	// add to "back" history
-	t = encodeURIComponent(t);
-	dt = encodeURIComponent(dt);
-	if(dn)dn = encodeURIComponent(dn);
+		// add to top
+		nav_obj.ol.push([t, dt, dn])	
+		
+		// encode
+		en_t = encodeURIComponent(t);
+		en_dt = encodeURIComponent(dt);
+		en_dn = dn ? encodeURIComponent(dn) : '';
+		
+		var id = en_t+'/'+ en_dt + (dn ? ('/'+en_dn): '')
+		
+		// option to add to analytics engine
+		if(nav_obj.on_open)
+			nav_obj.on_open(id);
+		
+		// add to "back" history
+		dhtmlHistory.add(id,'');
+	}
 	
-	var id = t+'/'+ dt + (dn ? ('/'+dn): '')
-	
-	// option to add to analytics engine
-	if(nav_obj.on_open)
-		nav_obj.on_open(id);
-	
-	dhtmlHistory.add(id,'');
-	
+	nav_obj.notify_observers(t, dt, dn);
+
+}
+
+// Notify observers
+// =========================================
+
+nav_obj.notify_observers = function(t, dt, dn) {
 	// notify observers (for menu?)
 	for(var i=0; i<nav_obj.observers.length; i++) {
 		var o = nav_obj.observers[i];
 		if(o && o.notify) o.notify(t, dt, dn);
 	}
 }
+
+// Remame links (for save - name change)
+// =========================================
 
 nav_obj.rename_notify = function(dt, oldn, newn) {
 	for(var i=0;i<nav_obj.ol.length;i++) {

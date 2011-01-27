@@ -19,16 +19,9 @@ function loadreport(dt, rep_name, onload, menuitem, reset_report) {
 				if(onload)
 					onload(rb);
 
-				// set menu item
-				if(menuitem) rb.menuitems[rep_name] = menuitem;
-
 				// if loaded, then run
 				if((rb.dt) && (!rb.dt.has_data() || rb.current_loaded!=t))
 					rb.dt.run();
-				
-				// high light menu item
-				if(rb.menuitems[rep_name]) 
-					rb.menuitems[rep_name].show_selected();
 
 			} else {
 				// reset if from toolbar
@@ -94,10 +87,6 @@ function loaddoc(doctype, name, onload, menuitem, from_archive) {
 			page_body.set_status('Done');
 			var frm = frms[doctype];
 
-			// menu item
-			if(menuitem) frm.menuitem = menuitem;
-			if(onload)onload(frm);
-						
 			// tweets
 			if(r && r.no_of_comments) frm.n_comments[name] = r.no_of_comments;
 			
@@ -107,9 +96,6 @@ function loaddoc(doctype, name, onload, menuitem, from_archive) {
 			// notify for back button
 			if(!frm.in_dialog)
 				nav_obj.open_notify('Form',doctype,name);
-
-			// show menuitem selected
-			if(frm.menuitem) frm.menuitem.show_selected();
 
 		} else {
 			// nothing, go home - there were errors
@@ -193,7 +179,7 @@ var newdoc = new_doc;
 
 var pscript={};
 var cur_page;
-function loadpage(page_name, call_back, menuitem) {
+function loadpage(page_name, call_back, no_history) {
 	if(page_name=='_home')
 		page_name = home_page;
 	var fn = function(r,rt) {
@@ -207,19 +193,15 @@ function loadpage(page_name, call_back, menuitem) {
 
 			// call refresh
 			try {
-				if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](menuitem); // onload
+				if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](); // onload
 			} catch(e) { 
 				submit_error(e); 
 			}
 		} else {
 			// new page
-			var p = render_page(page_name, menuitem);
-			if(menuitem) p.menuitem = menuitem;
+			var p = render_page(page_name);
 			if(!p)return;
 		}
-
-		// select menu
-		if(p.menuitem) p.menuitem.show_selected();
 
 		// execute callback
 		cur_page = page_name;
@@ -229,14 +211,14 @@ function loadpage(page_name, call_back, menuitem) {
 		scroll(0,0);
 
 		// update "back"
-		nav_obj.open_notify('Page',page_name,'');
+		nav_obj.open_notify('Page',page_name,'',no_history);
 	}
 	
 	if(get_local('Page', page_name) || page_body.pages[page_name]) 
 		fn();
 	else {
 		page_body.set_status('Loading Page...');
-		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn );
+		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn);
 	}
 }
 

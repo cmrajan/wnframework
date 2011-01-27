@@ -1,6 +1,9 @@
 var msg_dialog;
 function msgprint(msg, issmall, callback) {
 	if(!msg) return;
+	
+	if(typeof(msg)!='string')
+		msg = JSON.stringify(msg);
 
 	if(issmall) { show_alert(msg); return; }
 

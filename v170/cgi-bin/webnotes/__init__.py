@@ -1,6 +1,6 @@
 # webnotes init (all shared variables come here)
 code_fields_dict = {
-	'Page':[('script', 'js'), ('content', 'html'), ('style', 'css'), ('static_content', 'html')],
+	'Page':[('script', 'js'), ('content', 'html'), ('style', 'css'), ('static_content', 'html'), ('server_code', 'py')],
 	'DocType':[('server_code_core', 'py'), ('client_script_core', 'js')],
 	'Search Criteria':[('report_script', 'js'), ('server_script', 'py'), ('custom_query', 'sql')],
 	'Patch':[('patch_code', 'py')],

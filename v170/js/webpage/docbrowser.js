@@ -12,10 +12,7 @@ ItemBrowserPage = function() {
 	this.cur_list = null;
 
 	this.my_page = page_body.add_page('ItemBrowser');
-	this.wrapper = $a(this.my_page,'div');
-
-	var h = $a(this.wrapper, 'div');
-
+	this.wrapper = $a(this.my_page,'div','',{marginRight:'8px'});
 	this.body = $a(this.wrapper, 'div');
 
 	
@@ -26,7 +23,7 @@ ItemBrowserPage = function() {
 ItemBrowserPage.prototype.show = function(dt, label, field_list) {
 	var me = this;
 
-	if(this.cur_list) $dh(this.cur_list.wrapper);
+	if(this.cur_list && this.cur_list.dt != dt) $dh(this.cur_list.wrapper);
 		
 	if(!me.lists[dt]) {
 		me.lists[dt] = new ItemBrowser(me.body, dt, label, field_list);
@@ -48,7 +45,7 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	this.tag_filter_dict = {};
 	this.items = [];
 
-	this.wrapper = $a(parent, 'div', '', {display:'none'});
+	this.wrapper = $a(parent, 'div');
 	this.head = $a(this.wrapper, 'div');
 
 	// header (?)
@@ -58,11 +55,13 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	$dh(this.page_head.separator);
 
 	// areas
-	this.no_result_area = $a(this.wrapper, 'div');
-	this.no_result_message = $a(this.no_result_area,'span','',{backgroundColor:'#FFC', padding:'6px'});
+	this.no_result_area = $a(this.wrapper, 'div','help_box',{fontSize:'14px', textAlign:'center'});
 	
-	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#888', display:'none'});
-	this.loading_div.innerHTML = 'Loading...';
+	// loading...
+	this.loading_div = $a(this.wrapper,'div','',{margin:'200px 0px', textAlign:'center', fontSize:'14px', color:'#444', display:'none'});
+	this.loading_div.innerHTML = 'Loading<img src="images/ui/button-load.gif" style="margin-bottom: -2px; margin-left: 8px">';
+	
+	// body
 	this.body = $a(this.wrapper, 'div');
 	
 	// toolbar
@@ -201,14 +200,24 @@ ItemBrowser.prototype.show_activity = function() {
 // -------------------------------------------------
 
 ItemBrowser.prototype.show = function(show_callback) {
+	$ds(this.wrapper);
+	
+	if(this.loaded && this.lst.n_records) return;
+	
+	$ds(this.loading_div);
+	$dh(this.body);
+	$dh(this.head);
+	$dh(this.no_result_area);
+	
 	var me = this;
 	var callback = function(r, rt) {
 		if(r.message == 'Yes') {
-			if(!me.loaded)
+			if(!me.loaded) {
 				me.load_details(show_callback);
-			else
+			} else {
 				me.show_results();
 				if(show_callback)show_callback();
+			}
 		} else {
 			me.show_no_result();
 			if(show_callback)show_callback();
@@ -243,8 +252,8 @@ ItemBrowser.prototype.load_details = function(load_callback) {
 // -------------------------------------------------
 
 ItemBrowser.prototype.show_results = function() {
-	$ds(this.wrapper);
 	$dh(this.loading_div);
+	$ds(this.head);
 	$ds(this.body);
 	$dh(this.no_result_area);
 	set_title(get_doctype_label(this.label));
@@ -291,11 +300,11 @@ ItemBrowser.prototype.show_trend = function(trend) {
 // -------------------------------------------------
 
 ItemBrowser.prototype.show_no_result = function() {
-	$ds(this.wrapper);
 	$dh(this.loading_div);
-	$dh(this.body);	
 	$ds(this.no_result_area);
-	this.no_result_message.innerHTML = repl('No %(dt)s records found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s', {dt:get_doctype_label(this.dt)});
+	$ds(this.head);
+	$dh(this.body);
+	this.no_result_area.innerHTML = repl('No %(dt)s found. <span class="link_type" onclick="newdoc(\'%(dt)s\')">Click here</span> to create your first %(dt)s!', {dt:get_doctype_label(this.dt)});
 	set_title(get_doctype_label(this.label));
 }
 
