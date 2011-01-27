@@ -10,8 +10,14 @@ import webnotes.defs
 
 class HTTPRequest:
 	def __init__(self):
-		self.get_env()
-	
+
+		# Get Environment variables
+		self.domain = webnotes.get_env_vars('HTTP_HOST')
+		if self.domain and self.domain.startswith('www.'):
+			self.domain = self.domain[4:]
+
+		self.remote_ip = webnotes.get_env_vars('REMOTE_ADDR')					
+
 		# load cookies
 		webnotes.cookie_manager = CookieManager()
 
@@ -53,16 +59,6 @@ class HTTPRequest:
 		else:
 			webnotes.user.load_profile()	
 
-	# load env variables
-	# ------------------
-
-	def get_env(self): 
-		import os
-		self.domain = os.environ.get('HTTP_HOST')
-		if self.domain.startswith('www.'):
-			self.domain = self.domain[4:]
-			
-		webnotes.remote_ip = os.environ.get('REMOTE_ADDR')
 
 	# get account name
 	# ------------------
@@ -101,7 +97,7 @@ class HTTPRequest:
 
 		if not ac_name:
 			ac_name = self.get_ac_name()
-
+	
 		webnotes.conn = webnotes.db.Database(ac_name = ac_name)
 		webnotes.conn = webnotes.conn
 		webnotes.ac_name = ac_name
