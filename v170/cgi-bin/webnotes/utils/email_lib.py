@@ -150,8 +150,11 @@ def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc
 	for a in attach:
 		email.attach(a)
 
-	c = webnotes.conn
-	email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.erpnext.com">erpnext</a></div>')
+	footer = webnotes.conn.get_value('Control Panel',None,'mail_footer') or ''
+	footer += (webnotes.conn.get_global('global_mail_footer') or '')
+	
+	if footer:
+		email.set_message(footer)
 	email.send()
 
 def get_contact_list():
@@ -205,9 +208,12 @@ def send_form():
 		email.set_message(form.getvalue('body'))
 	
 		# footer
-		c = webnotes.app_conn or webnotes.conn
-		email.set_message(c.get_value('Control Panel',None,'mail_footer') or '<div style="font-family: Arial; border-top: 1px solid #888; padding-top: 8px">Powered by <a href="http://www.erpnext.com">erpnext</a></div>')
+		footer = webnotes.conn.get_value('Control Panel',None,'mail_footer') or ''
+		footer += (webnotes.conn.get_global('global_mail_footer') or '')
 		
+		if footer:
+			email.set_message(footer)
+				
 		for a in al:
 			if a:
 				email.attach(a.split(',')[0])

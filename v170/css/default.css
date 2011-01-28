@@ -352,18 +352,16 @@ div.attach_area table {
 
 
 .link_type {
-	padding-top:2px;
-	padding-bottom:2px;
+	padding:2px;
 	color: #00b;
 	text-decoration: underline;
 	cursor: pointer;
 }
 
 .link_type:hover {
-	padding-top:2px;
-	padding-bottom:2px;
 	color: #fff;
 	background-color: #07b;
+	text-decoration: none;
 }
 
 .tablabel_normal {
