@@ -6,13 +6,13 @@ html {
 body {	
 	margin: 0px;
 	padding: 0px;
-	font-family: Arial, Helvetica, Sans;
+	font-family: Lucida Grande, Arial, Helvetica, Sans;
 	font-size: 12px;
 	color: #000;
 	background: url(foo) fixed;
 }
 
-input, select, button { font-size: 12px; font-family: Arial, Helvetica, Sans; }
+input, select, button { font-size: 12px; font-family: Lucida Grande, Arial, Helvetica, Sans; }
 
 li { margin: 4px; }
 
@@ -354,7 +354,7 @@ div.attach_area table {
 .link_type {
 	padding-top:2px;
 	padding-bottom:2px;
-	color: #0000FF;
+	color: #00b;
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -362,7 +362,8 @@ div.attach_area table {
 .link_type:hover {
 	padding-top:2px;
 	padding-bottom:2px;
-	background-color: #FFC;
+	color: #fff;
+	background-color: #07b;
 }
 
 .tablabel_normal {

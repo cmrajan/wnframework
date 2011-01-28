@@ -99,7 +99,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 // ======================================================================================
 
 _f.SectionBreak.prototype.make_simple_section = function(with_header) {
-	var head = $a(this.row.main_head, 'div', '', {margin:'8px'});
+	var head = $a(this.row.main_head, 'div', '', {margin:'8px 8px 0px 0px'});
 	this.row.header.head = head;
 	var me = this;
 
