@@ -16,7 +16,7 @@ class HTTPRequest:
 		if self.domain and self.domain.startswith('www.'):
 			self.domain = self.domain[4:]
 
-		self.remote_ip = webnotes.get_env_vars('REMOTE_ADDR')					
+		webnotes.remote_ip = webnotes.get_env_vars('REMOTE_ADDR')					
 
 		# load cookies
 		webnotes.cookie_manager = CookieManager()
@@ -186,7 +186,7 @@ class LoginManager:
 		ip = [i.strip() for i in ip]
 			
 		if ret and ip:
-			if not (self.remote_ip.startswith(ip[0]) or (self.remote_ip in ip)):
+			if not (webnotes.remote_ip.startswith(ip[0]) or (webnotes.remote_ip in ip)):
 				raise Exception, 'Not allowed from this IP Address'	
 
 	# login as guest
@@ -355,7 +355,7 @@ class Session:
 				raise e
 
 		# update profile
-		webnotes.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (webnotes.utils.now(), self.remote_ip, self.data['user']))
+		webnotes.conn.sql("UPDATE tabProfile SET last_login = '%s', last_ip = '%s' where name='%s'" % (webnotes.utils.now(), webnotes.remote_ip, self.data['user']))
 
 		# set cookies to write
 		webnotes.session = self.data

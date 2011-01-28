@@ -22,6 +22,7 @@ cookies = {}
 auto_masters = {}
 tenant_id = None
 
+
 # for applications
 app_conn = None
 adt_list = ['DocType', 'DocField', 'DocPerm']
@@ -147,6 +148,8 @@ def set_as_admin(db_name=None, ac_name=None):
 #-----------------------------------------------------------
 def get_env_vars(env_var):
 	return getattr(os.environ,env_var,'None')
+
+remote_ip = get_env_vars('REMOTE_ADDR')		#Required for login from python shell
 
 # Logging
 # -----------------------------------------------------------
