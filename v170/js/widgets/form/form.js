@@ -6,6 +6,7 @@
 			+ this.form_wrapper
 				+ this.head
 				+ this.tip_wrapper
+				+ this.last_comment_wrapper
 				+ this.tab_wrapper
 				+ this.body
 					+ this.layout
@@ -196,7 +197,7 @@ _f.Frm.prototype.set_section = function(sec_id) {
 
 _f.Frm.prototype.setup_tips = function() {
 	var me = this;
-	this.tip_box = $a(this.tip_wrapper, 'div', 'frm_tip_box');
+	this.tip_box = $a(this.tip_wrapper, 'div', 'help_box');
 
 	var tab = $a(this.tip_box, 'table');
 	var r = tab.insertRow(0);
@@ -234,17 +235,7 @@ _f.Frm.prototype.setup_std_layout = function() {
 
 	// only tray
 	if(this.meta.section_style=='Tabbed') this.meta.section_style='Tray';
-	this.meta.section_style='Simple';
-
-	/* build the sidebar
-	if(this.meta.section_style=='Tray' && !get_url_arg('embed')) {
-		this.tray = new TrayPage(this.form_wrapper,null,100/8 + '%',700/8 + '%');
-		$y(this.tray.tab,{tableLayout:'fixed'});
-
-		this.body = $a(this.tray.body, 'div', 'frm_body',{margin:'16px', marginLeft:'0px'});
-	} else {
-		this.body = $a(this.form_wrapper, 'div', 'frm_body',{margin:'4px'});
-	}*/
+	this.meta.section_style='Simple'; // always simple!
 	
 	this.body = $a(this.form_wrapper, 'div', '');
 
@@ -477,6 +468,7 @@ _f.Frm.prototype.setup = function() {
 	this.head = $a(this.form_wrapper, 'div');
 
 	// tips
+	this.last_comment_wrapper = $a(this.form_wrapper, 'div', 'help_box', {display:'none', marginRight:'8px', fontSize:'11px', padding:'4px'});
 	this.tip_wrapper = $a(this.form_wrapper, 'div');
 	
 	if(this.meta.use_template) {
@@ -651,6 +643,9 @@ _f.Frm.prototype.refresh = function(docname) {
 			// header
 			if(!this.meta.istable) { this.refresh_header(); }
 
+			// comments
+			this.refresh_last_comment();
+		
 			// call trigger
 	 		this.runclientscript('refresh');
 			
@@ -1086,7 +1081,9 @@ _f.Frm.prototype.reload_doc = function() {
 	var ret_fn = function(r, rtxt) {
 		page_body.set_status('Done')
 		// n tweets and last comment
-		if(r.n_comments) this.n_comments[me] = r.no_of_comments;
+		
+		if(r.n_comments) this.n_comments[me.docname] = r.no_of_comments;
+		if(r.last_comment) this.last_comments[me.docname] = r.last_comment;
 		
 		me.runclientscript('setup', me.doctype, me.docname);
 		me.refresh();
@@ -1187,6 +1184,19 @@ _f.set_value = function(dt, dn, fn, v) {
 		if(frm && frm==cur_frm) {
 			frm.set_heading();
 		}
+	}
+}
+
+// ======================================================================================
+
+_f.Frm.prototype.refresh_last_comment = function() {
+	if(this.last_comments[this.docname]) {
+		$ds(this.last_comment_wrapper);
+		this.last_comment_wrapper.innerHTML = '<b>Lastest Comment: </b>' + this.last_comments[this.docname];
+		var sp = $a(this.last_comment_wrapper, 'span', 'link_type', {marginLeft:'8px'}, 'View all comments');
+		sp.onclick = function() { cur_frm.show_comments(); }
+	} else {
+		$dh(this.last_comment_wrapper);
 	}
 }
 

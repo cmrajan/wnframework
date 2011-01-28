@@ -114,7 +114,7 @@ _r.ReportBuilder = function(parent, doctype, onload) {
 
 _r.ReportBuilder.prototype.make_tabs = function() {
 	this.tab_wrapper = $a(this.wrapper, 'div', 'finder_tab_area');
-	this.mytabs = new TrayPage(this.tab_wrapper);
+	this.mytabs = new TabbedPage(this.tab_wrapper);
 	
 	this.mytabs.add_item('Result', null, null, 1);
 	this.mytabs.add_item('More Filters', null, null, 1);

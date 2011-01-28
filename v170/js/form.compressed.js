@@ -15,7 +15,7 @@ loadpage('_home');return;}
 if(r.print_access){if(!_f.temp_access[doctype])
 _f.temp_access[doctype]={};_f.temp_access[doctype][opt_name]=1;}
 var meta=locals['DocType'][doctype];var in_dialog=false;if(meta.istable)meta.in_dialog=1;if(cint(meta.in_dialog)){var parent=_f.frm_dialog;in_dialog=true;}else{var parent=_f.frm_con;}
-var f=new _f.Frm(doctype,parent);f.in_dialog=in_dialog;if(r.no_of_comments){f.n_comments[opt_name]=r.no_of_comments;}
+var f=new _f.Frm(doctype,parent);f.in_dialog=in_dialog;if(r.no_of_comments){f.n_comments[opt_name]=r.no_of_comments;f.last_comments[opt_name]=r.last_comment;}
 if(onload)onload(r,rt);}
 var is_new=0;if(opt_name&&locals[doctype]&&locals[doctype][opt_name]&&locals[doctype][opt_name].__islocal){is_new=1;}
 if(opt_name&&!is_new){var args={'name':opt_name,'doctype':doctype,'getdoctype':1,'user':user};if(get_url_arg('akey'))args['akey']=get_url_arg('akey');if(from_archive)args['from_archive']=1;$c('webnotes.widgets.form.getdoc',args,callback);page_body.set_status('Loading Document...')}else{$c('webnotes.widgets.form.getdoctype',args={'doctype':doctype},callback);page_body.set_status('Loading Document...')}}
@@ -77,7 +77,7 @@ _f.Frm.prototype.set_heading=function(){if(!this.meta.istable&&this.frm_head)thi
 _f.Frm.prototype.set_section=function(sec_id){if(!this.sections[sec_id]||!this.sections[sec_id].expand)
 return;if(this.sections[this.cur_section[this.docname]])
 this.sections[this.cur_section[this.docname]].collapse();this.sections[sec_id].expand();this.cur_section[this.docname]=sec_id;}
-_f.Frm.prototype.setup_tips=function(){var me=this;this.tip_box=$a(this.tip_wrapper,'div','frm_tip_box');var tab=$a(this.tip_box,'table');var r=tab.insertRow(0);var c0=r.insertCell(0);this.c1=r.insertCell(1);this.img=$a(c0,'img');this.img.setAttribute('src','images/icons/lightbulb.gif');c0.style.width='24px';this.set_tip=function(t,icon){me.c1.innerHTML='<div style="margin-bottom: 8px;">'+t+'</div>';$ds(me.tip_box);if(icon)this.img.setAttribute('src','images/icons/'+icon);}
+_f.Frm.prototype.setup_tips=function(){var me=this;this.tip_box=$a(this.tip_wrapper,'div','help_box');var tab=$a(this.tip_box,'table');var r=tab.insertRow(0);var c0=r.insertCell(0);this.c1=r.insertCell(1);this.img=$a(c0,'img');this.img.setAttribute('src','images/icons/lightbulb.gif');c0.style.width='24px';this.set_tip=function(t,icon){me.c1.innerHTML='<div style="margin-bottom: 8px;">'+t+'</div>';$ds(me.tip_box);if(icon)this.img.setAttribute('src','images/icons/'+icon);}
 this.append_tip=function(t){me.c1.innerHTML+='<div style="margin-bottom: 8px;">'+t+'</div>';$ds(me.tip_box);}
 this.clear_tip=function(){me.c1.innerHTML='';$dh(me.tip_box);}
 $dh(this.tip_box);}
@@ -104,7 +104,7 @@ if(cur_frm.doc.select_print_heading)
 cur_frm.set_print_heading(cur_frm.doc.select_print_heading)
 if(user!='Guest'){$di(this.view_btn_wrapper);if(cur_frm.doc.__archived){$dh(this.view_btn_wrapper);}else{$di(this.view_btn_wrapper);}}else{$dh(this.view_btn_wrapper);$dh(this.print_close_btn);}
 _p.build(this.default_format,print_callback,null,1);}
-_f.Frm.prototype.setup=function(){var me=this;this.fields=[];this.fields_dict={};this.wrapper=$a(this.parent.body,'div','frm_wrapper');this.setup_print_layout();this.saved_wrapper=$a(this.wrapper,'div');this.form_wrapper=$a(this.wrapper,'div');this.head=$a(this.form_wrapper,'div');this.tip_wrapper=$a(this.form_wrapper,'div');if(this.meta.use_template){this.setup_template_layout();}else{this.setup_std_layout();}
+_f.Frm.prototype.setup=function(){var me=this;this.fields=[];this.fields_dict={};this.wrapper=$a(this.parent.body,'div','frm_wrapper');this.setup_print_layout();this.saved_wrapper=$a(this.wrapper,'div');this.form_wrapper=$a(this.wrapper,'div');this.head=$a(this.form_wrapper,'div');this.last_comment_wrapper=$a(this.form_wrapper,'div','help_box',{display:'none',marginRight:'8px',fontSize:'11px',padding:'4px'});this.tip_wrapper=$a(this.form_wrapper,'div');if(this.meta.use_template){this.setup_template_layout();}else{this.setup_std_layout();}
 if(this.meta.allow_attach)
 this.setup_attach();this.setup_client_script();this.setup_done=true;}
 _f.Frm.prototype.hide=function(){$dh(this.wrapper);this.display=0;hide_autosuggest();}
@@ -129,7 +129,7 @@ if(this.docname){if(!this.check_doc_perm())return;if(!this.setup_done)this.setup
 if(this.doc.__islocal)
 this.is_editable[this.docname]=1;this.editable=this.is_editable[this.docname];if(!this.doc.__archived&&(this.editable||(!this.editable&&this.meta.istable))){if(this.print_wrapper){$dh(this.print_wrapper);$ds(this.form_wrapper);}
 if(!this.meta.istable){this.refresh_header();}
-this.runclientscript('refresh');this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();this.refresh_footer();if(this.layout)this.layout.show();}else{this.refresh_header();if(this.print_wrapper){this.refresh_print_layout();}
+this.refresh_last_comment();this.runclientscript('refresh');this.refresh_tabs();this.refresh_fields();this.refresh_dependency();if(this.meta.allow_attach)this.refresh_attachments();this.refresh_footer();if(this.layout)this.layout.show();}else{this.refresh_header();if(this.print_wrapper){this.refresh_print_layout();}
 this.runclientscript('edit_status_changed');}
 if(!this.display)this.show_the_frm();if(!this.meta.in_dialog)page_body.change_to('Forms');}}
 _f.Frm.prototype.refresh_tabs=function(){var me=this;if(me.meta.section_style=='Tray'||me.meta.section_style=='Tabbed'){for(var i in me.sections){me.sections[i].collapse();}
@@ -182,7 +182,7 @@ if(d1.parent==dn&&cint(tf_dict[d1.parentfield].no_copy)!=1){var ch=LocalDB.copy(
 newdoc.__islocal=1;newdoc.docstatus=0;newdoc.owner=user;newdoc.creation='';newdoc.modified_by=user;newdoc.modified='';if(onload)onload(newdoc);loaddoc(newdoc.doctype,newdoc.name);}
 _f.Frm.prototype.reload_doc=function(){var me=this;if(frms['DocType']&&frms['DocType'].opendocs[me.doctype]){msgprint("error:Cannot refresh an instance of \""+me.doctype+"\" when the DocType is open.");return;}
 var ret_fn=function(r,rtxt){page_body.set_status('Done')
-if(r.n_comments)this.n_comments[me]=r.no_of_comments;me.runclientscript('setup',me.doctype,me.docname);me.refresh();}
+if(r.n_comments)this.n_comments[me.docname]=r.no_of_comments;if(r.last_comment)this.last_comments[me.docname]=r.last_comment;me.runclientscript('setup',me.doctype,me.docname);me.refresh();}
 page_body.set_status('Reloading...')
 if(me.doc.__islocal){$c('webnotes.widgets.form.getdoctype',{'doctype':me.doctype},ret_fn,null,null,'Refreshing '+me.doctype+'...');}else{var gl=me.grids;for(var i=0;i<gl.length;i++){var dt=gl[i].df.options;for(var dn in locals[dt]){if(locals[dt][dn].__islocal&&locals[dt][dn].parent==me.docname){var d=locals[dt][dn];d.parent='';d.docstatus=2;d.__deleted=1;}}}
 $c('webnotes.widgets.form.getdoc',{'name':me.docname,'doctype':me.doctype,'getdoctype':1,'user':user},ret_fn,null,null,'Refreshing '+me.docname+'...');}}
@@ -201,6 +201,7 @@ _f.set_value=function(dt,dn,fn,v){var d=locals[dt][dn];var changed=d[fn]!=v;if(c
 msgprint('error:Trying to set a value for "'+dt+','+dn+'" which is not found');if(changed){d[fn]=v;d.__unsaved=1;var frm=frms[d.doctype];try{if(d.parent&&d.parenttype){locals[d.parenttype][d.parent].__unsaved=1;frm=frms[d.parenttype];}}catch(e){if(d.parent&&d.parenttype)
 errprint('Setting __unsaved error:'+d.name+','+d.parent+','+d.parenttype);}
 if(frm&&frm==cur_frm){frm.set_heading();}}}
+_f.Frm.prototype.refresh_last_comment=function(){if(this.last_comments[this.docname]){$ds(this.last_comment_wrapper);this.last_comment_wrapper.innerHTML='<b>Lastest Comment: </b>'+this.last_comments[this.docname];var sp=$a(this.last_comment_wrapper,'span','link_type',{marginLeft:'8px'},'View all comments');sp.onclick=function(){cur_frm.show_comments();}}else{$dh(this.last_comment_wrapper);}}
 _f.Frm.prototype.show_comments=function(){if(!cur_frm.comments){cur_frm.comments=new Dialog(540,400,'Comments');cur_frm.comments.comment_body=$a(cur_frm.comments.body,'div','dialog_frm');$y(cur_frm.comments.body,{backgroundColor:'#EEE'});cur_frm.comments.list=new CommentList(cur_frm.comments.comment_body);}
 cur_frm.comments.list.dt=cur_frm.doctype;cur_frm.comments.list.dn=cur_frm.docname;cur_frm.comments.show();cur_frm.comments.list.run();}
 _f.ColumnBreak=function(){this.set_input=function(){};}
@@ -474,7 +475,7 @@ get_field_obj=function(fn){return cur_frm.fields_dict[fn];}
 CommentList=function(parent,dt,dn){this.wrapper=$a(parent,'div','',{margin:'16px'});this.input_area=$a(this.wrapper,'div','',{margin:'2px'});this.lst_area=$a(this.wrapper,'div','',{margin:'2px'});this.make_input();this.make_lst();this.dt;this.dn;}
 CommentList.prototype.run=function(){this.lst.run();}
 CommentList.prototype.make_input=function(){var me=this;this.input=$a(this.input_area,'textarea','',{height:'60px',width:'300px',fontSize:'14px'});this.btn=$btn($a(this.input_area,'div'),'Post',function(){me.add_comment();},{marginTop:'8px'});}
-CommentList.prototype.add_comment=function(){var me=this;var args={};args.comment=this.input.value;args.comment_by=user;args.comment_by_fullname=user_fullname;args.comment_doctype=this.dt;args.comment_docname=this.dn;$c_obj('Widget Control','add_comment',docstring(args),function(r,rt){me.lst.run();me.input.value='';cur_frm.n_comments[cur_frm.doc.name]=cint(cur_frm.n_comments[cur_frm.doc.name])+1;cur_frm.frm_head.refresh_comments();});}
+CommentList.prototype.add_comment=function(){var me=this;var args={};args.comment=this.input.value;args.comment_by=user;args.comment_by_fullname=user_fullname;args.comment_doctype=this.dt;args.comment_docname=this.dn;$c_obj('Widget Control','add_comment',docstring(args),function(r,rt){me.lst.run();cur_frm.n_comments[cur_frm.doc.name]=cint(cur_frm.n_comments[cur_frm.doc.name])+1;cur_frm.last_comments[cur_frm.doc.name]=me.input.value;me.input.value='';cur_frm.frm_head.refresh_comments();cur_frm.refresh_last_comment();});}
 CommentList.prototype.make_lst=function(){if(!this.lst){var l=new Listing('Comments',1);var me=this;l.colwidths=['100%'];l.opts.hide_export=1;l.opts.hide_print=1;l.opts.hide_refresh=1;l.opts.no_border=1;l.opts.hide_rec_label=0;l.opts.show_calc=0;l.opts.round_corners=0;l.opts.alt_cell_style={};l.opts.cell_style={padding:'3px'};l.no_rec_message='No comments yet. Be the first one to comment!';l.get_query=function(){this.query=repl("select t1.name, t1.comment, t1.comment_by, '', t1.creation, t1.comment_doctype, t1.comment_docname, ifnull(concat_ws(' ',ifnull(t2.first_name,''),ifnull(t2.middle_name,''),ifnull(t2.last_name,'')),''), '', DAYOFMONTH(t1.creation), MONTHNAME(t1.creation), YEAR(t1.creation), hour(t1.creation), minute(t1.creation), second(t1.creation) from `tabComment Widget Record` t1, `tabProfile` t2 where t1.comment_doctype = '%(dt)s' and t1.comment_docname = '%(dn)s' and t1.comment_by = t2.name order by t1.creation desc",{dt:me.dt,dn:me.dn});this.query_max=repl("select count(name) from `tabComment Widget Record` where comment_doctype='%(dt)s' and comment_docname='%(dn)s'",{'dt':me.dt,'dn':me.dn});}
 l.show_cell=function(cell,ri,ci,d){new CommentItem(cell,ri,ci,d,me)}
 this.lst=l;this.lst.make(this.lst_area);}}

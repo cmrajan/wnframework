@@ -131,6 +131,7 @@ _f.add_frm = function(doctype, onload, opt_name, from_archive) {
 		// set # of comments
 		if(r.no_of_comments) {
 			f.n_comments[opt_name] = r.no_of_comments;
+			f.last_comments[opt_name] = r.last_comment;
 		}
 
 		if(onload)onload(r,rt);

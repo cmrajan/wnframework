@@ -18,7 +18,7 @@ def getdoc():
 	doclist = load_single_doc(doctype, docname, (form.get('user') or webnotes.session['user']), prefix)
 	
 	# get comments
-	webnotes.response['no_of_comments'] = get_comments(doctype, docname)
+	webnotes.response['no_of_comments'], webnotes.response['last_comment'] = get_comments(doctype, docname)
 	
 	# load doctype along with the doc
 	if form.get('getdoctype'):
@@ -33,7 +33,11 @@ def getdoc():
 
 def get_comments(doctype, docname):
 	try:
-		return int(webnotes.conn.sql("select count(*) from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s", (doctype, docname))[0][0])
+		last_comment = ''
+		nc = int(webnotes.conn.sql("select count(*) from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s", (doctype, docname))[0][0])
+		if nc:
+			last_comment = webnotes.conn.sql("select comment from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s order by creation desc limit 1", (doctype, docname))[0][0]
+		return nc, last_comment
 	except Exception, e:
 		if e.args[0]==1146:
 			# no table

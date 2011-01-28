@@ -35,10 +35,14 @@ CommentList.prototype.add_comment = function() {
   args.comment_docname = this.dn;
   $c_obj('Widget Control', 'add_comment', docstring(args), function(r,rt){
     me.lst.run();
+    cur_frm.n_comments[cur_frm.doc.name] = cint(cur_frm.n_comments[cur_frm.doc.name]) + 1;
+    cur_frm.last_comments[cur_frm.doc.name] = me.input.value;
+
     // clean up the text area
     me.input.value = '';
-    cur_frm.n_comments[cur_frm.doc.name] = cint(cur_frm.n_comments[cur_frm.doc.name]) + 1;
+
     cur_frm.frm_head.refresh_comments();
+    cur_frm.refresh_last_comment();
   });
 }
 
