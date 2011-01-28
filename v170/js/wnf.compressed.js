@@ -1218,10 +1218,9 @@ redirect_to_login();});}
 function redirect_to_login(){if(login_file)
 window.location.href=login_file;else
 window.location.href='index.cgi';}
-_p.def_print_style="html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
-+"\nbody { }"
+_p.def_print_style_body="html, body{ font-family: Arial, Helvetica; font-size: 12px; }"
 +"\npre { margin:0; padding:0;}"
-+"\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
+_p.def_print_style_other="\n.simpletable, .noborder { border-collapse: collapse; margin-bottom: 10px;}"
 +"\n.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }"
 +"\n.noborder td { vertical-align: top; }"
 _p.go=function(html){var w=window.open('');w.document.write(html);w.document.close();}

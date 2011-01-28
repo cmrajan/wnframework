@@ -215,25 +215,25 @@ _p.print_style = ".datalabelcell {padding: 2px 0px; width: 38%;vertical-align:to
 
 _p.formats = {}
 
-_p.build = function(fmtname, onload, no_letterhead) {
+_p.build = function(fmtname, onload, no_letterhead, only_body) {
 	if(!cur_frm) { alert('No Document Selected'); return; }
 	var doc = locals[cur_frm.doctype][cur_frm.docname];
 	if(fmtname=='Standard') {
-		onload(_p.render(_p.print_std(no_letterhead), _p.print_style, doc, doc.name, no_letterhead));
+		onload(_p.render(_p.print_std(no_letterhead), _p.print_style, doc, doc.name, no_letterhead, only_body));
 	} else {
 		if(!_p.formats[fmtname]) // not loaded, get data
 			$c('webnotes.widgets.form.get_print_format', {'name':fmtname }, 
 				function(r,rt) { 
 					_p.formats[fmtname] = r.message;
-					onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead)); 
+					onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead, only_body)); 
 				}
 			);
 		else // loaded
-			onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead));	
+			onload(_p.render(_p.formats[fmtname], '', doc, doc.name, no_letterhead, only_body));	
 	}
 }
 
-_p.render = function(body, style, doc, title, no_letterhead) {
+_p.render = function(body, style, doc, title, no_letterhead, only_body) {
 	var block = document.createElement('div');
 	var tmp_html = '';
 	block.innerHTML = body;
@@ -245,7 +245,7 @@ _p.render = function(body, style, doc, title, no_letterhead) {
 		var tmp_html = '<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">ARCHIVED</div>You must restore this document to make it editable.</div>';
 	}
 
-	style = _p.def_print_style + style;
+	style = (only_body ? '' : _p.def_print_style_body) + _p.def_print_style_other + style;
 
 	// run embedded javascript
 	var jslist = block.getElementsByTagName('script');
@@ -260,14 +260,19 @@ _p.render = function(body, style, doc, title, no_letterhead) {
 		}
 		jslist = block.getElementsByTagName('script');
 	}
-	return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
-		+ '<html><head>'
-		+ '<title>'+title+'</title>'
-		+ '<style>'+style+'</style>'
-		+ '</head><body>'
-		+ tmp_html
-		+ block.innerHTML.replace(/<td/g, '\n<td')
-		+ '</body></html>';
+	if(only_body) {
+		return tmp_html + block.innerHTML.replace(/<td/g, '\n<td').replace(/<div/g, '\n<div');
+		
+	} else {
+		return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
+			+ '<html><head>'
+			+ '<title>'+title+'</title>'
+			+ '<style>'+style+'</style>'
+			+ '</head><body>'
+			+ tmp_html
+			+ block.innerHTML.replace(/<td/g, '\n<td')
+			+ '</body></html>';
+	}
 }
 
 print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, condition, cssClass) {
@@ -275,7 +280,7 @@ print_table = function(dt, dn, fieldname, tabletype, cols, head_labels, widths, 
 	var ds = getchildren(tabletype, dn, fieldname, dt);
 	var tl = [];
 	var cell_style = {border:'1px solid #000', padding:'2px', verticalAlign:'top'};
-	var head_cell_style = {border:'1px solid #000', padding:'2px', verticalAlign:'top', backgroundColor:'#DDD'};
+	var head_cell_style = {border:'1px solid #000', padding:'2px', verticalAlign:'top', backgroundColor:'#ddd'};
 	
 	var make_table = function(fl) {
 		var w = document.createElement('div');
