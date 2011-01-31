@@ -23,9 +23,6 @@ type_map = {
 
 default_shortcuts = ['_Login', '__user', '_Full Name', 'Today', '__today']
 
-def get_schema():
-	return DbSchema()
-
 # -------------------------------------------------
 # Class database schema
 # -------------------------------------------------
@@ -124,7 +121,7 @@ class DbTable:
 
 	def get_foreign_key_definitions(self):
 		ret = []
-		tab_list = get_schema().get_tables()
+		tab_list = DbManager().get_tables()
 
 		for k in self.columns.keys():
 			if self.columns[k].fieldtype=='Link' and self.columns[k].options:
@@ -150,7 +147,7 @@ class DbTable:
 	# SET foreign keys
 	def set_foreign_keys(self):
 		if self.add_foreign_key:
-			tab_list = get_schema().get_tables()
+			tab_list = DbManager().get_tables()
 			webnotes.conn.sql("set foreign_key_checks=0")
 			for col in self.add_foreign_key:
 				if col.options:
@@ -178,7 +175,7 @@ class DbTable:
 			webnotes.conn.sql("set foreign_key_checks=1")
 		
 	def sync(self):
-		if not self.name in get_schema().get_tables():
+		if not self.name in DbManager().get_tables():
 			self.create()
 		else:
 			self.alter()
@@ -282,20 +279,25 @@ class DbManager:
 	Basically, a wrapper for oft-used mysql commands. like show tables,databases, variables etc... 
 
 	#TODO:
+		0.  Simplify / create settings for the restore database source folder 
+		0a. Merge restore database and extract_sql(from webnotes_server_tools).
 		1. Setter and getter for different mysql variables.
 		2. 
 	"""	
-	def __init__(self,conn = None):
+	def __init__(self,conn = webnotes.conn):
+		"""
+		Pass root_conn here for access to all databases.
+		"""
  		if conn:
  			self.conn = conn
-
+		
 	def get_tables_list(self,target):	
 		"""
 		
 		"""
 		try:
 			self.conn.use(target)
-			res = self.conn.sql("SHOW TABLES")
+			res = self.conn.sql("SHOW TABLES;")
 			table_list = []
 			for table in res:
 				table_list.append(table[0])
@@ -304,11 +306,14 @@ class DbManager:
 		except Exception,e:
 			raise e
 
-	def create_user(self,user,default_db_pwd):
+	def create_user(self,user,password):
 		#Create user if it doesn't exist.
 		try:
-			print "Creating user %s" %user
-			self.conn.sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (user, default_db_pwd))
+			print "Creating user %s" %user[:16]
+			if password:
+				self.conn.sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';" % (user[:16], password))
+			else:
+				self.conn.sql("CREATE USER '%s'@'localhost';"%user[:16])
 		except Exception, e:
 			raise e
 
@@ -317,7 +322,7 @@ class DbManager:
 	# delete user if exists
 		try:
 			print "Dropping user " ,target
-			self.conn.sql("DROP USER '%s'@'localhost'" % target)
+			self.conn.sql("DROP USER '%s'@'localhost';" % target)
 		except Exception, e:
 			if e.args[0]==1396:
 				pass
@@ -344,6 +349,17 @@ class DbManager:
 		try:
 			print "Granting all privileges on %s to %s@localhost" %(target,user)
 			self.conn.sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, user))
+		except Exception,e:
+			raise e
+
+	def grant_select_privilges(self,db,table,user):
+		try:
+			if table:
+				print "Granting Read privileges on %s.%s to %s@localhost" %(db,table,user)
+				self.conn.sql("GRANT SELECT ON %s.%s to '%s'@'localhost';" % (db,table,user))
+			else:
+				print "Granting Read privileges on %s.* to %s@localhost" %(db,user)
+				self.conn.sql("GRANT SELECT ON %s.* to '%s'@'localhost';" % (db,user))
 		except Exception,e:
 			raise e
 
