@@ -40,23 +40,24 @@ def import_db(source, target='', is_accounts=0):
 
 	import webnotes
 	import webnotes.db
-	import webnotes.defs
-	import os
-	
-	global dbman
-	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
-	
-	# get database number
-	if not target:
-		target = get_db_name(conn, webnotes.defs.server_prefix)
-
 	from webnotes import defs
+	import os
+	from webnotes.model.db_schema import DbManager
+	
+	mysql_path = hasattr(webnotes.defs, 'mysql_path') and webnotes.defs.mysql_path or ''
 	
 	conn = None
 	# login as root (if set)
 	if defs.root_login:
 		conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
+	
 	dbman = DbManager(conn)
+	# get database number
+	if not target:
+		global dbman
+		target = get_db_name(conn, webnotes.defs.server_prefix)
+
+	
 	# delete user (if exists)
 	dbman.delete_user(target)
 
