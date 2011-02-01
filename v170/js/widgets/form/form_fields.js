@@ -422,7 +422,8 @@ _f.CodeField.prototype.make_input = function() {
 			// General options
 			theme : "advanced",
 			plugins : "style,table",
-
+			extended_valid_elements: "div[id|dir|class|align|style]",
+			
 			// w/h
 			width: '100%',
 			height: '360px',
@@ -434,6 +435,8 @@ _f.CodeField.prototype.make_input = function() {
 
 			theme_advanced_toolbar_location : "top",
 			theme_advanced_toolbar_align : "left",
+
+			content_css: "js/tiny_mce_33/custom_content.css",
 
 			oninit: function() { me.init_editor(); }
 		});
