@@ -71,8 +71,11 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	this.sub_toolbar = $a(this.body, 'div', '', {marginBottom:'8px', padding: '4px', textAlign:'right', fontSize:'11px', color:'#444'});
 	
 	// archives label
-	this.archives_label = $a(this.body, 'div', '', {margin:'8px 0px', padding:'4px', fontSize:'14px', textAlign:'center', color:'#444', display:'none', backgroundColor:'#FFD'});
-	this.archives_label.innerHTML = '<i>Showing from Archives</i>';
+	this.archives_label = $a(this.body, 'div', 'help_box_big',{display:'none'});
+	this.archives_label.innerHTML = 'Showing from Archives'
+	var span = $a(this.archives_label, 'span', 'link_type', {marginLeft:'8px'});
+	span.innerHTML = 'Show Active';
+	span.onclick = function() { me.show_archives.checked = 0; me.show_archives.onclick(); }
 	
 	this.trend_area = $a(this.body, 'div', '', {marginBottom:'16px', padding: '4px', backgroundColor:'#EEF', border: '1px solid #CCF', display:'none'});
 	$br(this.trend_area, '5px');
@@ -402,6 +405,7 @@ ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		
 		this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
 		this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
+		this.prefix = 'arc';
 		
 	}
 	

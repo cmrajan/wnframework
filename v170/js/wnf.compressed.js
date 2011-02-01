@@ -401,8 +401,8 @@ me.cn=this.colnames;else{for(var i=1;i<this.colnames.length;i++)
 me.cn.push(this.colnames[i]);}
 var q=export_query(this.query,function(query){export_csv(query,me.head_text,null,1,null,me.cn);});}
 Listing.prototype.build_query=function(){if(this.get_query)this.get_query(this);if(!this.query){alert('No Query!');return;}
-var cond=[];for(var i in this.filters){var f=this.filters[i];var val=f.get_value();var c=f.condition;if(!c)c='=';if(val&&c.toLowerCase()=='like')val+='%';if(f.tn&&val&&!in_list(['All','Select...',''],val))
-cond.push(repl(' AND `tab%(dt)s`.%(fn)s %(condition)s "%(val)s"',{dt:f.tn,fn:f.fn,condition:c,val:val}));}
+if(!this.prefix)this.prefix='tab';var cond=[];for(var i in this.filters){var f=this.filters[i];var val=f.get_value();var c=f.condition;if(!c)c='=';if(val&&c.toLowerCase()=='like')val+='%';if(f.tn&&val&&!in_list(['All','Select...',''],val))
+cond.push(repl(' AND `%(prefix)s%(dt)s`.%(fn)s %(condition)s "%(val)s"',{prefix:this.prefix,dt:f.tn,fn:f.fn,condition:c,val:val}));}
 if(cond){this.query+=NEWLINE+cond.join(NEWLINE)
 this.query_max+=NEWLINE+cond.join(NEWLINE)}
 if(this.group_by)
@@ -1015,7 +1015,9 @@ ItemBrowserPage=function(){this.lists={};this.dt_details={};this.cur_list=null;t
 ItemBrowserPage.prototype.show=function(dt,label,field_list){var me=this;if(this.cur_list&&this.cur_list.dt!=dt)$dh(this.cur_list.wrapper);if(!me.lists[dt]){me.lists[dt]=new ItemBrowser(me.body,dt,label,field_list);}
 me.cur_list=me.lists[dt];me.cur_list.show();page_body.change_to('ItemBrowser');}
 ItemBrowser=function(parent,dt,label,field_list){var me=this;this.label=label?label:dt;this.dt=dt;this.field_list=field_list;this.tag_filter_dict={};this.items=[];this.wrapper=$a(parent,'div');this.head=$a(this.wrapper,'div');var l=get_doctype_label(dt);l=(l.toLowerCase().substr(-4)=='list')?l:(l+' List')
-this.page_head=new PageHeader(this.head,l);$y(this.page_head.wrapper,{marginBottom:'0px'});$dh(this.page_head.separator);this.no_result_area=$a(this.wrapper,'div','help_box',{fontSize:'14px',textAlign:'center'});this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center',fontSize:'14px',color:'#444',display:'none'});this.loading_div.innerHTML='Loading<img src="images/ui/button-load.gif" style="margin-bottom: -2px; margin-left: 8px">';this.body=$a(this.wrapper,'div');this.toolbar_area=$a(this.body,'div','',{padding:'4px',backgroundColor:'#EEE'});$br(this.toolbar_area,'4px');$gr(this.toolbar_area,'#DDD','#CCC');this.sub_toolbar=$a(this.body,'div','',{marginBottom:'8px',padding:'4px',textAlign:'right',fontSize:'11px',color:'#444'});this.archives_label=$a(this.body,'div','',{margin:'8px 0px',padding:'4px',fontSize:'14px',textAlign:'center',color:'#444',display:'none',backgroundColor:'#FFD'});this.archives_label.innerHTML='<i>Showing from Archives</i>';this.trend_area=$a(this.body,'div','',{marginBottom:'16px',padding:'4px',backgroundColor:'#EEF',border:'1px solid #CCF',display:'none'});$br(this.trend_area,'5px');this.tag_filters=$a(this.body,'div','',{marginBottom:'8px',display:'none',padding:'6px 8px 8px 8px',backgroundColor:'#FFD'});var span=$a(this.tag_filters,'span','',{marginRight:'4px',color:'#444'});span.innerHTML='<i>Showing for:</i>';this.tag_area=$a(this.tag_filters,'span');}
+this.page_head=new PageHeader(this.head,l);$y(this.page_head.wrapper,{marginBottom:'0px'});$dh(this.page_head.separator);this.no_result_area=$a(this.wrapper,'div','help_box',{fontSize:'14px',textAlign:'center'});this.loading_div=$a(this.wrapper,'div','',{margin:'200px 0px',textAlign:'center',fontSize:'14px',color:'#444',display:'none'});this.loading_div.innerHTML='Loading<img src="images/ui/button-load.gif" style="margin-bottom: -2px; margin-left: 8px">';this.body=$a(this.wrapper,'div');this.toolbar_area=$a(this.body,'div','',{padding:'4px',backgroundColor:'#EEE'});$br(this.toolbar_area,'4px');$gr(this.toolbar_area,'#DDD','#CCC');this.sub_toolbar=$a(this.body,'div','',{marginBottom:'8px',padding:'4px',textAlign:'right',fontSize:'11px',color:'#444'});this.archives_label=$a(this.body,'div','help_box_big',{display:'none'});this.archives_label.innerHTML='Showing from Archives'
+var span=$a(this.archives_label,'span','link_type',{marginLeft:'8px'});span.innerHTML='Show Active';span.onclick=function(){me.show_archives.checked=0;me.show_archives.onclick();}
+this.trend_area=$a(this.body,'div','',{marginBottom:'16px',padding:'4px',backgroundColor:'#EEF',border:'1px solid #CCF',display:'none'});$br(this.trend_area,'5px');this.tag_filters=$a(this.body,'div','',{marginBottom:'8px',display:'none',padding:'6px 8px 8px 8px',backgroundColor:'#FFD'});var span=$a(this.tag_filters,'span','',{marginRight:'4px',color:'#444'});span.innerHTML='<i>Showing for:</i>';this.tag_area=$a(this.tag_filters,'span');}
 ItemBrowser.prototype.make_toolbar=function(show_callback){var me=this;if(inList(profile.can_create,this.dt)){this.new_button=$btn(this.toolbar_area,'+ New '+get_doctype_label(this.dt),function(){newdoc(me.dt)},{fontWeight:'bold',marginRight:'0px'},'green');}
 if(in_list(profile.can_write,this.dt)){this.archive_btn=$btn(this.toolbar_area,'Archive',function(){me.archive_items();},{marginLeft:'24px'});}
 if(this.dt_details.can_cancel){this.delete_btn=$btn(this.toolbar_area,'Delete',function(){me.delete_items();});}
@@ -1047,7 +1049,7 @@ ItemBrowser.prototype.make_the_list=function(dt,wrapper){var me=this;var lst=new
 if(user_defaults.hide_report_builder)lst.opts.show_report=0;lst.is_std_query=1;lst.get_query=function(){q={};var fl=[];q.table=repl('`%(prefix)s%(dt)s`',{prefix:(me.show_archives.checked?'arc':'tab'),dt:this.dt});for(var i=0;i<this.cl.length;i++){if(!(me.show_archives&&me.show_archives.checked&&this.cl[i][0]=='_user_tags'))
 fl.push(q.table+'.`'+this.cl[i][0]+'`')}
 if(me.dt_details.submittable)
-fl.push(q.table+'.docstatus');q.fields=fl.join(', ');q.conds=q.table+'.docstatus < '+((me.show_cancelled&&me.show_cancelled.checked)?3:2)+' ';me.add_tag_conditions(q);me.add_search_conditions(q);this.query=repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s",q);this.query_max=repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s",q);}
+fl.push(q.table+'.docstatus');q.fields=fl.join(', ');q.conds=q.table+'.docstatus < '+((me.show_cancelled&&me.show_cancelled.checked)?3:2)+' ';me.add_tag_conditions(q);me.add_search_conditions(q);this.query=repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s",q);this.query_max=repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s",q);this.prefix='arc';}
 lst.colwidths=['100%'];lst.coltypes=['Data'];lst.coloptions=[''];lst.show_cell=function(cell,ri,ci,d){me.items.push(new ItemBrowserItem(cell,d[ri],me));}
 lst.make(wrapper);var sf=me.dt_details.filters;for(var i=0;i<sf.length;i++){var fname=sf[i][0];var label=sf[i][1];var ftype=sf[i][2];var fopts=sf[i][3];if(in_list(['Int','Currency','Float','Date'],ftype)){lst.add_filter('From '+label,ftype,fopts,dt,fname,'>=');lst.add_filter('To '+label,ftype,fopts,dt,fname,'<=');}else{lst.add_filter(label,ftype,fopts,dt,fname,(in_list(['Data','Text','Link'],ftype)?'LIKE':''));}}
 $dh(lst.filter_wrapper);lst.set_default_sort('modified','DESC');this.lst=lst;lst.run();}
@@ -1236,21 +1238,7 @@ get_window_height=function(){var ht=window.innerHeight?window.innerHeight:docume
 var bannerh=page_body.banner_area?page_body.banner_area.offsetHeight:0
 var footerh=page_body.footer?page_body.footer.offsetHeight:0
 ht=ht-bannerh-toolbarh-footerh;return ht;}
-var tinyMCE_GZ={settings:{themes:'',plugins:'',languages:'',disk_cache:true,page_name:'tiny_mce_gzip.cgi',debug:false,suffix:''},init:function(s,cb,sc){var t=this,n,i,nl=document.getElementsByTagName('script');for(n in s)
-t.settings[n]=s[n];s=t.settings;for(i=0;i<nl.length;i++){n=nl[i];if(n.src&&n.src.indexOf('tiny_mce')!=-1)
-t.baseURL=n.src.substring(0,n.src.lastIndexOf('/'));}
-t.baseURL='js/tiny_mce';if(!t.coreLoaded)
-t.loadScripts(1,s.themes,s.plugins,s.languages,cb,sc);},loadScripts:function(co,th,pl,la,cb,sc){var t=this,x,w=window,q,c=0,ti,s=t.settings;function get(s){x=0;try{x=new ActiveXObject(s);}catch(s){}
-return x;};q='js=true&diskcache='+(s.disk_cache?'true':'false')+'&core='+(co?'true':'false')+'&suffix='+escape(s.suffix)+'&themes='+escape(th)+'&plugins='+escape(pl)+'&languages='+escape(la);if(co)
-t.coreLoaded=1;x=w.XMLHttpRequest?new XMLHttpRequest():get('Msxml2.XMLHTTP')||get('Microsoft.XMLHTTP');x.overrideMimeType&&x.overrideMimeType('text/javascript');x.open('GET',t.baseURL+'/'+s.page_name+'?'+q,!!cb);x.send('');if(cb){ti=w.setInterval(function(){if(x.readyState==4||c++>10000){w.clearInterval(ti);if(c<10000&&x.status==200){t.loaded=1;t.eval(x.responseText);tinymce.dom.Event.domLoaded=true;cb.call(sc||t,x);}
-ti=x=null;}},100);}else
-t.eval(x.responseText);},start:function(){var t=this,each=tinymce.each,s=t.settings,ln=s.languages.split(',');tinymce.suffix=s.suffix;function load(u){tinymce.ScriptLoader.markDone(tinyMCE.baseURI.toAbsolute(u));};each(ln,function(c){if(c)
-load('langs/'+c+'.js');});each(s.themes.split(','),function(n){if(n){load('themes/'+n+'/editor_template'+s.suffix+'.js');each(ln,function(c){if(c)
-load('themes/'+n+'/langs/'+c+'.js');});}});each(s.plugins.split(','),function(n){if(n){load('plugins/'+n+'/editor_plugin'+s.suffix+'.js');each(ln,function(c){if(c)
-load('plugins/'+n+'/langs/'+c+'.js');});}});},end:function(){},eval:function(co){var w=window;if(!w.execScript){if(/Gecko/.test(navigator.userAgent))
-eval(co,w);else
-eval.call(w,co);}else
-w.execScript(co);}};Calendar=function(){this.views=[];this.events={};this.has_event={};this.weekdays=new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat");}
+Calendar=function(){this.views=[];this.events={};this.has_event={};this.weekdays=new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat");}
 Calendar.prototype.init=function(parent){this.wrapper=$a(parent,'div','cal_wrapper');this.page_head=new PageHeader(this.wrapper,'Calendar')
 this.body=$a(this.wrapper,'div','cal_body');this.make_head_buttons();this.make_header();this.todays_date=new Date();this.selected_date=this.todays_date;this.selected_hour=8;this.views['Month']=new Calendar.MonthView(this);this.views['Week']=new Calendar.WeekView(this);this.views['Day']=new Calendar.DayView(this);this.cur_view=this.views['Day'];this.views['Day'].show();setTimeout(_c.set_height,100);set_resize_observer(_c.set_height);}
 Calendar.prototype.rename_notify=function(dt,old_name,new_name){if(dt='Event'&&this.has_event[old_name])

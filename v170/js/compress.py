@@ -35,7 +35,6 @@ in_files_main = [
        ,'model/doclist.js'
        ,'webpage/body.js'
        ,'app.js'
-       ,'tiny_mce/tiny_mce_gzip.js'
        ,'widgets/calendar.js'
      ]
 

@@ -474,6 +474,8 @@ Listing.prototype.build_query = function() {
 	if(this.get_query)this.get_query(this);
 	if(!this.query) { alert('No Query!'); return; }
 
+	if(!this.prefix) this.prefix = 'tab';
+
 	// add filters
 	var cond = [];
 	for(var i in this.filters) {
@@ -483,7 +485,8 @@ Listing.prototype.build_query = function() {
 		if(!c)c='=';
 		if(val && c.toLowerCase()=='like')val += '%';
 		if(f.tn && val && !in_list(['All','Select...',''],val)) 
-			cond.push(repl(' AND `tab%(dt)s`.%(fn)s %(condition)s "%(val)s"', {dt:f.tn, fn:f.fn, condition:c, val:val}));
+			cond.push(repl(' AND `%(prefix)s%(dt)s`.%(fn)s %(condition)s "%(val)s"', {
+				prefix: this.prefix, dt:f.tn, fn:f.fn, condition:c, val:val}));
 	}
 
 	if(cond) {
