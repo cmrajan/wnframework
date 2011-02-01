@@ -1049,7 +1049,9 @@ ItemBrowser.prototype.make_the_list=function(dt,wrapper){var me=this;var lst=new
 if(user_defaults.hide_report_builder)lst.opts.show_report=0;lst.is_std_query=1;lst.get_query=function(){q={};var fl=[];q.table=repl('`%(prefix)s%(dt)s`',{prefix:(me.show_archives.checked?'arc':'tab'),dt:this.dt});for(var i=0;i<this.cl.length;i++){if(!(me.show_archives&&me.show_archives.checked&&this.cl[i][0]=='_user_tags'))
 fl.push(q.table+'.`'+this.cl[i][0]+'`')}
 if(me.dt_details.submittable)
-fl.push(q.table+'.docstatus');q.fields=fl.join(', ');q.conds=q.table+'.docstatus < '+((me.show_cancelled&&me.show_cancelled.checked)?3:2)+' ';me.add_tag_conditions(q);me.add_search_conditions(q);this.query=repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s",q);this.query_max=repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s",q);this.prefix='arc';}
+fl.push(q.table+'.docstatus');q.fields=fl.join(', ');q.conds=q.table+'.docstatus < '+((me.show_cancelled&&me.show_cancelled.checked)?3:2)+' ';me.add_tag_conditions(q);me.add_search_conditions(q);this.query=repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s",q);this.query_max=repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s",q);if(me.show_archives.checked)
+this.prefix='arc';else
+this.prefix='tab'}
 lst.colwidths=['100%'];lst.coltypes=['Data'];lst.coloptions=[''];lst.show_cell=function(cell,ri,ci,d){me.items.push(new ItemBrowserItem(cell,d[ri],me));}
 lst.make(wrapper);var sf=me.dt_details.filters;for(var i=0;i<sf.length;i++){var fname=sf[i][0];var label=sf[i][1];var ftype=sf[i][2];var fopts=sf[i][3];if(in_list(['Int','Currency','Float','Date'],ftype)){lst.add_filter('From '+label,ftype,fopts,dt,fname,'>=');lst.add_filter('To '+label,ftype,fopts,dt,fname,'<=');}else{lst.add_filter(label,ftype,fopts,dt,fname,(in_list(['Data','Text','Link'],ftype)?'LIKE':''));}}
 $dh(lst.filter_wrapper);lst.set_default_sort('modified','DESC');this.lst=lst;lst.run();}

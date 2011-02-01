@@ -405,7 +405,10 @@ ItemBrowser.prototype.make_the_list  = function(dt, wrapper) {
 		
 		this.query = repl("SELECT %(fields)s FROM %(table)s WHERE %(conds)s", q);
 		this.query_max = repl("SELECT COUNT(*) FROM %(table)s WHERE %(conds)s", q);
-		this.prefix = 'arc';
+		if(me.show_archives.checked)
+			this.prefix = 'arc';
+		else
+			this.prefix = 'tab'
 		
 	}
 	
