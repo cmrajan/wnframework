@@ -271,7 +271,7 @@ _f.Frm.prototype.setup_footer = function() {
 	this.footer = $a(this.form_wrapper, 'div', '',{display:'none'});
 
 	// save buttom
-	var b = $btn(this.footer, 'Save',function() { cur_frm.save('Save'); },{marginLeft:'12px'},'green');
+	var b = $btn(this.footer, 'Save',function() { cur_frm.save('Save'); },{marginLeft:'0px'},'green');
 	
 	// show / hide save
 	this.footer.show_save = function() {
@@ -702,7 +702,7 @@ _f.Frm.prototype.refresh_tabs = function() {
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_footer = function() {
-	if(get_url_arg('embed')) {
+	if(get_url_arg('embed') || (this.editable && !this.meta.in_dialog && this.doc.docstatus==0 && !this.meta.istable && this.get_doc_perms()[WRITE] && this.footer)) {
 		this.footer.show_save();
 	} else {
 		this.footer.hide_save();
@@ -916,6 +916,10 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 				+ '</div>';
 			return; // no refresh
 		}
+		
+		// scroll to top
+		scroll(0, 0);
+		
 		if(!me.meta.istable) {
 			me.refresh();
 		}

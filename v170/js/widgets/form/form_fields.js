@@ -104,9 +104,7 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header) {
 	var me = this;
 
 	// colour
-	var has_col = false;
 	if(this.df.colour) {
-		has_col = true;
 		var col = this.df.colour.split(':')[1];
 		if(col!='FFF') {			
 			$y(this.row.sub_wrapper, { margin:'8px', padding: '0px' ,backgroundColor: ('#' + col)} );
@@ -114,11 +112,14 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header) {
 	}
 	
 	if(with_header) {
-		if(this.df.label) {
+		if(this.df.label && this.df.options!='Simple') {
 			this.make_collapsible(head);
-		} else if(!has_col) {
+		} else {
 			// divider
-			$y(head,{borderBottom:'1px solid #AAA'});
+			$y(head,{borderBottom:'1px solid #AAA', fontWeight:'bold', paddingBottom:'4px'});
+			if(this.df.label) {
+				head.innerHTML = this.df.label
+			}
 		}
 	}
 
@@ -143,64 +144,7 @@ _f.SectionBreak.prototype.make_body = function() {
 	}
 	var me = this;
 
-	// header
-	/*if(this.frm.meta.section_style=='Tabbed') {
-		if(this.df.options!='Simple') {
-			// IE full page ??
-			
-			this.make_row();
-			this.add_to_sections();
-			
-			this.mytab = this.frm.tabs.add_tab(me.df.label, function() { me.frm.set_section(me.sec_id);});
-			
-			this.expand = function() { 
-				this.row.show(); me.mytab.set_selected();
-				
-				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
-					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
-			}
-			
-			this.collapse = function() { 
-				me.row.hide(); me.mytab.hide();
-			}
-
-			this.make_row();		
-			
-			this.make_simple_section(0, 0);
-			if(!isIE) this.collapse();
-		} else {
-			this.row = this.frm.layout.addsubrow();
-			this.make_simple_section(1, 1);
-		}
-	} else if(this.frm.meta.section_style=='Tray') {
-		if(this.df.options!='Simple') {
-			this.add_to_sections();
-			
-			this.tray_item = this.frm.tray.add_item(this.df.label, function() { me.frm.set_section(me.sec_id); }, 1);
-			
-			// expand and collapse the section
-			this.collapse = function() { 
-				me.row.hide();
-				me.tray_item.collapse();
-			}
-			this.expand = function() {
-				me.row.show(); 
-				me.tray_item.show_as_expanded();
-				
-				_f.cur_sec_header = this.header;
-				if(me.df.label && cur_frm.cscript[me.df.label] && (!me.in_filter))
-					cur_frm.runclientscript(me.df.label, me.doctype, me.docname);
-
-			}
-	
-			this.make_row();
-			this.make_simple_section(1, 0);
-			if(!isIE)this.collapse();
-		} else {
-			this.row = this.frm.layout.addsubrow();
-			this.make_simple_section(1, 1);
-		}
-	} else */ if(this.df){
+	if(this.df){
 		this.make_row();
 		this.make_simple_section(1, 1);
 	}	
@@ -448,7 +392,7 @@ _f.CodeField.prototype.make_input = function() {
 	this.input.setAttribute('wrap', 'off');
 	this.input.set_input = function(v) {
 		if(me.editor) {
-			me.editor.setContent(v); // tinyMCE
+			me.editor.setContent(v);
 		} else {
 			me.input.value = v;
 			me.input.innerHTML = v;
@@ -456,13 +400,13 @@ _f.CodeField.prototype.make_input = function() {
 	}
 	this.input.onchange = function() {
 		if(me.editor) {
-			me.set(me.editor.getContent()); // tinyMCE
+			//me.set(tinymce.get(me.myid).getContent());
 		} else {
 			me.set(me.input.value);
 		}
 		me.run_trigger();
 	}
-	this.get_value= function() {
+	this.get_value = function() {
 		if(me.editor) {
 			return me.editor.getContent(); // tinyMCE
 		} else {
@@ -470,23 +414,48 @@ _f.CodeField.prototype.make_input = function() {
 		}
 	}
 	if(this.df.fieldtype=='Text Editor') {
-		code_editors[me.df.fieldname] = me;
-		if(!tinymce_loaded) {
-			tinymce_loaded = 1;
-			tinyMCE_GZ.init({
-				strict_loading_mode: true,
-				themes : "advanced",
-				plugins : "style,table,indicime",
-				languages : "en",
-				disk_cache : true
-			}, function() { me.setup_editor() });
-		} else {
-			this.setup_editor();
-		}
+		// setup tiny mce
+		$(me.input).tinymce({
+			// Location of TinyMCE script
+			script_url : 'js/tiny_mce_33/tiny_mce.js',
+
+			// General options
+			theme : "advanced",
+			plugins : "style,table",
+
+			// w/h
+			width: '100%',
+			height: '360px',
+	
+			// buttons
+			theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+			theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,cleanup,help,code,|,forecolor,backcolor,|,indicime,indicimehelp",
+			theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup",
+
+			theme_advanced_toolbar_location : "top",
+			theme_advanced_toolbar_align : "left",
+
+			oninit: function() { me.init_editor(); }
+		});
 	} else {
 		$y(me.input, {fontFamily:'Courier, Fixed'});
 	}
 }
+
+_f.CodeField.prototype.init_editor = function() {
+	// attach onchange methods
+	var me = this;
+	this.editor = tinymce.get(this.myid);
+	this.editor.onKeyUp.add(function(ed, e) { 
+		me.set(ed.getContent()); 
+	});
+	this.editor.onPaste.add(function(ed, e) { 
+		me.set(ed.getContent()); 
+	});
+	// reset content
+	if(cur_frm) this.editor.setContent(locals[cur_frm.doctype][cur_frm.docname][this.df.fieldname]);
+}
+
 _f.CodeField.prototype.set_disp = function(val) {
 	$y(this.disp_area, {width:'90%'})
 	if(this.df.fieldtype=='Text Editor') {
@@ -494,41 +463,6 @@ _f.CodeField.prototype.set_disp = function(val) {
 	} else {
 		this.disp_area.innerHTML = '<textarea class="code_text" readonly=1>'+val+'</textarea>';
 	}
-}
-_f.CodeField.prototype.setup_editor = function() {
-	var me = this;
-	// make the editor
-	tinyMCE.init({
-		theme : "advanced",
-		mode : "none",
-		//elements: me.myid,
-		strict_loading_mode: true,
-		plugins:"table,style,indicime",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		extended_valid_elements: "div[id|dir|class|align|style]",
-
-		// w/h
-		width: '100%',
-		height: '360px',
-
-		// buttons
-		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,cleanup,help,code,|,forecolor,backcolor,|,indicime,indicimehelp",
-		theme_advanced_buttons3 : "tablecontrols,styleprops,|,hr,removeformat,visualaid,|,sub,sup",
-
-		// framework integation
-		init_instance_callback : "code_editors."+ this.df.fieldname+".editor_init_callback",
-		onchange_callback : "code_editors."+ this.df.fieldname+".input.onchange"
-	});
-
-	this.editor_init_callback = function() {
-		if(cur_frm)
-			cur_frm.fields_dict[me.df.fieldname].editor = tinyMCE.get(me.myid);
-	}
-	tinyMCE.execCommand("mceAddControl",false,me.myid);
-	cur_frm.tinymce_id_list.push(me.myid);
 }
 
 // ======================================================================================

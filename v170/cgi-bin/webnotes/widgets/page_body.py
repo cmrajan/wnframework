@@ -17,6 +17,7 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   
   <script language="JavaScript" src="js/jquery/jquery.min.js"></script>
   <script language="JavaScript" src="js/jquery/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="js/tiny_mce_33/jquery.tinymce.js"></script>
   <script language="JavaScript" src="js/wnf.compressed.js"></script>
   <script language="JavaScript" src="js/form.compressed.js"></script>
   <script language="JavaScript">var _startup_data = %(startup_data)s;</script>
