@@ -31,15 +31,8 @@ class Database:
 			webnotes.logger.debug('Database object initialized for:%s',self.user)
 
 	def get_db_login(self, ac_name):
-		import webnotes.db
-		c = webnotes.db.Database(use_default = 1)
-		res = None
-		try:
-			res = c.sql("select db_name, db_login from tabAccount where ac_name = '%s'" % ac_name)
-		except:
-			pass
-		if res:
-			return res[0][1] or res[0][0]
+		from webnotes.settings import account_map		
+		return account_map.ac_name_map.get(ac_name, account_map.default_db_name)
 
 	def connect(self):
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)

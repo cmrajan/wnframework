@@ -52,6 +52,9 @@ def archive_record(doctype, name, restore = 0):
 		if e.args[0]==1451:
 			webnotes.msgprint("Cannot archive %s '%s' as it is referenced in another record. You must delete the referred record first" % (doctype, name))
 
+			# delete from target, as it will create a double copy!
+			sql("delete from `%s` where name=%s limit 1" % (tar_tab, '%s'), name)
+
 # insert the record
 # -------------------------
 

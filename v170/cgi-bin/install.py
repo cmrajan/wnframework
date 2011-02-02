@@ -1,4 +1,6 @@
+from webnotes.settings import account_map
 
+# -------------------------------------------------------------
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -21,6 +23,8 @@ def copy_db(source, target=''):
 	
 	return target
 
+# -------------------------------------------------------------
+
 def get_db_name(conn, server_prefix):
 	global dbman
 	db_list = dbman.get_database_list()
@@ -33,6 +37,7 @@ def get_db_name(conn, server_prefix):
 		dbn = server_prefix + '001'
 	return dbn
 
+# -------------------------------------------------------------
 
 def import_db(source, target='', is_accounts=0):
 
@@ -99,6 +104,7 @@ def import_db(source, target='', is_accounts=0):
 			raise e
 	return target
 
+# -------------------------------------------------------------
 
 def get_source_path(s):
 	import os
@@ -118,86 +124,36 @@ def get_source_path(s):
 	else:
 		raise Exception, "Target file '%s' does not exist" % f
 
+# -------------------------------------------------------------
 
-def create_account_doctype(conn,target):
-	# update accounts
-	import webnotes.db
-	import webnotes
-
+def rewrite_account_map():
+	import datetime
 	
-	webnotes.session = {'user':'setup.py'}	
-	conn.use(target)
-	webnotes.conn = conn
+	f = open(account_map.__file__, 'w')
+	f.write('# Account/Domain Name to Database Mapping file\n')
+	f.write('# --------------------------------------------\n')
+	f.write('# last updated on: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+	f.write('\n\ndefault_db_name = "%s"' % account_map.default_db_name)
+	f.write('\n\nac_name_map = %s' % str(account_map.ac_name_map))
+	f.write('\n\n# without www')
+	f.write('\ndomain_name_map = %s' % str(account_map.domain_name_map))
+	f.close()
 
-	from webnotes.model.doc import Document
-	import webnotes.model.db_schema
+# -------------------------------------------------------------
 
-	# create tabAccount
-	ac = Document('DocType')
-	ac.name = 'Account'
-	ac.autoname = 'AC.#####'
-	ac.save(1)
-		
-	f = ac.addchild('fields', 'DocField')
-	f.label = 'Account Name'
-	f.fieldname = 'ac_name'
-	f.fieldtype = 'Data'
-	f.save()
-
-	f = ac.addchild('fields', 'DocField')
-	f.label = 'Database Name'
-	f.fieldname = 'db_name'
-	f.fieldtype = 'Data'
-	f.save()
-
-	f = ac.addchild('fields', 'DocField')
-	f.label = 'Database Login'
-	f.fieldname = 'db_login'
-	f.fieldtype = 'Data'
-	f.save()
-
-	f = ac.addchild('fields', 'DocField')
-	f.label = 'App Login'
-	f.fieldname = 'app_login'
-	f.fieldtype = 'Data'
-	f.save()
-		
-	f = ac.addchild('permissions', 'DocPerm')
-	f.role = 'Administrator'
-	f.read = 1
-	f.write = 1
-	f.create = 1
-	f.save()
-	
-	# udpate schema
-	webnotes.model.db_schema.updatedb('Account')
-	
 def create_account_record(ac_name, newdb, domain=''):
-	# update accounts
-	import webnotes.db
-
-	webnotes.conn = webnotes.db.Database(use_default = 1)
 	
-	webnotes.conn.begin()
-
-	if not webnotes.session:
-		webnotes.session = {'user':'shell'}
-
-	from webnotes.model.doc import Document
+	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
+	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}
 	
-	ac = Document('Account')
-	ac.ac_name = ac_name
-	ac.db_name = newdb
-	ac.name = newdb
-	ac.save(1)
-	
-	# add domain
+	account_map.ac_name_map[ac_name] = newdb
 	if domain:
-		acd = ac.addchild('account_domains','Account Domain',1)
-		acd.domain = ac_name + '.' + domain
-		acd.save(1)
+		account_map.domain_name_map[domain] = newdb
+		
+	rewrite_account_map()
 
-	webnotes.conn.sql("commit")
+
+# -------------------------------------------------------------
 
 def create_account(ac_name, ac_type='Framework'):
 	import webnotes.db
@@ -220,6 +176,7 @@ def create_account(ac_name, ac_type='Framework'):
 	return "%s,%s" % (ac_name, newdb)
 
 
+# -------------------------------------------------------------
 
 def create_log_folder(path):
 	import os
@@ -234,6 +191,7 @@ def create_log_folder(path):
 		pass
 
 
+# -------------------------------------------------------------
 
 def copy_defs_py():
 	import os
@@ -284,6 +242,19 @@ if __name__=='__main__':
 		
 		print "Setting up Account..."
 		create_account_doctype(conn,'accounts')
-	
-		
 
+# -----------------------------------------------------------------------
+# this is a patch that will build account_map.py from deprecated "accounts" database
+
+def build_account_map():
+	from webnotes.db import Database
+	conn = Database(user='accounts')
+	
+	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
+	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}	
+
+	for ac in conn.sql("select ac_name, db_name from tabAccount"):
+		account_map.ac_name_map[ac[0]] = ac[1]
+		
+	rewrite_account_map()
+		

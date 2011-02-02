@@ -21,6 +21,9 @@ type_map = {
 	,'blob':		('longblob', '')
 }
 
+default_columns = ['name', 'creation', 'modified', 'modified_by', 'owner', 'docstatus', 'parent',\
+	 'parentfield', 'parenttype', 'idx']
+
 default_shortcuts = ['_Login', '__user', '_Full Name', 'Today', '__today']
 
 # -------------------------------------------------
@@ -105,11 +108,14 @@ class DbTable:
 			self.current_columns[c[0]] = {'name': c[0], 'type':c[1], 'index':c[3], 'default':c[4]}
 	
 	def get_column_definitions(self):
+		column_list = [] + default_columns
 		ret = []
 		for k in self.columns.keys():
-			d = self.columns[k].get_definition()
-			if d:
-				ret.append(k + ' ' + d)
+			if k not in column_list:
+				d = self.columns[k].get_definition()
+				if d:
+					ret.append(k + ' ' + d)
+					column_list.append(k)
 		return ret
 	
 	def get_index_definitions(self):

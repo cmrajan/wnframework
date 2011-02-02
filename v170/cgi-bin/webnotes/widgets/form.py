@@ -196,6 +196,43 @@ def make_csv_output(res, dt):
 	webnotes.response['type'] = 'csv'
 	webnotes.response['doctype'] = dt.replace(' ','')						
 
+# Notify Observer
+#===========================================================================================
+# Observer pattern implemented as follows:
+# in table __Observer, add observer(module), event and subject(doctype)
+# in the module, declare an "notify" method
+#===========================================================================================
+
+observers = {}
+observers_loaded = 0
+
+def load_observers(doc):
+	global observers_loaded
+
+	if observers_loaded: 
+		return
+
+	try:
+		ol = sql("select observer, event from __Observer where subject=%s", doc.doctype)
+	except Exception, e:
+		if e.args[0]!=1047: # no table
+			raise e
+
+	for o in ol:
+		if not observers.get(o[1]): observers[o[1]] = o[0]
+	
+	observers_loaded = 1 
+
+def notify_observers(doc, event):
+	load_observers(doc)
+	
+	if observers.get(event):
+		mod = observers.get(event)
+
+		# import the module
+		exec 'import ' + mod
+		getattr(mod, 'notify')(doc, event)
+
 
 # Document Save
 #===========================================================================================
@@ -227,6 +264,9 @@ def _do_action(doc, doclist, so, method_name, docstatus=0):
 		if hasattr(so, 'custom_'+method_name):
 			run_server_obj(so, 'custom_'+method_name)
 		errmethod = ''
+
+	# notify observers (if any)
+	notify_observers(doc, method_name)
 
 	# set docstatus for all children records
 	if docstatus:

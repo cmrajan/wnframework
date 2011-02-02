@@ -76,30 +76,28 @@ class HTTPRequest:
 		elif webnotes.incoming_cookies.get('ac_name'):
 			return webnotes.incoming_cookies.get('ac_name')
 			
-		# from defs
-		elif getattr(webnotes.defs, 'ac_name', None):
-			return webnotes.defs.ac_name
 			
-		# from domain name
-		else:
-			return self.domain.split('.')[0]
-
 	# set database login
 	# ------------------
 
 	def set_db(self, ac_name = None):
-		res = None
+		from webnotes.settings import account_map
 
-		# Case 1 - Single Account
-		if hasattr(webnotes.defs, 'single_account'):
-			webnotes.conn = webnotes.db.Database(use_default=1)
-			return
+		ac_name = None
+		
+		# select based on subdomain
+		if account_map.domain_name_map.get(self.domain):
+			db_name = account_map.domain_name_map.get(self.domain)
 
-		if not ac_name:
+		# select based on ac_name
+		else:
 			ac_name = self.get_ac_name()
+			if ac_name:
+				db_name = account_map.ac_name_map.get(self.domain, account_map.default_db_name)
+			else:
+				db_name = account_map.default_db_name
 	
-		webnotes.conn = webnotes.db.Database(ac_name = ac_name)
-		webnotes.conn = webnotes.conn
+		webnotes.conn = webnotes.db.Database(user = db_name)
 		webnotes.ac_name = ac_name
 
 # =================================================================================
