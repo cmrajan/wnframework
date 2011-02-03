@@ -175,7 +175,7 @@ function $h(e,h){if(e&&e.style&&h)e.style.height=h;}
 function $bg(e,w){if(e&&e.style&&w)e.style.backgroundColor=w;}
 function $fg(e,w){if(e&&e.style&&w)e.style.color=w;}
 function $op(e,w){if(e&&e.style&&w){set_opacity(e,w);}}
-function $y(ele,s){if(ele&&s){for(var i in s)ele.style[i]=s[i];}}
+function $y(ele,s){if(ele&&s){for(var i in s)ele.style[i]=s[i];};return ele;}
 function $yt(tab,r,c,s){var rmin=r;var rmax=r;if(r=='*'){rmin=0;rmax=tab.rows.length-1;}
 if(r.search&&r.search('-')!=-1){r=r.split('-');rmin=cint(r[0]);rmax=cint(r[1]);}
 var cmin=c;var cmax=c;if(c=='*'){cmin=0;cmax=tab.rows[0].cells.length-1;}

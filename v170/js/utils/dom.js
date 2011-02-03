@@ -352,7 +352,13 @@ function $bg(e,w) { if(e && e.style && w)e.style.backgroundColor = w; }
 function $fg(e,w) { if(e && e.style && w)e.style.color = w; }
 function $op(e,w) { if(e && e.style && w) { set_opacity(e,w); } }
 
-function $y(ele, s) { if(ele && s) { for(var i in s) ele.style[i]=s[i]; }}
+function $y(ele, s) { 
+	if(ele && s) { 
+		for(var i in s) ele.style[i]=s[i]; 
+	}; 
+	return ele;
+}
+
 function $yt(tab, r, c, s) { /// set style on tables with wildcards
 	var rmin = r; var rmax = r;
 	if(r=='*') { rmin = 0; rmax = tab.rows.length-1; }

@@ -198,41 +198,21 @@ def make_csv_output(res, dt):
 
 # Notify Observer
 #===========================================================================================
-# Observer pattern implemented as follows:
-# in table __Observer, add observer(module), event and subject(doctype)
-# in the module, declare an "notify" method
+# update in modules/observers.py
 #===========================================================================================
 
-observers = {}
-observers_loaded = 0
-
-def load_observers(doc):
-	global observers_loaded
-
-	if observers_loaded: 
-		return
-
-	try:
-		ol = sql("select observer, event from __Observer where subject=%s", doc.doctype)
-	except Exception, e:
-		if e.args[0]!=1047: # no table
-			raise e
-
-	for o in ol:
-		if not observers.get(o[1]): observers[o[1]] = o[0]
-	
-	observers_loaded = 1 
-
 def notify_observers(doc, event):
-	load_observers(doc)
-	
-	if observers.get(event):
-		mod = observers.get(event)
+	import observers
 
+	mod = observers.observers.get(doc.doctype, {}).get(event)
+	if mod:
 		# import the module
-		exec 'import ' + mod
-		getattr(mod, 'notify')(doc, event)
-
+		mod = mod.split('.')
+		p1, p2 = '.'.join(mod[:-1]), mod[-1]
+		exec 'from %s import %s' % (p1, p2) in locals()
+		
+		if hasattr(locals()[p2], 'notify'):
+			locals()[p2].notify(doc, event)
 
 # Document Save
 #===========================================================================================
@@ -255,6 +235,8 @@ def _get_doclist(clientlist):
 	return main_doc, clientlist
 
 def _do_action(doc, doclist, so, method_name, docstatus=0):
+	webnotes.msgprint(method_name)
+
 	from webnotes.model.code import run_server_obj
 	set = webnotes.conn.set
 
@@ -331,6 +313,7 @@ def savedocs():
 				t = run_server_obj(server_obj, 'validate')
 			if hasattr(server_obj, 'custom_validate'):
 				t = run_server_obj(server_obj, 'custom_validate')
+			notify_observers(doc, 'validate')
 				
 		# set owner and modified times
 		is_new = cint(doc.fields.get('__islocal'))
@@ -379,6 +362,8 @@ def savedocs():
 				if hasattr(server_obj, 'custom_on_update'):
 					t = run_server_obj(server_obj, 'custom_on_update')
 					if t: webnotes.msgprint(t)
+
+			notify_observers(doc, 'on_update')
 				
 		# on_submit
 		if action == 'Submit':

@@ -75,7 +75,6 @@ def execute(code, doc=None, doclist=[]):
 def get_server_obj(doc, doclist = [], basedoctype = ''):
 
 	# for test
-	import sys
 	import webnotes
 	
 
