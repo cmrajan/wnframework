@@ -93,7 +93,7 @@ class HTTPRequest:
 		else:
 			ac_name = self.get_ac_name()
 			if ac_name:
-				db_name = account_map.ac_name_map.get(self.domain, account_map.default_db_name)
+				db_name = account_map.ac_name_map.get(ac_name, account_map.default_db_name)
 			else:
 				db_name = account_map.default_db_name
 	

@@ -16,7 +16,6 @@ class Database:
 		
 		if use_default:
 			self.user = defs.db_login
-			self.password = defs.db_password
 
 		self.is_testing = 0
 		self.in_transaction = 0
