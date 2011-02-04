@@ -19,7 +19,7 @@ _f.ColumnBreak.prototype.make_body = function() {
 	var fn = this.df.fieldname?this.df.fieldname:this.df.label;
 	// header
 	if(this.df&&this.df.label){
-		this.label = $a(this.cell.wrapper, 'div', 'columnHeading');
+		this.label = $a(this.cell.wrapper, 'h3');
 		this.label.innerHTML = this.df.label;
 	}
 
@@ -63,7 +63,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	this.chk = $a_input(div, 'checkbox',null,{marginRight:'8px'})
 	
 	// label
-	this.label = $a(div, 'span', '', {fontSize:'14px', fontWeight:'bold'});
+	this.label = $a(div, 'span', '', {fontSize:'16px', fontFamily:'Georgia'});
 	this.label.innerHTML = this.df.label?this.df.label:'';
 	
 	// description

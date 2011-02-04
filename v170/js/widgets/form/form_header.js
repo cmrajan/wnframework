@@ -4,20 +4,20 @@ _f.FrmHeader = function(parent, frm) {
 	if(frm.meta.in_dialog) $y(this.wrapper, {marginLeft:'8px', marginRight:'8px'});
 
 	this.page_head = new PageHeader(this.wrapper);
-	//$y(this.page_head.wrapper, {marginBottom:'0px'});
 	
 	// doctype
-	this.dt_area = $a(this.page_head.main_head, 'span', '', {fontSize:'18px', marginRight:'8px', fontWeight:'bold'})
+	this.dt_area = $a(this.page_head.main_head, 'h1', '', {marginRight:'8px', display:'inline'})
 	
 	// name
-	this.dn_area = $a(this.page_head.main_head, 'span', '', {fontSize:'14px', fontWeight:'normal', marginRight:'8px'})
+	var div = $a(null, 'div', '', {marginBottom:'4px'}); this.page_head.lhs.insertBefore(div, this.page_head.sub_head);
+	this.dn_area = $a(div, 'span', '', {fontSize:'14px', fontWeight:'normal', marginRight:'8px'})
 
 	// timestamp
-	this.timestamp_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'none'});
+	this.timestamp_area = $a(div, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'none'});
 	this.timestamp_area.innerHTML = 'more info';
 	
 	// status
-	this.status_area = $a(this.page_head.main_head, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer', textShadow:'none'})
+	this.status_area = $a(div, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer', textShadow:'none'})
 }
 _f.FrmHeader.prototype.show = function() {  $ds(this.wrapper); }
 _f.FrmHeader.prototype.hide = function() {  $dh(this.wrapper); }

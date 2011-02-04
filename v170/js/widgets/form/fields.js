@@ -624,10 +624,12 @@ LinkField.prototype.setup_buttons = function() {
 LinkField.prototype.set_onchange = function() { 
 	var me = this;
 	me.txt.onchange = function(e) { 
+		if(cur_autosug)return; // still setting value
+
 		// check values are not set in quick succession due to un-intentional event call				
 		if(_link_onchange_flag) { return;}
 		_link_onchange_flag = 1;
-				
+						
 		// not in form, do nothing
 		if(me.not_in_form) {
 			 return;
@@ -645,7 +647,7 @@ LinkField.prototype.set_onchange = function() {
 		}
 		
 		me.set(me.txt.value);
-					
+		
 		// deselect cell if in grid
 		if(_f.cur_grid_cell)
 			_f.cur_grid_cell.grid.cell_deselect();

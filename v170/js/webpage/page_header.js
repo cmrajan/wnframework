@@ -14,8 +14,8 @@
 
 var def_ph_style = {
 	wrapper: {marginBottom:'16px', backgroundColor:'#EEE'}
-	,main_heading: { fontSize:'20px', padding: '4px 0px', fontWeight:'bold'}
-	,sub_heading: { fontSize:'14px', marginBottom:'8px', color:'#555', display:'none' }
+	,main_heading: { }
+	,sub_heading: { marginBottom:'8px', color:'#555', display:'none' }
 	,separator: { borderTop:'3px solid #444' } // show this when there is no toolbar
 	,toolbar_area: { padding:'3px 0px', display:'none',borderBottom:'1px solid #AAA'}
 }
@@ -27,8 +27,8 @@ function PageHeader(parent, main_text, sub_text) {
 	$y(this.t1, {borderCollapse:'collapse'})
 	this.lhs = $td(this.t1, 0, 0);
 	
-	this.main_head = $a(this.lhs, 'div', '', def_ph_style.main_heading);
-	this.sub_head = $a(this.lhs, 'div', '', def_ph_style.sub_heading);
+	this.main_head = $a(this.lhs, 'h1', '', def_ph_style.main_heading);
+	this.sub_head = $a(this.lhs, 'h4', '', def_ph_style.sub_heading);
 
 	this.separator = $a(this.wrapper, 'div', '', def_ph_style.separator);
 	this.toolbar_area = $a(this.wrapper, 'div', '', def_ph_style.toolbar_area);

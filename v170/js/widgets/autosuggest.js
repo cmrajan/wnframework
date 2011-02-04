@@ -328,15 +328,14 @@ AutoSuggest.prototype.createList = function(arr) {
 			span.appendChild(small);
 			small.isactive = 1
 		}
-		
-		
-		var a = $ce("a", { href:"#" });
+				
+		var a = $a(null, "a");
 		
 		a.appendChild(span);
 		
 		a.name = i+1;
 		a.onclick = function (e) { 
-			me.setHighlightedValue(); return false; 
+			me.setHighlightedValue();
 		};
 		a.onmouseover = function () { me.setHighlight(this.name); };
 		a.isactive = 1;
@@ -473,13 +472,6 @@ AutoSuggest.prototype.setHighlight = function(n)
 
 	// no values returned
 	if(!this.aSug[this.iHigh-1]) return;
-
-	// set it the field (but do not call onchange as this field still has focus)
-	if(this.set_input_value) {
-		this.set_input_value(this.aSug[this.iHigh-1].value);
-	} else {
-		this.fld.value = this.aSug[this.iHigh-1].value;
-	}
 };
 
 
@@ -499,16 +491,20 @@ AutoSuggest.prototype.setHighlightedValue = function ()
 	if (this.iHigh) {
 		this.sInp = this.aSug[ this.iHigh-1 ].value;
 
+		// set the value
 		if(this.set_input_value) {
 			this.set_input_value(this.sInp);
 		} else {
 			this.fld.value = this.sInp;
 		}
-		
+
 		this.clearSuggestions();
 		this.killTimeout();
 
-		if(this.fld.onchange)this.fld.onchange();	
+		if(this.fld.onchange){
+			cur_autosug = null;
+			this.fld.onchange();
+		}
 	}
 };
 
