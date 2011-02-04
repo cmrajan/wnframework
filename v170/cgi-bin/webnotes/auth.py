@@ -165,13 +165,9 @@ class LoginManager:
 	# --------
 	def run_trigger(self, method='on_login'):
 		self.load_control_panel()
-		try:
-			if self.cp and hasattr(self.cp, method):
-				self.cp.on_login(self)
-				
-		except Exception, e:
-			webnotes.response[method + ' Exception'] = webnotes.utils.getTraceback()
-	
+		if self.cp and hasattr(self.cp, method):
+			self.cp.on_login(self)
+
 	# ip validation
 	# -------------
 	
