@@ -126,17 +126,17 @@ def get_source_path(s):
 
 # -------------------------------------------------------------
 
-def rewrite_account_map():
+def rewrite_account_map(ac_name_map={}, domain_name_map={}, default_db_name=None):
 	import datetime
 	
 	f = open(account_map.__file__, 'w')
 	f.write('# Account/Domain Name to Database Mapping file\n')
 	f.write('# --------------------------------------------\n')
 	f.write('# last updated on: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-	f.write('\n\ndefault_db_name = "%s"' % account_map.default_db_name)
-	f.write('\n\nac_name_map = %s' % str(account_map.ac_name_map))
+	f.write('\n\ndefault_db_name = "%s"' % (default_db_name or account_map.default_db_name))
+	f.write('\n\nac_name_map = %s' % str(ac_name_map or account_map.ac_name_map))
 	f.write('\n\n# without www')
-	f.write('\ndomain_name_map = %s' % str(account_map.domain_name_map))
+	f.write('\ndomain_name_map = %s' % str(domain_name_map or account_map.domain_name_map))
 	f.close()
 
 # -------------------------------------------------------------
