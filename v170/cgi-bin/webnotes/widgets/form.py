@@ -202,7 +202,10 @@ def make_csv_output(res, dt):
 #===========================================================================================
 
 def notify_observers(doc, event):
-	import observers
+	try:
+		import observers
+	except ImportError, e:
+		return # no module
 
 	mod = observers.observers.get(doc.doctype, {}).get(event)
 	if mod:
@@ -235,7 +238,6 @@ def _get_doclist(clientlist):
 	return main_doc, clientlist
 
 def _do_action(doc, doclist, so, method_name, docstatus=0):
-	webnotes.msgprint(method_name)
 
 	from webnotes.model.code import run_server_obj
 	set = webnotes.conn.set
