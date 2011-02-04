@@ -92,7 +92,10 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 	try:
 		exec 'from %s.doctype.%s.%s import DocType' % (module, dt, dt)
 	except ImportError, e:
-		return None
+		# declare it here
+		class DocType:
+			def __init__(self, d, dl):
+				self.doc, self.doclist = d, dl
 
 	# custom?
 	if dt_details[0][1]:
