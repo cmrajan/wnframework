@@ -164,7 +164,7 @@ class AppManager:
 	# create a new app
 	# ----------------------------------
 	def new_app(self, ac_name, source):
-		from webnotes import install
+		import install
 
 		# setup
 		print 'Creating new application...'
