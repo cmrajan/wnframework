@@ -41,7 +41,7 @@ def get_comments(doctype, docname):
 	except Exception, e:
 		if e.args[0]==1146:
 			# no table
-			return -1
+			return -1, ''
 		else:
 			raise e
 	
