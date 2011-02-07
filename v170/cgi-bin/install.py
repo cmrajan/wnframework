@@ -178,13 +178,13 @@ def create_account(source,ac_name=None):
 		
 	if not ac_name:
 		if not getattr(account_map,'ac_name_map',None):
-			ac_name = newdb
+			ac_name = "ax0000001"
+			
 		else:
 			
 			ac = account_map.ac_name_map.keys()
 			ac.sort()
 			ac = ac[-1:]
-
 			ac_name = ac[0][:2]+cstr(cint(ac[0][2:])+1)
 
 			
