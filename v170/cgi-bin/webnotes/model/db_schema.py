@@ -297,7 +297,15 @@ class DbManager:
  		if conn:
  			self.conn = conn
 		
-	def delete_all_databases(self):
+
+	def get_variables(self,regex):
+		"""
+		Get variables that match the passed pattern regex
+		"""
+		return list(self.conn.sql("SHOW VARIABLES LIKE '%s'"%regex))
+
+
+	def drop_all_databases(self):
 		"""
 		Danger: will delete all databases except test,mysql.
 		"""
