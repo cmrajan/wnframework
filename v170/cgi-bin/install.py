@@ -1,6 +1,14 @@
-from webnotes.settings import account_map
-
 # -------------------------------------------------------------
+import os
+
+try:
+	from webnotes.settings import account_map
+except ImportError:
+	template_path = os.path.join(os.getcwd(),'webnotes','settings','account_map_template.py')
+	py_path = os.path.join(os.getcwd(),'webnotes','settings','account_map.py')
+	copy_template_to_py(template_path,py_path)
+
+from webnotes.settings import account_map
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -84,7 +92,6 @@ def import_db(source, target='', is_accounts=0):
 	# import in target
 	dbman.restore_database(target,source_path,getattr(defs,'root_password',None))
 
-
 	conn.use(target)
 	dbman.drop_table('__DocTypeCache')
 	conn.sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
@@ -127,11 +134,10 @@ def get_source_path(s):
 # -------------------------------------------------------------
 
 def rewrite_account_map(ac_name_map={}, domain_name_map={}, default_db_name=None):
+	print ac_name_map,domain_name_map
 	import datetime
-	
 	fn = account_map.__file__
 	if fn.endswith('c'): fn = fn[:-1] # for .pyc
-	
 	f = open(fn, 'w')
 	f.write('# Account/Domain Name to Database Mapping file\n')
 	f.write('# --------------------------------------------\n')
@@ -148,26 +154,41 @@ def create_account_record(ac_name, newdb, domain=''):
 	
 	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
 	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}
-	
-	account_map.ac_name_map[ac_name] = newdb
+
+	account_map.ac_name_map.update({ac_name : newdb})
 	if domain:
-		account_map.domain_name_map[domain] = newdb
+		account_map.domain_name_map.update({domain: newdb})
 		
-	rewrite_account_map()
+	rewrite_account_map(account_map.ac_name_map,account_map.domain_name_map,account_map.default_db_name)
 
 
 # -------------------------------------------------------------
 
-def create_account(ac_name, ac_type='Framework'):
+def create_account(source,ac_name=None):
 	import webnotes.db
 
-	newdb = import_db(ac_type)
+	from webnotes.utils import cint,cstr
+	
+	newdb = import_db(source)
 
 	# set account id
 	conn = webnotes.db.Database(user=newdb)
 	conn.use(newdb)
 	sql = conn.sql
-	
+		
+	if not ac_name:
+		if not getattr(account_map,'ac_name_map',None):
+			ac_name = newdb
+		else:
+			
+			ac = account_map.ac_name_map.keys()
+			ac.sort()
+			ac = ac[-1:]
+
+			ac_name = ac[0][:2]+cstr(cint(ac[0][2:])+1)
+
+			
+		
 	conn.begin()
 	sql("update tabSingles set value=%s where doctype='Control Panel' and field='account_id'", ac_name)
 
@@ -196,18 +217,36 @@ def create_log_folder(path):
 
 # -------------------------------------------------------------
 
-def copy_defs_py():
-	import os
+def copy_template_to_py(template_path,target_path):
 	try:
-		cur_path = os.getcwd()
-		defs_path = os.path.join(cur_path,'webnotes','defs')
+		print "Copying %s to %s"%(template_path,target_path)
 		cp_cmd = 'cp'
 		
-		ret = os.system(cp_cmd +' '+ defs_path+' '+defs_path+'.py')
+		ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
 		assert ret == 0 
 		print ret
 	except Exception,ret:
 		print ret
+
+# -----------------------------------------------------------------------
+# this is a patch that will build account_map.py from deprecated "accounts" database
+
+def build_account_map():
+	
+	from webnotes.db import Database
+	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
+	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}	
+	
+	try:
+		
+		conn = Database(user='accounts')
+		for ac in conn.sql("select ac_name, db_name from tabAccount"):
+			account_map.ac_name_map.update({ac[0]:ac[1]})
+	except Exception,e:
+		raise e
+	
+	rewrite_account_map(account_map.ac_name_map,account_map.domain_name_map,account_map.default_db_name)
+
 
 
 # Installation
@@ -218,15 +257,20 @@ if __name__=='__main__':
 	# set path
 	sys.path.append(os.path.abspath(os.path.dirname(sys.argv[0]) + '/../../'))	
 
-	if not os.path.exists(os.path.join(os.getcwd(),'webnotes','defs.py')):
+	cur_path = os.getcwd()
+	defs_template_path = os.path.join(cur_path,'webnotes','defs')
+	
+	defs_path = os.path.join(cur_path,'webnotes','defs.py')
 
+	if not os.path.exists(defs_path):
 		print "Creating defs.py"	
-		copy_defs_py()
+		copy_template_to_py(defs_template_path,defs_path)
 
 	from webnotes import defs
-	print "Creating log folder and file..."
+	
 	log_path = getattr(defs,'log_file_path',None)
 	if log_path:
+		print "Creating log folder and file..."
 		create_log_folder(os.path.dirname(log_path))
 
 
@@ -237,27 +281,20 @@ if __name__=='__main__':
 		from webnotes.model.db_schema import DbManager
 		import webnotes.db
 		import webnotes.defs
+		
+		print "Importing Master.sql..." 
+		create_account("master")
+		
 
-	
+	elif sys.argv[1] =='framework-setup':
 		
-		print "Importing Framework.sql..." 
-		import_db("Framework", "accounts")
+		# create the first account
+		from webnotes.model.db_schema import DbManager
+		import webnotes.db
+		import webnotes.defs
 		
+		print "Importing Master.sql..." 
+		create_account()
+
 		print "Setting up Account..."
-		create_account_doctype(conn,'accounts')
-
-# -----------------------------------------------------------------------
-# this is a patch that will build account_map.py from deprecated "accounts" database
-
-def build_account_map():
-	from webnotes.db import Database
-	conn = Database(user='accounts')
-	
-	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
-	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}	
-
-	for ac in conn.sql("select ac_name, db_name from tabAccount"):
-		account_map.ac_name_map[ac[0]] = ac[1]
-		
-	rewrite_account_map()
-		
+		account_map.default_db_map = 'webnotesframework' 
