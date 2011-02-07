@@ -1,6 +1,21 @@
 # -------------------------------------------------------------
 import os
 
+
+# -------------------------------------------------------------
+
+def copy_template_to_py(template_path,target_path):
+	try:
+		print "Copying %s to %s"%(template_path,target_path)
+		cp_cmd = 'cp'
+		
+		ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
+		assert ret == 0 
+		print ret
+	except Exception,ret:
+		print ret
+#--------------------------------------------------------------
+
 try:
 	from webnotes.settings import account_map
 except ImportError:
@@ -214,19 +229,6 @@ def create_log_folder(path):
 		print e
 		pass
 
-
-# -------------------------------------------------------------
-
-def copy_template_to_py(template_path,target_path):
-	try:
-		print "Copying %s to %s"%(template_path,target_path)
-		cp_cmd = 'cp'
-		
-		ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
-		assert ret == 0 
-		print ret
-	except Exception,ret:
-		print ret
 
 # -----------------------------------------------------------------------
 # this is a patch that will build account_map.py from deprecated "accounts" database
