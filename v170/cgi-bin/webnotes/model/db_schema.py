@@ -297,6 +297,13 @@ class DbManager:
  		if conn:
  			self.conn = conn
 		
+	def delete_all_databases(self):
+		"""
+		Danger: will delete all databases except test,mysql.
+		"""
+		db_list = self.get_database_list()
+		for db in db_list:
+			self.drop_database(db)
 	def get_tables_list(self,target):	
 		"""
 		
