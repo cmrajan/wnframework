@@ -149,7 +149,6 @@ def get_source_path(s):
 # -------------------------------------------------------------
 
 def rewrite_account_map(ac_name_map={}, domain_name_map={}, default_db_name=None):
-	print ac_name_map,domain_name_map
 	import datetime
 	fn = account_map.__file__
 	if fn.endswith('c'): fn = fn[:-1] # for .pyc
