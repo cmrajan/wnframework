@@ -525,13 +525,6 @@ def check_page_perm(dn):
 # load a record and its child records and bundle it in a list - doclist
 # ---------------------------------------------------------------------
 
-def get_report_builder_code(doc):
-	if doc.doctype=='Search Criteria':
-		from webnotes.modules import code_sync
-		
-		if doc.standard != 'No':
-			doc.report_script = code_sync.get_code(doc.module, 'Search Criteria', doc.name, 'js')
-			doc.custom_query = code_sync.get_code(doc.module, 'Search Criteria', doc.name, 'sql')
 	
 def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 	import webnotes 
@@ -553,7 +546,6 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 			raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
 
 	# import report_builder code
-	get_report_builder_code(doc)
 
 	if not with_children:
 		# done

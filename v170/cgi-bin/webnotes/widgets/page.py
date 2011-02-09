@@ -10,7 +10,6 @@ class Page:
 
 	def load(self):	
 		from webnotes.modules import compress
-		from webnotes.modules import code_sync
 		
 		doclist = webnotes.model.doc.get('Page', self.name)
 		doc = doclist[0]
@@ -18,8 +17,8 @@ class Page:
 		doc.script = None
 		doc.fields['__script'] = compress.get_page_js(self.name)
 		if doc.standard!='No':
-			doc.content = code_sync.get_code(doc.module, 'page', doc.name, 'html')
-			doc.style = code_sync.get_code(doc.module, 'page', doc.name, 'css')
+			doc.content = 'No static Content'
+			#doc.style = code_sync.get_code(doc.module, 'page', doc.name, 'css')
 		
 		if doc.fields.get('content') and doc.content.startswith('#python'):
 			doc.fields['__content'] = webnotes.model.code.execute(doc.content)

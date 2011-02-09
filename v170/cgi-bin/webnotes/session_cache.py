@@ -29,11 +29,6 @@ def get():
 	import webnotes
 	import webnotes.defs
 	
-	# check if system is updated, if yes - clear the cache
-	from webnotes.modules import code_sync
-	if code_sync.check_modules_update():
-		webnotes.conn.sql("delete from __DocTypeCache")
-		clear_cache()
 	
 	# get country
 	country = 'Not Defined'
@@ -120,10 +115,9 @@ def get_letter_heads():
 
 def load_startup(cp):
 	from webnotes.modules import compress
-	from webnotes.modules import code_sync
 	
 	cp.startup_code = compress.get_js_code('system','Control Panel','Control Panel')
-	cp.startup_css = code_sync.get_code('system','Control Panel','Control Panel','css')
+	#cp.startup_css = code_sync.get_code('system','Control Panel','Control Panel','css')
 
 # build it
 # ==================================================

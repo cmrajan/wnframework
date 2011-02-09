@@ -213,11 +213,10 @@ def runquery(q='', ret=0, from_export=0):
 	style, header_html, footer_html, page_template = '', '', '', ''
 	if form.has_key('sc_id') and form.getvalue('sc_id'):
 		sc_id = form.getvalue('sc_id')
-		from webnotes.modules import code_sync
 		
 		sc_details = webnotes.conn.sql("select module, standard, server_script from `tabSearch Criteria` where name=%s", sc_id)[0]
 		if sc_details[1]!='No':	
-			code = code_sync.get_code(sc_details[0], 'Search Criteria', sc_id, 'py')
+			code = 'No static Content'
 		else:
 			code = sc_details[2]
 			
