@@ -10,7 +10,7 @@ WNF requires the following applications
 
 1. Python
 2. MySQL
-3. MySQL-Python (connector)
+3. MySQL-Python (connector)  
 4. simplejson (for Python 2.4 or lower)
 5. email (for Python 2.4 or lower)
 6. pytz (easy_install pytz)
@@ -55,10 +55,10 @@ Hence we call this app "accounts". To setup the accounts app, you can do either 
 	b,run the following from the python shell
 
 		>>>import webnotes
-		>>>import setup
+		>>>import install
 
-		>>>setup.import_db('Framework','accounts')
-		>>>setup.create_account_doctype()
+		>>>install.import_db('Framework','accounts')
+		>>>install.create_account_doctype()
 
 ------------------------------------------------------------------------
 4. Login to application

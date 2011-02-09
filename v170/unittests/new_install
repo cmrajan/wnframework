@@ -1,0 +1,4 @@
+setup.create_account('panache')
+from webnotes.utils import module_manager
+module_manager.get_all_modules_from_filesystem()
+
