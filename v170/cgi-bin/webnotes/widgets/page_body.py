@@ -62,10 +62,11 @@ Redirecting...
 import webnotes
 
 def get_page_content(page):
+	from webnotes.model.code import get_code
 	if not page:
 		return 'No Title', 'No Content'
 	
-	content = 'No static content'
+	content = get_code(None, 'Page', page, 'html', 1) or 'No static content'
 
 	# title
 	if webnotes.conn.sql("select name from tabDocField where fieldname='page_title' and parent='Page'"):

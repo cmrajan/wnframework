@@ -125,6 +125,8 @@ def execute_page_method(module, page, method, arg=''):
 # get object (from dt and/or dn or doclist)
 #=================================================================================
 
+
+
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:
 		import webnotes.model.doc
@@ -159,3 +161,32 @@ def updatedb(doctype, userfields = [], args = {}):
 
 def check_syntax(code):
 	return ''
+
+#===================================================================================
+def get_code(module, dt, dn, extn, is_static=None):
+	from webnotes.defs import modules_path
+	from webnotes.modules import scrub
+	import os, webnotes
+	
+	# get module (if required)
+	if not module:
+		module = webnotes.conn.sql("select module from `tab%s` where name=%s" % (dt,'%s'),dn)[0][0]
+		
+	# file names
+	if dt != 'Control Panel':
+		dt, dn = scrub(dt), scrub(dn)
+
+	# get file name
+	fname = dn + '.' + extn
+	if is_static:
+		fname = dn + '_static.' + extn
+
+	# code
+	try:
+		file = open(os.path.join(modules_path, scrub(module), dt, dn, fname), 'r')
+	except IOError, e:
+		return ''
+		
+	code = file.read()
+	file.close()
+	return code
