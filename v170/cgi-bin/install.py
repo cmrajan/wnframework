@@ -241,8 +241,16 @@ def build_account_map():
 	try:
 		
 		conn = Database(user='accounts')
-		for ac in conn.sql("select ac_name, db_name from tabAccount"):
+		for ac in conn.sql("select ac_name, db_name,allocated,deleted,last_backup,trial_or_paid,expiry_date,timezone from tabAccount"):
+
 			account_map.ac_name_map.update({ac[0]:ac[1]})
+			account_map.ac_allocated_map.update({ac[0]:ac[2]})
+			acccount_map.ac_deleted_map.update({ac[0]:ac[3])
+			account_map.ac_last_backup_map.update({ac[0]:ac[4]})
+			account_map.ac_trial_or_paid_map.update({ac[0]:ac[5]})
+			account_map.ac_expiry_date_map.update({ac[0]:ac[6]})
+			account_map.ac_timezone_map.update({ac[0]:ac[7]})
+
 	except Exception,e:
 		raise e
 	
@@ -295,7 +303,6 @@ if __name__=='__main__':
 		import webnotes.defs
 		
 		print "Importing Master.sql..." 
-		create_account()
+		create_account('Framework','webnotesframework')
 
-		print "Setting up Account..."
-		account_map.default_db_map = 'webnotesframework' 
+		
