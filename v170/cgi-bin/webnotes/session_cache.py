@@ -115,9 +115,10 @@ def get_letter_heads():
 
 def load_startup(cp):
 	from webnotes.modules import compress
+	from webnotes.model.code import get_code
 	
 	cp.startup_code = compress.get_js_code('system','Control Panel','Control Panel')
-	#cp.startup_css = code_sync.get_code('system','Control Panel','Control Panel','css')
+	cp.startup_css = get_code('system','Control Panel','Control Panel','css')
 
 # build it
 # ==================================================

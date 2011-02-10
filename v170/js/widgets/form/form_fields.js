@@ -453,8 +453,12 @@ _f.CodeField.prototype.init_editor = function() {
 		me.set(ed.getContent()); 
 	});
 	this.editor.onPaste.add(function(ed, e) { 
+		me.set(ed.getContent());
+	});
+	this.editor.onSetContent.add(function(ed, e) { 
 		me.set(ed.getContent()); 
 	});
+	
 	// reset content
 	if(cur_frm) this.editor.setContent(locals[cur_frm.doctype][cur_frm.docname][this.df.fieldname]);
 }
