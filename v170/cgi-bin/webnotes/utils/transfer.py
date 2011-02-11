@@ -1,8 +1,9 @@
+import webnotes
+
 # =============================================================================
 # Import a record (with its chilren)
 # =============================================================================
 def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
-	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model.code import get_obj
 	from webnotes.model.code import get_server_obj
@@ -99,7 +100,6 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 # Transfer DocType
 # =============================================================================
 def merge_doctype(doc_list, ovr, ignore, onupdate):
-	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
 	from webnotes.utils import cint
@@ -129,32 +129,13 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 			fld = sql("select name from tabDocField where label=%s and parent=%s", (d.label, d.parent))
 
 		if (not fld) and d.label: # must have label
-			if prevfield:
-				idx = sql("select idx from tabDocField where fieldname = %s and parent = %s",(prevfield,d.parent))
-				prevfield = ''
-				
-			if prevlabel and not prevfield:
-				idx = sql("select idx from tabDocField where label = %s and parent = %s",(prevlabel,d.parent))[0][0]
-				
-			if idx:
-				sql("update tabDocField set idx = idx + 1 where parent=%s and idx > %s", (d.parent, cint(idx)))					
-
 			# add field
 			nd = Document(fielddata = d.fields)
 			nd.oldfieldname, nd.oldfieldtype = '', ''
-			if idx:
-				nd.idx = cint(idx)+1
 			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
 			fld_lst += 'Label : '+cstr(d.label)+'	 ---	 Fieldtype : '+cstr(d.fieldtype)+'	 ---	 Fieldname : '+cstr(d.fieldname)+'	 ---	 Options : '+cstr(d.options)
 			added += 1
 			
-		# clean up
-		if d.fieldname:
-			prevfield = d.fieldname
-			prevlabel = ''
-		elif d.label:
-			prevfield = ''
-			prevlabel = d.label
 			
 	# Print Formats
 	# -------------
@@ -180,6 +161,8 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 	cur_doc.module = doc.module
 	cur_doc.save(ignore_fields = ignore, check_links = 0)	
 	
+	# reorganize sequence
+	re_index_doctype(doc.module.lower().replace(' ', '_'), doc.name.lower().replace(' ', '_'))
 
 	# update schema
 	# -------------
@@ -197,7 +180,95 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 		added_fields =	' Added Fields :'+ cstr(fld_lst)
 		
 	return doc.name + (' Upgraded: %s fields added' % added)+added_fields
+
+# =============================================================================
+# Reorganize Fields in DocType
+# =============================================================================
+
+
+def re_index_doctype(module, dt):
+	from webnotes.defs import modules_path
 	
+	import os
+	
+	file = open(os.path.join(modules_path, module, 'doctype', dt, dt + '.txt'),'r')
+	doclist = eval(file.read())
+	file.close()
+
+	dt = doclist[0]['name']
+	
+	extra = get_extra_fields(doclist, dt)
+	
+	clear_section_breaks(dt)
+	
+	add_section_breaks_and_renum(doclist, dt)
+	
+	fix_extra_fields(extra, dt)
+	
+	webnotes.conn.sql("delete from __DocTypeCache where name=%s", dt)
+
+# get extra fields
+# ----------------
+
+def get_extra_fields(doclist, dt):
+	prev_field, prev_field_key = '', ''
+	extra = []
+	
+	# get new fields and labels
+	fieldnames = [d.get('fieldname') for d in doclist]
+	labels = [d.get('label') for d in doclist]
+
+	# check if all existing are present
+	for f in webnotes.conn.sql("select fieldname, label, idx from tabDocField where parent=%s and fieldtype not in ('Section Break', 'Column Break', 'HTML') order by idx asc", dt):
+		if f[0] and not f[0] in fieldnames:
+			extra.append([f[0], f[1], prev_field, prev_field_key])
+		elif f[1] and not f[1] in labels:
+			extra.append([f[0], f[1], prev_field, prev_field_key])
+			
+		prev_field, prev_field_key = f[0] or f[1], f[0] and 'fieldname' or 'label'
+	
+	return extra
+
+# adjust the extra fields
+# -----------------------
+
+def fix_extra_fields(extra, dt):
+	# push fields down at new idx
+	for e in extra:
+		# get idx of the prev to extra field
+		idx = 0
+		if e[2]:
+			idx = webnotes.conn.sql("select idx from tabDocField where %s=%s and parent=%s" % (e[3], '%s', '%s'), (e[2], dt))
+			idx = idx and idx[0][0] or 0
+		
+		if idx:
+			webnotes.conn.sql("update tabDocField set idx=idx+1 where idx>%s and parent=%s", (idx, dt))	
+			webnotes.conn.sql("update tabDocField set idx=%s where %s=%s and parent=%s" % \
+				('%s', e[0] and 'fieldname' or 'label', '%s', '%s'), (idx+1, e[0] or e[1], dt))
+
+# clear section breaks
+# --------------------
+
+def clear_section_breaks(dt):
+	webnotes.conn.sql("delete from tabDocField where fieldtype in ('Section Break', 'Column Break', 'HTML') and parent=%s", dt)
+
+# add section breaks and renum
+# ----------------------------
+
+def add_section_breaks_and_renum(doclist, dt):
+	from webnotes.model.doc import Document
+	for d in doclist:
+		if d.get('parentfield')=='fields':
+			if d.get('fieldtype') in ('Section Break', 'Column Break', 'HTML'):
+				tmp = Document(fielddata = d)
+				tmp.fieldname = d.get('fieldtype').lower().replace(' ', '_') + str(d.get('idx'))
+				tmp.name = None
+				tmp.save(1)
+			else:
+				webnotes.conn.sql("update tabDocField set idx=%s where %s=%s and parent=%s" % \
+					('%s', d.get('fieldname') and 'fieldname' or 'label', '%s', '%s'), (d.get('idx'), d.get('fieldname') or d.get('label'), dt))
+
+
 	
 # =============================================================================
 # Transfer Mapper
@@ -386,65 +457,4 @@ def merge_module_def(doc_list, ovr, ignore, onupdate):
 	return doc.name + ('Upgraded: %s fields added' % added)+added_fields
 	
 	
-# =============================================================================
-# Execute Patches
-# =============================================================================
-def execute_patches(modules,record_list):
-	import webnotes
-	from webnotes.model import code
-	
-	ret = {}
-	try:
-		patch_list, ret = get_patch_list(modules, record_list, ret)
-	except Exception, e:
-		if e.args[0]==1146:
-			return 'No table Patch'
-		else:
-			raise e
-	
-	for d in patch_list:
-		try:
-			if not webnotes.conn.in_transaction:
-				webnotes.conn.sql("START TRANSACTION")
-			#print 'Patch: ' + d[0]
-			ret_msg = code.execute(d[1])
-			webnotes.conn.sql("update tabPatch set status = 'Executed' where name = %s", d[0])
-			webnotes.conn.sql("COMMIT")
-		except Exception, e:
-			ret_msg = e
-		#finally: #Only works on python 2.5+
-		ret[d[0]] = ret_msg
 
-	return ret
-
-
-# =============================================================================
-# Get patch list
-# =============================================================================
-def get_patch_list(modules, record_list, ret):
-	import webnotes
-	patch_list = [] 
-	if modules:
-		for each in modules:
-			patch_list += [[d[0], d[1]] for d in webnotes.conn.sql("select name, patch_code from `tabPatch` where module = %s and status = 'Ready'",each)]
-
-	if record_list:
-		for each in record_list:
-			if each[0] == 'Patch':
-				cd = webnotes.conn.sql("select patch_code from tabPatch where name = %s and status = 'Ready'", each[1])
-				if cd:
-					patch_list.append([each[1], cd[0][0]]) 
-				else:
-					ret[each[1]] = 'Patch is not ready'
-					
-	return patch_list, ret
-	
-	
-# =============================================================================
-# Sync control panel
-# =============================================================================
-def sync_control_panel(startup_code, startup_css):
-	import webnotes
-	webnotes.conn.set_value('Control Panel', None, 'startup_code', startup_code)
-	webnotes.conn.set_value('Control Panel', None, 'startup_css', startup_css)
-	webnotes.conn.sql("commit")
