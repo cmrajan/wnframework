@@ -57,7 +57,8 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 	var me = this;
 
 	var div = $a(head,'div','',{padding:'4px 4px', backgroundColor:'#EEE'});
-	$gr(div, '#DDD', '#CCC'); $br(div, '3px');
+	$gr(div, '#DDD', '#CCC'); $br(div, '3px');  
+	if(cur_frm.meta.in_dialog) $y(div, {marginLeft:'8px'});
 	
 	// checkbox
 	this.chk = $a_input(div, 'checkbox',null,{marginRight:'8px'})

@@ -351,19 +351,13 @@ def savedocs():
 	
 		# on_update
 		if action in ('Save','Submit') and server_obj:
-			# special for DocType, DocType
-			if doc.doctype == 'DocType':
-				import webnotes.model.doctype
-				webnotes.model.doctype.update_doctype([doc] + doclist)
-				
-			else:				
-				if hasattr(server_obj, 'on_update'):
-					t = run_server_obj(server_obj, 'on_update')
-					if t: webnotes.msgprint(t)
+			if hasattr(server_obj, 'on_update'):
+				t = run_server_obj(server_obj, 'on_update')
+				if t: webnotes.msgprint(t)
 	
-				if hasattr(server_obj, 'custom_on_update'):
-					t = run_server_obj(server_obj, 'custom_on_update')
-					if t: webnotes.msgprint(t)
+			if hasattr(server_obj, 'custom_on_update'):
+				t = run_server_obj(server_obj, 'custom_on_update')
+				if t: webnotes.msgprint(t)
 
 			notify_observers(doc, 'on_update')
 				

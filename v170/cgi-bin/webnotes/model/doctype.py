@@ -132,40 +132,6 @@ class _DocType:
 
 		return doclist
 
-# Called when "DocType" form is saved - scrubs field names, clears cache, updates schema
-#=======================================================================================
-
-def update_doctype(doclist):
-	doc = doclist[0]
-	
-	# make field name from label
-	scrub_field_names(doclist)
-	
-	# make schma changes
-	import db_schema
-	db_schema.updatedb(doc.name)
-	
-	# reload record
-	for d in doclist:
-		try:
-			d.loadfromdb()
-		except:
-			pass
-
-	# change modifed of parent doctype (to clear the cache)
-	clear_cache()
-
-def scrub_field_names(doclist):
-	restricted = ('name','parent','idx','owner','creation','modified','modified_by','parentfield','parenttype')
-	
-	for d in doclist:
-		if d.parent and d.fieldtype:
-			if (not d.fieldname) and (d.fieldtype.lower() in ('data', 'select', 'int', 'float', 'currency', 'table', 'text', 'link', 'date', 'code', 'check', 'read only', 'small text', 'time', 'text editor')):
-				d.fieldname = d.label.strip().lower().replace(' ','_')
-				if d.fieldname in restricted:
-					d.fieldname = d.fieldname + '1'
-				webnotes.model.meta.set_fieldname(d.name, d.fieldname)
-
 def clear_cache():
 	webnotes.conn.sql("delete from __DocTypeCache")
 	

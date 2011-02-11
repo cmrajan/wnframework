@@ -34,7 +34,7 @@ def db_exists(dt, dn):
 
 
 # Get Traceback
-# -------------
+# ==============================================================================
 
 def getTraceback():
 	import sys, traceback, string
@@ -46,7 +46,7 @@ def getTraceback():
 	return body
 
 # Log
-# ---
+# ==============================================================================
 
 def log(event, details):
 	return
@@ -63,7 +63,7 @@ def log(event, details):
 		pass # bc
 
 # Date and Time
-# -------------
+# ==============================================================================
 
 
 def getdate(string_date):
@@ -141,7 +141,7 @@ def dict_to_str(args, sep='&'):
 	return sep.join(t)
 
 # Datatype
-# ----------
+# ==============================================================================
 
 def isNull(v):
 	return (v=='' or v==None)
@@ -176,6 +176,9 @@ def replace_newlines(s):
 	if s==None:return ''
 	return s.replace("\n","<br>")
 
+
+# ==============================================================================
+
 def parse_val(v):
 	import datetime
 	
@@ -195,10 +198,11 @@ def parse_val(v):
 	except: pass
 
 	return v
+	
+# ==============================================================================
 
 def fmt_money(amount, fmt = '%.2f'):
-	curr = webnotes.conn.sql("select value from tabSingles where doctype = 'Control Panel' and field = 'currency_format'")
-	curr = curr and curr[0][0] or 'Millions'
+	curr = webnotes.conn.get_value('Control Panel', None, 'currency_format') or 'Millions'
 
 	val = 2
 	if curr == 'Millions': val = 3
@@ -230,7 +234,7 @@ def fmt_money(amount, fmt = '%.2f'):
 	return amount
 	
 # Get Defaults
-# ------------
+# ==============================================================================
 
 def get_defaults():
 	res = webnotes.conn.sql('select defkey, defvalue from `tabDefaultValue` where parent = "Control Panel"')
@@ -255,7 +259,7 @@ def set_default(key, val):
 		d.save(1)
 
 # Clear recycle bin
-# -----------------
+# ==============================================================================
 
 def clear_recycle_bin():
 	sql = webnotes.conn.sql
@@ -283,7 +287,8 @@ def clear_recycle_bin():
 
 
 # Send Error Report
-# ------------------
+# ==============================================================================
+
 def send_error_report():
 	sql = webnotes.conn.sql
 	m = ''
@@ -295,3 +300,20 @@ def send_error_report():
 		Err Msg : %s
 	''' % (m, form.getvalue('err_msg'))
 	sendmail([webnotes.conn.get_value('Control Panel',None,'support_email_id') or 'support@iwebnotes.com'], sender=webnotes.session['user'], msg=err_msg, subject='Error Report '+m)
+
+# pretty print a dict
+# ==============================================================================
+
+def pprint_dict(d, level=1):
+	indent = ''
+	for i in range(0,level):
+		indent += '\t'
+	lines = []
+	kl = d.keys()
+	kl.sort()
+	for key in kl:
+		tmp = {key: d[key]}
+		lines.append(indent + str(tmp)[1:-1] )
+	return indent + '{\n' \
+			+ indent + ',\n\t'.join(lines) \
+			+ '\n' + indent + '}'

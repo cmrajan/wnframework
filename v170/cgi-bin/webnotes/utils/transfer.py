@@ -130,15 +130,20 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 
 		if (not fld) and d.label: # must have label
 			if prevfield:
-				idx = sql("select idx from tabDocField where fieldname = %s and parent = %s",(prevfield,d.parent))[0][0]
-			elif prevlabel and not prevfield:
+				idx = sql("select idx from tabDocField where fieldname = %s and parent = %s",(prevfield,d.parent))
+				prevfield = ''
+				
+			if prevlabel and not prevfield:
 				idx = sql("select idx from tabDocField where label = %s and parent = %s",(prevlabel,d.parent))[0][0]
-			sql("update tabDocField set idx = idx + 1 where parent=%s and idx > %s", (d.parent, cint(idx)))					
+				
+			if idx:
+				sql("update tabDocField set idx = idx + 1 where parent=%s and idx > %s", (d.parent, cint(idx)))					
 
 			# add field
 			nd = Document(fielddata = d.fields)
 			nd.oldfieldname, nd.oldfieldtype = '', ''
-			nd.idx = cint(idx)+1
+			if idx:
+				nd.idx = cint(idx)+1
 			nd.save(new = 1, ignore_fields = ignore, check_links = 0)
 			fld_lst += 'Label : '+cstr(d.label)+'	 ---	 Fieldtype : '+cstr(d.fieldtype)+'	 ---	 Fieldname : '+cstr(d.fieldname)+'	 ---	 Options : '+cstr(d.options)
 			added += 1

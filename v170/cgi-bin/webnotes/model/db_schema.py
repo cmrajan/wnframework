@@ -167,6 +167,8 @@ class DbTable:
 		if not self.drop_foreign_key:
 			return
 	
+		webnotes.msgprint(self.drop_foreign_key)
+	
 		fk_list = self.get_foreign_keys()
 		
 		# make dictionary of constraint names
@@ -198,18 +200,22 @@ class DbTable:
 		for col in self.change_type:
 			webnotes.conn.sql("alter table `%s` change `%s` `%s` %s" % (self.name, col.fieldname, col.fieldname, col.get_definition()))
 
+		self.set_foreign_keys()
+		self.drop_foreign_keys()
+
 		for col in self.add_index:
 			webnotes.conn.sql("alter table `%s` add index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
 
 		for col in self.drop_index:
 			if col.fieldname != 'name': # primary key
-				webnotes.conn.sql("alter table `%s` drop index `%s`(`%s`)" % (self.name, col.fieldname, col.fieldname))
+				try:
+					webnotes.conn.sql("alter table `%s` drop index `%s`" % (self.name, col.fieldname))
+				except Exception, e:
+					if e.args[0]==1025: pass # foreign-key confict 
+					else: raise e
 
 		for col in self.set_default:
 			webnotes.conn.sql("alter table `%s` alter column `%s` set default %s" % (self.name, col.fieldname, '%s'), col.default)
-
-		self.set_foreign_keys()
-		self.drop_foreign_keys()
 
 
 # -------------------------------------------------
@@ -241,6 +247,8 @@ class DbColumn:
 		
 	def check(self, current_def):
 		column_def = self.get_definition(0)
+		fk_list = [f[0] for f in self.table.get_foreign_keys()]
+
 		# no columns
 		if not column_def:
 			return
@@ -257,12 +265,12 @@ class DbColumn:
 
 		# foreign key
 		if self.fieldtype=='Link':
-			fk_list = [f[0] for f in self.table.get_foreign_keys()]
 			if not self.fieldname in fk_list:
 				self.table.add_foreign_key.append(self)
 
-			if not self.options and (self.fieldname in fk_list):
-				self.table.drop_foreign_key.append(self)
+		# drop foreign key
+		if self.fieldtype!='Link' and (self.fieldname in fk_list):
+			self.table.drop_foreign_key.append(self)
 		
 		# index
 		else:

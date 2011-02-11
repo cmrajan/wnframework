@@ -143,48 +143,54 @@ def get_module_doclist(module):
 	return super_doclist
 
 # ==============================================================================
-# Create module folders
+# Create __init__.py files
 # ==============================================================================
 
-def create_folder(module, dt, dn):
+def create_init_py(module, dt, dn):
 	import os
 	from webnotes.defs import modules_path
 	from webnotes.modules import scrub
 	
+	# in module
+	if not '__init__.py' in os.listdir(os.path.join(modules_path, scrub(module))):
+		open(os.path.join(modules_path, scrub(module), '__init__.py'), 'w').close()
+
+	# in type and name folders
+	if dt in ['DocType', 'Page', 'Search Criteria']:
+		if not '__init__.py' in os.listdir(os.path.join(modules_path, scrub(module), scrub(dt))):
+			open(os.path.join(modules_path, scrub(module), scrub(dt), '__init__.py'), 'w').close()
+
+		if not '__init__.py' in os.listdir(os.path.join(modules_path, scrub(module), scrub(dt), scrub(dn))):
+			open(os.path.join(modules_path, scrub(module), scrub(dt), scrub(dn), '__init__.py'), 'w').close()
+
+
+# ==============================================================================
+# Create module folders
+# ==============================================================================
+
+def create_folder(module, dt, dn):
+	import webnotes, os
+	from webnotes.defs import modules_path
+	
+	# create folder
 	code_type = dt in ['DocType', 'Page', 'Search Criteria']
 	
-	# module
-	if not scrub(module) in os.listdir(modules_path):
-		os.mkdir(os.path.join(modules_path, scrub(module)))
-		init = open(os.path.join(modules_path, scrub(module), '__init__.py'), 'w')
-		init.close()
-
-	if code_type:
-		dt, dn = scrub(dt), scrub(dn)
-
-	# doctype		
-	if not dt in os.listdir(os.path.join(modules_path, scrub(module))):
-		os.mkdir(os.path.join(modules_path, scrub(module), dt))
-		if dt == 'doctype':
-			init = open(os.path.join(modules_path, scrub(module), dt, '__init__.py'), 'w')
-			init.close()
-		
-	# name
-	if not dn in os.listdir(os.path.join(modules_path, scrub(module), dt)):
-		os.mkdir(os.path.join(modules_path, scrub(module), dt, dn))
-		if dt == 'doctype':
-			init = open(os.path.join(modules_path, scrub(module), dt, dn, '__init__.py'), 'w')
-			init.close()
+	folder = os.path.join(modules_path, scrub(module), \
+		code_type and scrub(dt) or dt, code_type and scrub(dn) or dn)
 	
-	return os.path.join(modules_path, scrub(module), dt, dn)
+	webnotes.create_folder(folder)
+	
+	# create init_py_files
+	create_init_py(module, dt, dn)
+	
+	return os.path.join(modules_path, scrub(module), scrub(dt), scrub(dn))
 
 # ==============================================================================
 # Write doclist into file
 # ==============================================================================
 def write_document_file(doclist, record_module=None):
 	import os
-	import webnotes
-	import webnotes.defs
+	from webnotes.utils import pprint_dict
 
 	global updated_modules
 
@@ -207,36 +213,39 @@ def write_document_file(doclist, record_module=None):
 	folder = create_folder(module, doclist[0]['doctype'], doclist[0]['name'])
 	
 	# separate code files
-	#separate_code_files(doclist, folder, code_type)
+	separate_code_files(doclist, folder, code_type)
 		
-	# write the data file
+	# write the data file	
 	fname = (code_type and scrub(doclist[0]['name'])) or doclist[0]['name']
-	txtfile = open(os.path.join(folder, fname +'.txt'),'w+')
-	txtfile.write(str(doclist))
+	dict_list = [pprint_dict(d) for d in doclist]	
+	
+	txtfile = open(os.path.join(folder, fname +'.txt'),'w+')	
+	txtfile.write('[\n' + ',\n'.join(dict_list) + '\n]')
 	txtfile.close()
+
 
 # ==============================================================================
 # Create seperate files for code
 # ==============================================================================
 
 def separate_code_files(doclist, folder, code_type):
-	return
 	
 	import os
 	import webnotes
 	# code will be in the parent only
 	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
+	
 	for code_field in code_fields:
 		if doclist[0].get(code_field[0]):
-			fname = (code_type and scrub(doclist[0]['name'])) or doclist[0]['name']
-			fname = fname.replace('/','-')  #Weirdly, doesn't work..using a hack instead.
+			#fname = (code_type and scrub(doclist[0]['name'])) or doclist[0]['name']
+			#fname = fname.replace('/','-')  #Weirdly, doesn't work..using a hack instead.
 			# 2 htmls
-			if code_field[0]=='static_content':
-				fname+=' Static'
+			#if code_field[0]=='static_content':
+			#	fname+=' Static'
 			# write the file
-			codefile = open(os.path.join(folder, fname+'.'+code_field[1]),'w+')
-			codefile.write(doclist[0][code_field[0]])
-			codefile.close()
+			#codefile = open(os.path.join(folder, fname+'.'+code_field[1]),'w+')
+			#codefile.write(doclist[0][code_field[0]])
+			#codefile.close()
 		
 			# clear it from the doclist
 			doclist[0][code_field[0]] = None

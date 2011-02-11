@@ -212,7 +212,7 @@ this.cell.hide();else
 this.cell.show();this.set_hidden=this.df.hidden;}}}
 _f.SectionBreak=function(){this.set_input=function(){};}
 _f.SectionBreak.prototype.make_row=function(){this.row=this.df.label?this.frm.layout.addrow():this.frm.layout.addsubrow();}
-_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var div=$a(head,'div','',{padding:'4px 4px',backgroundColor:'#EEE'});$gr(div,'#DDD','#CCC');$br(div,'3px');this.chk=$a_input(div,'checkbox',null,{marginRight:'8px'})
+_f.SectionBreak.prototype.make_collapsible=function(head){var me=this;var div=$a(head,'div','',{padding:'4px 4px',backgroundColor:'#EEE'});$gr(div,'#DDD','#CCC');$br(div,'3px');if(cur_frm.meta.in_dialog)$y(div,{marginLeft:'8px'});this.chk=$a_input(div,'checkbox',null,{marginRight:'8px'})
 this.label=$a(div,'span','',{fontSize:'16px',fontFamily:'Georgia'});this.label.innerHTML=this.df.label?this.df.label:'';var d=this.df.description;if(d){this.desc_area=$a(div,'span','',{color:'#888',marginLeft:'8px'});this.desc_area.innerHTML=d.substr(0,80)+(d.length>80?'...':'');}
 this.chk.onclick=function(){if(this.checked)me.expand();else me.collapse();}
 this.expand=function(){$(me.row.main_body).slideDown();}
