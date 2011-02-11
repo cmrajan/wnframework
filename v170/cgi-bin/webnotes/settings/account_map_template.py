@@ -4,23 +4,35 @@
 
 default_db_name = "db_name"
 
-ac_name_map = {'main_instance':'my_db'}
+db_name_map = {'':''}
+#{'main_acc_name';'db_name'}
 
 # without www
-domain_name_map = {'example.com': 'my_db'}
+domain_name_map = {'':''}
+#domain {'domain':'db_name'}
 
 #deleted status
-ac_deleted_map = {'':''}
+deleted_map = {'':''}
+#deleted {'ac_name':0/1}
+
 
 #last backup time
 last_backup_map = {'':''}
+#last_backup {'ac_name':'last_backup_utctime_int'}
+
 
 #allocated status
-allocated_map = {'':''}
+allocated_list = []
+#alloc_list = [allocated dbs]
 
 #trial_or_paid status
 trial_or_paid_map = {'':''}
+#trial_or_paid_map {'ac_name': trial/paid}
 
 #expiry_date_status
 expiry_date_map = {'':''}
+#expiry_date_map {'ac_name':'expiry_date'}
 
+#timezone map
+time_zone_map = {'':''}
+#time_zone_map {'ac_name':'time_zone'}

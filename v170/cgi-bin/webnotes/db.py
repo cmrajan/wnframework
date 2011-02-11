@@ -31,7 +31,7 @@ class Database:
 
 	def get_db_login(self, ac_name):
 		from webnotes.settings import account_map		
-		return account_map.ac_name_map.get(ac_name, account_map.default_db_name)
+		return account_map.db_name_map.get(ac_name, account_map.default_db_name)
 
 	def connect(self):
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)

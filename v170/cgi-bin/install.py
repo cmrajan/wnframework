@@ -11,19 +11,39 @@ def copy_template_to_py(template_path,target_path):
 		
 		ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
 		assert ret == 0 
-		print ret
+
 	except Exception,ret:
 		print ret
-#--------------------------------------------------------------
 
+
+# -------------------------------------------------------------
+
+def rewrite_account_map(db_name_map={}, domain_name_map={}, default_db_name=None):
+	import datetime
+	fn = account_map.__file__
+	if fn.endswith('c'): fn = fn[:-1] # for .pyc
+	f = open(fn, 'w')
+	f.write('# Account/Domain Name to Database Mapping file\n')
+	f.write('# --------------------------------------------\n')
+	f.write('# last updated on: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+	f.write('\n\ndefault_db_name = "%s"' % (default_db_name or account_map.default_db_name or account_map.db_name_map.keys()[0]))
+	f.write('\n\ndb_name_map = %s' % str(db_name_map or account_map.db_name_map))
+	f.write('\n\n# without www')
+	f.write('\ndomain_name_map = %s' % str(domain_name_map or account_map.domain_name_map))
+	f.close()
+#--------------------------------------------------------------
 try:
 	from webnotes.settings import account_map
 except ImportError:
 	template_path = os.path.join(os.getcwd(),'webnotes','settings','account_map_template.py')
 	py_path = os.path.join(os.getcwd(),'webnotes','settings','account_map.py')
 	copy_template_to_py(template_path,py_path)
+	
+
+
 
 from webnotes.settings import account_map
+
 
 def copy_db(source, target=''):
 	import webnotes.defs
@@ -128,52 +148,35 @@ def import_db(source, target='', is_accounts=0):
 
 # -------------------------------------------------------------
 
-def get_source_path(s):
+def get_source_path(source_path):
 	import os
-	
+		
 	cwd = os.path.split(os.getcwd())[-1]
-	
-	if cwd == 'cgi-bin':
-		f = '../data/' + s + '.sql'
-	elif cwd == 'data':
-		f = target + '.sql'
-	else:
-		f = 'data/' + s + '.sql'
+	if not os.path.exists(source_path):
+		if cwd == 'cgi-bin':
+			source_path = '../data/' + source_path + '.sql'
+		else:
+			source_path = 'data/' + s + '.sql'
 		
 	# check if exists
-	if os.path.exists(f):
-		return f
+	if os.path.exists(source_path):
+		return source_path
 	else:
-		raise Exception, "Target file '%s' does not exist" % f
+		raise Exception, "Target file '%s' does not exist" % source_path
 
-# -------------------------------------------------------------
-
-def rewrite_account_map(ac_name_map={}, domain_name_map={}, default_db_name=None):
-	import datetime
-	fn = account_map.__file__
-	if fn.endswith('c'): fn = fn[:-1] # for .pyc
-	f = open(fn, 'w')
-	f.write('# Account/Domain Name to Database Mapping file\n')
-	f.write('# --------------------------------------------\n')
-	f.write('# last updated on: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-	f.write('\n\ndefault_db_name = "%s"' % (default_db_name or account_map.default_db_name))
-	f.write('\n\nac_name_map = %s' % str(ac_name_map or account_map.ac_name_map))
-	f.write('\n\n# without www')
-	f.write('\ndomain_name_map = %s' % str(domain_name_map or account_map.domain_name_map))
-	f.close()
 	
 # -------------------------------------------------------------
 
 def create_account_record(ac_name, newdb, domain=''):
 	
-	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
+	if not getattr(account_map, 'db_name_map'): account_map.db_name_map = {}
 	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}
 
-	account_map.ac_name_map.update({ac_name : newdb})
+	account_map.db_name_map.update({ac_name : newdb})
 	if domain:
 		account_map.domain_name_map.update({domain: newdb})
 		
-	rewrite_account_map(account_map.ac_name_map,account_map.domain_name_map,account_map.default_db_name)
+	rewrite_account_map(account_map.db_name_map,account_map.domain_name_map,account_map.default_db_name)
 
 
 # -------------------------------------------------------------
@@ -191,12 +194,12 @@ def create_account(source,ac_name=None):
 	sql = conn.sql
 		
 	if not ac_name:
-		if not getattr(account_map,'ac_name_map',None):
+		if not getattr(account_map,'db_name_map',None):
 			ac_name = "ax0000001"
 			
 		else:
 			
-			ac = account_map.ac_name_map.keys()
+			ac = account_map.db_name_map.keys()
 			ac.sort()
 			ac = ac[-1:]
 			ac_name = ac[0][:2]+cstr(cint(ac[0][2:])+1)
@@ -234,27 +237,50 @@ def create_log_folder(path):
 
 def build_account_map():
 	
+	import sys,os
+
+	sys.path.append(os.getcwd())
+		
+
 	from webnotes.db import Database
-	if not getattr(account_map, 'ac_name_map'): account_map.ac_name_map = {}
+	import webnotes.defs
+
+	if not getattr(account_map, 'db_name_map'): account_map.db_name_map = {}
 	if not getattr(account_map, 'domain_name_map'): account_map.domain_name_map = {}	
-	
+	conn = Database(user=webnotes.defs.root_login, password=webnotes.defs.root_password)
 	try:
 		
-		conn = Database(user='accounts')
-		for ac in conn.sql("select ac_name, db_name,allocated,deleted,last_backup,trial_or_paid,expiry_date,timezone from tabAccount"):
+		conn = Database(user = webnotes.defs.root_login,password = webnotes.defs.root_password)
 
-			account_map.ac_name_map.update({ac[0]:ac[1]})
-			account_map.ac_allocated_map.update({ac[0]:ac[2]})
-			acccount_map.ac_deleted_map.update({ac[0]:ac[3])
-			account_map.ac_last_backup_map.update({ac[0]:ac[4]})
-			account_map.ac_trial_or_paid_map.update({ac[0]:ac[5]})
-			account_map.ac_expiry_date_map.update({ac[0]:ac[6]})
-			account_map.ac_timezone_map.update({ac[0]:ac[7]})
+		conn.use('accounts')
+		for ac in conn.sql("select ac_name, db_name,allocated,deleted,last_backup,trial_or_paid,expiry_date from tabAccount"):
+		
+			account_map.db_name_map.update({ac[0]:ac[1]})
+			if ac[2] == 1:
+				account_map.allocated_list.append(ac[0])
+			if ac[3]:
+				account_map.deleted_map.update({ac[0]:ac[3]})
+			else:
+				account_map.deleted_map.update({ac[0]:None})
+			if ac[4]:
+				account_map.last_backup_map.update({ac[0]:ac[4]})
+			else:
+				account_map.last_backup_map.update({ac[0]:None})
+
+			account_map.trial_or_paid_map.update({ac[0]:ac[5]})
+			account_map.expiry_date_map.update({ac[0]:ac[6]})
+
+			conn.use(account_map.db_name_map[ac[0]])
+			print ac
+			account_map.time_zone_map.update({ac[0]:conn.get_value('Control Panel',None,'time_zone') or 'Asia/Calcutta'})
+			
+		conn.close()
 
 	except Exception,e:
 		raise e
 	
-	rewrite_account_map(account_map.ac_name_map,account_map.domain_name_map,account_map.default_db_name)
+	account_map.default_db_name = account_map.db_name_map.keys().sort()[0]
+	rewrite_account_map(account_map.db_name_map,account_map.domain_name_map,account_map.default_db_name)
 
 
 
