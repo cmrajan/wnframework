@@ -40,15 +40,15 @@ def get_folder_paths(modules, record_list):
 	import webnotes
 	import fnmatch
 	import webnotes.defs
-	from webnotes.modules import transfer_types
+	from webnotes.modules import transfer_types, get_module_path, scrub
 
 	folder_list=[]
 
 	# get the folder list
 	if record_list:
 		for record in record_list:
-			folder_list.append(os.path.join(webnotes.defs.modules_path, \
-				record[0], record[1], record[2].replace('/','_')))
+			folder_list.append(os.path.join(get_module_path(record[0]), \
+				record[1], record[2].replace('/','_')))
 
 	if modules:
 		# system modules will be transferred in a predefined order and before all other modules
