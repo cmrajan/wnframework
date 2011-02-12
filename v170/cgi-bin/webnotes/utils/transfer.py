@@ -1,9 +1,9 @@
-import webnotes
 
 # =============================================================================
 # Import a record (with its chilren)
 # =============================================================================
 def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
+	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model.code import get_obj
 	from webnotes.model.code import get_server_obj
@@ -100,6 +100,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 # Transfer DocType
 # =============================================================================
 def merge_doctype(doc_list, ovr, ignore, onupdate):
+	import webnotes
 	from webnotes.model.doc import Document
 	from webnotes.model import doclist
 	from webnotes.utils import cint
@@ -187,6 +188,7 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 
 
 def re_index_doctype(module, dt):
+	import webnotes
 	from webnotes.defs import modules_path
 	
 	import os
@@ -211,6 +213,8 @@ def re_index_doctype(module, dt):
 # ----------------
 
 def get_extra_fields(doclist, dt):
+	import webnotes
+	
 	prev_field, prev_field_key = '', ''
 	extra = []
 	
@@ -233,6 +237,8 @@ def get_extra_fields(doclist, dt):
 # -----------------------
 
 def fix_extra_fields(extra, dt):
+	import webnotes
+
 	# push fields down at new idx
 	for e in extra:
 		# get idx of the prev to extra field
@@ -250,12 +256,15 @@ def fix_extra_fields(extra, dt):
 # --------------------
 
 def clear_section_breaks(dt):
+	import webnotes
+
 	webnotes.conn.sql("delete from tabDocField where fieldtype in ('Section Break', 'Column Break', 'HTML') and parent=%s", dt)
 
 # add section breaks and renum
 # ----------------------------
 
 def add_section_breaks_and_renum(doclist, dt):
+	import webnotes
 	from webnotes.model.doc import Document
 	for d in doclist:
 		if d.get('parentfield')=='fields':
