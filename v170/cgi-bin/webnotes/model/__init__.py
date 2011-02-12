@@ -11,7 +11,8 @@ def delete_doc(doctype, name):
 	tablefields = webnotes.model.meta.get_table_fields(doctype)
 	
 	# check if submitted
-	if int(webnotes.conn.sql("select docstatus from `tab%s` where name=%s" % (doctype, '%s'), name)[0][0])==1:
+	d = webnotes.conn.sql("select docstatus from `tab%s` where name=%s" % (doctype, '%s'), name)
+	if d and int(d[0][0]) == 1:
 		webnotes.msgprint("Submitted Record '%s' '%s' cannot be deleted" % (doctype, name))
 		raise Exception
 	
