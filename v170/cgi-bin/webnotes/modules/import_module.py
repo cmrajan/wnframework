@@ -64,7 +64,7 @@ def get_folder_paths(modules, record_list):
 			
 			# build the folders
 			for d in all_transfer_types:
-				if d != 'files':
+				if d not in  ('files', 'startup', 'patches'):
 					# get all folders inside type
 					folder_list+=listfolders(os.path.join(webnotes.defs.modules_path, module, d))
 
@@ -205,36 +205,6 @@ def update_module_timestamp_query(mod, timestamp):
 	webnotes.conn.sql("update `tabModule Def` set last_updated_date=%s where name=%s", (timestamp, mod))
 	webnotes.conn.sql("commit")
 
-# =============================================================================
-# Sync control panel
-# =============================================================================
-def import_control_panel():
-	from webnotes.utils import transfer
-	import os
-	import webnotes.defs
-	
-	startup_code = startup_css = ''
-	folder = os.path.join(webnotes.defs.modules_path, 'system','control_panel','control_panel')
-	
-	# js
-	try:
-		file = open(os.path.join(folder, 'control_panel.js'),'r')
-		startup_code = file.read()
-		file.close()
-	except OSError, e:
-		pass
-	
-	# css
-	try:
-		file = open(os.path.join(folder, 'control_panel.css'),'r')
-		startup_css = file.read()
-		file.close()
-	except OSError, e:
-		pass
-
-
-	transfer.sync_control_panel(startup_code, startup_css)
-	return "Control Panel Synced"
 
 # =============================================================================
 # Import Attachments

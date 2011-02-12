@@ -4,7 +4,7 @@
 
 updated_modules = []
 
-from webnotes.modules import scrub
+from webnotes.modules import scrub, get_module_path
 
 def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, verbose=1, record_module=None):
 	# Multiple doctype  and multiple modules export to be done
@@ -79,7 +79,7 @@ def write_attachments(m):
 def write_module_info(mod):
 	import webnotes.utils, os
 
-	file = open(os.path.join(webnotes.defs.modules_path, scrub(mod), 'module.info'), 'w')
+	file = open(os.path.join(get_module_path(mod), 'module.info'), 'w')
 	file.write(str({'update_date': webnotes.utils.now()}))
 	file.close()
 	
@@ -122,6 +122,7 @@ def get_module_items(mod):
 # ==============================================================================
 # build a list of doclists of items in that module and send them
 # ==============================================================================
+
 def get_module_doclist(module):
 	import webnotes
 	import webnotes.model.doc
@@ -146,22 +147,21 @@ def get_module_doclist(module):
 # Create __init__.py files
 # ==============================================================================
 
-def create_init_py(module, dt, dn):
+def create_init_py(modules_path, dt, dn):
 	import os
-	from webnotes.defs import modules_path
 	from webnotes.modules import scrub
 	
 	# in module
-	if not '__init__.py' in os.listdir(os.path.join(modules_path, scrub(module))):
-		open(os.path.join(modules_path, scrub(module), '__init__.py'), 'w').close()
+	if not '__init__.py' in os.listdir(modules_path):
+		open(os.path.join(modules_path, '__init__.py'), 'w').close()
 
 	# in type and name folders
-	if dt in ['DocType', 'Page', 'Search Criteria']:
-		if not '__init__.py' in os.listdir(os.path.join(modules_path, scrub(module), scrub(dt))):
-			open(os.path.join(modules_path, scrub(module), scrub(dt), '__init__.py'), 'w').close()
+	if dt in ['doctype', 'page', 'search_criteria']:
+		if not '__init__.py' in os.listdir(os.path.join(modules_path, dt)):
+			open(os.path.join(modules_path, dt, '__init__.py'), 'w').close()
 
-		if not '__init__.py' in os.listdir(os.path.join(modules_path, scrub(module), scrub(dt), scrub(dn))):
-			open(os.path.join(modules_path, scrub(module), scrub(dt), scrub(dn), '__init__.py'), 'w').close()
+		if not '__init__.py' in os.listdir(os.path.join(modules_path, dt, dn)):
+			open(os.path.join(modules_path, dt, dn, '__init__.py'), 'w').close()
 
 
 # ==============================================================================
@@ -170,24 +170,27 @@ def create_init_py(module, dt, dn):
 
 def create_folder(module, dt, dn):
 	import webnotes, os
-	from webnotes.defs import modules_path
 	
-	# create folder
+	# get module path by importing the module
+	modules_path = get_module_path(module)
+			
 	code_type = dt in ['DocType', 'Page', 'Search Criteria']
 	
-	folder = os.path.join(modules_path, scrub(module), \
-		code_type and scrub(dt) or dt, code_type and scrub(dn) or dn)
+	# create folder
+	folder = os.path.join(modules_path, code_type and scrub(dt) or dt, code_type and scrub(dn) or dn)
 	
 	webnotes.create_folder(folder)
 	
 	# create init_py_files
-	create_init_py(module, dt, dn)
+	if code_type:
+		create_init_py(modules_path, scrub(dt), scrub(dn))
 	
-	return os.path.join(modules_path, scrub(module), scrub(dt), scrub(dn))
+	return folder
 
 # ==============================================================================
 # Write doclist into file
 # ==============================================================================
+
 def write_document_file(doclist, record_module=None):
 	import os
 	from webnotes.utils import pprint_dict

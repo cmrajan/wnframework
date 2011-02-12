@@ -110,15 +110,19 @@ def get_letter_heads():
 			return {}
 		else:
 			raise Exception, e
-			
+
 # ==================================================
+# load startup.js and startup.css from the modules/startup folder
 
 def load_startup(cp):
 	from webnotes.modules import compress
-	from webnotes.model.code import get_code
-	
-	cp.startup_code = compress.get_js_code('system','Control Panel','Control Panel')
-	cp.startup_css = get_code('system','Control Panel','Control Panel','css')
+	from webnotes.defs import modules_path
+	import os
+
+	cp.startup_code = compress.get_js_code(os.path.join(modules_path, 'startup', 'startup'))
+	startup_css = open(os.path.join(modules_path, 'startup', 'startup.css'), 'r')
+	cp.startup_css = startup_css.read()
+	startup_css.close()
 
 # build it
 # ==================================================

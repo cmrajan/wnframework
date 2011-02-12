@@ -17,6 +17,7 @@ class Page:
 
 		doc.script = None
 		doc.fields['__script'] = compress.get_page_js(self.name)
+				
 		if doc.standard!='No':
 			doc.content = get_code(doc.module, 'page', doc.name, 'html')
 			doc.style = get_code(doc.module, 'page', doc.name, 'css')

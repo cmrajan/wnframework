@@ -164,8 +164,7 @@ def check_syntax(code):
 
 #===================================================================================
 def get_code(module, dt, dn, extn, is_static=None):
-	from webnotes.defs import modules_path
-	from webnotes.modules import scrub
+	from webnotes.modules import scrub, get_module_path
 	import os, webnotes
 	
 	# get module (if required)
@@ -183,7 +182,7 @@ def get_code(module, dt, dn, extn, is_static=None):
 
 	# code
 	try:
-		file = open(os.path.join(modules_path, scrub(module), dt, dn, fname), 'r')
+		file = open(os.path.join(get_module_path(scrub(module)), dt, dn, fname), 'r')
 	except IOError, e:
 		return ''
 		

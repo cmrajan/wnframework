@@ -1,17 +1,12 @@
 # load "compressed" js code from modules
 #==============================================================================
 
-def get_js_code(module, dt, dn, extn='js'):
-	from webnotes.defs import modules_path
+def get_js_code(fn, extn='js'):
+	import webnotes
 	from webnotes.modules import scrub, get_file_timestamp
-	import os
 
-	# source and compressed file paths
-	if dt != 'Control Panel':
-		dt, dn = scrub(dt), scrub(dn)
-			
-	src_file_name = os.path.join(modules_path, scrub(module), dt, dn, dn) + '.' + extn
-	comp_file_name = os.path.join(modules_path, scrub(module), dt, dn, dn) + '.comp.' + extn
+	src_file_name = fn + '.' + extn
+	comp_file_name = fn + '.comp.' + extn
 
 	src_timestamp = get_file_timestamp(src_file_name)
 	
@@ -39,11 +34,14 @@ def sub_get_doctype_js(match):
 	return get_doctype_js(name)
 
 def get_doctype_js(dt):
-	import webnotes
+	import webnotes, os
+	from webnotes.modules import scrub, get_module_path
 	
 	dt_details = webnotes.conn.sql('select module, client_script from tabDocType where name = %s', dt)
+	module = scrub(dt_details[0][0])
 
-	code = get_js_code(dt_details[0][0], 'DocType', dt) + '\n' + (dt_details[0][1] or '')
+	code = get_js_code(os.path.join(get_module_path(module), 'doctype', scrub(dt), scrub(dt))) \
+		+ '\n' + (dt_details[0][1] or '')
 	
 	# compile for import
 	if code.strip():
@@ -62,11 +60,13 @@ def sub_get_page_js(match):
 	return get_page_js(name)
 
 def get_page_js(page):
-	import webnotes
+	import webnotes, os
+	from webnotes.modules import scrub, get_module_path
 
 	dt_details = webnotes.conn.sql('select module from tabPage where name = %s', page)
+	module = scrub(dt_details[0][0])
 
-	code = get_js_code(dt_details[0][0], 'Page', page)
+	code = get_js_code(os.path.join(get_module_path(module), 'page', scrub(page), scrub(page)))
 	
 	# compile for import
 	if code.strip():

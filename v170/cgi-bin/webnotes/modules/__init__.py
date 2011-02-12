@@ -12,3 +12,18 @@ def get_file_timestamp(fn):
 			raise e
 		else:
 			return None
+			
+def get_module_path(module):
+	import webnotes.defs, os, os.path
+	
+	# get module path by importing the module
+	modules_path = os.path.join(webnotes.defs.modules_path, scrub(module))
+	
+	try:
+		exec ('import ' + scrub(module)) in locals()
+		modules_path = eval(scrub(module) + '.__file__')
+		modules_path = os.path.sep.join(modules_path.split(os.path.sep)[:-1])
+	except ImportError, e:
+		pass
+
+	return modules_path

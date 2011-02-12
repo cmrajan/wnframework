@@ -1,0 +1,26 @@
+[
+	{
+		'content': None,
+		'creation': '2010-11-30 17:25:41',
+		'docstatus': 0,
+		'doctype': 'Page',
+		'icon': None,
+		'idx': None,
+		'menu_index': None,
+		'modified': '2010-12-31 15:57:48',
+		'modified_by': 'Administrator',
+		'module': 'Core',
+		'name': 'Login Page',
+		'owner': 'Administrator',
+		'page_name': 'Login Page',
+		'parent': None,
+		'parent_node': None,
+		'parentfield': None,
+		'parenttype': None,
+		'script': None,
+		'show_in_menu': None,
+		'standard': 'Yes',
+		'static_content': None,
+		'style': ''
+	}
+]
