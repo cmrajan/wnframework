@@ -78,13 +78,9 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 			pass # ignore tables
 	
 	if onupdate:
-		if doc.doctype=='DocType':
-			import webnotes.model.doctype
-			webnotes.model.doctype.update_doctype(dl)
-		else:
-			so = get_server_obj(doc, dl)
-			if hasattr(so, 'on_update'):
-				so.on_update()
+		so = get_server_obj(doc, dl)
+		if hasattr(so, 'on_update'):
+			so.on_update()
 			
 		
 	# reset modified
