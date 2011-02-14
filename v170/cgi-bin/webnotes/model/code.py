@@ -170,9 +170,9 @@ def get_code(module, dt, dn, extn, is_static=None):
 	# get module (if required)
 	if not module:
 		module = webnotes.conn.sql("select module from `tab%s` where name=%s" % (dt,'%s'),dn)[0][0]
-		
+	
 	# file names
-	if dt != 'Control Panel':
+	if scrub(dt) in ('page','doctype','search_criteria'):
 		dt, dn = scrub(dt), scrub(dn)
 
 	# get file name
@@ -180,11 +180,13 @@ def get_code(module, dt, dn, extn, is_static=None):
 	if is_static:
 		fname = dn + '_static.' + extn
 
+
 	# code
 	try:
 		file = open(os.path.join(get_module_path(scrub(module)), dt, dn, fname), 'r')
 	except IOError, e:
 		return ''
+		
 		
 	code = file.read()
 	file.close()

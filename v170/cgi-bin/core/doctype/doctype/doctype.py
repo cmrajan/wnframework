@@ -49,4 +49,6 @@ class DocType:
 		from webnotes.modules.export_module import export_to_files
 		export_to_files(record_list=[['DocType', self.doc.name]])
 		
-		
+	def import_doc(self):
+		from webnotes.modules.import_module import import_from_files
+		import_from_files(record_list=[[self.doc.module, 'doctype', self.doc.name]])		

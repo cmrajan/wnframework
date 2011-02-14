@@ -997,6 +997,7 @@ _f.Frm.prototype.runclientscript = function(caller, cdt, cdn) {
 	}
 
 	if(caller && caller.toLowerCase()=='setup') {
+
 		var doctype = get_local('DocType', this.doctype);
 		var cs = doctype.__client_script ? doctype.__client_script : (doctype.client_script_core + doctype.client_script);
 		if(cs) {

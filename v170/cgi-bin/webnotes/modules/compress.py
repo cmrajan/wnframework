@@ -40,9 +40,9 @@ def get_doctype_js(dt):
 	dt_details = webnotes.conn.sql('select module, client_script from tabDocType where name = %s', dt)
 	module = scrub(dt_details[0][0])
 
-	code = get_js_code(os.path.join(get_module_path(module), 'doctype', scrub(dt), scrub(dt))) \
+	code = get_js_code(os.path.join(get_module_path(scrub(module)), 'doctype', scrub(dt), scrub(dt))) \
 		+ '\n' + (dt_details[0][1] or '')
-	
+		
 	# compile for import
 	if code.strip():
 		import re

@@ -2,6 +2,22 @@ class DocType:
   def __init__(self, d, dl):
     self.doc, self.doclist = d,dl
 
+  def autoname(self):
+    self.doc.name = self.doc.page_name.lower().replace(' ', '-')
+
+  def onload(self):
+    import os
+    from webnotes.modules import get_module_path, scrub
+    
+    # load content
+    try:
+      file = open(os.path.join(get_module_path(self.doc.module), 'page', scrub(self.doc.name) + '.html'), 'r')
+      self.doc.content = file.read() or ''
+      file.close()
+    except IOError, e: # no file / permission
+      if e.args[0]!=2:
+        raise e
+
   # replace $image
   # ------------------
   def validate(self):
@@ -17,5 +33,15 @@ class DocType:
     
   # export
   def on_update(self):
-	from webnotes.modules.export_module import export_to_files
-	webnotes.msgprint(export_to_files(record_list=[['Page', self.doc.name]]))
+    from webnotes.modules.export_module import export_to_files
+    from webnotes.modules import get_module_path, scrub
+    import os
+	
+    export_to_files(record_list=[['Page', self.doc.name]])
+	
+    if self.doc.write_content:
+      file = open(os.path.join(get_module_path(self.doc.module), 'page', scrub(self.doc.name), scrub(self.doc.name) + '.html'), 'w')
+      file.write(self.doc.content)
+      file.close()
+      
+ 

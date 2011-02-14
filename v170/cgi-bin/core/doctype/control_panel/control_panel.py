@@ -1,18 +1,13 @@
 # Please edit this list and import only required elements
 import webnotes
 
-from webnotes.utils import add_days, add_months, add_years, cint, cstr, date_diff, default_fields, flt, fmt_money, formatdate, generate_hash, getTraceback, get_defaults, get_first_day, get_last_day, getdate, has_common, month_name, now, nowdate, replace_newlines, sendmail, set_default, str_esc_quote, user_format, validate_email_add
-from webnotes.model import db_exists
-from webnotes.model.doc import Document, addchild, removechild, getchildren, make_autoname, SuperDocType
-from webnotes.model.doclist import getlist, copy_doclist
-from webnotes.model.code import get_obj, get_server_obj, run_server_obj, updatedb, check_syntax
+from webnotes.utils import cint, flt
+from webnotes.model.doc import Document
+from webnotes.model.code import get_obj
 from webnotes import session, form, is_testing, msgprint, errprint
 
-set = webnotes.conn.set
 sql = webnotes.conn.sql
 get_value = webnotes.conn.get_value
-in_transaction = webnotes.conn.in_transaction
-convert_to_lists = webnotes.conn.convert_to_lists
 	
 # -----------------------------------------------------------------------------------------
 
@@ -95,7 +90,8 @@ class DocType:
 			webnotes.session['data']['login_from'] = webnotes.form.getvalue('login_from')
 
 	def on_logout(self, login_manager):
-		get_obj('SSO Control').logout_sso()
+		if cint(webnotes.conn.get_value('Control Panel', None, 'sync_with_gateway')):
+			get_obj('SSO Control').logout_sso()
 
 	def login_as(self, user, login_manager):
 		import os
@@ -119,7 +115,3 @@ class DocType:
 				p.password = pr['message']['password']
 				p.enabled = 0
 				p.owner = user
-				#if not in_transaction:
-					#sql("START TRANSACTION")
-				#p.save(1)
-				#sql("COMMIT")

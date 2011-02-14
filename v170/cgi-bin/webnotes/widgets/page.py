@@ -17,17 +17,51 @@ class Page:
 
 		doc.script = None
 		doc.fields['__script'] = compress.get_page_js(self.name)
-				
+
 		if doc.standard!='No':
-			doc.content = get_code(doc.module, 'page', doc.name, 'html')
+			template = '%(content)s'
+			# load code from template
+			if doc.template:
+				template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html')
+
+			doc.content = template % {'content':get_code(doc.module, 'page', doc.name, 'html')}
 			doc.style = get_code(doc.module, 'page', doc.name, 'css')
+
 		
-		if doc.fields.get('content') and doc.content.startswith('#python'):
+		# execute content
+		if doc.content and doc.content.startswith('#python'):
 			doc.fields['__content'] = webnotes.model.code.execute(doc.content)
+			
+		# add stylesheet
+		if doc.stylesheet:
+			doclist += self.load_stylesheet(doc.stylesheet)
+			
 		return doclist
+
+	def load_stylesheet(self, stylesheet):
+		import webnotes
+		# load stylesheet
+		loaded = eval(webnotes.form_dict.get('stylesheets') or '[]')
+		if not stylesheet in loaded:
+			import webnotes.model.doc
+			from webnotes.model.code import get_code
+			
+			# doclist
+			sslist = webnotes.model.doc.get('Stylesheet', stylesheet)
+			
+			# stylesheet from module
+			sslist[0].stylesheet = get_code(sslist[0].module, 'Stylesheet', stylesheet, 'css')
+			return sslist
+		else:
+			return []
 
 def get(name):
 	return Page(name).load()
 
 def getpage():
-	webnotes.response['docs'] = get(webnotes.form.getvalue('name'))
+	doclist = get(webnotes.form.getvalue('name'))
+		
+	# send
+	webnotes.response['docs'] = doclist
+	
+	

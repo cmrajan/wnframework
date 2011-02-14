@@ -74,6 +74,7 @@ def getdoctype():
 	# load search criteria for reports (all)
 	doclist += webnotes.model.meta.get_search_criteria(dt)
 
+
 	webnotes.response['docs'] = doclist
 
 #===========================================================================================

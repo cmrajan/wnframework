@@ -12,14 +12,13 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
   <title>%(title)s</title>
   <link type="text/css" rel="stylesheet" href="css/jquery-ui.css">
   <link type="text/css" rel="stylesheet" href="css/default.css">
-  <link type="text/css" rel="stylesheet" href="css/user.css">
   <link rel="Shortcut Icon" href="/favicon.ico">
   
   <script language="JavaScript" src="js/jquery/jquery.min.js"></script>
   <script language="JavaScript" src="js/jquery/jquery-ui.min.js"></script>
   <script type="text/javascript" src="js/tiny_mce_33/jquery.tinymce.js"></script>
   <script language="JavaScript" src="js/wnf.compressed.js"></script>
-  <script language="JavaScript" src="js/form.compressed.js"></script>
+  %(import_form)s
   <script language="JavaScript">var _startup_data = %(startup_data)s;</script>
   <!--[if IE]><script language="javascript" type="text/javascript" src="js/jquery/excanvas.min.js"></script><![endif]-->
   %(add_in_head)s
@@ -59,27 +58,64 @@ Redirecting...
 </BODY>
 </HTML>'''
 
+page_properties = {
+	'add_in_head':'',
+	'add_in_body':'',
+	'keywords':'',
+	'site_description':'',
+	'title':'',
+	'content':'',
+	'startup_data':'{}',
+	'import_form':'<script language="JavaScript" src="js/form.compressed.js"></script>'
+}
+
+
 import webnotes
 
+# remove 'id' attributes so they don't conflict
+# ---------------------------------------------
+def replace_id(match):
+	#webnotes.msgprint(match.group('name'))
+	return ''
+	
+def scrub_ids(content):
+	import re
+	
+	p = re.compile('id=\"(?P<name> [^\"]*)\"', re.VERBOSE)
+	content = p.sub(replace_id, content)
+
+	p = re.compile('id=\'(?P<name> [^\']*)\'', re.VERBOSE)
+	content = p.sub(replace_id, content)
+	
+	return content
+
+# load the page content and meta tags
+# -----------------------------------
 def get_page_content(page):
 	from webnotes.model.code import get_code
+	from webnotes.model.doc import Document
+	
 	if not page:
 		return 'No Title', 'No Content'
-	
-	content = get_code(None, 'Page', page, 'html', 1) or 'No static content'
 
-	# title
-	if webnotes.conn.sql("select name from tabDocField where fieldname='page_title' and parent='Page'"):
-		title = webnotes.conn.sql("select page_title from tabPage where name=%s", page)[0][0]
-	else:
-		title = page
-	
+	page_doc = Document('Page', page)
+
+	# page meta-tags
+	page_properties['page_title'] = page_doc.page_title or page_doc.name
+	page_properties['keywords'] = page_doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
+	page_properties['site_description'] = page_doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+
+	# content
+	content = get_code(page_doc.module, 'Page', page, 'html')
+		
 	# dynamic (scripted) content
 	if content and content.startswith('#python'):
 		content = webnotes.model.code.execute(content)
 
-	return title, content
+	page_properties['content'] = scrub_ids(content)
 
+# load the form as page (deprecated)
+# -----------------------------------
 def get_doc_content(dt, dn):
 	import webnotes.model.code
 	
@@ -94,12 +130,14 @@ def get_doc_content(dt, dn):
 	else:
 		return 'Forbidden - 404', '<h1>Forbidden - 404</h1>'
 
-def get_static_content():
+# find the page to load as static
+# -------------------------------
+
+def load_properties():
 	import webnotes.widgets.page
 	import urllib
 
-	form = webnotes.form
-	page_url = form.getvalue('page', '')
+	page_url = webnotes.form_dict.get('_escaped_fragment_', '')
 	
 	if page_url:
 		page_url = [urllib.unquote(i) for i in page_url.split('/')]		
@@ -108,54 +146,26 @@ def get_static_content():
 			
 	content = ''
 	
-	# generate the page
+	# load content
 	# -----------------	
 	if page_url[0] == 'Page':
-		title, content = get_page_content(page_url[1])
-		
-	elif page_url[0] == 'Form' and len(page_url)==3:
-		title, content = get_doc_content(page_url[1], page_url[2])
-		
-	else:
-		title, content = get_page_content(webnotes.user.get_home_page())
-	
-	content_html = content
+		get_page_content(page_url[1])
 
-	return title, content_html
-
-# generate the index.cgi file
-# ---------------------------
-
+# generate the page
+# -----------------
 def get():
 	import webnotes
 	no_startup = webnotes.form.getvalue('no_startup') or None
 
 	global index_template
-	import webnotes.model.code
 	import webnotes.session_cache
 	try:
 		import json
 	except: # python 2.4
 		import simplejson as json
-		
-	template, add_in_head, add_in_body = index_template, '', ''
-	cp = webnotes.model.code.get_obj('Control Panel', 'Control Panel')
-	if hasattr(cp, 'get_index_template'):
-		template = cp.get_index_template()
-		
-	if hasattr(cp, 'add_in_head'):
-		add_in_head = cp.add_in_head()
-
-	if hasattr(cp, 'add_in_body'):
-		add_in_body = cp.add_in_body()
 	
-	if '%(content)s' in template:
-
-		# for SEO
-		# -------
-		title, content = get_static_content()
-		keywords = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
-		site_description = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+	if '%(content)s' in index_template:
+		load_properties()
 		
 		# load the session data
 		# ---------------------
@@ -168,16 +178,12 @@ def get():
 		# add debug messages
 		sd['server_messages'] = '\n--------------\n'.join(webnotes.message_log)
 		
-		sd = no_startup and '{}' or json.dumps(sd)
+		page_properties['startup_data'] = no_startup and '{}' or json.dumps(sd)
 		
-		template = template % {
-			'title':title
-			,'content':content
-			,'keywords':keywords
-			,'site_description':site_description
-			,'add_in_head':add_in_head
-			,'add_in_body':add_in_body
-			,'startup_data':sd
-		}
+		# no form api required for guests
+		if webnotes.session['user']=='Guest':
+			page_properties['import_form'] = ''
 		
-	return template
+		index_template = index_template % page_properties
+		
+	return index_template

@@ -48,6 +48,18 @@ cur_frm.cscript.onload = function(doc, cdt, cdn) {
   this.show_in_menu(doc, cdt, cdn);
 }
 
+cur_frm.cscript.refresh = function(doc, cdt, cdn) {
+  // show button for import
+  cur_frm.add_custom_button('Import from File', cur_frm.cscript.do_import);
+}
+
 cur_frm.cscript.validate = function(doc, cdt, cdn) {
   doc.server_code_compiled = null;
+}
+
+cur_frm.cscript.do_import = function(doc, cdt, cdn) {
+  callback = function(r,rt) {
+  	cur_frm.refresh_doc();
+  }
+  $c_obj([doc], 'import_doctype', '', callback)
 }

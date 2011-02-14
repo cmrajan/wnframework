@@ -2,9 +2,9 @@
 # --------------------------------------------
 # last updated on: 2011-02-02 14:31:14
 
-default_db_name = "db_name"
+default_db_name = "erpnext"
 
-db_name_map = {'':''}
+db_name_map = {'erpnext':'erpnext'}
 #{'main_acc_name';'db_name'}
 
 # without www

@@ -45,9 +45,11 @@ def get():
 		webnotes.conn.sql("delete from __DocTypeCache")
 	
 	# run patches
-	import webnotes.modules.patch
-	webnotes.modules.patch.run()
-
+	try:
+		import webnotes.modules.patch
+		webnotes.modules.patch.run()
+	except ImportError, e: 
+		pass # no patches - do nothing
 
 	# if not create it
 	sd = build()
@@ -119,10 +121,14 @@ def load_startup(cp):
 	from webnotes.defs import modules_path
 	import os
 
-	cp.startup_code = compress.get_js_code(os.path.join(modules_path, 'startup', 'startup'))
-	startup_css = open(os.path.join(modules_path, 'startup', 'startup.css'), 'r')
-	cp.startup_css = startup_css.read()
-	startup_css.close()
+	try:
+		cp.startup_code = compress.get_js_code(os.path.join(modules_path, 'startup', 'startup'))
+		startup_css = open(os.path.join(modules_path, 'startup', 'startup.css'), 'r')
+		cp.startup_css = startup_css.read()
+		startup_css.close()
+	except IOError, e:
+		if e.args[0]!=2: # no startup module!
+			raise e
 
 # build it
 # ==================================================

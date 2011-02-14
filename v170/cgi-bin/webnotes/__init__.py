@@ -4,6 +4,8 @@ code_fields_dict = {
 	'DocType':[('server_code_core', 'py'), ('client_script_core', 'js')],
 	'Search Criteria':[('report_script', 'js'), ('server_script', 'py'), ('custom_query', 'sql')],
 	'Patch':[('patch_code', 'py')],
+	'Stylesheet':['stylesheet', 'css'],
+	'Page Template':['template', 'html'],
 	'Control Panel':[('startup_code', 'js'), ('startup_css', 'css')]
 }
 

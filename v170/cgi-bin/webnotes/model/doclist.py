@@ -35,6 +35,10 @@ def compress(doclist):
 			fl = d.keys()
 			forbidden = ['server_code_compiled']
 			nl = ['doctype','localname','__oldparent','__unsaved']
+			
+			# add client script for doctype, doctype due to ambiguity
+			if dt=='DocType': nl.append('__client_script')
+			
 			for f in fl:
 				if not (f in nl) and not (f in forbidden):
 					nl.append(f)
