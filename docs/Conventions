@@ -1,0 +1,3 @@
+Conventions/Standard practices to follow:
+	1. Use tabs not spaces for python indentation
+	2. Please add branch/trunk name and/or issue name to the commit message
