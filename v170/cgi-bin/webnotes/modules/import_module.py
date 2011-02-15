@@ -47,8 +47,11 @@ def get_folder_paths(modules, record_list):
 	# get the folder list
 	if record_list:
 		for record in record_list:
+			if scrub(record[1]) in ('doctype', 'page', 'search_criteria'):
+				record[1], record[2] = scrub(record[1]), scrub(record[2])
+			
 			folder_list.append(os.path.join(get_module_path(scrub(record[0])), \
-				scrub(record[1]), scrub(record[2]).replace('/','_')))
+				record[1], record[2].replace('/','_')))
 
 	if modules:
 		# system modules will be transferred in a predefined order and before all other modules
