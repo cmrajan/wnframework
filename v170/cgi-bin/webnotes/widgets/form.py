@@ -460,9 +460,9 @@ def get_fields():
 	import webnotes
 	r = {}
 	args = {
-		'select':form.getvalue('select')
-		,'from':form.getvalue('from')
-		,'where':form.getvalue('where')
+		'select':webnotes.form.getvalue('select')
+		,'from':webnotes.form.getvalue('from')
+		,'where':webnotes.form.getvalue('where')
 	}
 	ret = webnotes.conn.sql("select %(select)s from `%(from)s` where %(where)s limit 1" % args)
 	if ret:
