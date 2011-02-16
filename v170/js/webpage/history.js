@@ -36,7 +36,7 @@ nav_obj.open_notify = function(t, dt, dn, no_history) {
 			nav_obj.on_open(id);
 		
 		// add to "back" history
-		dhtmlHistory.add(id,'');
+		dhtmlHistory.add('!' + id,'');
 	}
 	
 	nav_obj.notify_observers(t, dt, dn);
@@ -94,6 +94,7 @@ function history_get_name(t) {
 }
 
 function historyChange(newLocation, historyData) {
+	if(newLocation.substr(0,1)=='!') newLocation = newLocation.substr(1);
 	t = newLocation.split('/');
 
 	for(var i=0;i<t.length;i++) 

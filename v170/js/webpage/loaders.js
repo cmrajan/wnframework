@@ -191,18 +191,12 @@ function loadpage(page_name, call_back, no_history) {
 			// show
 			page_body.change_to(page_name);
 
-			// call refresh
-			try {
-				if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](); // onload
-			} catch(e) { 
-				submit_error(e); 
-			}
 		} else {
 			// new page
 			var p = render_page(page_name);
 			if(!p)return;
 		}
-
+		
 		// execute callback
 		cur_page = page_name;
 		if(call_back)call_back();
@@ -212,12 +206,18 @@ function loadpage(page_name, call_back, no_history) {
 
 		// update "back"
 		nav_obj.open_notify('Page',page_name,'',no_history);
+
+		// call refresh script
+		try {
+			if(pscript['refresh_'+page_name]) pscript['refresh_'+page_name](); // onload
+		} catch(e) { 
+			submit_error(e); 
+		}
 	}
 	
 	if(get_local('Page', page_name) || page_body.pages[page_name]) 
 		fn();
 	else {
-		page_body.set_status('Loading Page...');
 		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn);
 	}
 }
