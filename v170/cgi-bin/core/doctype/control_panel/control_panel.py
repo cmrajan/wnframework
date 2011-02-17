@@ -50,21 +50,6 @@ class DocType:
 			else:
 				return "window.parent.pscript.set_pp_lh(); window.parent.pscript.upload_obj.obj.hide();"
 
-	# Redirect to SSO
-	# ===========================================================
-	def get_index_template(self):
-		import webnotes
-		import webnotes.widgets.page_body
-
-		if webnotes.form.getvalue('sid'):
-			page = ''
-			if webnotes.form.getvalue('page'):
-				page = '?page=' + webnotes.form.getvalue('page')
-			return webnotes.widgets.page_body.redirect_template % ('Redirecting...', ('index.cgi' + page))
-		else:
-			return webnotes.widgets.page_body.index_template
-
-
 	# Login 
 	# ===========================================================
 

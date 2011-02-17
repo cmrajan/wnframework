@@ -157,12 +157,18 @@ def get():
 	import webnotes
 	no_startup = webnotes.form.getvalue('no_startup') or None
 
-	global index_template
+	global index_template, redirect_template
 	import webnotes.session_cache
 	try:
 		import json
 	except: # python 2.4
 		import simplejson as json
+	
+	page = webnotes.form_dict.get('page', '')
+	# sid in public display
+	# ---------------------
+	if webnotes.form_dict.get('sid'): 
+		return redirect_template % ('Redirecting...', ('index.cgi' + (page and ('?page='+page) or '')))
 	
 	if '%(content)s' in index_template:
 		load_properties()
