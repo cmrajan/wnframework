@@ -30,6 +30,6 @@ class DocType:
   def on_update(self):
     self.set_module()
 
-	# export
-  from webnotes.modules.export_module import export_to_files
-  webnotes.msgprint(export_to_files(record_list=[['Search Criteria', self.doc.name]]))
+	  # export
+    from webnotes.modules.export_module import export_to_files
+    webnotes.msgprint(export_to_files(record_list=[['Search Criteria', self.doc.name]]))
