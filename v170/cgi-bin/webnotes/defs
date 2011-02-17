@@ -33,5 +33,5 @@ files_path = <path to store user files>
 
 #MODULE MANAGER SETTINGS
 modules_path = <path where you have the erp modules checked out>
-developer_mode = 1
+developer_mode = 0
 user_timezone = 'Asia/Calcutta'
