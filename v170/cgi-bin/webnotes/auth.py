@@ -146,8 +146,8 @@ class LoginManager:
 			p = webnotes.conn.sql("select name from tabProfile where name=%s and (`password`=%s  OR `password`=PASSWORD(%s)) and IFNULL(enabled,0)=1", (user, pwd, pwd))
 			
 		if not p:
+			webnotes.response['message'] = 'Authentication Failed'
 			raise Exception, 'Authentication Failed'
-			webnotes.msgprint('Authentication Failed')
 			
 		self.user = p[0][0]
 	

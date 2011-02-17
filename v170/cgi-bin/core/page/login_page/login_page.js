@@ -1,6 +1,6 @@
 pscript['onload_Login Page'] = function(){
 	var lw = $i('login_wrapper')
-	$br(lw, '5px'); $bs(lw, '1px 1px 3px #888');
+	$bs(lw, '1px 1px 3px #888');
 	$bg(document.getElementsByTagName('body')[0], '#DDD');
 	
     keypress_observers.push(new function() {

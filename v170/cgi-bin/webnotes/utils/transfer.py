@@ -266,7 +266,7 @@ def add_section_breaks_and_renum(doclist, dt):
 		if d.get('parentfield')=='fields':
 			if d.get('fieldtype') in ('Section Break', 'Column Break', 'HTML'):
 				tmp = Document(fielddata = d)
-				tmp.fieldname = d.get('fieldtype').lower().replace(' ', '_') + str(d.get('idx'))
+				tmp.fieldname = ''
 				tmp.name = None
 				tmp.save(1)
 			else:
