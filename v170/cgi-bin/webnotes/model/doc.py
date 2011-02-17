@@ -524,10 +524,6 @@ def check_page_perm(doc):
 		webnotes.response['exc_type'] = 'PermissionError'
 		raise Exception, '[WNF] No read permission for %s %s' % ('Page', doc.name)
 
-# called from everywhere
-# load a record and its child records and bundle it in a list - doclist
-# ---------------------------------------------------------------------
-
 def get_report_builder_code(doc):
 	if doc.doctype=='Search Criteria':
 		from webnotes.model.code import get_code
@@ -537,6 +533,10 @@ def get_report_builder_code(doc):
 			doc.custom_query = get_code(doc.module, 'Search Criteria', doc.name, 'sql')
 
 	
+# called from everywhere
+# load a record and its child records and bundle it in a list - doclist
+# ---------------------------------------------------------------------
+
 def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 	import webnotes 
 	import webnotes.model
@@ -557,6 +557,8 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 			raise Exception, '[WNF] No read permission for %s %s' % (dt, dn)
 
 	# import report_builder code
+	get_report_builder_code(doc)
+
 
 	if not with_children:
 		# done
