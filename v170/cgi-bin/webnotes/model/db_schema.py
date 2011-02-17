@@ -320,6 +320,14 @@ class DbManager:
 		db_list = self.get_database_list()
 		for db in db_list:
 			self.drop_database(db)
+			
+	def get_table_schema(self,table):
+		"""
+		Just returns the output of Desc tables.
+		"""
+		return list(self.conn.sql("DESC %s"%table))
+		
+			
 	def get_tables_list(self,target):	
 		"""
 		
