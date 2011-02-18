@@ -159,8 +159,13 @@ def get_file(fname):
 		fname = webnotes.conn.sql("select file_list from tabFile where name=%s", fname)
 		fname = fname and fname[0][0]
 		fname = fname.split('\n')[0].split(',')[1]
-	
-	f = get_file_system_name(fname)[0]
+
+
+	if get_file_system_name(fname):
+		f = get_file_system_name(fname)[0]
+	else:
+		f = None
+
 		
 	# read the file
 	import os
