@@ -170,6 +170,10 @@ def get_code(module, dt, dn, extn, is_static=None):
 	# get module (if required)
 	if not module:
 		module = webnotes.conn.sql("select module from `tab%s` where name=%s" % (dt,'%s'),dn)[0][0]
+
+	# no module, quit
+	if not module:
+		return ''
 	
 	# file names
 	if scrub(dt) in ('page','doctype','search_criteria'):
@@ -179,7 +183,6 @@ def get_code(module, dt, dn, extn, is_static=None):
 	fname = dn + '.' + extn
 	if is_static:
 		fname = dn + '_static.' + extn
-
 
 	# code
 	try:
