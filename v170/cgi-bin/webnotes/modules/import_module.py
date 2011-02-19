@@ -55,8 +55,9 @@ def get_folder_paths(modules, record_list):
 
 	if modules:
 		# system modules will be transferred in a predefined order and before all other modules
-		sys_mod_ordered_list = ['roles', 'system', 'application_internal', 'mapper', 'settings']
+		sys_mod_ordered_list = ['roles', 'core','application_internal', 'mapper', 'settings']
 		all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
+				
 		for module in all_mod_ordered_list:
 			mod_path = os.path.join(webnotes.defs.modules_path, module)
 			types_list = listfolders(mod_path, 1)
