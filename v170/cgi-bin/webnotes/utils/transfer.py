@@ -9,7 +9,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	from webnotes.model.code import get_server_obj
 	from webnotes.model.meta import get_table_fields
 
-	sql = webnotes.conn.sql
+	sql = webnotes.conn.sql 	#Unnecessary,just lazy and promotes future maintainers to make silly mistakes.Remove it later.
 
 	if not doclist:
 		return 'No Doclist'

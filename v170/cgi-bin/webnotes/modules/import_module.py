@@ -59,7 +59,7 @@ def get_folder_paths(modules, record_list):
 		all_mod_ordered_list = [t for t in sys_mod_ordered_list if t in modules] + list(set(modules).difference(sys_mod_ordered_list))
 				
 		for module in all_mod_ordered_list:
-			mod_path = os.path.join(webnotes.defs.modules_path, module)
+			mod_path = get_module_path(module)
 			types_list = listfolders(mod_path, 1)
 			
 			# list of types
@@ -70,7 +70,7 @@ def get_folder_paths(modules, record_list):
 			for d in all_transfer_types:
 				if d not in  ('files', 'startup', 'patches'):
 					# get all folders inside type
-					folder_list+=listfolders(os.path.join(webnotes.defs.modules_path, module, d))
+					folder_list+=listfolders(os.path.join(mod_path, d))
 
 	return folder_list
 
