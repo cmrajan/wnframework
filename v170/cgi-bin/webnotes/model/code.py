@@ -163,7 +163,7 @@ def check_syntax(code):
 	return ''
 
 #===================================================================================
-def get_code(module, dt, dn, extn, is_static=None):
+def get_code(module, dt, dn, extn, is_static=None, fieldname=None):
 	from webnotes.modules import scrub, get_module_path
 	import os, webnotes
 	
@@ -185,12 +185,14 @@ def get_code(module, dt, dn, extn, is_static=None):
 		fname = dn + '_static.' + extn
 
 	# code
+	code = ''
 	try:
 		file = open(os.path.join(get_module_path(scrub(module)), dt, dn, fname), 'r')
+		code = file.read()
+		file.close()	
 	except IOError, e:
-		return ''
-		
-		
-	code = file.read()
-	file.close()
+		# no file, try from db
+		if fieldname:
+			code = webnotes.conn.get_value(dt, dn, fieldname)
+
 	return code

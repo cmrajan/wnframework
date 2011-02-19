@@ -13,8 +13,12 @@ _f.FrmHeader = function(parent, frm) {
 	this.dn_area = $a(div, 'span', '', {fontSize:'14px', fontWeight:'normal', marginRight:'8px'})
 
 	// timestamp
-	this.timestamp_area = $a(div, 'span', '', {marginRight:'8px', cursfontWeight:'normal', cursor:'pointer', color:'#00B', fontSize:'11px', fontWeight:'normal', textDecoration:'underline', textShadow:'none'});
-	this.timestamp_area.innerHTML = 'more info';
+	this.timestamp_area = $a(div, 'span', 'link_type', {marginRight:'8px', fontSize:'11px'});
+	this.timestamp_area.innerHTML = 'More Info';
+
+	// timestamp
+	this.help_link = $a(div, 'span', 'link_type', {marginRight:'8px', fontSize:'11px'});
+	this.help_link.innerHTML = 'Help';
 	
 	// status
 	this.status_area = $a(div, 'span', '', {marginRight:'8px', marginBottom:'2px', cursor:'pointer', textShadow:'none'})
@@ -243,4 +247,13 @@ _f.FrmHeader.prototype.refresh_labels = function(f) {
 
 	// timestamp
 	this.timestamp_area.onclick = function() { msgprint(me.get_timestamp(doc)) }
+	
+	// help
+	$dh(this.help_link)
+	if(locals.DocType[f.doctype].description) {
+		this.help_link.desc = locals.DocType[f.doctype].description;
+		this.help_link.onclick = function() { msgprint(this.desc); }
+		$di(this.help_link);	
+	}
+	
 }

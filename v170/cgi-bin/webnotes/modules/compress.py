@@ -56,20 +56,22 @@ def get_doctype_js(dt):
 #==============================================================================
 
 def sub_get_page_js(match):
+	from webnotes.model.doc import Document
+	
 	name = match.group('name')
-	return get_page_js(name)
+	return get_page_js(Document('Page', name))
 
 def get_page_js(page):
 	import webnotes, os
 	from webnotes.modules import scrub, get_module_path
 
-	dt_details = webnotes.conn.sql('select module from tabPage where name = %s', page)
-	module = scrub(dt_details[0][0])
-
-	code = get_js_code(os.path.join(get_module_path(module), 'page', scrub(page), scrub(page)))
+	code = get_js_code(os.path.join(get_module_path(page.module), 'page', scrub(page.name), scrub(page.name)))
+	
+	if not code:
+		code = page.script
 	
 	# compile for import
-	if code.strip():
+	if code and code.strip():
 		import re
 		p = re.compile('\$import\( (?P<name> [^)]*) \)', re.VERBOSE)
 	

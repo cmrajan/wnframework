@@ -16,16 +16,17 @@ class Page:
 		doc = doclist[0]
 
 		doc.script = None
-		doc.fields['__script'] = compress.get_page_js(self.name)
+		doc.fields['__script'] = compress.get_page_js(doc)
 
-		if doc.standard!='No':
-			template = '%(content)s'
-			# load code from template
-			if doc.template:
-				template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html')
+		template = '%(content)s'
+		# load code from template
+		if doc.template:
+			template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
 
-			doc.content = template % {'content':get_code(doc.module, 'page', doc.name, 'html')}
-			doc.style = get_code(doc.module, 'page', doc.name, 'css')
+		doc.content = template % {'content':(get_code(doc.module, 'page', doc.name, 'html') or doc.content)}
+		
+		css = get_code(doc.module, 'page', doc.name, 'css')
+		if css: doc.style = css
 
 		
 		# execute content
@@ -49,8 +50,11 @@ class Page:
 			# doclist
 			sslist = webnotes.model.doc.get('Stylesheet', stylesheet)
 			
-			# stylesheet from module
-			sslist[0].stylesheet = get_code(sslist[0].module, 'Stylesheet', stylesheet, 'css')
+			# stylesheet from file
+			css = get_code(sslist[0].module, 'Stylesheet', stylesheet, 'css')
+			
+			if css: sslist[0].stylesheet = css
+			
 			return sslist
 		else:
 			return []
