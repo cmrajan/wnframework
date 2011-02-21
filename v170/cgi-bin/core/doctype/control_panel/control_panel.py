@@ -20,7 +20,7 @@ class DocType:
 	def execute_test(self, arg=''):
 		out = ''
 		exec(arg and arg or self.doc.test_code)
-		webnotes.msgrint('that worked!')
+		webnotes.msgprint('that worked!')
 		return out
 
 	def on_update(self):
