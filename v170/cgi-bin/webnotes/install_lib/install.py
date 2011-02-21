@@ -92,18 +92,39 @@ class Installer:
 
 
 	def install_base_fw(self):
-	"""
-	Create Base Tables for framework:
-		1.tabSession
-		2.tabSingles
-		3.__DocTypeCache
-		4.tabRole
-		5.tabDocField
-		6.tabDocPerm
-		7.tabDocFormat
-		8.tabDocType
-		9.tabModule Def
-	"""
+		"""
+		Create Base Tables for framework:
+			1.tabSessions
+			2.tabSingles
+			3.__DocTypeCache
+			4.tabRole
+			5.tabDocField
+			6.tabDocPerm
+			7.tabDocFormat
+			8.tabDocType
+			9.tabModule Def
+			10.tabPrint Format
+			11.tabEvent Role
+			12.tabSearch Criteria
+			13.tabSeries
+			14.tabWeb Visitor
+			15.tabUserRole
+			16.tabTweet
+			17.tabTransfer Module
+			18.tabTransfer Account
+			19.tabToDo Item
+			20.tabTicket
+			21.tabPrint Format
+			22.tabPage
+			23.tabFile
+		
+		Insert records into tabDocType:
+			1.DocType
+			2.DocPerm
+			3.DocFormat
+			4.DocField
+			5.Module
+		"""
 			
 		self.DbInt.create_db_and_user()
 		
