@@ -94,25 +94,30 @@ def scrub_ids(content):
 def get_page_content(page):
 	from webnotes.model.code import get_code
 	from webnotes.model.doc import Document
+	global page_properties
 	
 	if not page:
 		return 'No Title', 'No Content'
 
-	page_doc = Document('Page', page)
+	doc = Document('Page', page)
+	template = '%(content)s'
 
 	# page meta-tags
-	page_properties['page_title'] = page_doc.page_title or page_doc.name
-	page_properties['keywords'] = page_doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
-	page_properties['site_description'] = page_doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+	page_properties['page_title'] = doc.page_title or doc.name
+	page_properties['keywords'] = doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
+	page_properties['site_description'] = doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
 
 	# content
-	content = get_code(page_doc.module, 'Page', page, 'html')
-		
-	# dynamic (scripted) content
-	if content and content.startswith('#python'):
-		content = webnotes.model.code.execute(content)
+	if doc.template:
+		template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
 
-	page_properties['content'] = scrub_ids(content)
+	content = get_code(doc.module, 'page', doc.name, 'html') or doc.content
+			
+	# dynamic (scripted) content
+	if content and content.startswith('#!python'):
+		page_properties.update(webnotes.model.code.execute(content))
+
+	page_properties['content'] = scrub_ids(template % {'content':page_properties['content']})
 
 # load the form as page (deprecated)
 # -----------------------------------

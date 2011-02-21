@@ -20,7 +20,12 @@ class DocType:
 	def execute_test(self, arg=''):
 		out = ''
 		exec(arg and arg or self.doc.test_code)
+		webnotes.msgrint('that worked!')
 		return out
+
+	def on_update(self):
+		# clear cache on save
+		sql("delete from __SessionCache")
 
 	def upload_many(self,form):
 		form_name = form.getvalue('form_name')

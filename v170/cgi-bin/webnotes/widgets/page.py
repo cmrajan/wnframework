@@ -23,20 +23,26 @@ class Page:
 		if doc.template:
 			template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
 
-		doc.content = template % {'content':(get_code(doc.module, 'page', doc.name, 'html') or doc.content)}
-		
+		doc.content = get_code(doc.module, 'page', doc.name, 'html') or doc.content
+				
+		# execute content
+		if doc.content and doc.content.startswith('#!python'):
+			doc.__content = template % {'content': webnotes.model.code.execute(doc.content).get('content')}
+		else:
+			doc.__content = template % {'content': doc.content or ''}
+
+		# local stylesheet
 		css = get_code(doc.module, 'page', doc.name, 'css')
 		if css: doc.style = css
-
-		
-		# execute content
-		if doc.content and doc.content.startswith('#python'):
-			doc.fields['__content'] = webnotes.model.code.execute(doc.content)
 			
 		# add stylesheet
 		if doc.stylesheet:
 			doclist += self.load_stylesheet(doc.stylesheet)
-			
+		
+		# comments etc
+		from webnotes.widgets.form import get_comments
+		doc.n_comments, doc.last_comment = get_comments('Page', self.name)
+		
 		return doclist
 
 	def load_stylesheet(self, stylesheet):

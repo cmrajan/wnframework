@@ -205,7 +205,7 @@ function loadpage(page_name, call_back, no_history) {
 		scroll(0,0);
 
 		// update "back"
-		nav_obj.open_notify('Page',page_name,'',no_history);
+		nav_obj.open_notify('Page', page_name, window.location.hash.split('/')[2], no_history);
 
 		// call refresh script
 		try {
