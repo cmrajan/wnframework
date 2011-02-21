@@ -33,7 +33,7 @@ CommentList.prototype.add_comment = function() {
   args.comment_by_fullname = user_fullname;
   args.comment_doctype = this.dt;
   args.comment_docname = this.dn;
-  $c_obj('Widget Control', 'add_comment', docstring(args), function(r,rt){
+  $c('webnotes.widgets.form.add_comment', args, function(r,rt){
     me.lst.run();
     cur_frm.n_comments[cur_frm.doc.name] = cint(cur_frm.n_comments[cur_frm.doc.name]) + 1;
     cur_frm.last_comments[cur_frm.doc.name] = me.input.value;
@@ -125,7 +125,7 @@ CommentItem.prototype.cmt_delete = function(cell, ri, ci, d) {
     del = $a(cell,'div','wn-icon ic-trash',{cursor:'pointer'});
     del.cmt_id = d[ri][0];
     del.onclick = function(){ 
-      $c_obj('Widget Control','remove_comment',JSON.stringify({id:this.cmt_id, dt:cur_frm.doctype, dn:cur_frm.docname}),function(r,rt){
+      $c('webnotes.widgets.form.remove_comment',{id:this.cmt_id, dt:cur_frm.doctype, dn:cur_frm.docname},function(r,rt){
       	cur_frm.no_of_comments = cur_frm.no_of_comments - 1;
       	cur_frm.frm_head.refresh_comments();
         me.comment.lst.run();

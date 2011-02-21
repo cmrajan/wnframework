@@ -31,6 +31,8 @@ def getdoc():
 
 	webnotes.response['docs'] = doclist
 
+#===========================================================================================
+
 def get_comments(doctype, docname):
 	try:
 		last_comment = ''
@@ -44,7 +46,38 @@ def get_comments(doctype, docname):
 			return -1, ''
 		else:
 			raise e
-	
+
+#===========================================================================================
+
+def add_comment():
+	import time
+	args = webnotes.form_dict
+
+	if(args['comment']):
+		from webnotes.model.doc import Document
+		from webnotes.model.code import get_obj
+		from webnotes.utils import nowdate
+		
+		cmt = Document('Comment Widget Record')
+		for arg in ['comment', 'comment_by', 'comment_by_fullname', 'comment_doctype', 'comment_docname']:
+			cmt.fields[arg] = args[arg]
+		cmt.comment_date = nowdate()
+		cmt.comment_time = time.strftime('%H:%M')
+		cmt.save(1)
+      
+		try:
+			get_obj('Feed Control').upate_comment_in_feed(args['comment_doctype'], args['comment_docname'])
+		except: pass
+			
+#===========================================================================================
+
+def remove_comment():
+	args = webnotes.form_dict
+	webnotes.conn.sql("delete from `tabComment Widget Record` where name=%s",args.get('id'))
+
+	try:
+		get_obj('Feed Control').upate_comment_in_feed(args['dt'], args['dn'])
+	except: pass
 
 #===========================================================================================
 

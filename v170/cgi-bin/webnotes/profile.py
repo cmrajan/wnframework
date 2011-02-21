@@ -189,19 +189,12 @@ def get_user_img():
 		webnotes.response['message'] = 'no_img_m'
 		return
 
-	f = webnotes.conn.sql("select file_list, gender from tabProfile where name=%s", webnotes.form.getvalue('username',''))
+	f = webnotes.conn.sql("select file_list from tabProfile where name=%s", webnotes.form.getvalue('username',''))
 	if f:
 		if f[0][0]:
-			lst = f[0][0].split('\n')
-		
-			if lst and len(lst)<2:	
-				webnotes.response['message'] = lst[0].split(',')[1]
-			else:
-				webnotes.response['message'] = lst[1].split(',')[1]
+			lst = f[0][0].split('\n')	
+			webnotes.response['message'] = lst[0].split(',')[1]
 		else:
-			if f[0][1] and f[0][1] == 'Female':
-				webnotes.response['message'] = 'no_img_f'
-			else:
-				webnotes.response['message'] = 'no_img_m'		
+			webnotes.response['message'] = 'no_img_m'		
 	else:
-		webnotes.response['message'] = 'no_img_f'
+		webnotes.response['message'] = 'no_img_m'
