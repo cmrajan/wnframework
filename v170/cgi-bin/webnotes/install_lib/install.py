@@ -66,31 +66,6 @@ class Installer:
 			raise e
 
 
-	def copy_from_db_dump(source, target=''):
-		import defs
-
-		if not defs.server_prefix:
-			msgprint("Server Prefix must be set in defs.py")
-			raise Exception
-
-		import os
-		os.chdir(os.path.normpath('../data'))
-	
-		# dump
-		mysqldump(source)
-
-		# import
-		target = import_db(source, target)
-	
-		# delete dump
-		os.system('rm %s.sql' % source)
-	
-		return target
-
-	
-
-
-
 	def install_base_fw(self):
 		"""
 		Create Base Tables for framework:
