@@ -274,7 +274,7 @@ else:
 				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc',\
 					'webnotes.widgets.form.getdoctype','logout','webnotes.widgets.page.getpage',\
 					'get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form.savedocs',\
-					'startup','webnotes.widgets.form.add_comment']:
+					'startup','webnotes.widgets.form.add_comment', 'execute_page_method']:
 					
 					webnotes.msgprint('Guest not allowed to perform this action')
 					raise Exception
