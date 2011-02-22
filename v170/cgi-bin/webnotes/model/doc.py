@@ -559,7 +559,6 @@ def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
 	# import report_builder code
 	get_report_builder_code(doc)
 
-
 	if not with_children:
 		# done
 		return [doc,]

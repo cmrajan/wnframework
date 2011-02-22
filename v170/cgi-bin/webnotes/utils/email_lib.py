@@ -4,10 +4,11 @@
 # Allows easy adding of Attachments of "File" objects
 # -------------------
 
+import webnotes	
 from webnotes import msgprint
 
 class EMail:
-	def __init__(self, sender='', recipients=[], subject='', from_defs=0):
+	def __init__(self, sender='', recipients=[], subject='', from_defs=0, alternative=0):
 		from email.mime.multipart import MIMEMultipart
 		if type(recipients)==str:
 			recipients.replace(';', ',')
@@ -18,7 +19,7 @@ class EMail:
 		self.reply_to = sender
 		self.recipients = recipients
 		self.subject = subject
-		self.msg = MIMEMultipart()
+		self.msg = MIMEMultipart(alternative and 'alternative' or None)
 		self.cc = []
 		
 	def set_message(self, message, mime_type='text/html'):
@@ -69,6 +70,9 @@ class EMail:
 		self.msg.attach(msg)
 	
 	def validate(self):
+		if not self.sender:
+			self.sender = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
+
 		from webnotes.utils import validate_email_add
 		# validate ids
 		if self.sender and (not validate_email_add(self.sender)):
@@ -136,44 +140,86 @@ class EMail:
 			sess.quit()
 		except:
 			pass
+
+# text + html type of email
+# --------------------------------------------
+
+def sendmail_html(sender, recipients, subject, html, text, template=''):
+	from email.mime.multipart import MIMEMultipart
+
+	email = EMail(sender, recipients, subject, alternative = 1)
 	
+	email.set_message(text, 'text/plain')
+	email.set_message(make_html_body(html, template), 'text/html')
+
+	email.send()
+
+# build html content
+# --------------------------------------------
+
+def make_html_body(content, template = ''):
+	from webnotes.model.code import get_code
+
+	template_html = '%(content)s'
+	
+	if template:
+		template_html = get_code(webnotes.conn.get_value('Page Template', template, 'module'), 'Page Template', template, 'html', fieldname='template')
+	
+	footer = get_footer()
+	if footer: content += footer
+	
+	return template_html % {'content': content}
+
+# standard email
+# -------------------------
+
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
-	import webnotes	
 	
-	if not sender:
-		sender = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
 	email = EMail(sender, recipients, subject)
 	email.cc = cc
-	if msg: email.set_message(msg)
+		
+	if msg: 
+		email.set_message(msg)
 	for p in parts:
 		email.set_message(p[1])
 	for a in attach:
 		email.attach(a)
 
-	footer = webnotes.conn.get_value('Control Panel',None,'mail_footer') or ''
-	footer += (webnotes.conn.get_global('global_mail_footer') or '')
-	
-	if footer:
-		email.set_message(footer)
+	footer = get_footer()
+	if footer: email.set_message(footer)
+
 	email.send()
 
-def get_contact_list():
-	import webnotes
+# footer
+# --------------------------------------------
 
-	cond = ['`%s` like "%s%%"' % (f, webnotes.form.getvalue('txt')) for f in webnotes.form.getvalue('where').split(',')]
-	cl = webnotes.conn.sql("select `%s` from `tab%s` where %s" % (
-  			 webnotes.form.getvalue('select')
-			,webnotes.form.getvalue('from')
-			,' OR '.join(cond)
-		)
-	)
-	webnotes.response['cl'] = filter(None, [c[0] for c in cl])
+def get_footer():
 
+	footer = webnotes.conn.get_value('Control Panel',None,'mail_footer') or ''
+	footer += (webnotes.conn.get_global('global_mail_footer') or '')
+	return footer
+
+def get_form_link(dt, dn):
+	public_domain = webnotes.conn.get_value('Control Panel', None, 'public_domain')
+	if not public_domain:
+		return ''
+
+	args = {
+		'dt': dt, 
+		'dn':dn, 
+		'acx': webnotes.conn.get_value('Control Panel', None, 'account_id'),
+		'server': public_domain,
+		'akey': encrypt(dn)
+	}
+	return '<div>If you are unable to view the form below <a href="http://%(server)s/index.cgi?page=Form/%(dt)s/%(dn)s&acx=%(acx)s&akey=%(akey)s">click here to see it in your browser</div>' % args
+	
 # Send Form
-# ----------
+# --------------------------------------------
+
 def send_form():
 	import webnotes
 	from webnotes.utils import cint
+	from webnotes.model.encrypt import encrypt
 
 	form = webnotes.form
 
@@ -193,26 +239,30 @@ def send_form():
 				pass # no attachments in single types!
 			else:
 				raise Exception, e
+				
+	# make the email
 	if recipients:
 		recipients = recipients.replace(';', ',')
 		recipients = recipients.split(',')
 		update_contacts(recipients)
 
-		if not sendfrom:
-			sendfrom = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
 		email = EMail(sendfrom, recipients, subject)
 		email.cc = [form.getvalue('cc'),]
 
 		if form.getvalue('message'):
-			email.set_message(form.getvalue('message') or 'No text')
+			email.set_message(form.getvalue('message'))
+		
+		# link
+		form_link = get_form_link(form.getvalue('dt'), form.getvalue('dn'))
+		if form_link:
+			email.set_message(form_link)
+		
+		# attach the print format
 		email.set_message(form.getvalue('body'))
 	
 		# footer
-		footer = webnotes.conn.get_value('Control Panel',None,'mail_footer') or ''
-		footer += (webnotes.conn.get_global('global_mail_footer') or '')
-		
-		if footer:
-			email.set_message(footer)
+		footer = get_footer()
+		if footer: email.set_message(footer)
 				
 		for a in al:
 			if a:
@@ -221,8 +271,23 @@ def send_form():
 		email.send()
 	webnotes.msgprint('Sent')
 
+# get list of contacts for autosuggest
+# --------------------------------------------
+
+def get_contact_list():
+	import webnotes
+
+	cond = ['`%s` like "%s%%"' % (f, webnotes.form.getvalue('txt')) for f in webnotes.form.getvalue('where').split(',')]
+	cl = webnotes.conn.sql("select `%s` from `tab%s` where %s" % (
+  			 webnotes.form.getvalue('select')
+			,webnotes.form.getvalue('from')
+			,' OR '.join(cond)
+		)
+	)
+	webnotes.response['cl'] = filter(None, [c[0] for c in cl])
+	
 # Add to Contacts
-# ---------------
+# --------------------------------------------
 
 def update_contacts(recipients):
 	import webnotes
