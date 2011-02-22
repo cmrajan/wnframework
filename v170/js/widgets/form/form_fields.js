@@ -422,7 +422,7 @@ _f.CodeField.prototype.make_input = function() {
 
 			// General options
 			theme : "advanced",
-			plugins : "style,table",
+			plugins : "style,inlinepopups,table",
 			extended_valid_elements: "div[id|dir|class|align|style]",
 			
 			// w/h
