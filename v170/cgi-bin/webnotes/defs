@@ -4,6 +4,9 @@
 # 
 # After "accounts" is created, login and pwd should point to accounts db
 
+#webnotes folder
+webnotes_folder = '/home/anand/workspace/webnotes/wnframework/trunk/v170/cgi-bin'
+
 db_name = <Your DB Name>
 db_login = <Your DB Login>
 db_password = <Your DB Password>
@@ -35,3 +38,6 @@ files_path = <path to store user files>
 modules_path = <path where you have the erp modules checked out>
 developer_mode = 0
 user_timezone = 'Asia/Calcutta'
+
+
+
