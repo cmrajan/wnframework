@@ -40,7 +40,7 @@ import os
 import defs
 
 import sys
-sys.path.append(getattr(defs,'modules_path'))
+sys.path.append(getattr(defs,'modules_path',None))
 
 def getTraceback():
 	import sys, traceback, string
