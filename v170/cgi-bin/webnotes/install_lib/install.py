@@ -1,26 +1,16 @@
 # -------------------------------------------------------------------------------------------------------------
 import os,sys
+sys.path.append(os.getcwd())
+
+def copy_template_to_py(template_path,target_path):
+		try:
+			print "Copying %s to %s"%(template_path,target_path)
+			cp_cmd = 'cp'
+			ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
+		except Exception,e:
+			raise e
 
 # -------------------------------------------------------------------------------------------------------------
-
-def get_source_path(source_path):
-	import os
-		
-	cwd = os.path.split(os.getcwd())[-1]
-	if not os.path.exists(source_path):
-		if cwd == 'cgi-bin':
-			source_path = '../data/' + source_path + '.sql'
-		else:
-			source_path = 'data/' + s + '.sql'
-		
-	# check if exists
-	if os.path.exists(source_path):
-		return source_path
-	else:
-		raise Exception, "Target file '%s' does not exist" % source_path
-
-
-
 
 def create_log_folder(path):
 	import os
@@ -38,33 +28,68 @@ class Installer:
 	def __init__(self,wn_folder,conn = None):
 	
 		sys.path.append(wn_folder)
-	
+		from webnotes import defs
 		import webnotes
 		import webnotes.db
-		from webnotes import defs
 		from webnotes.model.db_schema import DbManager
 		import db_init
 		
-		
-		if defs.root_login:
+		if not conn:
 			self.conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
+			
+		else:
+			self.conn = conn
 		
-		self.dbman = DbManager(conn)		
+		self.dbman = DbManager(self.conn)		
 		self.webnotes_folder = wn_folder
-		#self.source_path = get_source_path(source_path)
 		self.mysql_path = hasattr(defs, 'mysql_path') and webnotes.defs.mysql_path or ''
 		self.DbInt = db_init.DatabaseInstance(self.conn,'webnotesdb')
 
-	def copy_template_to_py(template_path,target_path):
-		try:
-			print "Copying %s to %s"%(template_path,target_path)
-			cp_cmd = 'cp'
+	
+
+	def import_from_db(self,source):
+		"""
+		a very simplified version, just for the time being..will eventually be deprecated once the framework stabilizes.
+		"""
+		target = "webnotesdb"
+		# delete user (if exists)
+		self.dbman.delete_user(target)
+
+		# create user and db
+		self.dbman.create_user(target,getattr(defs,'db_password',None))
+	
+		self.dbman.create_database(target)
+
+		self.dbman.grant_all_privileges(target,target)
+
+		self.dbman.flush_privileges()
+
+		self.dbman.set_transaction_isolation_level('GLOBAL','READ COMMITTED')
+
+		source_path = os.path.join(os.path.dirname(getattr(defs,'webnotes_folder')),'data')+'/' +source +'.sql'
+
+		# import in target
+		self.dbman.restore_database(target,source_path,getattr(defs,'root_password'))
+
+		self.conn.use(target)
+		self.dbman.drop_table('__DocTypeCache')
+		self.conn.sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
+
+
+		self.conn.sql("update tabProfile set password = password('admin') where name='Administrator'")
+		self.conn.sql("update tabDocType set server_code_compiled = NULL")
+
+		# temp
+		self.conn.sql("alter table tabSessions change sessiondata sessiondata longtext")
+		try: 	
+			self.conn.sql("alter table tabSessions add index sid(sid)")
+		except Exception, e:
+			if e.args[0]==1061:
+				pass
+			else:
+				raise e
+		return target
 		
-			ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
-
-		except Exception,e:
-			raise e
-
 
 	def install_base_fw(self):
 		"""
@@ -134,26 +159,29 @@ class Installer:
 
 if __name__=='__main__':
 
-#	defs_template_path = os.path.join(cur_path,'webnotes','defs')
-#	defs_path = os.path.join(cur_path,'webnotes','defs.py')
 
-#	if not os.path.exists(defs_path):
-#		print "Creating defs.py"	
-#		copy_template_to_py(defs_template_path,defs_path)
 
-#	from webnotes import defs
-	
-#	log_path = getattr(defs,'log_file_path',None)
-#	if log_path:
-#		print "Creating log folder and file..."
-#		create_log_folder(os.path.dirname(log_path))
+	defs_path = os.path.join(os.getcwd(),'webnotes','defs.py')
+
+	if not os.path.exists(defs_path):
+		defs_template_path = os.path.join(os.getcwd(),'webnotes','defs')
+		print "Creating defs.py"	
+		copy_template_to_py(defs_template_path,defs_path)
+
+
+	from webnotes import defs
+	log_path = getattr(defs,'log_file_path',None)
+	if log_path:
+		print "Creating log folder and file..."
+		create_log_folder(os.path.dirname(log_path))
 	sys.path.append(os.getcwd())
 	
 	if sys.argv[1]=='install':
 
-		wn_folder = os.path.split(list(os.path.split(sys.path[0]))[:-1][0])[:-1][0]  #Hacky,Hard cody
-		Inst = Installer(wn_folder)
-		Inst.install_base_fw()
+		Inst = Installer(getattr(defs,'webnotes_folder'))
+		#Inst.install_base_fw()
+		
+		Inst.import_from_db("Framework")
 
 		
 		
