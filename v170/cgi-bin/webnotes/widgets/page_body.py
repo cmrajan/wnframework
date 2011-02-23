@@ -111,11 +111,11 @@ def get_page_content(page):
 	if doc.template:
 		template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
 
-	content = get_code(doc.module, 'page', doc.name, 'html') or doc.content
+	page_properties['content'] = get_code(doc.module, 'page', doc.name, 'html', fieldname='content')
 			
 	# dynamic (scripted) content
-	if content and content.startswith('#!python'):
-		page_properties.update(webnotes.model.code.execute(content))
+	if page_properties['content'] and page_properties['content'].startswith('#!python'):
+		page_properties.update(webnotes.model.code.execute(page_properties['content']))
 
 	page_properties['content'] = scrub_ids(template % {'content':page_properties['content']})
 
@@ -145,16 +145,15 @@ def load_properties():
 	page_url = webnotes.form_dict.get('_escaped_fragment_', '')
 	
 	if page_url:
-		page_url = [urllib.unquote(i) for i in page_url.split('/')]		
+		if page_url.startswith('Page/'): 
+			page_url = page_url[5:]
+		page_url = ['Page', urllib.unquote(page_url)]
 	else:
 		page_url = ['Page', webnotes.user.get_home_page()]
-			
-	content = ''
-	
+		
 	# load content
 	# -----------------	
-	if page_url[0] == 'Page':
-		get_page_content(page_url[1])
+	get_page_content(page_url[1])
 
 # generate the page
 # -----------------

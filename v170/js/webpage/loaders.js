@@ -205,7 +205,11 @@ function loadpage(page_name, call_back, no_history) {
 		scroll(0,0);
 
 		// update "back"
-		nav_obj.open_notify('Page', page_name, window.location.hash.split('/')[2], no_history);
+		if(window.location.hash.substr(0,6)=='#!Page')
+			arg = window.location.hash.split('/')[2];
+		else
+			arg = window.location.hash.split('/')[1];
+		nav_obj.open_notify('Page', page_name, arg, no_history);
 
 		// call refresh script
 		try {
@@ -218,7 +222,9 @@ function loadpage(page_name, call_back, no_history) {
 	if(get_local('Page', page_name) || page_body.pages[page_name]) 
 		fn();
 	else {
-		$c('webnotes.widgets.page.getpage', {'name':page_name}, fn);
+		args = get_url_dict(); // send everything to the page
+		args.name = page_name;		
+		$c('webnotes.widgets.page.getpage', args, fn);
 	}
 }
 

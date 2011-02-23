@@ -115,10 +115,9 @@ function startup() {
 function to_open() {
 	if(get_url_arg('page'))
 		return get_url_arg('page');
-	if(location.hash) {
-		if(location.hash.substr(0,2)=='#!')
-			return location.hash.substr(2);		
-		return location.hash.substr(1);
+	var h = location.hash;
+	if(h) {
+		return h.substr(1);
 	}
 }
 

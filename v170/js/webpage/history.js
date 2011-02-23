@@ -29,8 +29,12 @@ nav_obj.open_notify = function(t, dt, dn, no_history) {
 		en_dt = encodeURIComponent(dt);
 		en_dn = dn ? encodeURIComponent(dn) : '';
 		
-		var id = en_t+'/'+ en_dt + (dn ? ('/'+en_dn): '')
-		
+		if(en_t=='Page') {
+			var id = en_dt + (dn ? ('/'+en_dn): '')
+		} else {
+			var id = en_t+'/'+ en_dt + (dn ? ('/'+en_dn): '')
+		}
+				
 		// option to add to analytics engine
 		if(nav_obj.on_open)
 			nav_obj.on_open(id);
@@ -94,7 +98,14 @@ function history_get_name(t) {
 }
 
 function historyChange(newLocation, historyData) {
-	if(newLocation.substr(0,1)=='!') newLocation = newLocation.substr(1);
+	// remove exclamation for hash-bangs
+	if(newLocation.substr(0,1)=='!') {
+		newLocation = newLocation.substr(1);
+		if(!in_list(['Page/', 'Form/', 'Repor'], newLocation.substr(0,5))) {
+			newLocation = 'Page/' + newLocation;	
+		}
+	}
+	
 	t = newLocation.split('/');
 
 	for(var i=0;i<t.length;i++) 

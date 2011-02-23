@@ -90,11 +90,13 @@ $item_set_working = function(ele) {
 	if(ele.loading_img) { 
 		$di(ele.loading_img) 
 	} else {
+		ele.disabled = 1;
 		ele.loading_img = $a(ele.parentNode,'img','',{marginLeft:'4px',marginBottom:'-2px',display:'inline'});
 		ele.loading_img.src = 'images/ui/button-load.gif';
 	}
 }
 $item_done_working = function(ele) {
+	ele.disabled = 0;
 	if(ele.loading_img) { $dh(ele.loading_img) };
 }
 
@@ -514,7 +516,11 @@ function get_url_arg(name) {
 function get_url_dict() {
 	var d = {}
 	var t = window.location.href.split('?')[1];
+	if(!t) return d;
+	
 	if(t.indexOf('#')!=-1) t = t.split('#')[0];
+	if(!t) return d;
+
 	t = t.split('&');
 	for(var i=0; i<t.length; i++) {
 		var a = t[i].split('=');
