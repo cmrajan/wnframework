@@ -27,19 +27,6 @@ default_columns = ['name', 'creation', 'modified', 'modified_by', 'owner', 'docs
 default_shortcuts = ['_Login', '__user', '_Full Name', 'Today', '__today']
 
 # -------------------------------------------------
-# Class database schema
-# -------------------------------------------------
-
-class DbSchema:
-	def __init__(self):
-		self.tables = None
-		
-	def get_tables(self):
-		if not self.tables:
-			self.tables = [t[0] for t in webnotes.conn.sql("show tables")]
-		return self.tables
-
-# -------------------------------------------------
 # Class database table
 # -------------------------------------------------
 
@@ -296,7 +283,7 @@ class DbManager:
 		0.  Simplify / create settings for the restore database source folder 
 		0a. Merge restore database and extract_sql(from webnotes_server_tools).
 		1. Setter and getter for different mysql variables.
-		2. 
+		2. Setter and getter for mysql variables at global level??
 	"""	
 	def __init__(self,conn = webnotes.conn):
 		"""
