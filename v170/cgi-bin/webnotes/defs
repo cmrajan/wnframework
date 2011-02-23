@@ -5,26 +5,26 @@
 # After "accounts" is created, login and pwd should point to accounts db
 
 #webnotes folder
-webnotes_folder = '/home/anand/workspace/webnotes/wnframework/trunk/v170/cgi-bin'
+#webnotes_folder = <The absolute path to the webnotes folder inside the checked out code> <ex:'/home/anand/workspace/v170/cgi-bin'>
 
-db_name = <Your DB Name>
-db_login = <Your DB Login>
-db_password = <Your DB Password>
+#db_name = <Your DB Name>
+#db_login = <Your DB Login>
+#db_password = <Your DB Password>
 
 # root
-root_login = <Your mysql root login>
-root_password = <Your mysql root password>
+#root_login = <Your mysql root login>
+#root_password = <Your mysql root password>
 	
 # default mail server
-mail_server = <Your mail server>
-mail_login = <Your mail login>
-mail_password = <Your mail password>
+#mail_server = <Your mail server>
+#mail_login = <Your mail login>
+#mail_password = <Your mail password>
 
 # new accounts will be created with this prefix
-server_prefix = <prefix you want to be used for new databases>
+#server_prefix = <prefix you want to be used for new databases>
 
-mysql_path = <path where mysql is installed,blank for default>
-files_path = <path to store user files>
+#mysql_path = <path where mysql is installed,blank for default>
+#files_path = <path to store user files>
 
 #LOG SETTINGS
 #log_file_path = <Path where you want the framework to store log files>
@@ -35,7 +35,7 @@ files_path = <path to store user files>
 
 
 #MODULE MANAGER SETTINGS
-modules_path = <path where you have the erp modules checked out>
+#modules_path = <path where you have the erp modules checked out>
 developer_mode = 0
 user_timezone = 'Asia/Calcutta'
 
