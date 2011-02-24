@@ -72,7 +72,7 @@ def rename(dt, old, new, is_doctype = 0):
 	ll = sql("select parent, fieldname from tabDocField where parent not like 'old%%' and ((options = '%s' and fieldtype='Link') or (options = 'link:%s' and fieldtype='Select'))" % (dt, dt))
 	for l in ll:
 		is_single = sql("select issingle from tabDocType where name = '%s'" % l[0])
-		is_single = is_single and cint(is_single[0][0]) or 0
+		is_single = is_single and webnotes.utils.cint(is_single[0][0]) or 0
 		if is_single:
 			sql("update `tabSingles` set value='%s' where field='%s' and value = '%s' and doctype = '%s' " % (new, l[1], old, l[0]))
 		else:
