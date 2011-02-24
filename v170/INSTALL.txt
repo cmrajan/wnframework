@@ -38,28 +38,20 @@ c. Add "index.cgi" to DirectoryIndex
 2. Setup your MySQL passwords
 
 Set the variables in the defs file. (cgi-bin/webnotes/defs)
+uncomment the lines first(delete the # at the start of the line)
+Mandatory ones: 'webnotes_folder','root_login','root_password' (You can delete the root_password later.)
+Optional: 'mysql_path','modules_path'
 
-This will be copied to 
+These will be copied to 
 	cgi-bin/webnotes/defs.py
 
 ------------------------------------------------------------------------
 3. Setting up your first app
 
-The first app in your server must also acts as a router for all other apps on your server.
-Hence we call this app "accounts". To setup the accounts app, you can do either step mentioned below:
-
-	a, Run the install file in the cgi-bin folder like:
-		python install.py install
+ Run this command from shell, while you are in the cgi-bin folder like:
+		python webnotes/install_lib/install.py install
 	
-		OR
-	b,run the following from the python shell
-
-		>>>import webnotes
-		>>>import install
-
-		>>>install.import_db('Framework','accounts')
-		>>>install.create_account_doctype()
-
+	
 ------------------------------------------------------------------------
 4. Login to application
 
@@ -82,7 +74,7 @@ Step by step instructions on CentOS/Fedora:
 	7. easy_install email
 	8. easy_install simplejson
 	   easy_install suds
-	9. yum install libjpeg-devel
+		9. yum install libjpeg-devel
 	10.yum install python-imaging
 
 	11. Edit /etc/httpd/conf/httpd.conf and add the options as mentioned above.	11a, If you enable logging set apache umask to 002
