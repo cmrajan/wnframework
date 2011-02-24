@@ -2,7 +2,7 @@
 import os,sys
 sys.path.append(os.getcwd())
 
-def copy_template_to_py(template_path,target_path):
+def copy_file(template_path,target_path):
 		try:
 			print "Copying %s to %s"%(template_path,target_path)
 			cp_cmd = 'cp'
@@ -166,8 +166,12 @@ if __name__=='__main__':
 	if not os.path.exists(defs_path):
 		defs_template_path = os.path.join(os.getcwd(),'webnotes','defs')
 		print "Creating defs.py"	
-		copy_template_to_py(defs_template_path,defs_path)
+		copy_file(defs_template_path,defs_path)
 
+	accmap_path = os.path.join(os.getcwd(),'webnotes','settings','account_map.py')
+	if not os.path.exists(accmap_path):
+		accmap_temp_path = os.path.join(os.getcwd(),'webnotes','settings','account_map_template.py')
+	copy_file(accmap_temp_path,accmap_path)
 
 	from webnotes import defs
 	log_path = getattr(defs,'log_file_path',None)
