@@ -15,7 +15,7 @@ try:
 	import webnotes
 	import webnotes.defs
 
-	sys.path.append(webnotes.defs.modules_path)
+	sys.path.append(getattr(webnotes.defs,'modules_path',None))
 
 	webnotes.form = cgi.FieldStorage()
 	for each in webnotes.form.keys():
