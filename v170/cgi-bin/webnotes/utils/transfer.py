@@ -185,11 +185,12 @@ def merge_doctype(doc_list, ovr, ignore, onupdate):
 
 def re_index_doctype(module, dt):
 	import webnotes
-	from webnotes.defs import modules_path
-	
 	import os
 	
-	file = open(os.path.join(modules_path, module, 'doctype', dt, dt + '.txt'),'r')
+	from webnotes.modules import get_module_path
+	
+	modules_path = get_module_path(module)
+	file = open(os.path.join(modules_path, 'doctype', dt, dt + '.txt'),'r')
 	doclist = eval(file.read())
 	file.close()
 
