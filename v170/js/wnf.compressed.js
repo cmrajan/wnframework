@@ -1261,7 +1261,7 @@ d.onshow=function(){var c=me.selected_date;var tmp=time_to_ampm(this.ev.event_ho
 +' - <b>'+tmp+'</b></div>';this.widgets['Description'].value=cstr(this.ev.description);this.widgets['Public Event'].checked=false;this.widgets['Cancel Event'].checked=false;if(this.ev.event_type=='Public')
 this.widgets['Public Event'].checked=true;this.widgets['Event Link'].innerHTML='';var div=$a(this.widgets['Event Link'],'div','link_type',{margin:'4px 0px'});div.onclick=function(){me.event_dialog.hide();loaddoc('Event',me.event_dialog.ev.name);}
 div.innerHTML='View Event details, add or edit participants';}
-d.widgets['Save'].onclick=function(){var d=me.event_dialog;d.ev.description=d.widgets['Description'].value;if(d.widgets['Cancel Event'].checked)d.ev.event_type='Cancelled';else if(d.widgets['Public Event'].checked)d.ev.event_type='Public';me.event_dialog.hide();if(d.cal_ev)
+d.widgets['Save'].onclick=function(){var d=me.event_dialog;d.ev.description=d.widgets['Description'].value;if(d.widgets['Cancel Event'].checked)d.ev.event_type='Cancel';else if(d.widgets['Public Event'].checked)d.ev.event_type='Public';me.event_dialog.hide();if(d.cal_ev)
 var cal_ev=d.cal_ev;else
 var cal_ev=me.set_event(d.ev);cal_ev.save();if(me.cur_view)me.cur_view.refresh();}
 this.event_dialog=d;}
