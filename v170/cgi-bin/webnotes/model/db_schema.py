@@ -114,7 +114,7 @@ class DbTable:
 
 	def get_foreign_key_definitions(self):
 		ret = []
-		tab_list = DbManager().get_tables_list(webnotes.conn.cur_db_name)
+		tab_list = DbManager(webnotes.conn).get_tables_list(webnotes.conn.cur_db_name)
 
 		for k in self.columns.keys():
 			if self.columns[k].fieldtype=='Link' and self.columns[k].options:
@@ -140,7 +140,7 @@ class DbTable:
 	# SET foreign keys
 	def set_foreign_keys(self):
 		if self.add_foreign_key:
-			tab_list = DbManager().get_tables_list(webnotes.conn.cur_db_name)
+			tab_list = DbManager(webnotes.conn).get_tables_list(webnotes.conn.cur_db_name)
 			webnotes.conn.sql("set foreign_key_checks=0")
 			for col in self.add_foreign_key:
 				if col.options:
@@ -170,7 +170,7 @@ class DbTable:
 			webnotes.conn.sql("set foreign_key_checks=1")
 		
 	def sync(self):
-		if not self.name in DbManager().get_tables_list(webnotes.conn.cur_db_name):
+		if not self.name in DbManager(webnotes.conn).get_tables_list(webnotes.conn.cur_db_name):
 			self.create()
 		else:
 			self.alter()
