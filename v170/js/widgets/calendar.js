@@ -130,7 +130,7 @@ Calendar.prototype.show_event = function(ev, cal_ev) {
 			
 			// save values
 			d.ev.description = d.widgets['Description'].value;
-			if(d.widgets['Cancel Event'].checked) d.ev.event_type='Cancelled';
+			if(d.widgets['Cancel Event'].checked) d.ev.event_type='Cancel';
 			else if(d.widgets['Public Event'].checked) d.ev.event_type='Public';
 			
 			me.event_dialog.hide();
