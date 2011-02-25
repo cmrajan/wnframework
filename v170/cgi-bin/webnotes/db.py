@@ -30,8 +30,7 @@ class Database:
 			webnotes.logger.debug('Database object initialized for:%s',self.user)
 
 	def get_db_login(self, ac_name):
-		from webnotes.settings import account_map		
-		return account_map.db_name_map.get(ac_name, account_map.default_db_name)
+		return getattr(defs,'db_name_map').get(ac_name, getattr(defs,'default_db'))
 
 	def connect(self):
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)

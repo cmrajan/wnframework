@@ -168,16 +168,12 @@ if __name__=='__main__':
 		print "Creating defs.py"	
 		copy_file(defs_template_path,defs_path)
 
-	accmap_path = os.path.join(os.getcwd(),'webnotes','settings','account_map.py')
-	if not os.path.exists(accmap_path):
-		accmap_temp_path = os.path.join(os.getcwd(),'webnotes','settings','account_map_template.py')
-	copy_file(accmap_temp_path,accmap_path)
-
 	from webnotes import defs
 	log_path = getattr(defs,'log_file_path',None)
 	if log_path:
 		print "Creating log folder and file..."
 		create_log_folder(os.path.dirname(log_path))
+		
 	sys.path.append(os.getcwd())
 	
 	if sys.argv[1]=='install':
@@ -186,7 +182,7 @@ if __name__=='__main__':
 		#Inst.install_base_fw()
 		
 		Inst.import_from_db("Framework")
-
+		
 		
 		
 

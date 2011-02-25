@@ -81,21 +81,19 @@ class HTTPRequest:
 	# ------------------
 
 	def set_db(self, ac_name = None):
-		from webnotes.settings import account_map
-
-		ac_name = None
 		
+
 		# select based on subdomain
-		if account_map.domain_name_map.get(self.domain):
-			db_name = account_map.domain_name_map.get(self.domain)
+		if getattr(webnotes.defs,'domain_name_map').get(self.domain):
+			db_name = getattr(webnotes.defs,'domain_name_map').get(self.domain)
 
 		# select based on ac_name
 		else:
 			ac_name = self.get_ac_name()
 			if ac_name:
-				db_name = account_map.db_name_map.get(ac_name, account_map.default_db_name)
+				db_name = getattr(webnotes.defs,'db_name_map').get(ac_name, getattr(webnotes.defs,'default_db'))
 			else:
-				db_name = account_map.default_db_name
+				db_name = getattr(webnotes.defs,'default_db')
 	
 		webnotes.conn = webnotes.db.Database(user = db_name,password = getattr(webnotes.defs,'db_password'))
 		webnotes.ac_name = ac_name
