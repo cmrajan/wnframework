@@ -8,14 +8,14 @@ import webnotes
 class Database:
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
-		self.user = user or defs.db_login
+		self.user = user or defs.default_db
 		self.password = password or defs.db_password
 
 		if ac_name:
-			self.user = self.get_db_login(ac_name) or defs.db_login
+			self.user = self.get_db_login(ac_name) or defs.default_db
 		
 		if use_default:
-			self.user = defs.db_login
+			self.user = defs.default_db
 
 		self.is_testing = 0
 		self.in_transaction = 0
