@@ -1,0 +1,21 @@
+
+
+#webnotes folder
+webnotes_folder = '/home/anand/workspace/webnotes/wnframework/trunk/v170/cgi-bin'
+
+
+db_password = 'webnotesdb'
+
+# root
+root_login = 'root'
+root_password = 'route'
+
+
+
+#MODULE MANAGER SETTINGS
+modules_path = '/home/anand/workspace/webnotes/wnframework-modules/trunk'
+developer_mode = 0
+user_timezone = 'Asia/Calcutta'
+
+
+
