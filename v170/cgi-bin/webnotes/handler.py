@@ -33,7 +33,7 @@ def cleanup_docs():
 # server calls
 # ------------------------------------------------------------------------------------
 
-def runserverobj():
+def runserverobj(arg=None):
 	import webnotes.widgets.form
 	webnotes.widgets.form.runserverobj()
 

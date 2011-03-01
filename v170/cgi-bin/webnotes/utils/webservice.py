@@ -105,8 +105,8 @@ class FrameworkServer:
 	
 	# -----------------------------------------------------------------------------------------
 			
-	def runmethod(self, method, arg):
-		res = self.http_get_response('execute_method', args{
+	def run_method(self, method, arg):
+		res = self.http_get_response(method, args = {
 			'arg':arg	
 		})
 		ret = eval(res.read())
