@@ -65,7 +65,7 @@ class Database:
 		for r in result:
 			dict = {}
 			for i in range(len(r)):
-				dict[self._cursor.description[i][0]] = r[i]
+				dict[self._cursor.description[i][0]] = self.convert_to_simple_type(r[i])
 			ret.append(dict)
 		return ret
 	

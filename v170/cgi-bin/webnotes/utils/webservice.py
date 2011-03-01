@@ -47,7 +47,9 @@ class FrameworkServer:
 			self.sid = cookies.get('sid')
 			
 			self.login_response = ret
-				
+
+	# -----------------------------------------------------------------------------------------
+
 	def http_get_response(self, method, args):
 		# get response from remote server
 	
@@ -73,6 +75,8 @@ class FrameworkServer:
 		conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
 	
 		return conn.getresponse()
+
+	# -----------------------------------------------------------------------------------------
 	
 	def _extract_cookies(self, res):
 		h = res.getheader('set-cookie')
@@ -84,6 +88,8 @@ class FrameworkServer:
 					if len(t)==2:
 						self.cookies[t[0].strip(', ')] = t[1].strip()
 
+	# -----------------------------------------------------------------------------------------
+
 	def runserverobj(self, doctype, docname, method, arg=''):
 		res = self.http_get_response('runserverobj', args = {
 			'doctype':doctype
@@ -91,4 +97,20 @@ class FrameworkServer:
 			,'method':method
 			,'arg':arg
 		})
-		return eval(res.read())
+		ret = eval(res.read())
+		if ret.get('exc'):
+			webnotes.msgprint(ret.get('exc'))
+			raise Exeception
+		return ret
+	
+	# -----------------------------------------------------------------------------------------
+			
+	def runmethod(self, method, arg):
+		res = self.http_get_response('execute_method', args{
+			'arg':arg	
+		})
+		ret = eval(res.read())
+		if ret.get('exc'):
+			webnotes.msgprint(ret.get('exc'))
+			raise Exeception
+		return ret

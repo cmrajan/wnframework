@@ -106,26 +106,10 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 		return CustomDocType(doc, doclist)
 	else:
 		return DocType(doc, doclist)
-
-#=================================================================================
-# run a page method
-#=================================================================================
-
-def execute_page_method(module, page, method, arg=''):
-	import webnotes
-
-	# import module
-	exec 'from %s.page.%s import %s' % (module, page, page)
-
-	# run the method		
-	if getattr(locals()[page], method):
-		webnotes.response['message']  = getattr(locals()[page], method)(arg)
-
+	
 #=================================================================================
 # get object (from dt and/or dn or doclist)
 #=================================================================================
-
-
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:

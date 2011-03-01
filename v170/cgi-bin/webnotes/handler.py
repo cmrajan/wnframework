@@ -37,10 +37,6 @@ def runserverobj():
 	import webnotes.widgets.form
 	webnotes.widgets.form.runserverobj()
 
-def execute_page_method():
-	from webnotes.model.code import execute_page_method
-	execute_page_method(webnotes.form_dict['module'], webnotes.form_dict['page'], webnotes.form_dict['method'], webnotes.form_dict.get('arg', None))
-
 def logout():
 	webnotes.login_manager.logout()
 
@@ -211,6 +207,19 @@ def backupdb(form_dict, session):
 	webnotes.response['filename'] = db_name+'.tar.gz'
 	webnotes.response['filecontent'] = open('../backups/' + db_name+'.tar.gz','rb').read()
 
+# ---------------------------------------------------------------------
+
+def validate_cmd(cmd):
+	# check if there is no direct possibility of malicious script injection
+	if cmd.startswith('webnotes.model.code'):
+		raise Exception, 'Cannot call any methods from webnotes.model.code directly from the handler'
+
+	if cmd.startswith('webnotes.model.db_schema'):
+		raise Exception, 'Cannot call any methods from webnotes.model.db_schema directly from the handler'
+
+	if cmd.startswith('webnotes.conn'):
+		raise Exception, 'Cannot call database connection method directly from the handler'
+	
 # Execution Starts Here
 # ---------------------------------------------------------------------
 
@@ -269,29 +278,30 @@ else:
 			cmd = form_dict.has_key('cmd') and form_dict.get('cmd') or ''
 			read_only = form_dict.has_key('_read_only') and form_dict.get('_read_only') or None
 
-			# load module
-			if webnotes.session['user'] == 'Guest':
-				if cmd not in ['runserverobj', 'webnotes.widgets.form.getdoc',\
-					'webnotes.widgets.form.getdoctype','logout','webnotes.widgets.page.getpage',\
-					'get_file','webnotes.widgets.query_builder.runquery','webnotes.widgets.form.savedocs',\
-					'startup','webnotes.widgets.form.add_comment', 'execute_page_method']:
-					
-					webnotes.msgprint('Guest not allowed to perform this action')
-					raise Exception
+			validate_cmd(cmd)
 
 			module = ''
 			if '.' in cmd:
 				module = '.'.join(cmd.split('.')[:-1])
 				cmd = cmd.split('.')[-1]
 
-				exec 'from %s import %s' % (module, cmd) in locals()
+				exec 'from %s import %s' % (module, cmd) in locals()			
+	
 	
 			# execute
 			if locals().has_key(cmd):
 				if (not webnotes.conn.in_transaction) and (not read_only):
 					sql("START TRANSACTION")
 				
-				locals()[cmd]()
+				if webnotes.form_dict.get('arg'):
+					# direct method call
+					ret = locals()[cmd](webnotes.form_dict.get('arg'))
+				else:
+					ret = locals()[cmd]()
+				
+				# returns with a message
+				if ret:
+					webnotes.response['message'] = ret
 						
 				# update session
 				webnotes.session_obj.update()

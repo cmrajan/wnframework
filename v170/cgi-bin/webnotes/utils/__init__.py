@@ -4,6 +4,7 @@ import webnotes
 
 user_time_zone = None
 month_name = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+month_name_full = ['','January','February','March','April','May','June','July','August','September','October','November','December']
 no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image', 'Graph']
 default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
 
@@ -71,16 +72,21 @@ def log(event, details):
 
 def getdate(string_date):
 	import datetime
+	if ' ' in string_date:
+		string_date = string_date.split(' ')[0]
 	t = string_date.split('-')
 	if len(t)==3:
 		return datetime.date(cint(t[0]), cint(t[1]), cint(t[2]))
 	else:
 		return ''
 
-def add_days(string_date, days):
+def add_days(date, days):
 	import datetime
-	d = getdate(string_date)
-	return (d + datetime.timedelta(days)).strftime('%Y-%m-%d')
+	if not date:
+		date = now_datetime()
+	if type(date)==str:
+		date = getdate(date)
+	return (date + datetime.timedelta(days)).strftime('%Y-%m-%d')
 
 def add_months(string_date, months):
 	import datetime
@@ -142,6 +148,17 @@ def dict_to_str(args, sep='&'):
 	for k in args.keys():
 		t.append(str(k)+'='+urllib.quote(str(args[k] or '')))
 	return sep.join(t)
+	
+def global_date_format(date):
+	import datetime
+
+	if type(date)==str:
+		date = getdate(date)
+	
+	return date.strftime('%d') + ' ' + month_name_full[int(date.strftime('%m'))] + ' ' + date.strftime('%Y')
+	
+	
+	
 
 # Datatype
 # ==============================================================================

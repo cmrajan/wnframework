@@ -70,9 +70,13 @@ function $c(command, args, fn, on_timeout, no_spinner, freeze_msg) {
 
 function validate_session(r,rt) {
 	// check for midway change in session
-	if(start_sid && start_sid != get_cookie('sid') && r.message!='Logged In') {
+	if(r.message=='Logged In') {
+		start_sid = get_cookie('sid');
+		return true;
+	}
+	if(start_sid && start_sid != get_cookie('sid')) {
 		page_body.set_session_changed();	
-		return
+		return;
 	}
 
 	// check for expired session
@@ -114,11 +118,7 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 
 // For call a page metho
 function $c_page(module, page, method, arg, call_back, no_spinner, freeze_msg) {
-	$c('execute_page_method',{
-		'module':module,
-		'page':page,
-		'method':method, 
-		'arg':arg}, call_back, null, no_spinner, freeze_msg);
+	$c(module+'.page.'+page+'.'+page+'.'+method,{'arg':arg}, call_back, null, no_spinner, freeze_msg);
 }
 
 // For calling an for output as csv

@@ -117,6 +117,10 @@ function DateFn() {
 			return  d[2]+'-'+d[0]+'-'+d[1];
 		}
 	}
+	this.global_date_format = function(d) {
+		if(d.substr) d = this.str_to_obj(d);
+		return d.getDate() + ' ' + month_list_full[d.getMonth()] + ' ' + d.getFullYear();
+	}
 }
 
 var dateutil = new DateFn();

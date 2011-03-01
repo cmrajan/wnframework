@@ -162,9 +162,17 @@ class LoginManager:
 	
 	# --------
 	def run_trigger(self, method='on_login'):
+		try:
+			import event_handlers
+			if hasattr(event_handlers, method):
+				getattr(event_handlers, method)()
+		except ImportError, e:
+			pass
+	
+		# deprecated
 		self.load_control_panel()
 		if self.cp and hasattr(self.cp, method):
-			self.cp.on_login(self)
+			getattr(self.cp, method)(self)
 
 	# ip validation
 	# -------------

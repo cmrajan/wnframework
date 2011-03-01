@@ -879,27 +879,6 @@ div.ann_body {
 	border: 1px solid #AAA;
 }
 
-div.dialog_row {
-	padding: 8px 8px 0px 8px;
-}
-
-div.dialog_row table {
-	width: 100%;
-}
-
-div.dialog_row table td {
-}
-
-div.dialog_row input, div.dialog_row textarea, div.dialog_row select {
-	width: 80%;
- 	margin: 0px; border: 1px solid #888; padding: 1px; 
- }
-
-div.dialog_row table td textarea {
-	width: 80%;
-	height: 200px;
-	font-size: 12px;
-}
 
 div.notice {
 	postion: absolute;
@@ -1305,8 +1284,9 @@ div.dialog_row table {
 div.dialog_row table td {
 }
 
-div.dialog_row input, div.dialog_row textarea, div.dialog_row select {
+div.dialog_row input[type="text"], div.dialog_row input[type="password"], div.dialog_row textarea, div.dialog_row select {
 	width: 80%;
+	font-size: 14px;
 }
 
 div.dialog_row table td textarea {

@@ -89,7 +89,8 @@ this.user_to_str=function(d){var user_fmt=this.get_user_fmt();if(user_fmt=='dd-m
 else if(user_fmt=='dd/mm/yyyy'){var d=d.split('/');return d[2]+'-'+d[1]+'-'+d[0];}
 else if(user_fmt=='yyyy-mm-dd'){return d;}
 else if(user_fmt=='mm/dd/yyyy'){var d=d.split('/');return d[2]+'-'+d[0]+'-'+d[1];}
-else if(user_fmt=='mm-dd-yyyy'){var d=d.split('-');return d[2]+'-'+d[0]+'-'+d[1];}}}
+else if(user_fmt=='mm-dd-yyyy'){var d=d.split('-');return d[2]+'-'+d[0]+'-'+d[1];}}
+this.global_date_format=function(d){if(d.substr)d=this.str_to_obj(d);return d.getDate()+' '+month_list_full[d.getMonth()]+' '+d.getFullYear();}}
 var dateutil=new DateFn();var date=dateutil;var reversedate=dateutil.str_to_user;function only_date(val){if(val==null||val=='')return null;if(val.search(':')!=-1){var tmp=val.split(' ');var d=tmp[0].split('-');}else{var d=val.split('-');}
 if(d.length==3)
 val=d[2]+'-'+d[1]+'-'+d[0];return val;}
@@ -232,13 +233,14 @@ function $c(command,args,fn,on_timeout,no_spinner,freeze_msg){var req=newHttpReq
 if(freeze_msg)unfreeze();if(!validate_session(r,rtxt))return;if(r.exc){errprint(r.exc);};if(r.server_messages){msgprint(r.server_messages);};if(r.docs){LocalDB.sync(r.docs);}
 saveAllowed=true;if(fn)fn(r,rtxt);}}
 req.onreadystatechange=ret_fn;req.open("POST",outUrl,true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");args['cmd']=command;req.send(makeArgString(args));if(!no_spinner)set_loading();if(freeze_msg)freeze(freeze_msg,1);}
-function validate_session(r,rt){if(start_sid&&start_sid!=get_cookie('sid')&&r.message!='Logged In'){page_body.set_session_changed();return}
+function validate_session(r,rt){if(r.message=='Logged In'){start_sid=get_cookie('sid');return true;}
+if(start_sid&&start_sid!=get_cookie('sid')){page_body.set_session_changed();return;}
 if(r.exc&&r.session_status=='Session Expired'){resume_session();return;}
 if(r.exc&&r.session_status=='Logged Out'){msgprint('You have been logged out');setTimeout('redirect_to_login()',3000);return;}
 if(r.exc&&r.exc_type&&r.exc_type=='PermissionError'){loadpage('_home');}
 return true;}
 function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){if(doclist.substr){$c('runserverobj',{'doctype':doclist,'method':method,'arg':arg},call_back,null,no_spinner,freeze_msg);}else{$c('runserverobj',{'docs':compress_doclist(doclist),'method':method,'arg':arg},call_back,null,no_spinner,freeze_msg);}}
-function $c_page(module,page,method,arg,call_back,no_spinner,freeze_msg){$c('execute_page_method',{'module':module,'page':page,'method':method,'arg':arg},call_back,null,no_spinner,freeze_msg);}
+function $c_page(module,page,method,arg,call_back,no_spinner,freeze_msg){$c(module+'.page.'+page+'.'+page+'.'+method,{'arg':arg},call_back,null,no_spinner,freeze_msg);}
 function $c_obj_csv(doclist,method,arg){var args={}
 args.cmd='runserverobj';args.as_csv=1;args.method=method;args.arg=arg;if(doclist.substr)
 args.doctype=doclist;else
@@ -322,7 +324,7 @@ Dialog.prototype.make_row=function(d){var me=this;this.rows[d[1]]=$a(this.body,'
 $t(c1,d[1]);}
 if(d[0]=='HTML'){if(d[2])row.innerHTML=d[2];this.widgets[d[1]]=row;}
 else if(d[0]=='Check'){var i=$a_input(c2,'checkbox','',{width:'20px'});c1.innerHTML=d[1];this.widgets[d[1]]=i;}
-else if(d[0]=='Data'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a(c2,'input');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
+else if(d[0]=='Data'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a_input(c2,'text');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
 else if(d[0]=='Link'){c1.innerHTML=d[1];var f=make_field({fieldtype:'Link','label':d[1],'options':d[2]},'',c2,this,0,1);f.not_in_form=1;f.dialog=this;f.refresh();this.widgets[d[1]]=f.input;}
 else if(d[0]=='Date'){c1.innerHTML=d[1];var f=make_field({fieldtype:'Date','label':d[1],'options':d[2]},'',c2,this,0,1);f.not_in_form=1;f.refresh();f.dialog=this;this.widgets[d[1]]=f.input;}
 else if(d[0]=='Password'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a_input(c2,'password');if(d[3])$a(c2,'div','comment').innerHTML=d[3];}
@@ -927,9 +929,9 @@ l.onclick=function(){loaddoc(this.dt,this.link_name);d.hide();}
 var cl=[]
 for(var j=1;j<r.values[i].length;j++)cl.push(r.values[i][j]);var c=$a(div,'div','comment',{marginTop:'2px'});c.innerHTML=cl.join(', ');}}
 selector=d;}
-var _loading_div;function set_loading(){if(page_body.wntoolbar)$ds(page_body.wntoolbar.spinner);$y(document.getElementsByTagName('body')[0],{cursor:'progress'});pending_req++;}
-function hide_loading(){pending_req--;if(page_body.wntoolbar)
-var d=page_body.wntoolbar.spinner;if(!d)return;if(!pending_req){$y(document.getElementsByTagName('body')[0],{cursor:'default'});$dh(d);}}
+var _loading_div;function set_loading(){if(page_body.wntoolbar)$ds(page_body.wntoolbar.spinner);$y(document.getElementsByTagName('body')[0],{cursor:'progress'});if(page_body.on_start_spinner)page_body.on_start_spinner();pending_req++;}
+function hide_loading(){pending_req--;if(!pending_req){$y(document.getElementsByTagName('body')[0],{cursor:'default'});if(page_body.wntoolbar)
+var d=page_body.wntoolbar.spinner;if(d)$dh(d);if(page_body.on_stop_spinner)page_body.on_stop_spinner();}}
 var fcount=0;var frozen=0;var dialog_message;var dialog_back;function freeze(msg,do_freeze){if(msg){if(!dialog_message){dialog_message=$a('dialogs','div','dialog_message');}
 var d=get_screen_dims();$y(dialog_message,{left:((d.w-250)/2)+'px',top:(get_scroll_top()+200)+'px'});dialog_message.innerHTML='<div style="font-size:16px; color: #444; font-weight: bold; text-align: center;">'+msg+'</div>';$ds(dialog_message);}
 if(!dialog_back){dialog_back=$a($i('body_div'),'div','dialog_back');if(isIE)dialog_back.style['filter']='alpha(opacity=60)';}

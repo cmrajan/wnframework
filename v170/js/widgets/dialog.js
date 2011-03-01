@@ -148,7 +148,7 @@ Dialog.prototype.make_row = function(d) {
 	else if(d[0]=='Data') {
 		c1.innerHTML = d[1];
 		c2.style.overflow = 'auto';
-		this.widgets[d[1]] = $a(c2, 'input');
+		this.widgets[d[1]] = $a_input(c2, 'text');
 		if(d[2])$a(c2, 'div', 'comment').innerHTML = d[2];
 	} 
 	else if(d[0]=='Link') {
