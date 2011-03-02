@@ -3,7 +3,8 @@ class DocType:
     self.doc, self.doclist = d,dl
 
   def autoname(self):
-    self.doc.name = self.doc.page_name.lower().replace(' ', '-')
+    if not self.doc.name:
+      self.doc.name = self.doc.page_name.lower().replace(' ', '-')
 
   def onload(self):
     import os
@@ -36,8 +37,10 @@ class DocType:
     from webnotes.modules.export_module import export_to_files
     from webnotes.modules import get_module_path, scrub
     import os
-	
-    export_to_files(record_list=[['Page', self.doc.name]])
+    from webnotes import defs
+    
+    if getattr(defs,'developer_mode', 0):
+      export_to_files(record_list=[['Page', self.doc.name]])
 	
     if self.doc.write_content:
       file = open(os.path.join(get_module_path(self.doc.module), 'page', scrub(self.doc.name), scrub(self.doc.name) + '.html'), 'w')
