@@ -99,18 +99,14 @@ class FrameworkServer:
 		})
 		ret = eval(res.read())
 		if ret.get('exc'):
-			webnotes.msgprint(ret.get('exc'))
-			raise Exeception
+			raise Exception, ret.get('exc')
 		return ret
 	
 	# -----------------------------------------------------------------------------------------
 			
-	def run_method(self, method, arg):
-		res = self.http_get_response(method, args = {
-			'arg':arg	
-		})
+	def run_method(self, method, args):
+		res = self.http_get_response(method, args)
 		ret = eval(res.read())
 		if ret.get('exc'):
-			webnotes.msgprint(ret.get('exc'))
-			raise Exeception
+			raise Exception, ret.get('exc')
 		return ret

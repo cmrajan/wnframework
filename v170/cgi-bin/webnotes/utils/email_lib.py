@@ -201,6 +201,8 @@ def get_footer():
 
 def get_form_link(dt, dn):
 	public_domain = webnotes.conn.get_value('Control Panel', None, 'public_domain')
+	from webnotes.util.encrypt import encrypt
+
 	if not public_domain:
 		return ''
 
@@ -219,7 +221,6 @@ def get_form_link(dt, dn):
 def send_form():
 	import webnotes
 	from webnotes.utils import cint
-	from webnotes.model.encrypt import encrypt
 
 	form = webnotes.form
 
