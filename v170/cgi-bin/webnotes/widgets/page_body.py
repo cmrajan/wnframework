@@ -106,6 +106,8 @@ def get_page_content(page):
 	page_properties['page_title'] = doc.page_title or doc.name
 	page_properties['keywords'] = doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
 	page_properties['site_description'] = doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+	page_properties['add_in_head'] = webnotes.conn.get_global('add_in_head') or ''
+	page_properties['add_in_body'] = webnotes.conn.get_global('add_in_body') or ''
 
 	# content
 	if doc.template:

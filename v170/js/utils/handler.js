@@ -118,6 +118,7 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 
 // For call a page metho
 function $c_page(module, page, method, arg, call_back, no_spinner, freeze_msg) {
+	if(arg && !arg.substr) arg = JSON.stringify(arg);
 	$c(module+'.page.'+page+'.'+page+'.'+method,{'arg':arg}, call_back, null, no_spinner, freeze_msg);
 }
 
