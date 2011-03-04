@@ -35,6 +35,13 @@ def get():
 	if webnotes.session['data'].get('ipinfo',{}).get('CountryName'):
 		country = webnotes.session['data'].get('ipinfo')['CountryName']
 
+	# run patches
+	try:
+		import webnotes.modules.patch
+		webnotes.modules.patch.run()
+	except ImportError, e: 
+		pass # no patches - do nothing
+
 	# check if cache exists
 	if not getattr(webnotes.defs,'auto_cache_clear',None):
 		cache = load(country)
@@ -44,13 +51,6 @@ def get():
 		# for developers, clear out cache after every refresh
 		webnotes.conn.sql("delete from __DocTypeCache")
 	
-	# run patches
-	try:
-		import webnotes.modules.patch
-		webnotes.modules.patch.run()
-	except ImportError, e: 
-		pass # no patches - do nothing
-
 	# if not create it
 	sd = build()
 	dump(sd, country)
