@@ -6,6 +6,7 @@ var session = {};
 var start_sid = null;
 
 function startup() {
+
 	//initialize our DHTML history
 	dhtmlHistory.initialize();
 

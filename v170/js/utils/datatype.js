@@ -143,6 +143,7 @@ function strip(s, chars) {
 	s = rstrip(s, chars);
 	return s;
 }
+
 function lstrip(s, chars) {
 	if(!chars) chars = ['\n', '\t', ' '];
 	// strip left
@@ -184,7 +185,9 @@ function values(obj) { var myvalues=[];for (key in obj) myvalues[myvalues.length
 function seval(s) { return eval('var a='+s+';a'); }
 
 function in_list(list, item) {
-	return list.indexOf(item)==-1 ? false : true;
+	for(var i=0; i<list.length; i++)
+		if(list[i]==item) return true;
+	return false;
 }
 function has_common(list1, list2) {
 	if(!list1 || !list2) return false;
@@ -193,6 +196,7 @@ function has_common(list1, list2) {
 	}
 	return false;
 }
+
 var inList = in_list; // bc
 function add_lists(l1, l2) {
 	var l = [];

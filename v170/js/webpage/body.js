@@ -21,11 +21,12 @@ function Body() {
 
 	this.no_of_columns = function() {
 		var n = 2;
-		if(cint(this.cp.right_sidebar_width)) n++;
+		if(cint(me && me.cp && me.cp.right_sidebar_width)) 
+			n = n + 1;
 		return n;
 	}
 	
-	this.setup_page_areas = function() {
+	this.setup_page_areas = function() {		
 		var n = this.no_of_columns();
 
 		// has sidebars, make a table
@@ -53,6 +54,7 @@ function Body() {
 		this.center.body = $a(this.center, 'div');
 		this.center.loading = $a(this.center, 'div', '', {margin:'200px 0px', fontSize:'14px', color:'#999', textAlign:'center'});
 		this.center.loading.innerHTML = 'Loading...'
+				
 	}
 
 	this.setup_sidebar_menu = function() {
@@ -111,6 +113,7 @@ function Body() {
 		}		
 
 		this.setup_page_areas();
+
 	
 		// headers & footer
 		this.setup_header_footer();
