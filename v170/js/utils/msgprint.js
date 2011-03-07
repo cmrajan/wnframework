@@ -15,7 +15,7 @@ function msgprint(msg, issmall, callback) {
 
 	if(!msg_dialog) {
 		msg_dialog = new Dialog(500, 200, "Message");
-		msg_dialog.make_body([['HTML','Msg'],])
+		msg_dialog.make_body([['HTML','Msg']])
 		msg_dialog.onhide = function() {
 			msg_dialog.msg_area.innerHTML = '';
 			$dh(msg_dialog.msg_icon);
