@@ -17,6 +17,7 @@ class FrameworkServer:
 		self.account = account
 		self.account_id = None
 		self.https = https
+		self.conn = None
 
 		# login
 		if not cookies:
@@ -66,15 +67,16 @@ class FrameworkServer:
 			headers["Accept"] = "text/plain, text/html, */*"
 			headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
 		
-		if self.https:
-			conn = httplib.HTTPSConnection(self.remote_host)	
-		else:
-			conn = httplib.HTTPConnection(self.remote_host)	
+		if not self.conn:
+			if self.https:
+				self.conn = httplib.HTTPSConnection(self.remote_host)	
+			else:
+				self.conn = httplib.HTTPConnection(self.remote_host)	
 			
 		import os
-		conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
+		self.conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
 	
-		return conn.getresponse()
+		return self.conn.getresponse()
 
 	# -----------------------------------------------------------------------------------------
 	
