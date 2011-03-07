@@ -72,6 +72,10 @@ def log(event, details):
 
 def getdate(string_date):
 	import datetime
+	
+	if type(string_date)==datetime.datetime: 
+		return string_date
+	
 	if ' ' in string_date:
 		string_date = string_date.split(' ')[0]
 	t = string_date.split('-')
@@ -96,7 +100,7 @@ def add_years(string_date, years):
 	import datetime
 	return webnotes.conn.sql("select DATE_ADD('%s',INTERVAL '%s' YEAR)" % (getdate(string_date),years))[0][0]
 
-def date_diff(string_ed_date, string_st_date):
+def date_diff(string_ed_date, string_st_date=None):
 	import datetime
 	return webnotes.conn.sql("SELECT DATEDIFF('%s','%s')" %(getdate(string_ed_date), getdate(string_st_date)))[0][0]
 

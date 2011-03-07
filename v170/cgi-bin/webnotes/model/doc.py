@@ -131,13 +131,15 @@ class Document:
 	def _set_name(self, autoname, istable):
 		self.localname = self.name
 
-	
 		# get my object
 		import webnotes.model.code
-		so = webnotes.model.code.get_server_obj(self, [])		
+		so = webnotes.model.code.get_server_obj(self, [])
+
+		# default name for table
+		if istable: self.name = make_autoname('#########', self.doctype)
 
 		# amendments
-		if self.amended_from: self._get_amended_name()
+		elif self.amended_from: self._get_amended_name()
 		
 		# by method
 		elif so and hasattr(so, 'autoname'):
@@ -156,9 +158,6 @@ class Document:
 
 		# call the method!
 		elif autoname and autoname!='Prompt': self.name = make_autoname(autoname, self.doctype)
-
-		# default name for table
-		elif istable: self.name = make_autoname('#########', self.doctype)
 	
 	# Validate Name
 	# ---------------------------------------------------------------------------

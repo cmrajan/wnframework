@@ -159,6 +159,14 @@ def load_properties():
 
 # generate the page
 # -----------------
+def load_default_properties():
+	if not page_properites['keywords']:
+		page_properites['keywords'] = webnotes.conn.get_value('Control Panel',None,'keywords') or ''
+	if not page_properites['site_description']:
+		page_properites['site_description'] = webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+
+# generate the page
+# -----------------
 def get():
 	import webnotes
 	no_startup = webnotes.form.getvalue('no_startup') or None
@@ -188,6 +196,7 @@ def get():
 			sd = {'exc':webnotes.utils.getTraceback()}
 		
 		# add debug messages
+
 		sd['server_messages'] = '\n--------------\n'.join(webnotes.message_log)
 		
 		page_properties['startup_data'] = no_startup and '{}' or json.dumps(sd)
