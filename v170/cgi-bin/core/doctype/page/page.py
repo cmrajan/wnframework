@@ -3,7 +3,7 @@ class DocType:
     self.doc, self.doclist = d,dl
 
   def autoname(self):
-    if not self.doc.name:
+    if (self.doc.name and self.doc.name.startswith('New Page')) or not self.doc.name:
       self.doc.name = self.doc.page_name.lower().replace(' ', '-')
 
   def onload(self):

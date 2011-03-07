@@ -1,10 +1,11 @@
-# -------------------
+# ===========================================
 # Email class:
 # Sends email via outgoing server specified in "Control Panel"
 # Allows easy adding of Attachments of "File" objects
-# -------------------
+# ===========================================
 
 import webnotes	
+import webnotes.defs
 from webnotes import msgprint
 
 class EMail:
@@ -87,7 +88,6 @@ class EMail:
 	
 	def setup(self):
 		if self.from_defs:
-			import webnotes.defs
 			self.server = getattr(webnotes.defs,'mail_server','')
 			self.login = getattr(webnotes.defs,'mail_login','')
 			self.port = getattr(webnotes.defs,'mail_port',None)
@@ -105,13 +105,41 @@ class EMail:
 			self.port = cp.mail_port and cp.mail_port or getattr(webnotes.defs,'mail_port',None)
 			self.password = cp.mail_password and cp.mail_password or getattr(webnotes.defs,'mail_password','')
 			self.use_ssl = cint(cp.use_ssl)
+
+	def make_msg(self):
+		self.msg['Subject'] = self.subject
+		self.msg['From'] = self.sender
+		self.msg['To'] = ', '.join([r.strip() for r in self.recipients])
+		self.msg['Reply-To'] = self.reply_to
+		if self.cc:
+			self.msg['CC'] = ', '.join([r.strip() for r in self.cc])
 	
+	def add_to_queue(self):
+		# write to a file called "email_queue" or as specified in email
+		q = EmailQueue()
+		q.push({
+			'server': self.server, 
+			'port': self.port, 
+			'use_ssl': self.use_ssl,
+			'login': self.login,
+			'password': self.password,
+			'sender': self.sender,
+			'recipients': self.recipients, 
+			'msg': self.msg.as_string()
+		})
+		q.close()
+
 	def send(self):
 		from webnotes.utils import cint
 		
 		self.setup()
 		self.validate()
+		self.make_msg()
 		
+		if getattr(webnotes.defs, 'batch_emails'):
+			self.add_to_queue()
+			return
+			
 		import smtplib
 		sess = smtplib.SMTP(self.server, self.port or None)
 		
@@ -126,13 +154,6 @@ class EMail:
 		if ret[0]!=235:
 			msgprint(ret[1])
 			raise Exception
-		
-		self.msg['Subject'] = self.subject
-		self.msg['From'] = self.sender
-		self.msg['To'] = ', '.join([r.strip() for r in self.recipients])
-		self.msg['Reply-To'] = self.reply_to
-		if self.cc:
-			self.msg['CC'] = ', '.join([r.strip() for r in self.cc])
 				
 		sess.sendmail(self.sender, self.recipients, self.msg.as_string())
 		
@@ -140,9 +161,84 @@ class EMail:
 			sess.quit()
 		except:
 			pass
+# ===========================================
+# Email Queue
+# Maintains a list of emails in a file
+# Flushes them when called from cron
+# Defs settings:
+# 	email_queue: (filename) [default: email_queue.py]
+#
+# From the scheduler, call: flush(qty)
+# ===========================================
+
+class EmailQueue():
+	def __init__(self):
+		self.server = self.login = self.sess = None
+		self.filename = getattr(webnotes.defs, 'email_queue', 'email_queue.py')
+	
+		try:
+			f = open(self.filename, 'r')
+			self.queue = eval(f.read() or '[]')
+			f.close()
+		except IOError, e:
+			if e.args[0]==2:
+				self.queue = []
+			else:
+				raise e
+		
+	def push(self, email):
+		self.queue.append(email)
+		
+	def close(self):
+		f = open(self.filename, 'w')
+		f.write(str(self.queue))
+		f.close()
+
+	def get_smtp_session(self, e):
+		if self.server==e['server'] and self.login==e['login'] and self.sess:
+			return self.sess
+
+		webnotes.msgprint('getting server')
+
+		import smtplib
+	
+		sess = smtplib.SMTP(e['server'], e['port'] or None)
+		
+		if self.use_ssl: 
+			sess.ehlo()
+			sess.starttls()
+			sess.ehlo()
+			
+		ret = sess.login(e['login'], e['password'])
+
+		# check if logged correctly
+		if ret[0]!=235:
+			webnotes.msgprint(ret[1])
+			raise Exception
+						
+		self.sess = sess
+		self.server, self.login = e['server'], e['login']
+		
+		return sess
+		
+	def flush(self, qty = 100):
+		f = open(self.filename, 'r')
+		
+		self.queue = eval(f.read() or '[]')
+		
+		if len(self.queue) < 100:
+			qty = len(self.queue)
+
+		for i in range(qty):
+			e = self.queue[i]
+			sess = self.get_smtp_session(e)
+			sess.sendmail(e['sender'], e['recipients'], e['msg'])			
+		
+		self.queue = self.queue[:(len(self.queue) - qty)]
+		self.close()
 
 # text + html type of email
-# --------------------------------------------
+# ===========================================
 
 def sendmail_html(sender, recipients, subject, html, text, template=''):
 	from email.mime.multipart import MIMEMultipart
@@ -155,7 +251,7 @@ def sendmail_html(sender, recipients, subject, html, text, template=''):
 	email.send()
 
 # build html content
-# --------------------------------------------
+# ===========================================
 
 def make_html_body(content, template = ''):
 	from webnotes.model.code import get_code
@@ -171,7 +267,7 @@ def make_html_body(content, template = ''):
 	return template_html % {'content': content}
 
 # standard email
-# -------------------------
+# ===========================================
 
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
 	
@@ -191,7 +287,7 @@ def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc
 	email.send()
 
 # footer
-# --------------------------------------------
+# ===========================================
 
 def get_footer():
 
@@ -216,7 +312,7 @@ def get_form_link(dt, dn):
 	return '<div>If you are unable to view the form below <a href="http://%(server)s/index.cgi?page=Form/%(dt)s/%(dn)s&acx=%(acx)s&akey=%(akey)s">click here to see it in your browser</div>' % args
 	
 # Send Form
-# --------------------------------------------
+# ===========================================
 
 def send_form():
 	import webnotes
