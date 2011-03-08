@@ -171,7 +171,7 @@ class EMail:
 # From the scheduler, call: flush(qty)
 # ===========================================
 
-class EmailQueue():
+class EmailQueue:
 	def __init__(self):
 		self.server = self.login = self.sess = None
 		self.filename = getattr(webnotes.defs, 'email_queue', 'email_queue.py')
