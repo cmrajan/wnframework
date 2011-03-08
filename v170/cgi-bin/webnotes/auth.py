@@ -410,7 +410,6 @@ class Session:
 		
 		# timout in 2 seconds
 		t.join(2)
-		
 		return
 
 	def _get_ipinfo(self):

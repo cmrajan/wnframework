@@ -32,8 +32,8 @@ def get():
 	
 	# get country
 	country = 'Not Defined'
-	if webnotes.session['data'].get('ipinfo',{}).get('CountryName'):
-		country = webnotes.session['data'].get('ipinfo')['CountryName']
+	if webnotes.session['data'].get('ipinfo',{}).get('countryName'):
+		country = webnotes.session['data'].get('ipinfo')['countryName']
 
 	# run patches
 	try:
