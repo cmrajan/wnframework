@@ -43,9 +43,9 @@ class FrameworkServer:
 				
 			self._extract_cookies(res)
 
-			self.account_id = cookies.get('account_id')
-			self.app_id = cookies.get('app_id')
-			self.sid = cookies.get('sid')
+			self.account_id = self.cookies.get('account_id')
+			self.app_id = self.cookies.get('app_id')
+			self.sid = self.cookies.get('sid')
 			
 			self.login_response = ret
 

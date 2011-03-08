@@ -129,14 +129,14 @@ class EMail:
 		})
 		q.close()
 
-	def send(self):
+	def send(self, send_now = 0):
 		from webnotes.utils import cint
 		
 		self.setup()
 		self.validate()
 		self.make_msg()
 		
-		if getattr(webnotes.defs, 'batch_emails'):
+		if (not send_now) and getattr(webnotes.defs, 'batch_emails'):
 			self.add_to_queue()
 			return
 			
@@ -147,7 +147,7 @@ class EMail:
 			sess.ehlo()
 			sess.starttls()
 			sess.ehlo()
-			
+		
 		ret = sess.login(self.login, self.password)
 
 		# check if logged correctly
@@ -240,7 +240,7 @@ class EmailQueue():
 # text + html type of email
 # ===========================================
 
-def sendmail_html(sender, recipients, subject, html, text, template=''):
+def sendmail_html(sender, recipients, subject, html, text, template='', send_now=0):
 	from email.mime.multipart import MIMEMultipart
 
 	email = EMail(sender, recipients, subject, alternative = 1)
@@ -248,7 +248,7 @@ def sendmail_html(sender, recipients, subject, html, text, template=''):
 	email.set_message(text, 'text/plain')
 	email.set_message(make_html_body(html, template), 'text/html')
 
-	email.send()
+	email.send(send_now)
 
 # build html content
 # ===========================================
@@ -269,7 +269,7 @@ def make_html_body(content, template = ''):
 # standard email
 # ===========================================
 
-def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[], send_now=0):
 	
 	email = EMail(sender, recipients, subject)
 	email.cc = cc
@@ -365,7 +365,7 @@ def send_form():
 			if a:
 				email.attach(a.split(',')[0])
 
-		email.send()
+		email.send(send_now=1)
 	webnotes.msgprint('Sent')
 
 # get list of contacts for autosuggest
