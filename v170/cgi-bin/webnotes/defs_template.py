@@ -74,10 +74,11 @@ batch_emails = 0
 
 #
 # Logging Settings: Log using the python logger
+# Error levels (in string): 'login.DEBUG', 'login.INFO', 'login.WARNING', 'logging.ERROR', 'login.CRITICAL'
 #
 log_file_name = 'logs/error_log.txt'
 debug_log_dbs = []
-log_level = 'logging.ERROR'
+log_level = 'logging.INFO'
 log_file_size = 5000
 log_file_backup_count = 5
 

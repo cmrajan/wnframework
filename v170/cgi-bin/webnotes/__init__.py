@@ -144,7 +144,7 @@ def set_as_admin(db_name=None, ac_name=None):
 # Environment Variables
 #-----------------------------------------------------------
 def get_env_vars(env_var):
-	return getattr(os.environ,env_var,'None')
+	return os.environ.get(env_var,'None')
 
 remote_ip = get_env_vars('REMOTE_ADDR')		#Required for login from python shell
 
