@@ -43,13 +43,8 @@ import sys
 sys.path.append(getattr(defs,'modules_path',None))
 
 def getTraceback():
-	import sys, traceback, string
-	type, value, tb = sys.exc_info()
-	body = "Traceback (innermost last):\n"
-	list = traceback.format_tb(tb, None) \
-	        + traceback.format_exception_only(type, value)
-	body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
-	return body
+	import webnotes.utils
+	webnotes.utils.getTraceback()
 
 def errprint(msg):
 	debug_log.append(str(msg or ''))
@@ -167,18 +162,13 @@ def setup_logging():
 
 	logger = logging.getLogger('WNLogger')
 	logger.setLevel(eval(defs.log_level))
-		
-	log_handler = logging.handlers.RotatingFileHandler(os.path.join(defs.log_file_path,defs.log_file_name),maxBytes = defs.log_file_size,backupCount = defs.log_file_backup_count)
-	
-	console_handler = logging.StreamHandler()
-	
-	formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s - %(message)s')
+
+	log_handler = logging.handlers.RotatingFileHandler(os.path.join(defs.log_file_path, defs.log_file_name),maxBytes = defs.log_file_size,backupCount = defs.log_file_backup_count)	
+	formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s\n%(message)s\n-------------------')
 	
 	log_handler.setFormatter(formatter)
 	logger.addHandler(log_handler)
-	logger.info('Importing Webnotes')
 
 if getattr(defs, 'log_file_path', None):
-	create_folder(defs.log_file_path)
 	setup_logging()
 	

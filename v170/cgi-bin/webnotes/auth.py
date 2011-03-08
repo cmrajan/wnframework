@@ -84,14 +84,15 @@ class HTTPRequest:
 		
 
 		# select based on subdomain
-		if getattr(webnotes.defs,'domain_name_map').get(self.domain):
-			db_name = getattr(webnotes.defs,'domain_name_map').get(self.domain)
+		if getattr(webnotes.defs,'domain_name_map', {}).get(self.domain):
+			db_name = webnotes.defs.domain_name_map[self.domain]
 
 		# select based on ac_name
 		else:
 			ac_name = self.get_ac_name()
 			if ac_name:
-				db_name = getattr(webnotes.defs,'db_name_map').get(ac_name, getattr(webnotes.defs,'default_db'))
+				db_name = getattr(webnotes.defs,'db_name_map',{}).\
+					get(ac_name, ac_name)
 			else:
 				db_name = getattr(webnotes.defs,'default_db')
 	

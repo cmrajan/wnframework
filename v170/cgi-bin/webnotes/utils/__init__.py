@@ -46,25 +46,17 @@ def getTraceback():
 	body = "Traceback (innermost last):\n"
 	list = traceback.format_tb(tb, None) + traceback.format_exception_only(type, value)
 	body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
-	log("Server Error", body)
+	
+	if webnotes.logger:
+		webnotes.logger.error('Db:'+webnotes.conn.cur_db_name + ' - ' + body)
+	
 	return body
 
 # Log
 # ==============================================================================
 
 def log(event, details):
-	return
-	import time
-	d = Document(doctype = "Error Log")
-	d.event =  event
-	d.time = time.strftime('%H:%M')
-	d.date = time.strftime('%d-%m-%Y')
-	d.user = session['user']
-	d.detail = details
-	try:
-		d.save(1)
-	except:
-		pass # bc
+	webnotes.logger.info(details)
 
 # Date and Time
 # ==============================================================================
