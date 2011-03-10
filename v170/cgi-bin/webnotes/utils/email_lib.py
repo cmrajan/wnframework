@@ -136,7 +136,7 @@ class EMail:
 		self.validate()
 		self.make_msg()
 		
-		if (not send_now) and getattr(webnotes.defs, 'batch_emails'):
+		if (not send_now) and getattr(webnotes.defs, 'batch_emails', 0):
 			self.add_to_queue()
 			return
 			

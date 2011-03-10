@@ -131,7 +131,7 @@ class Profile:
 	def send_email(self, subj, mess, email):
 		import webnotes.utils.email_lib
 		
-		webnotes.utils.email_lib.sendmail(email, message=mess, subject=subj)
+		webnotes.utils.email_lib.sendmail(email, msg=mess, subject=subj)
 	
 	# update recent documents
 	def update_recent(self, dt, dn):
