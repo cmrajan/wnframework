@@ -333,7 +333,6 @@ class DbManager:
 	def create_user(self,user,password):
 		#Create user if it doesn't exist.
 		try:
-			print "Creating user %s" %user[:16]
 			if password:
 				self.conn.sql("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';" % (user[:16], password))
 			else:
@@ -345,7 +344,6 @@ class DbManager:
 	def delete_user(self,target):
 	# delete user if exists
 		try:
-			print "Dropping user " ,target
 			self.conn.sql("DROP USER '%s'@'localhost';" % target)
 		except Exception, e:
 			if e.args[0]==1396:
@@ -356,7 +354,6 @@ class DbManager:
 	def create_database(self,target):
 		
 		try:
-			print "Creating Database", target
 			self.conn.sql("CREATE DATABASE IF NOT EXISTS `%s` ;" % target)
 		except Exception,e:
 			raise e
@@ -364,14 +361,12 @@ class DbManager:
 
 	def drop_database(self,target):
 		try:
-			print "Dropping Database:",target
 			self.conn.sql("DROP DATABASE IF EXISTS `%s`;"%target)
 		except Exception,e:
 			raise e
 
 	def grant_all_privileges(self,target,user):
 		try:
-			print "Granting all privileges on %s to %s@localhost" %(target,user)
 			self.conn.sql("GRANT ALL PRIVILEGES ON `%s` . * TO '%s'@'localhost';" % (target, user))
 		except Exception,e:
 			raise e
@@ -379,17 +374,14 @@ class DbManager:
 	def grant_select_privilges(self,db,table,user):
 		try:
 			if table:
-				print "Granting Read privileges on %s.%s to %s@localhost" %(db,table,user)
 				self.conn.sql("GRANT SELECT ON %s.%s to '%s'@'localhost';" % (db,table,user))
 			else:
-				print "Granting Read privileges on %s.* to %s@localhost" %(db,user)
 				self.conn.sql("GRANT SELECT ON %s.* to '%s'@'localhost';" % (db,user))
 		except Exception,e:
 			raise e
 
 	def flush_privileges(self):
 		try:
-			print "Flushing privileges"
 			self.conn.sql("FLUSH PRIVILEGES")
 		except Exception,e:
 			raise e
@@ -407,15 +399,17 @@ class DbManager:
 			raise e
 
 	def restore_database(self,target,source,root_password):
+		import webnotes.defs
+		mysql_path = getattr(webnotes.defs, 'mysql_path', None)
+		mysql = mysql_path and os.path.join(mysql_path, 'mysql') or 'mysql'
+		
 		try:
-			ret = os.system("mysql -u root -p%s %s < %s"%(root_password,target,source))
-			print "Restore DB Return status:",ret
+			ret = os.system("%s -u root -p%s %s < %s"%(mysql, root_password, target, source))
 		except Exception,e:
 			raise e
 
 	def drop_table(self,table_name):
 		try:
-			print "Dropping table %s" %(table_name)
 			self.conn.sql("DROP TABLE IF EXISTS %s "%(table_name))
 		except Exception,e:
 			raise e	
@@ -424,8 +418,6 @@ class DbManager:
 		#Sets the transaction isolation level. scope = global/session
 		try:
 			self.conn.sql("SET %s TRANSACTION ISOLATION LEVEL %s"%(scope,level))
-			print "Set transaction level ",scope, level
-
 		except Exception,e:
 			raise e
 

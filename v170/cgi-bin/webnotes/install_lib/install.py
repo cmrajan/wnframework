@@ -1,81 +1,47 @@
-# -------------------------------------------------------------------------------------------------------------
 import os,sys
-sys.path.append(os.getcwd())
 
-def copy_file(template_path,target_path):
-		try:
-			print "Copying %s to %s"%(template_path,target_path)
-			cp_cmd = 'cp'
-			ret = os.system(cp_cmd +' '+ template_path+' '+target_path)
-		except Exception,e:
-			raise e
+cgi_bin_path = os.path.sep.join(__file__.split(os.path.sep)[:-3])
 
-# -------------------------------------------------------------------------------------------------------------
+sys.path.append(cgi_bin_path)
 
-def create_log_folder(path):
-	import os
-	try:   		 
-		os.mkdir(os.path.join(path,'log'))
-		webnotes.LOG_FILENAME = os.path.join(path,'log','wnframework.log')
-		open(webnotes.LOG_FILENAME,'w+').close()
-	except Exception,e:
-		print e
-		pass
-	
-# -------------------------------------------------------------------------------------------------------------	
 
+from webnotes import defs
+import webnotes
+import webnotes.db
+		
+#
+# make a copy of defs.py (if not exists)
+#		
+def copy_defs():
+	global cgi_bin_path
+	if not os.path.exists(os.path.join(cgi_bin_path, 'webnotes', 'defs.py')):
+		ret = os.system('cp '+ os.path.join(cgi_bin_path, 'webnotes', 'defs_template.py')+\
+			' '+os.path.join(cgi_bin_path, 'webnotes', 'defs.py'))
+		print 'Made copy of defs.py'
+
+#
+# Main Installer Class
+#
 class Installer:
-	def __init__(self,wn_folder,conn = None):
+	def __init__(self, root_login, root_password):
 	
-		sys.path.append(wn_folder)
-		from webnotes import defs
-		import webnotes
-		import webnotes.db
+		self.root_password = root_password
 		from webnotes.model.db_schema import DbManager
-		import db_init
 		
-		if not conn:
-			self.conn = webnotes.db.Database(user=defs.root_login, password=defs.root_password)
-			
-		else:
-			self.conn = conn
+		self.conn = webnotes.db.Database(user=root_login, password=root_password)			
 		
-		self.dbman = DbManager(self.conn)		
-		self.webnotes_folder = wn_folder
+		self.dbman = DbManager(self.conn)
 		self.mysql_path = hasattr(defs, 'mysql_path') and webnotes.defs.mysql_path or ''
-		self.DbInt = db_init.DatabaseInstance(self.conn,'webnotesdb')
 
-	
-
-	def import_from_db(self,source):
-		"""
-		a very simplified version, just for the time being..will eventually be deprecated once the framework stabilizes.
-		"""
-		target = "webnotesdb"
-		# delete user (if exists)
-		self.dbman.delete_user(target)
-
-		# create user and db
-		self.dbman.create_user(target,getattr(defs,'db_password',None))
-	
-		self.dbman.create_database(target)
-
-		self.dbman.grant_all_privileges(target,target)
-
-		self.dbman.flush_privileges()
-
-		self.dbman.set_transaction_isolation_level('GLOBAL','READ COMMITTED')
-
-		source_path = os.path.join(os.path.dirname(getattr(defs,'webnotes_folder')),'data')+'/' +source +'.sql'
-
-		# import in target
-		self.dbman.restore_database(target,source_path,getattr(defs,'root_password'))
-
+	#
+	# run framework related cleanups
+	#
+	def framework_cleanups(self, target):
 		self.conn.use(target)
 		self.dbman.drop_table('__DocTypeCache')
 		self.conn.sql("create table `__DocTypeCache` (name VARCHAR(120), modified DATETIME, content TEXT, server_code_compiled TEXT)")
 
-
+		# set the basic passwords
 		self.conn.sql("update tabProfile set password = password('admin') where name='Administrator'")
 		self.conn.sql("update tabDocType set server_code_compiled = NULL")
 
@@ -87,103 +53,88 @@ class Installer:
 			if e.args[0]==1061:
 				pass
 			else:
-				raise e
-		return target
-		
+				raise e	
 
-	def install_base_fw(self):
+	#
+	# main script to create a database from
+	#
+	def import_from_db(self, target, source_path='', password = 'admin', verbose=0):
 		"""
-		Create Base Tables for framework:
-			1.tabSessions
-			2.tabSingles
-			3.__DocTypeCache
-			4.tabRole
-			5.tabDocField
-			6.tabDocPerm
-			7.tabDocFormat
-			8.tabDocType
-			9.tabModule Def
-			10.tabPrint Format
-			11.tabEvent Role
-			12.tabSearch Criteria
-			13.tabSeries
-			14.tabWeb Visitor
-			15.tabUserRole
-			16.tabTweet
-			17.tabTransfer Module
-			18.tabTransfer Account
-			19.tabToDo Item
-			20.tabTicket
-			21.tabPrint Format
-			22.tabPage
-			23.tabFile
-		
-		Insert records into tabDocType:
-			1.DocType
-			2.DocPerm
-			3.DocFormat
-			4.DocField
-			5.Module
+		a very simplified version, just for the time being..will eventually be deprecated once the framework stabilizes.
 		"""
-			
-		self.DbInt.create_db_and_user()
 		
-		self.DbInt.create_singles()
-		self.DbInt.create_sessions()
-		self.DbInt.create_doctypecache()
-		self.DbInt.create_role()
-		self.DbInt.create_docfield()
-		self.DbInt.create_docperm()
-		
-		self.DbInt.create_docformat()
-		self.DbInt.create_doctype()
-		
-		self.DbInt.create_module_def()
-		self.DbInt.create_base_doctype_records()
-		
-		#Import doctype,docperm,docfield,docformat,core etc.
-		from webnotes.modules.import_module import import_from_files
-		import webnotes.db
-		webnotes.conn = self.conn
-		import_from_files(['core'])
-		
-		
-		
-		self.DbInt.post_cleanup()
-		
-		
+		# get the path of the sql file to import
+		if not source_path:
+			source_path = os.path.join(os.path.sep.join(webnotes.__file__.split(os.path.sep)[:-3]), 'data', 'Framework.sql')
 
-# Installation
-# -------------------------------------------------------------
-#TODO: 1. tabDefaults table creation
+		# delete user (if exists)
+		self.dbman.delete_user(target)
 
+		# create user and db
+		self.dbman.create_user(target,getattr(defs,'db_password',None))
+		if verbose: print "Created user %s" % target
+	
+		# create a database
+		self.dbman.create_database(target)
+		if verbose: print "Created database %s" % target
+
+		# grant privileges to user
+		self.dbman.grant_all_privileges(target,target)
+		if verbose: print "Granted privileges to user %s and database %s" % (target, target)
+
+		# flush user privileges
+		self.dbman.flush_privileges()
+
+		# import in target
+		if verbose: print "Starting database import..."
+		self.dbman.restore_database(target, source_path, self.root_password)
+		if verbose: print "Imported from database %s" % source_path
+
+		# framework cleanups
+		self.framework_cleanups(target)
+		if verbose: print "Ran framework startups on %s" % target
+		
+		return target		
+
+#
+# load the options
+#
+def get_parser():
+	from optparse import OptionParser
+
+	parser = OptionParser(usage="usage: %prog [options] ROOT_LOGIN ROOT_PASSWORD DBNAME")
+	parser.add_option("-x", "--database-password", dest="password", default="admin", help="Optional: New password for the Framework Administrator, default 'admin'")	
+	parser.add_option("-s", "--source", dest="source_path", default=None, help="Optional: Path of the sql file from which you want to import the instance, default 'data/Framework.sql'")
+	
+	return parser
+
+
+#
+# execution here
+#
 if __name__=='__main__':
 
-
-
-	defs_path = os.path.join(os.getcwd(),'webnotes','defs.py')
-
-	if not os.path.exists(defs_path):
-		defs_template_path = os.path.join(os.getcwd(),'webnotes','defs')
-		print "Creating defs.py"	
-		copy_file(defs_template_path,defs_path)
-
-	from webnotes import defs
-	log_path = getattr(defs,'log_file_path',None)
-	if log_path:
-		print "Creating log folder and file..."
-		create_log_folder(os.path.dirname(log_path))
+	parser = get_parser()
+	(options, args)	= parser.parse_args()
 		
-	sys.path.append(os.getcwd())
+	if len(args)==3:
+		
+		root_login, root_password, db_name = args[0], args[1], args[2]
+		Inst = Installer(root_login, root_password)
+
+		Inst.import_from_db(db_name, source_path=options.source_path, \
+			password = options.password, verbose = 1)
+
+		copy_defs()
+
+		print "Database created, please edit defs.py to get started"		
+	else:
+		parser.print_help()
+
 	
-	if sys.argv[1]=='install':
 
-		Inst = Installer(getattr(defs,'webnotes_folder'))
-		#Inst.install_base_fw()
 		
-		Inst.import_from_db("Framework")
-		
-		
+			
 		
 
 		

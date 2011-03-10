@@ -21,7 +21,21 @@ WNF requires the following applications
 	)
 
 ------------------------------------------------------------------------
-1. Configuring Apache
+1. Create a databse instance for your application
+
+   Call the install script with the following options. For more options use -h
+   
+   python [folder]/cgi-bin/webnotes/install_lib/install.py MYSQL_ROOT_LOGIN MYSQL_ROOT_PASSWORD DBNAME
+
+------------------------------------------------------------------------
+2. Setup defs.py
+
+   The framework picks up the database details from cgi-bin/webnotes/defs.py
+   
+   You need to edit this file and set your database name and other options
+   
+------------------------------------------------------------------------
+3. Configuring Apache
 
 a. You must set Apache to execute index.cgi file, one way to do this is to add cgi handler
    and add ExecCGI in the options directive.
@@ -33,24 +47,6 @@ b. You can also add couple of lines below to block Apache from rendering .py fil
 
 c. Add "index.cgi" to DirectoryIndex
 
-
-------------------------------------------------------------------------
-2. Setup your MySQL passwords
-
-Set the variables in the defs file. (cgi-bin/webnotes/defs)
-uncomment the lines first(delete the # at the start of the line)
-Mandatory ones: 'webnotes_folder','root_login','root_password' (You can delete the root_password later.)
-Optional: 'mysql_path','modules_path'
-
-These will be copied to 
-	cgi-bin/webnotes/defs.py
-
-------------------------------------------------------------------------
-3. Setting up your first app
-
- Run this command from shell, while you are in the cgi-bin folder like:
-		python webnotes/install_lib/install.py install
-	
 	
 ------------------------------------------------------------------------
 4. Login to application
@@ -62,6 +58,7 @@ The default logins are:
 login: Administrator
 password: admin
 
+------------------------------------------------------------------------
 
 Step by step instructions on CentOS/Fedora:
 	0.Check out the source code.
