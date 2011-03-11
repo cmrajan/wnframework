@@ -134,8 +134,8 @@ class DbTable:
 						self.foreign_keys.append((words[4][2:-2], words[1][1:-1]))
 					except IndexError, e:
 						pass
-		
-		return self.foreign_keys				
+
+		return self.foreign_keys
 
 	# SET foreign keys
 	def set_foreign_keys(self):
@@ -153,8 +153,6 @@ class DbTable:
 	def drop_foreign_keys(self):
 		if not self.drop_foreign_key:
 			return
-	
-		webnotes.msgprint(self.drop_foreign_key)
 	
 		fk_list = self.get_foreign_keys()
 		
