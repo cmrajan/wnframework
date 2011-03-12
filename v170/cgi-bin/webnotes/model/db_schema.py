@@ -128,10 +128,9 @@ class DbTable:
 		if not self.foreign_keys:
 			txt = webnotes.conn.sql("show create table `%s`" % self.name)[0][1]
 			for line in txt.split('\n'):
-				if line.strip().startswith('CONSTRAINT') and line.find('FOREIGN')!=1:
-					words = line.split()
+				if line.strip().startswith('CONSTRAINT') and line.find('FOREIGN')!=-1:
 					try:
-						self.foreign_keys.append((words[4][2:-2], words[1][1:-1]))
+						self.foreign_keys.append(line.split('`')[1])
 					except IndexError, e:
 						pass
 
@@ -153,7 +152,7 @@ class DbTable:
 	def drop_foreign_keys(self):
 		if not self.drop_foreign_key:
 			return
-	
+
 		fk_list = self.get_foreign_keys()
 		
 		# make dictionary of constraint names
