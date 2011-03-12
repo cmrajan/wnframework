@@ -13,7 +13,7 @@ class DocType:
   def autoname(self):
     from webnotes.utils import cint
     
-    if webnotes.session['user'].lower() == 'administrator' and self.doc.name[:11] != 'New Search':
+    if webnotes.session['user'].lower() == 'administrator' and self.doc.name.startswith('New Search'):
       self.doc.standard = 'Yes'
       series = sql("select name from `tabSearch Criteria` where name like 'STDSRCH/%' order by name desc limit 1")
       self.doc.name = 'STDSRCH/' + ('%.5i' % (series and cint(series[0][0][-5:])+1 or 1))
@@ -29,7 +29,8 @@ class DocType:
 
   def on_update(self):
     self.set_module()
-
-	  # export
-    from webnotes.modules.export_module import export_to_files
-    export_to_files(record_list=[['Search Criteria', self.doc.name]])
+    
+    # export
+    if self.doc.standard == 'Yes' and getattr(webnotes.defs, 'developer_mode', 0) == 1:
+      from webnotes.modules.export_module import export_to_files
+      export_to_files(record_list=[['Search Criteria', self.doc.name]])

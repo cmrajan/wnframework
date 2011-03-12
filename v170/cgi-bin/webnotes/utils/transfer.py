@@ -1,4 +1,3 @@
-
 # =============================================================================
 # Import a record (with its chilren)
 # =============================================================================
@@ -25,9 +24,8 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	#print doc.doctype, doc.name
 	if not webnotes.conn.in_transaction: 
 		sql("START TRANSACTION")
-	
+	sql("set foreign_key_checks = 0")
 	if timestamp:
-		 
 		if ovr:
 			if doc.doctype == 'DocType':
 				return merge_doctype(doclist, ovr, ignore, onupdate) 
@@ -37,31 +35,35 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 
 			if doc.doctype == 'Module Def':
 				return merge_module_def(doclist, ovr, ignore, onupdate)
-			
-					
+	
 			# check modified timestamp
 			# ------------------------
 			ts = sql("select modified from `tab%s` where name=%s" % (doc.doctype, '%s'), doc.name)[0][0]
 			if str(ts)==doc.modified:
 				return doc.name + ": No update"
 
+			# Check if custom search criteria
+			#----------------------------------
+			if doc.doctype == 'Search Criteria':
+				std_srch = sql("select standard from `tabSearch Criteria` where name = '%s'" % (doc.name))
+				if std_srch and std_srch[0][0] == 'No':
+					return doc.name + ": No update (Customised)"
+
 			# Replace the record
 			# ------------------
-				
-			sql("DELETE FROM `tab%s` WHERE name = '%s' limit 1" % (doc.doctype, doc.name))
-			
+
+			sql("DELETE FROM `tab%s` WHERE name = '%s' limit 1" % (doc.doctype, doc.name))			
 			# remove child elements
 			tf_list = get_table_fields(doc.doctype)
 			for t in tf_list:
 				sql("DELETE FROM `tab%s` WHERE parent='%s' AND parentfield='%s'" % (t[0], doc.name, t[1]))
-				
 		else:
 			if webnotes.conn.in_transaction: 
 				sql("ROLLBACK")
 			return doc.name + ": Exists / No change"
 
 	# save main
-	check_links = 1	
+	check_links = 1
 	if doc.doctype == 'Patch':
 		doc.save(make_autoname = 0, new = 1, ignore_fields = ignore, check_links=0)
 	else:
