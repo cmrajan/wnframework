@@ -130,7 +130,7 @@ class DbTable:
 			for line in txt.split('\n'):
 				if line.strip().startswith('CONSTRAINT') and line.find('FOREIGN')!=-1:
 					try:
-						self.foreign_keys.append(line.split('`')[1])
+						self.foreign_keys.append((line.split('`')[3], line.split('`')[1]))
 					except IndexError, e:
 						pass
 
