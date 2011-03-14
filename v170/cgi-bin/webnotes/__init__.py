@@ -44,7 +44,7 @@ sys.path.append(getattr(defs,'modules_path',None))
 
 def getTraceback():
 	import webnotes.utils
-	webnotes.utils.getTraceback()
+	return webnotes.utils.getTraceback()
 
 def errprint(msg):
 	debug_log.append(str(msg or ''))
