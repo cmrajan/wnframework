@@ -120,9 +120,9 @@ if __name__=='__main__':
 	if len(args)==3:
 		
 		root_login, root_password, db_name = args[0], args[1], args[2]
-		Inst = Installer(root_login, root_password)
+		inst = Installer(root_login, root_password)
 
-		Inst.import_from_db(db_name, source_path=options.source_path, \
+		inst.import_from_db(db_name, source_path=options.source_path, \
 			password = options.password, verbose = 1)
 
 		copy_defs()

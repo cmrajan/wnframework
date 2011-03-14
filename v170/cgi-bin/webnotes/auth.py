@@ -94,7 +94,7 @@ class HTTPRequest:
 				db_name = getattr(webnotes.defs,'db_name_map',{}).\
 					get(ac_name, ac_name)
 			else:
-				db_name = getattr(webnotes.defs,'default_db')
+				db_name = getattr(webnotes.defs,'default_db_name')
 	
 		webnotes.conn = webnotes.db.Database(user = db_name,password = getattr(webnotes.defs,'db_password'))
 		webnotes.ac_name = ac_name

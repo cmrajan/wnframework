@@ -8,14 +8,14 @@ import webnotes
 class Database:
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
-		self.user = user or defs.default_db
+		self.user = user or defs.default_db_name
 		self.password = password or defs.db_password
 
 		if ac_name:
-			self.user = self.get_db_login(ac_name) or defs.default_db
+			self.user = self.get_db_login(ac_name) or defs.default_db_name
 		
 		if use_default:
-			self.user = defs.default_db
+			self.user = defs.default_db_name
 
 		self.is_testing = 0
 		self.in_transaction = 0
@@ -30,7 +30,7 @@ class Database:
 			webnotes.logger.debug('Database object initialized for:%s',self.user)
 
 	def get_db_login(self, ac_name):
-		return getattr(defs,'db_name_map').get(ac_name, getattr(defs,'default_db'))
+		return getattr(defs,'db_name_map').get(ac_name, getattr(defs,'default_db_name'))
 
 	def connect(self):
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
