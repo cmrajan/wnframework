@@ -1,51 +1,51 @@
 import webnotes
 
 def import_docs(docs = []):
-        from webnotes.model.doc import Document
-        import webnotes.model.code
+	from webnotes.model.doc import Document
+	import webnotes.model.code
 
-        doc_list = {}
-        created_docs = []
-        already_exists = []
+	doc_list = {}
+	created_docs = []
+	already_exists = []
 
-        out, tmp ="", ""
+	out, tmp ="", ""
 
-        for d in docs:
-                cur_doc = Document(fielddata = d)
-                if not cur_doc.parent in already_exists: # parent should not exist
-                        try:
-                                cur_doc.save(1)
-                                out += "Created: " + cur_doc.name + "\n"
-                                created_docs.append(cur_doc)
-        
-                                # make in groups
-                                if cur_doc.parent:
-                                        if not doc_list.has_key(cur_doc.parent):
-                                                doc_list[cur_doc.parent] = []
-                                        doc_list[cur_doc.parent].append(cur_doc)
+	for d in docs:
+		cur_doc = Document(fielddata = d)
+		if not cur_doc.parent in already_exists: # parent should not exist
+			try:
+				cur_doc.save(1)
+				out += "Created: " + cur_doc.name + "\n"
+				created_docs.append(cur_doc)
 
-                        except Exception, e:
-                                out += "Creation Warning/Error: " + cur_doc.name + " :"+ str(e) + "\n"
-                                already_exists.append(cur_doc.name)
+				# make in groups
+				if cur_doc.parent:
+					if not doc_list.has_key(cur_doc.parent):
+						doc_list[cur_doc.parent] = []
+					doc_list[cur_doc.parent].append(cur_doc)
 
-        # Run scripts for main docs
-        for m in created_docs:
-                if doc_list.has_key(m.name):
-                        tmp = webnotes.model.code.run_server_obj(webnotes.model.code.get_server_obj(m, doc_list.get(m.name, [])),'on_update')
+			except Exception, e:
+				out += "Creation Warning/Error: " + cur_doc.name + " :"+ str(e) + "\n"
+				already_exists.append(cur_doc.name)
 
-                        # update database (in case of DocType)
-                        if m.doctype=='DocType':
-                                import webnotes.model.doctype
-                                try: webnotes.model.doctype.update_doctype(doc_list.get(m.name, []))
-                                except: pass
-                        
-                        out += 'Executed: '+ str(m.name) + ', Err:' + str(tmp) + "\n"
+	# Run scripts for main docs
+	for m in created_docs:
+		if doc_list.has_key(m.name):
+			tmp = webnotes.model.code.run_server_obj(webnotes.model.code.get_server_obj(m, doc_list.get(m.name, [])),'on_update')
 
-        return out
+			# update database (in case of DocType)
+			if m.doctype=='DocType':
+				import webnotes.model.doctype
+				try: webnotes.model.doctype.update_doctype(doc_list.get(m.name, []))
+				except: pass			
+			out += 'Executed: '+ str(m.name) + ', Err:' + str(tmp) + "\n"
+
+	return out
 
 #======================================================================================================================================
 
 import webnotes
+import webnotes.utils
 sql = webnotes.conn.sql
 flt = webnotes.utils.flt
 cint = webnotes.utils.cint
@@ -57,40 +57,38 @@ class CSVImport:
 		self.csv_data = None
 		self.import_date_format = None
 
-        def validate_doctype(self, dt_list):
-                cl, tables, self.dt_list, self.prompt_autoname_flag = 0, [t[0] for t in sql("show tables")], [], 0
-                self.msg.append('<p><b>Identifying Documents</b></p>')
-	
-                dtd = sql("select name, istable, autoname from `tabDocType` where name = '%s' " % dt_list[0])
-                if dtd and dtd[0][0]:
-                        self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[0] + '</div>')
-                        self.dt_list.append(dt_list[0])
-                        if dtd[0][2] and 'Prompt' in dtd[0][2]: self.prompt_autoname_flag = 1
-                        if flt(dtd[0][1]):
-                                res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % self.dt_list[0])
-                                if res1 and res1[0][0] == dt_list[1]:
-                                        self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[1] + '</div>')
-                                        self.dt_list.append(dt_list[1])
-                                else : 
-                                        self.msg.append('<div style="color:RED"> Error: At Row 1, Column 2 => %s is not a valid Document </div>' % dt_list[1])
-                                        self.validate_success = 0
+	def validate_doctype(self, dt_list):
+		cl, tables, self.dt_list, self.prompt_autoname_flag = 0, [t[0] for t in sql("show tables")], [], 0
+		self.msg.append('<p><b>Identifying Documents</b></p>')
+		dtd = sql("select name, istable, autoname from `tabDocType` where name = '%s' " % dt_list[0])
+		if dtd and dtd[0][0]:
+			self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[0] + '</div>')
+			self.dt_list.append(dt_list[0])
+			if dtd[0][2] and 'Prompt' in dtd[0][2]: self.prompt_autoname_flag = 1
+			if flt(dtd[0][1]):
+				res1 = sql("select parent, fieldname from tabDocField where options='%s' and fieldtype='Table' and docstatus!=2" % self.dt_list[0])
+				if res1 and res1[0][0] == dt_list[1]:
+					self.msg.append('<div style="color: GREEN">Identified Document: ' + dt_list[1] + '</div>')
+					self.dt_list.append(dt_list[1])
+				else : 
+					self.msg.append('<div style="color:RED"> Error: At Row 1, Column 2 => %s is not a valid Document </div>' % dt_list[1])
+					self.validate_success = 0
 
-                                if res1 and res1[0][1] == dt_list[2]:
-                                        self.msg.append('<div style="color: GREEN" >Identified Document Fieldname: ' + dt_list[2] + '</div>')
-                                        self.dt_list.append(dt_list[2])
-                                else :
-                                        self.msg.append('<div style="color:RED"> Error: At Row 1, Column 3 => %s is not a valid Fieldname </div>' % dt_list[2])
-                                        self.validate_success = 0
-                        elif dt_list[1] or dt_list[2]:
-                                self.msg.append('<div style="color:RED"> Error: At Row 1, Column 1 => %s is not a Table.  </div>' % dt_list[0])
+				if res1 and res1[0][1] == dt_list[2]:
+					self.msg.append('<div style="color: GREEN" >Identified Document Fieldname: ' + dt_list[2] + '</div>')
+					self.dt_list.append(dt_list[2])
+				else :
+					self.msg.append('<div style="color:RED"> Error: At Row 1, Column 3 => %s is not a valid Fieldname </div>' % dt_list[2])
+					self.validate_success = 0
+			elif dt_list[1]:
+				self.msg.append('<div style="color:RED"> Error: At Row 1, Column 1 => %s is not a Table.	</div>' % dt_list[0])
 				self.validate_success = 0
-                else:
-                        self.msg.append('<div style="color:RED"> Error: At Row 1, Column 1 => %s is not a valid Document </div>' % dt_list[0])
-                        self.validate_success = 0
+		else:
+			self.msg.append('<div style="color:RED"> Error: At Row 1, Column 1 => %s is not a valid Document </div>' % dt_list[0])
+			self.validate_success = 0
 
 
 	def validate_fields(self, lb_list):
-
 		self.msg.append('<p><b>Checking fieldnames for %s</b></p>' % self.dt_list[0])
 		if len(self.dt_list) > 1 and self.overwrite:
 			self.msg.append('<div style="color:RED"> Error: Overwrite is not possible for Document %s </div>' % self.dt_list[0])
@@ -112,7 +110,7 @@ class CSVImport:
 		if self.prompt_autoname_flag or self.overwrite:
 			self.fields.append('name')
 			lb_list.pop(lb_list.index('Name'))
-		
+
 		cl = 1
 		for l in lb_list:
 			try:
@@ -360,9 +358,9 @@ def get_template():
 	
 	form = webnotes.form
 	sql = webnotes.conn.sql
-        # get form values
+	# get form values
 	dt = form.getvalue('dt')
-        overwrite = cint(form.getvalue('overwrite')) or 0
+	overwrite = cint(form.getvalue('overwrite')) or 0
 
 	pt, pf = '', ''
 	tmp_lbl, tmp_ml = [],[]
@@ -395,11 +393,11 @@ def get_template():
 	res = sql("select fieldname, fieldtype, label, reqd, hidden from tabDocField where parent='%s' and docstatus!=2" % dt)
 
 	for r in res:
-                # restrict trash_reason field, hidden and required fields 
+		# restrict trash_reason field, hidden and required fields 
 		if not r[1] in webnotes.model.no_value_fields and r[0] != 'trash_reason' and not r[4] and not r[3]:
 			tmp_lbl.append(getCSVelement(r[2]))
 			tmp_ml.append('')
-                # restrict trash_reason field and hidden fields and add Mandatory indicator for required fields
+		# restrict trash_reason field and hidden fields and add Mandatory indicator for required fields
 		elif not r[1] in webnotes.model.no_value_fields and r[0] != 'trash_reason' and not r[4] and r[3]:
 			lbl.append(getCSVelement(r[2]))
 			ml.append(getCSVelement('[Mandatory]'))
