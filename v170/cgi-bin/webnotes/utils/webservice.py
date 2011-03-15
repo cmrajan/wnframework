@@ -2,7 +2,7 @@ import webnotes
 import webnotes.utils
 
 class FrameworkServer:
-	def __init__(self, remote_host, path, user='', password='', account='', cookies={}, opts={}, https = 0):
+	def __init__(self, remote_host, path, user='', password='', account='', cookies=None, opts=None, https = 0):
 		# validate
 		if not (remote_host and path):
 			raise Exception, "Server address and path necessary"
@@ -12,7 +12,7 @@ class FrameworkServer:
 	
 		self.remote_host = remote_host
 		self.path = path
-		self.cookies = cookies
+		self.cookies = cookies or {}
 		self.webservice_method='POST'
 		self.account = account
 		self.account_id = None
@@ -23,8 +23,9 @@ class FrameworkServer:
 		if not cookies:
 			args = { 'usr': user, 'pwd': password, 'acx': account }
 			
-			for key in opts: # add additional keys
-				args[key] = opts[key]
+			if opts:
+				for key in opts: # add additional keys
+					args[key] = opts[key]
 			
 			res = self.http_get_response('login', args)
 		
@@ -47,7 +48,8 @@ class FrameworkServer:
 			self.app_id = self.cookies.get('app_id')
 			self.sid = self.cookies.get('sid')
 			
-			self.login_response = ret
+			self.login_response = res
+			self.login_return = ret
 
 	# -----------------------------------------------------------------------------------------
 
