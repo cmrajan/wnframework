@@ -56,10 +56,17 @@ class FrameworkServer:
 	def http_get_response(self, method, args):
 		# get response from remote server
 	
-		import httplib, urllib		
+		import urllib, urllib2
 
 		args['cmd'] = method
 
+		protocol = self.https and 'https://' or 'http://'
+		req = urllib2.Request(protocol + os.path.join(self.remote_host, self.path, 'index.cgi'), urllib.urlencode(args))
+		for key in self.cookies:
+			req.add_header('Set-Cookie', '%s=%s' % (key, self.cookies[key]))
+		return urllib2.urlopen(req)
+
+		"""
 		headers = {}
 		if self.cookies:
 			headers.update(self._build_cookies())
@@ -79,13 +86,14 @@ class FrameworkServer:
 		self.conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
 	
 		return self.conn.getresponse()
-
+		"""
+		
 	# -----------------------------------------------------------------------------------------
 
 	def _build_cookies(self):
 		sc = {}
 		for key in self.cookies:
-			sc['Set-Cookie'] = '%s=%s' % (key, self.cookies[key])
+			sc['Cookie'] = '%s=%s' % (key, self.cookies[key])
 		return sc
 
 	# -----------------------------------------------------------------------------------------
@@ -93,7 +101,7 @@ class FrameworkServer:
 	def _extract_cookies(self, res):
 		import Cookie
 		cookies = Cookie.SimpleCookie()
-		cookies.load(res.getheader('set-cookie'))
+		cookies.load(res.headers.get('set-cookie'))
 		for c in cookies.values():
 			self.cookies[c.key] = c.value
 
