@@ -409,7 +409,7 @@ class Session:
 		
 		try:
 			import pygeoip
-		except ImportError:
+		except:
 			return
 		
 		gi = pygeoip.GeoIP('data/GeoIP.dat')
