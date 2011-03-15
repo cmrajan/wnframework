@@ -405,6 +405,10 @@ class Session:
 	# Get IP Info from ipinfodb.com
 	# -----------------------------
 	def get_ipinfo(self):
+		# till it works
+		self._get_ipinfo()
+		return
+	
 		from threading import Thread
 		t = Thread(target=self._get_ipinfo)
 		t.start()

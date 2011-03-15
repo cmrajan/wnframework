@@ -47,9 +47,6 @@ def get():
 		cache = load(country)
 		if cache:
 			return cache
-	else:
-		# for developers, clear out cache after every refresh
-		webnotes.conn.sql("delete from __DocTypeCache")
 	
 	# if not create it
 	sd = build()

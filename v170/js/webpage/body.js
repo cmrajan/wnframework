@@ -120,7 +120,7 @@ function Body() {
 
 		// core areas;
 		if(user=='Guest') user_defaults.hide_webnotes_toolbar = 1;
-		if(!user_defaults.hide_webnotes_toolbar || user=='Administrator') {
+		if(!cint(user_defaults.hide_webnotes_toolbar) || user=='Administrator') {
 			this.wntoolbar = new WNToolbar(this.wntoolbar_area);
 			$y(this.wrapper, {marginTop: this.wntoolbar.wrapper.offsetHeight + 'px'});
 		}
