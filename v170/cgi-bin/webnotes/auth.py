@@ -166,7 +166,7 @@ class LoginManager:
 		try:
 			import event_handlers
 			if hasattr(event_handlers, method):
-				getattr(event_handlers, method)()
+				getattr(event_handlers, method)(self)
 		except ImportError, e:
 			pass
 	
