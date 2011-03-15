@@ -342,7 +342,7 @@ class Session:
 		self.data['data']['tenant_id'] = webnotes.form_dict.get('tenant_id', 0)
 
 		# get ipinfo
-		if webnotes.conn.get_value('Control Panel',None,'get_ip_info'):
+		if webnotes.conn.get_global('get_ip_info'):
 			self.get_ipinfo()
 		
 		# insert session
