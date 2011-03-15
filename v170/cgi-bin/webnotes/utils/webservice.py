@@ -84,7 +84,7 @@ class FrameworkServer:
 	
 	def _extract_cookies(self, res):
 		import Cookie
-		cookies = Cookie.SimpleCookie
+		cookies = Cookie.SimpleCookie()
 		cookies.load(res.getheader('set-cookie'))
 		for c in cookies.values():
 			self.cookies[c.key] = c.value
