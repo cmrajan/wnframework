@@ -62,7 +62,7 @@ class FrameworkServer:
 
 		headers = {}
 		if self.cookies:
-			headers['Cookie'] = webnotes.utils.dict_to_str(self.cookies, '; ')
+			headers['Cookie'] = self._build_cookies()
 	
 		if self.webservice_method == 'POST':
 			headers["ENCTYPE"] =  "multipart/form-data"
@@ -79,6 +79,15 @@ class FrameworkServer:
 		self.conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
 	
 		return self.conn.getresponse()
+
+	# -----------------------------------------------------------------------------------------
+
+	def _build_cookies(self):
+		import Cookie
+		cookies = Cookie.SimpleCookie()
+		for key in self.cookies:
+			cookies[key] = self.cookies[key]
+		return str(cookies)
 
 	# -----------------------------------------------------------------------------------------
 	
