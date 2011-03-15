@@ -33,7 +33,7 @@ def get():
 	# get country
 	if webnotes.conn.get_value('Control Panel',None,'get_ip_info'):
 		webnotes.session_obj.get_ipinfo()
-	country = webnotes.session['data'].get('ipinfo').get('countryName', 'Unknown Country')
+	country = webnotes.session['data'].get('ipinfo', {}).get('countryName', 'Unknown Country')
 
 	# run patches
 	try:
