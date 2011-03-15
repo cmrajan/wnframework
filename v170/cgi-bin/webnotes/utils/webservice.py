@@ -24,8 +24,7 @@ class FrameworkServer:
 			args = { 'usr': user, 'pwd': password, 'acx': account }
 			
 			if opts:
-				for key in opts: # add additional keys
-					args[key] = opts[key]
+				args.update(opts)
 			
 			res = self.http_get_response('login', args)
 		
@@ -66,28 +65,6 @@ class FrameworkServer:
 		for key in self.cookies:
 			req.add_header('cookie', '%s=%s' % (key, self.cookies[key]))
 		return urllib2.urlopen(req)
-
-		"""
-		headers = {}
-		if self.cookies:
-			headers.update(self._build_cookies())
-	
-		if self.webservice_method == 'POST':
-			headers["ENCTYPE"] =  "multipart/form-data"
-			headers["Accept"] = "text/plain, text/html, */*"
-			headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
-		
-		if not self.conn:
-			if self.https:
-				self.conn = httplib.HTTPSConnection(self.remote_host)	
-			else:
-				self.conn = httplib.HTTPConnection(self.remote_host)	
-			
-		import os
-		self.conn.request(self.webservice_method, os.path.join(self.path, "index.cgi"), urllib.urlencode(args), headers=headers)
-	
-		return self.conn.getresponse()
-		"""
 		
 	# -----------------------------------------------------------------------------------------
 
