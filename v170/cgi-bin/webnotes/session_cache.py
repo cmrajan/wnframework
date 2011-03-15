@@ -92,6 +92,10 @@ def dump(sd, country):
 	if sd.get('docs'):
 		sd['docs'] = webnotes.model.doclist.compress(sd['docs'])
 
+	# delete earlier (?)
+	webnotes.conn.sql("delete from __SessionCache where user=%s and country=%s", webnotes.session['user'], country)
+
+	# make new
 	webnotes.conn.sql("insert into `__SessionCache` (user, country, cache) VALUES (%s, %s, %s)", (webnotes.session['user'], country, str(sd)))
 
 # ==================================================
