@@ -56,7 +56,7 @@ class FrameworkServer:
 	def http_get_response(self, method, args):
 		# get response from remote server
 	
-		import urllib, urllib2
+		import urllib, urllib2, os
 
 		args['cmd'] = method
 
