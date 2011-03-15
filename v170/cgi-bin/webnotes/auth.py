@@ -92,7 +92,7 @@ class HTTPRequest:
 			ac_name = self.get_ac_name()
 			if ac_name:
 				db_name = getattr(webnotes.defs,'db_name_map',{}).\
-					get(ac_name, ac_name)
+					get(ac_name, getattr(webnotes.defs,'default_db_name'))
 			else:
 				db_name = getattr(webnotes.defs,'default_db_name')
 	

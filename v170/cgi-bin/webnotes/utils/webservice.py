@@ -62,7 +62,7 @@ class FrameworkServer:
 
 		headers = {}
 		if self.cookies:
-			headers['Cookie'] = self._build_cookies()
+			headers.update(self._build_cookies())
 	
 		if self.webservice_method == 'POST':
 			headers["ENCTYPE"] =  "multipart/form-data"
@@ -83,11 +83,10 @@ class FrameworkServer:
 	# -----------------------------------------------------------------------------------------
 
 	def _build_cookies(self):
-		import Cookie
-		cookies = Cookie.SimpleCookie()
+		sc = {}
 		for key in self.cookies:
-			cookies[key] = self.cookies[key]
-		return str(cookies)
+			sc['Set-Cookie'] = '%s=%s' % (key, self.cookies[key])
+		return sc
 
 	# -----------------------------------------------------------------------------------------
 	
