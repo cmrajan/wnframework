@@ -96,7 +96,6 @@ function startup() {
 		if(t) {
 			historyChange(t);
 		} else if(home_page) {
-
 			// show home oage
 			loadpage(home_page);
 		}

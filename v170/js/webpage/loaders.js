@@ -174,9 +174,9 @@ function new_doc(doctype, onload, in_dialog, on_save_callback, cdt, cdn, cnic) {
 }
 var newdoc = new_doc;
 
+//
 // Load Page
-// -------------------------------------------------------------------------------
-
+//
 var pscript={};
 var cur_page;
 function loadpage(page_name, call_back, no_history) {
@@ -205,11 +205,7 @@ function loadpage(page_name, call_back, no_history) {
 		scroll(0,0);
 
 		// update "back"
-		if(window.location.hash.substr(0,6)=='#!Page')
-			arg = window.location.hash.split('/')[2];
-		else
-			arg = window.location.hash.split('/')[1];
-		nav_obj.open_notify('Page', page_name, arg, no_history);
+		pscript.update_page_history(page_name, no_history)
 
 		// call refresh script
 		try {
@@ -228,9 +224,28 @@ function loadpage(page_name, call_back, no_history) {
 	}
 }
 
-// Load Script
-// -------------------------------------------------------------------------------
+//
+// adds to the url (if called using loadpage and not the url) - if i do not do this then it will overwrite
+// this is useful when an argument is passed to the page separated by a /
+//
+pscript.update_page_history = function(page_name, no_history) {
+	var arg = null;
+	// get from page
+	if(window.location.hash) {
+		var t = nav_obj.get_page(window.location.hash)
+	} else if(get_url_arg('page')) {
+		var t = nav_obj.get_page(get_url_arg('page'))
+	} else {
+		return;
+	}
 
+	if(t[1]==page_name) arg = t[2];
+	nav_obj.open_notify('Page', page_name, arg, no_history);
+}
+
+//
+// Load Script
+//
 function loadscript(src, call_back) {
 	set_loading();
 	var script = $a('head','script');

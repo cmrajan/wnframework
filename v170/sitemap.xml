@@ -5,20 +5,16 @@ import sys, os, cgi
 sys.path.append(os.getcwd()+'/cgi-bin')
 
 import webnotes
-import webnotes.auth
-import webnotes.utils.sitemap
-import Cookie
+import webnotes.db
 
-out_cookies = Cookie.SimpleCookie()
-
-# login
-auth_obj = webnotes.auth.Authentication(cgi.FieldStorage(), out_cookies, {})
+# connect to the default db
+conn = webnotes.db.Database()
 
 # get the server prefix
-prefix = webnotes.conn.sql('select defvalue from `tabDefaultValue` where parent = "Control Panel" and defkey="sitemap_url"')
+prefix = webnotes.conn.get_global('sitemap_url')
 
 print "Content-Type: text/xml"
 print
 
 # get the xml
-print webnotes.utils.sitemap.generate_xml(webnotes.conn, prefix and prefix[0][0] or '')
+print webnotes.utils.sitemap.generate_xml(webnotes.conn, prefix)

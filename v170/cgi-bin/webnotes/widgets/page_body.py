@@ -89,26 +89,22 @@ def scrub_ids(content):
 	
 	return content
 
+#
 # load the page content and meta tags
-# -----------------------------------
+#
 def get_page_content(page):
 	from webnotes.model.code import get_code
 	from webnotes.model.doc import Document
 	global page_properties
 	
-	if not page:
-		return 'No Title', 'No Content'
+	if not page: return 'No Title', 'No Content'
+
+	if '/' in page: page = page.split('/')[0]
 
 	doc = Document('Page', page)
+	load_page_metatags(doc)
+
 	template = '%(content)s'
-
-	# page meta-tags
-	page_properties['page_title'] = doc.page_title or doc.name
-	page_properties['keywords'] = doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
-	page_properties['site_description'] = doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
-	page_properties['add_in_head'] = webnotes.conn.get_global('add_in_head') or ''
-	page_properties['add_in_body'] = webnotes.conn.get_global('add_in_body') or ''
-
 	# content
 	if doc.template:
 		template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
@@ -121,8 +117,22 @@ def get_page_content(page):
 
 	page_properties['content'] = scrub_ids(template % {'content':page_properties['content']})
 
+#
+# load metatags
+#
+def load_page_metatags(doc):
+	global page_properties
+
+	# page meta-tags
+	page_properties['page_title'] = doc.page_title or doc.name
+	page_properties['keywords'] = doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
+	page_properties['site_description'] = doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
+	page_properties['add_in_head'] = webnotes.conn.get_global('add_in_head') or ''
+	page_properties['add_in_body'] = webnotes.conn.get_global('add_in_body') or ''
+
+#
 # load the form as page (deprecated)
-# -----------------------------------
+#
 def get_doc_content(dt, dn):
 	import webnotes.model.code
 	
@@ -144,7 +154,7 @@ def load_properties():
 	import webnotes.widgets.page
 	import urllib
 
-	page_url = webnotes.form_dict.get('_escaped_fragment_', '')
+	page_url = webnotes.form_dict.get('_escaped_fragment_', webnotes.form_dict.get('page', ''))
 	
 	if page_url:
 		if page_url.startswith('Page/'): 

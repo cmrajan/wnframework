@@ -4,9 +4,11 @@ frame_xml = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s
 </urlset>"""
 
+link_xml = """\n<url><loc>%s</loc><lastmod>%s</lastmod></url>"""
+
 # generate the sitemap XML
 def generate_xml(conn, site_prefix):
-	global frame_xml
+	global frame_xml, link_xml
 	import urllib
 
 	# settings
@@ -17,14 +19,16 @@ def generate_xml(conn, site_prefix):
 	
 	if site_prefix:
 		# list of all Guest pages (static content)
-		for r in conn.sql("SELECT tabPage.name, tabPage.modified FROM `tabPage Role`, tabPage WHERE `tabPage Role`.role='Guest' AND `tabPage Role`.parent = tabPage.name ORDER BY tabPage.modified DESC"):
-			site_map += '\n<url><loc>%s?page=Page/%s</loc><lastmod>%s</lastmod></url>' % (site_prefix, urllib.quote(r[0]), r[1].strftime('%Y-%m-%d'))
+		for r in conn.sql("SELECT name, modified FROM tabPage WHERE ifnull(published,0)=1 ORDER BY modified DESC"):
+			page_url = site_prefix = '?page=' + urllib.quote(r[0])
+			site_map += link_xml % (page_url, r[1].strftime('%Y-%m-%d'))
 		
 		# list of all Records that are viewable by guests (Blogs, Articles etc)
-		for dt in conn.sql("SELECT DISTINCT tabDocPerm.parent FROM `tabDocPerm`, tabDocType WHERE tabDocPerm.role='Guest' AND IFNULL(tabDocPerm.`read`,0) = 1 AND IFNULL(tabDocPerm.`permlevel`,0) = 0 AND tabDocType.name = tabDocPerm.parent and IFNULL(tabDocType.issingle,0) != 1 LIMIT %s" % max_doctypes):
-			
-			for d in conn.sql("SELECT name, modified FROM `tab%s` WHERE docstatus != 2 ORDER BY modified DESC LIMIT %s" % (dt[0], max_items)):
-			
-				site_map += '\n<url><loc>%s?page=Form/%s/%s</loc><lastmod>%s</lastmod></url>' % (site_prefix, dt[0], urllib.quote(d[0]), d[1].strftime('%Y-%m-%d'))
+		try:
+			from event_handlers import get_sitemap_items
+			for i in get_sitemap_items(site_prefix):
+				site_map += link_xml % (i[0], i[1])
+		except ImportError, e:
+			pass
 
 	return frame_xml % site_map

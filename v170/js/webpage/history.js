@@ -6,6 +6,10 @@ nav_obj.observers = [];
 nav_obj.add_observer = function(o) { nav_obj.observers.push(o); }
 
 nav_obj.ol = [];
+
+//
+// notify my history so that it gets added to the back button history
+//
 nav_obj.open_notify = function(t, dt, dn, no_history) {
 	// last should not be this (refresh)
 	if(nav_obj.ol.length) {
@@ -34,7 +38,7 @@ nav_obj.open_notify = function(t, dt, dn, no_history) {
 		} else {
 			var id = en_t+'/'+ en_dt + (dn ? ('/'+en_dn): '')
 		}
-				
+
 		// option to add to analytics engine
 		if(nav_obj.on_open)
 			nav_obj.on_open(id);
@@ -97,16 +101,26 @@ function history_get_name(t) {
 	return parts.join('/')
 }
 
-function historyChange(newLocation, historyData) {
-	// remove exclamation for hash-bangs
-	if(newLocation.substr(0,1)=='!') {
-		newLocation = newLocation.substr(1);
-		if(!in_list(['Page/', 'Form/', 'Repor'], newLocation.substr(0,5))) {
-			newLocation = 'Page/' + newLocation;	
-		}
-	}
+//
+// get the page details from the location
+//
+nav_obj.get_page = function(loc) {
+	if(!loc) loc = window.location.hash;
 	
-	t = newLocation.split('/');
+	// remove exclamation for hash-bangs
+	if(loc.substr(0,1)=='#') { loc = loc.substr(1); }
+	if(loc.substr(0,1)=='!') { loc = loc.substr(1); }
+
+	if(!in_list(['Page/', 'Form/', 'Repor', 'DocBr'], loc.substr(0,5))) {
+		loc = 'Page/' + loc;	
+	}
+	return loc.split('/');	
+}
+//
+// function called when page is updated
+//
+function historyChange(newLocation, historyData) {
+	var t = nav_obj.get_page(newLocation)
 
 	for(var i=0;i<t.length;i++) 
 		t[i] = decodeURIComponent(t[i]);
