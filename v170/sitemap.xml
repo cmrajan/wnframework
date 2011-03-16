@@ -8,7 +8,7 @@ import webnotes
 import webnotes.db
 
 # connect to the default db
-conn = webnotes.db.Database()
+webnotes.conn = webnotes.db.Database()
 
 # get the server prefix
 prefix = webnotes.conn.get_global('sitemap_url')
