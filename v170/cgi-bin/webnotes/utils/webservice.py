@@ -58,10 +58,8 @@ class FrameworkServer:
 		import urllib, urllib2, os
 
 		args['cmd'] = method
-		if self.path=='/': self.path = ''
-		
-		webnotes.msgprint(self.path + '|' + os.path.join(self.remote_host, self.path, 'index.cgi'))
-		
+		if self.path.startswith('/'): self.path = self.path[1:]
+				
 		protocol = self.https and 'https://' or 'http://'
 		req = urllib2.Request(protocol + os.path.join(self.remote_host, self.path, 'index.cgi'), urllib.urlencode(args))
 		for key in self.cookies:
