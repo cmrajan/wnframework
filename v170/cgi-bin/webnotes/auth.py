@@ -175,6 +175,7 @@ class LoginManager:
 			import event_handlers
 			if hasattr(event_handlers, method):
 				getattr(event_handlers, method)(self)
+			return
 		except ImportError, e:
 			pass
 	
@@ -217,10 +218,8 @@ class LoginManager:
 		if hasattr(cp, 'on_logout'):
 			cp.on_logout(self)
 
-	def logout(self, call_on_logout = 1):
-		if call_on_logout:
-			self.call_on_logout_event()
-
+	def logout(self, arg=''):
+		self.run_trigger('on_logout')
 		webnotes.conn.sql('update tabSessions set status="Logged Out" where sid="%s"' % webnotes.session['sid'])
 		
 # =================================================================================
