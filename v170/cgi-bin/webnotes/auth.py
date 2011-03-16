@@ -29,6 +29,10 @@ class HTTPRequest:
 			webnotes.msgprint(webnotes.conn.get_global("__session_status_message"))
 			raise Exception
 
+		# -----------------------------
+		# start transaction
+		webnotes.conn.begin()
+
 		# login
 		webnotes.login_manager = LoginManager()
 
@@ -47,6 +51,10 @@ class HTTPRequest:
 			
 		# load profile
 		self.setup_profile()
+
+		webnotes.conn.commit()
+		# end transaction
+		# -----------------------------
 
 	# setup profile
 	# -------------
