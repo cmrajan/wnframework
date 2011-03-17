@@ -2,7 +2,7 @@ import webnotes
 import webnotes.model.doc
 import webnotes.model.code
 
-conn = webnotes.app_conn or webnotes.conn
+conn = webnotes.conn
 
 class Page:
 	def __init__(self, name):

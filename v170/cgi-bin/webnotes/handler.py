@@ -311,11 +311,12 @@ else:
 			else:
 				if cmd!='login':
 					webnotes.msgprint('No Method: %s' % cmd)
+
+	except webnotes.ValidationError:
+		webnotes.conn.rollback()
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
-
-		if webnotes.conn and webnotes.conn.in_transaction and sql:
-			sql("ROLLBACK")
+		webnotes.conn.rollback()
 			
 
 #### cleanup

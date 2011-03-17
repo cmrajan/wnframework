@@ -43,6 +43,7 @@ def db_exists(dt, dn):
 def getTraceback():
 	import sys, traceback, string
 	type, value, tb = sys.exc_info()
+	
 	body = "Traceback (innermost last):\n"
 	list = traceback.format_tb(tb, None) + traceback.format_exception_only(type, value)
 	body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])

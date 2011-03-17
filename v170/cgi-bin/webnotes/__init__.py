@@ -1,4 +1,14 @@
-# webnotes init (all shared variables come here)
+#
+# import modules path
+# 
+import os, sys
+
+import webnotes.defs
+sys.path.append(getattr(webnotes.defs,'modules_path',None))
+
+#
+# map for identifying which field values come from files
+#
 code_fields_dict = {
 	'Page':[('script', 'js'), ('content', 'html'), ('style', 'css'), ('static_content', 'html'), ('server_code', 'py')],
 	'DocType':[('server_code_core', 'py'), ('client_script_core', 'js')],
@@ -9,7 +19,9 @@ code_fields_dict = {
 	'Control Panel':[('startup_code', 'js'), ('startup_css', 'css')]
 }
 
-
+#
+# globals
+#
 version = 'v170'
 form_dict = {}
 auth_obj = None
@@ -24,23 +36,22 @@ cookies = {}
 auto_masters = {}
 tenant_id = None
 
+#
+# Custom Class (no traceback)
+#
+class ValidationError(Exception):
+	pass
 
-# for applications
-app_conn = None
-adt_list = ['DocType', 'DocField', 'DocPerm']
-
-
-
-# json response object
+#
+# HTTP standard response
+#
 response = {'message':'', 'exc':''}
 
+#
+# the logs
+#
 debug_log, message_log = [], []
 
-import os
-import defs
-
-import sys
-sys.path.append(getattr(defs,'modules_path',None))
 
 def getTraceback():
 	import webnotes.utils
@@ -49,8 +60,10 @@ def getTraceback():
 def errprint(msg):
 	debug_log.append(str(msg or ''))
 
-def msgprint(msg, small=0):
+def msgprint(msg, small=0, raise_exception=1):
 	message_log.append((small and '__small:' or '')+str(msg or ''))
+	if raise_exception:
+		raise VadiationError
 
 def is_apache_user():
 	import os
