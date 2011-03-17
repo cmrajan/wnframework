@@ -116,6 +116,9 @@ class DbTable:
 		ret = []
 		tab_list = DbManager(webnotes.conn).get_tables_list(webnotes.conn.cur_db_name)
 
+		if cint(webnotes.conn.get_global('ignore_foreign_keys')):
+			return []
+
 		for k in self.columns.keys():
 			if self.columns[k].fieldtype=='Link' and self.columns[k].options:
 				tab_name = "tab" + self.columns[k].options
@@ -138,6 +141,11 @@ class DbTable:
 
 	# SET foreign keys
 	def set_foreign_keys(self):
+		from webnotes.utils import cint
+		
+		if cint(webnotes.conn.get_global('ignore_foreign_keys')):
+			return
+		
 		if self.add_foreign_key:
 			tab_list = DbManager(webnotes.conn).get_tables_list(webnotes.conn.cur_db_name)
 			webnotes.conn.sql("set foreign_key_checks=0")
