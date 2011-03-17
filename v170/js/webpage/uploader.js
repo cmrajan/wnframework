@@ -1,6 +1,11 @@
 var uploaders = {};
 var upload_frame_count = 0;
 
+//
+// parent is the element in which you want to add the upload box
+// args - additional hidden arguments
+// callback - callback function to be called after upload with file id
+//
 Uploader = function(parent, args, callback) {
 	var id = 'frame'+upload_frame_count; upload_frame_count++;
 	this.callback = callback;
