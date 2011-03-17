@@ -63,7 +63,7 @@ def errprint(msg):
 def msgprint(msg, small=0, raise_exception=1):
 	message_log.append((small and '__small:' or '')+str(msg or ''))
 	if raise_exception:
-		raise VadiationError
+		raise ValidationError
 
 def is_apache_user():
 	import os
