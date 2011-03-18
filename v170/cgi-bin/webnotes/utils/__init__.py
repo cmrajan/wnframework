@@ -49,7 +49,7 @@ def getTraceback():
 	body = body + "%-20s %s" % (string.join(list[:-1], ""), list[-1])
 	
 	if webnotes.logger:
-		webnotes.logger.error('Db:'+webnotes.conn.cur_db_name + ' - ' + body)
+		webnotes.logger.error('Db:'+(webnotes.conn and webnotes.conn.cur_db_name or '') + ' - ' + body)
 	
 	return body
 
