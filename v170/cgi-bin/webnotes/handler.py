@@ -291,7 +291,7 @@ else:
 			# execute
 			if locals().has_key(cmd):
 				if (not webnotes.conn.in_transaction) and (not read_only):
-					sql("START TRANSACTION")
+					webnotes.conn.begin()
 				
 				if webnotes.form_dict.get('arg'):
 					# direct method call
@@ -307,7 +307,7 @@ else:
 				webnotes.session_obj.update()
 				
 				if webnotes.conn.in_transaction:
-					sql("COMMIT")
+					webnotes.conn.commit()
 			else:
 				if cmd!='login':
 					webnotes.msgprint('No Method: %s' % cmd)

@@ -60,7 +60,7 @@ def getTraceback():
 def errprint(msg):
 	debug_log.append(str(msg or ''))
 
-def msgprint(msg, small=0, raise_exception=1):
+def msgprint(msg, small=0, raise_exception=0):
 	message_log.append((small and '__small:' or '')+str(msg or ''))
 	if raise_exception:
 		raise ValidationError
