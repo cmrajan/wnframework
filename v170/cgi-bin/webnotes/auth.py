@@ -227,8 +227,8 @@ class LoginManager:
 class CookieManager:
 	def __init__(self):
 		import Cookie
-		self.get_incoming_cookies()
 		webnotes.cookies = Cookie.SimpleCookie()
+		self.get_incoming_cookies()
 
 	# get incoming cookies
 	# --------------------
