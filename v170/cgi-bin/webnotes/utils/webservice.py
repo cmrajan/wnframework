@@ -62,7 +62,7 @@ class FrameworkServer:
 		protocol = self.https and 'https://' or 'http://'
 		req = urllib2.Request(protocol + os.path.join(self.remote_host, self.path, 'index.cgi'), urllib.urlencode(args))
 		for key in self.cookies:
-			req.add_header('cookie', ', '.join(['%s=%s' % (key, self.cookies[key]) for key in self.cookies]))
+			req.add_header('cookie', '; '.join(['%s=%s' % (key, self.cookies[key]) for key in self.cookies]))
 		return urllib2.urlopen(req)
 
 	# -----------------------------------------------------------------------------------------
