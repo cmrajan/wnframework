@@ -90,7 +90,7 @@ class test_doc(unittest.TestCase):
 		assert (cint(new_name[get_num_start_pos(new_name):])) - cint(last_name[get_num_start_pos(last_name):])
 		
 		
-	def test_clear_table(self):
+
 		
 		
 		
