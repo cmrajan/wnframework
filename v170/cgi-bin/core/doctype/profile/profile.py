@@ -21,18 +21,6 @@ class DocType:
   def __init__(self, doc, doclist):
     self.doc = doc
     self.doclist = doclist
-
-  def validate(self):
-     self.disable_users()
-    
-  
-  # Function to Disallow disabling of users from client account
-  # -----------------------------------------------------------
-  def disable_users(self):
-    if self.doc.enabled==0:
-      msgprint('Please go to Setup --> Manage User Page to disable users from this account')
-      raise Exception
-  
   
   # Autoname is Email id
   # --------------------
