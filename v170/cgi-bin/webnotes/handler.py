@@ -316,7 +316,7 @@ else:
 		webnotes.conn.rollback()
 	except:
 		webnotes.errprint(webnotes.utils.getTraceback())
-		webnotes.conn.rollback()
+		webnotes.conn and webnotes.conn.rollback()
 			
 
 #### cleanup
