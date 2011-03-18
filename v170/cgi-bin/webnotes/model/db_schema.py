@@ -26,6 +26,9 @@ default_columns = ['name', 'creation', 'modified', 'modified_by', 'owner', 'docs
 
 default_shortcuts = ['_Login', '__user', '_Full Name', 'Today', '__today']
 
+
+from webnotes.utils import cint
+
 # -------------------------------------------------
 # Class database table
 # -------------------------------------------------
@@ -445,13 +448,16 @@ def validate_column_name(n):
 # -------------------------------------------------
 
 def updatedb(dt, archive=0):
-	if webnotes.conn.sql("select issingle from tabDocType where name=%s", dt)[0][0]:
-		return
-
-	webnotes.conn.commit()
-	tab = DbTable(dt, archive and 'arc' or 'tab')
-	tab.sync()
-	webnotes.conn.begin()
+	res = webnotes.conn.sql("select issingle from tabDocType where name=%s", dt)
+	
+	if not res:
+		webnotes.conn.commit()
+		tab = DbTable(dt, archive and 'arc' or 'tab')
+		tab.sync()
+		webnotes.conn.begin()
+		
+	else:
+		return None
 	
 # -------------------------------------------------
 # patch to create foreign keys on tables
