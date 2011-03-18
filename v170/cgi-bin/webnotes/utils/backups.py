@@ -79,6 +79,7 @@ def delete_oldest_file(folder):
 def get_backup():
 	import webnotes		
 	import os, time
+
 	global backup_folder, download_folder
 
 	# get the last nightly backup file from the backups folder
@@ -90,13 +91,12 @@ def get_backup():
 		# rename it
 		from random import choice
 		lnd='0123456789'
-		new_name = ''.join(map(lambda x,y=lnd: choice(y), range(8))) + '.tar.gz'
-		folder = backup_folder + '/archives/' + webnotes.conn.cur_db_name + '/'
+		new_name = ''.join(map(lambda x,y=lnd: choice(y), range(8))) + '.sql.gz'
+		folder = backup_folder + '/dumps/'
+
 		# get the newest file
 		if os.path.exists(folder):
-			fl = sorted(os.listdir(folder), key=lambda fn: os.stat(os.path.join(folder,fn)).st_mtime, reverse=True)
-			os.system('cp '+ folder + fl[0] + ' ./' + new_name)
-		
+			os.system('cp '+ folder + webnotes.conn.cur_db_name+'.sql.gz' + ' ./' + new_name)
 			webnotes.msgprint('Your nightly backup is available for download by <a href="'+download_folder+'/' + new_name + '">clicking here</a> (only for the next few hours)')
 	
 	# delete any files older than a day
