@@ -74,6 +74,11 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 		this.desc_area.innerHTML = d.substr(0,80) + (d.length > 80 ? '...' : '');
 	}
 
+	// back to top
+	var span = $a(div, 'span', 'link_type', {cssFloat:'right', marginRight:'8px'});
+	span.innerHTML = 'Go To Top';
+	span.onclick = function() { scroll(0, 0); }
+
 	// exp / collapse
 
 	this.chk.onclick = function() { 

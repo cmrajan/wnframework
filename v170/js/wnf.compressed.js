@@ -236,7 +236,7 @@ if(freeze_msg)unfreeze();if(!validate_session(r,rtxt))return;if(r.exc){errprint(
 saveAllowed=true;if(fn)fn(r,rtxt);}}
 req.onreadystatechange=ret_fn;req.open("POST",outUrl,true);req.setRequestHeader("ENCTYPE","multipart/form-data");req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");args['cmd']=command;req.send(makeArgString(args));if(!no_spinner)set_loading();if(freeze_msg)freeze(freeze_msg,1);}
 function validate_session(r,rt){if(r.message=='Logged In'){start_sid=get_cookie('sid');return true;}
-if(start_sid&&start_sid!=get_cookie('sid')){page_body.set_session_changed();return;}
+if(start_sid&&start_sid!=get_cookie('sid')&&user!='Guest'){page_body.set_session_changed();return;}
 if(r.exc&&r.session_status=='Session Expired'){resume_session();return;}
 if(r.exc&&r.session_status=='Logged Out'){msgprint('You have been logged out');setTimeout('redirect_to_login()',3000);return;}
 if(r.exc&&r.exc_type&&r.exc_type=='PermissionError'){loadpage('_home');}
