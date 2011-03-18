@@ -237,11 +237,9 @@ class CookieManager:
 		cookies = {}
 		if 'HTTP_COOKIE' in os.environ:
 			c = os.environ['HTTP_COOKIE']
-			c = c.split('; ')
-				  
-			for cookie in c:
-				cookie = cookie.split('=')
-				cookies[cookie[0].strip()] = cookie[1].strip()
+			webnotes.cookies.load(c)
+			for c in webnotes.cookies.values():
+				cookies[c.key] = c.value
 					
 		webnotes.incoming_cookies = cookies
 		
