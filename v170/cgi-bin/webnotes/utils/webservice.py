@@ -72,7 +72,7 @@ class FrameworkServer:
 		cookies = Cookie.SimpleCookie()
 		cookies.load(res.headers.get('set-cookie'))
 		for c in cookies.values():
-			self.cookies[c.key] = c.value
+			self.cookies[c.key] = c.value.rstrip(',')
 
 	# -----------------------------------------------------------------------------------------
 
