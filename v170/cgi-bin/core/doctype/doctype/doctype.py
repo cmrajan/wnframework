@@ -3,12 +3,14 @@ import webnotes
 
 from webnotes.utils import now, cint
 sql = webnotes.conn.sql
-	
+msgprint = webnotes.msgprint
+
+
 # -----------------------------------------------------------------------------------------
 
 
 class DocType:
-	def __init__(self, doc, doclist):
+	def __init__(self, doc=None, doclist=[]):
 		self.doc = doc
 		self.doclist = doclist
 
@@ -28,8 +30,22 @@ class DocType:
 	
 	def set_version(self):
 		self.doc.version = cint(self.doc.version) + 1
+	
+	#
+	# check if this series is not used elsewhere
+	#
+	def validate_series(self, autoname=None, name=None):
+		if not autoname: autoname = self.doc.autoname
+		if not name: name = self.doc.name
+		
+		if autoname and (not autoname.startswith('field:')) and (not autoname=='Prompt'):
+			prefix = autoname.split('.')[0]
+			used_in = sql('select name from tabDocType where substring_index(autoname, ".", 1) = %s and name!=%s', (prefix, name))
+			if used_in:
+				msgprint('<b>Series already in use:</b> The series "%s" is already used in "%s"' % (prefix, used_in[0][0]), raise_exception=1)
 
 	def validate(self):
+		self.validate_series()
 		self.scrub_field_names()
 		self.set_version()
 
