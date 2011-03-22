@@ -97,25 +97,29 @@ def get_page_content(page):
 	from webnotes.model.doc import Document
 	global page_properties
 	
-	if not page: return 'No Title', 'No Content'
+	if not page: return
 
 	if '/' in page: page = page.split('/')[0]
 
-	doc = Document('Page', page)
-	load_page_metatags(doc)
-
-	template = '%(content)s'
-	# content
-	if doc.template:
-		template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
-
-	page_properties['content'] = get_code(doc.module, 'page', doc.name, 'html', fieldname='content')
-			
-	# dynamic (scripted) content
-	if page_properties['content'] and page_properties['content'].startswith('#!python'):
-		page_properties.update(webnotes.model.code.execute(page_properties['content']))
-
-	page_properties['content'] = scrub_ids(template % {'content':page_properties['content']})
+	try:
+		doc = Document('Page', page)
+	
+		load_page_metatags(doc)
+	
+		template = '%(content)s'
+		# content
+		if doc.template:
+			template = get_code(webnotes.conn.get_value('Page Template', doc.template, 'module'), 'Page Template', doc.template, 'html', fieldname='template')
+	
+		page_properties['content'] = get_code(doc.module, 'page', doc.name, 'html', fieldname='content')
+				
+		# dynamic (scripted) content
+		if page_properties['content'] and page_properties['content'].startswith('#!python'):
+			page_properties.update(webnotes.model.code.execute(page_properties['content']))
+	
+		page_properties['content'] = scrub_ids(template % {'content':page_properties['content']})
+	except:
+		pass
 
 #
 # load metatags
