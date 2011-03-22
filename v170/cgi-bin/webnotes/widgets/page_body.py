@@ -3,7 +3,7 @@ index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://ww
 <head id="head">
 <!-- Web Notes Framework : www.webnotesframework.org -->
 
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="robots" content="index, follow" />
   <meta name="keywords" content="%(keywords)s" />
   <meta name="description" content="%(site_description)s" />
