@@ -98,9 +98,9 @@ def get_page_content(page):
 	global page_properties
 	
 	if not page: return
-
 	if '/' in page: page = page.split('/')[0]
-
+	if page=='Form': return
+	
 	try:
 		doc = Document('Page', page)
 	
