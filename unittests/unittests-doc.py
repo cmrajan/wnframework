@@ -5,7 +5,8 @@ import webnotes.model.db_schema
 from webnotes.utils import cint,cstr
 import unittest
 import testlib
-
+from webnotes.model.db_schema import updatedb
+from webnotes.model.db_schema import DbManager
 
 def get_num_start_pos(string):
 	for each in string:
@@ -24,19 +25,27 @@ class test_doc(unittest.TestCase):
 		self.f3 = doc.Document('')
 		self.f4 = doc.Document('')
 		self.p = doc.Document('')
+		webnotes.session = testlib.test_webnotes_session
+		webnotes.conn = testlib.test_conn
+		self.dbman = DbManager(webnotes.conn)
+	
 		
-	def test_create_doctype(self):
-
-		
+	def test_create_new_doctype_record(self):
+				
 		# create tabAccount
 		self.test_doc = doc.Document('DocType')
 		self.test_doc.name = testlib.test_doctype
 		self.test_doc.autoname = testlib.test_doctype_autoname
 		self.test_doc.save(1)
+		assert (testlib.test_conn.sql("select count(*) from tabDocType where name = '%s'"%testlib.test_doctype)[0][0])
+
+	def test_create_new_doctype_table(self):
+		updatedb((self.test_doc.name))
+		table_list = self.dbman.get_tables_list(testlib.test_db)
+		assert ('tab'+testlib.test_doctype in table_list)
 		
-		assert (testlib.test_conn.sql("select count(*) from tabDocType where name = '%s'"%self.testlib.test_doctype)[0][0])
-	
-	def test_create_docfields(self):
+		
+	def test_create_new_docfields(self):
 	
 		self.f1 = self.test_doc.addchild('fields', 'DocField')
 		self.f1.label = 'Test Account Name'
@@ -63,6 +72,8 @@ class test_doc(unittest.TestCase):
 		self.f4.fieldtype = 'Data'
 		self.f4.save()
 		
+		updatedb((testlib.test_doctype))
+		
 		assert (testlib.test_conn.sql("select count(*) from tabDocField where name = '%s'"%self.f1.fieldname)[0][0])
 		assert (testlib.test_conn.sql("select count(*) from tabDocField where name = '%s'"%self.f2.fieldname)[0][0])
 		assert (testlib.test_conn.sql("select count(*) from tabDocField where name = '%s'"%self.f3.fieldname)[0][0])
@@ -71,22 +82,23 @@ class test_doc(unittest.TestCase):
 		
 	def test_create_docperms(self):
 		
-		self.p = self.test_doc.addchild('permissions', 'DocPerm')
-		self.p.role = 'Administrator'
+		self.p = self.test_doc.addchild(testlib.test_docperm, 'DocPerm')
+		self.p.role =  'Administrator'
 		self.p.read = 1
 		self.p.write = 1
 		self.p.create = 1
 		self.p.save()
 	
-		assert testlib.test_conn.sql("select count(*) from tabDocPerm where name = '%s'"%self.p.name)
+		assert testlib.test_conn.sql("select count(*) from tabDocPerm where name = '%s'"%self.p.name)[0][0]
 		
 
 		
 		
 	def test_make_autoname(self):
 		new_name = doc.make_autoname(self.test_doc.name,self.test_doc.parenttype)
-		last_name = testlib.test_conn.sql("select name from `tabTestAccount` order by name desc limit 1")
-		
+		last_name = testlib.test_conn.sql("select name from `tab%s` order by name desc limit 1"%testlib.test_doctype)		
+		if not last_name:
+			last_name = '0'
 		assert (cint(new_name[get_num_start_pos(new_name):])) - cint(last_name[get_num_start_pos(last_name):])
 		
 		
