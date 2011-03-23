@@ -185,7 +185,6 @@ class DbTable:
 	
 	def alter(self):
 		self.get_columns_from_db()
-
 		for col in self.columns.values():
 			col.check(self.current_columns.get(col.fieldname, None))
 
@@ -448,14 +447,12 @@ def validate_column_name(n):
 # -------------------------------------------------
 
 def updatedb(dt, archive=0):
-	res = webnotes.conn.sql("select issingle from tabDocType where name=%s", dt)
-	
-	if not res:
+	res = webnotes.conn.sql("select ifnull(issingle, 0) from tabDocType where name=%s", dt)
+	if res and not res[0][0]:
 		webnotes.conn.commit()
 		tab = DbTable(dt, archive and 'arc' or 'tab')
 		tab.sync()
-		webnotes.conn.begin()
-		
+		webnotes.conn.begin()		
 	else:
 		return None
 	
