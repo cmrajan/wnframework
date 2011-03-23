@@ -33,7 +33,7 @@ class Database:
 		return getattr(defs,'db_name_map').get(ac_name, getattr(defs,'default_db_name'))
 
 	def connect(self):
-		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password,charset = 'utf8')
+		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
 		self._cursor = self._conn.cursor()
 		
 		return self._cursor
