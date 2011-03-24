@@ -15,7 +15,7 @@ $wid_make = function(ele,color) {
 	if(ele.disabled) return;
 	fsize = ele.style.fontSize ? ele.style.fontSize : '11px';
 	
-	$y(ele, {padding:'4px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); 
+	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); 
 	$br(ele,'3px'); $gr(ele,'#FFF','#DDD'); $bs(ele, '0.5px 0.5px 2px #EEE');
 	
 	if(!color && ele.wid_color) color = ele.wid_color;

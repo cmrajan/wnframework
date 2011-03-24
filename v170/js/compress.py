@@ -17,6 +17,7 @@ in_files_main = [
        ,'webpage/page_header.js'
        ,'widgets/autosuggest.js'
        ,'widgets/select.js'
+       ,'widgets/tags.js'
        ,'widgets/export_query.js'
        ,'widgets/list_selector.js'
        ,'widgets/form/fields.js'

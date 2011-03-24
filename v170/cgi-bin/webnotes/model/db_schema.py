@@ -145,11 +145,12 @@ class DbTable:
 	# SET foreign keys
 	def set_foreign_keys(self):
 		from webnotes.utils import cint
-		
-		if cint(webnotes.conn.get_global('ignore_foreign_keys')):
-			return
-		
+
 		if self.add_foreign_key:
+		
+			if cint(webnotes.conn.get_global('ignore_foreign_keys')):
+				return
+		
 			tab_list = DbManager(webnotes.conn).get_tables_list(webnotes.conn.cur_db_name)
 			webnotes.conn.sql("set foreign_key_checks=0")
 			for col in self.add_foreign_key:
@@ -277,9 +278,6 @@ class DbColumn:
 		# default
 		if (self.default and (current_def['default'] != self.default) and (self.default not in default_shortcuts) and not (column_def in ['text','blob'])):
 			self.table.set_default.append(self)
-
-
-
 
 
 class DbManager:
@@ -448,13 +446,14 @@ def validate_column_name(n):
 
 def updatedb(dt, archive=0):
 	res = webnotes.conn.sql("select ifnull(issingle, 0) from tabDocType where name=%s", dt)
-	if res and not res[0][0]:
+	if not res:
+		raise Exception, 'Wrong doctype "%s" in updatedb' % dt
+	
+	if not res[0][0]:
 		webnotes.conn.commit()
 		tab = DbTable(dt, archive and 'arc' or 'tab')
 		tab.sync()
 		webnotes.conn.begin()		
-	else:
-		return None
 	
 # -------------------------------------------------
 # patch to create foreign keys on tables

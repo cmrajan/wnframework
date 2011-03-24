@@ -632,8 +632,8 @@ LinkField.prototype.set_onchange = function() {
 						
 		// not in form, do nothing
 		if(me.not_in_form) {
-			 return;
 			_link_onchange_flag = 0;	 
+			return;
 		}
 		
 		// same value, do nothing

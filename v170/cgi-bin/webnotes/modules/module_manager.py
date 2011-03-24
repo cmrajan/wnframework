@@ -22,25 +22,80 @@ def change_module(dt, dn, from_module, to_module):
 	# svn remove
 	webnotes.msgprint(os.popen("svn remove %s" % os.path.join(webnotes.defs.modules_path, scrub(from_module), dt, dn)).read())
 
-#==============================================================================
-# Return module names present in File System
-#==============================================================================
-def get_modules_from_filesystem():
-	import os, webnotes.defs
-	from import_module import listfolders
-	
-	modules = listfolders(webnotes.defs.modules_path, 1)
-	out = []
-	modules.sort()
-	modules = filter(lambda x: x!='patches', modules)
-	
-	for m in modules:
-		file = open(os.path.join(webnotes.defs.modules_path, m, 'module.info'), 'r')
-		out.append([m, eval(file.read()), get_last_update_for(m), \
-			webnotes.conn.exists('Module Def',m) and 'Installed' or 'Not Installed'])
-		file.close()
 
-	return out
+
+#==============================================================================
+# SYNC
+#==============================================================================
+def reload_doc(module, dt, dn):
+	from webnotes.modules.import_module import import_from_files
+
+	import_from_files(record_list = [[module, dt, dn]])
+
+#
+# get list of doctypes and their last update times
+#
+def get_doc_list(dt):
+	import webnotes
+	module = dt=='Module Def' and 'name' or 'module'
+	q = "select %s, name, _last_update from `tab%s`" % (module, dt)
+	try:
+		return webnotes.conn.sql(q)
+	except Exception, e:
+		if e.args[0]==1054:
+			webnotes.conn.commit()
+			webnotes.conn.sql("alter table `tab%s` add column _last_update varchar(32)" % dt)
+			webnotes.conn.begin()
+			return webnotes.conn.sql(q)
+		elif e.args[0]==1146:
+			return []
+		else:
+			raise e
+
+#
+# sync dt
+#
+def sync_one_doc(d, dt, ts):
+	import webnotes
+	from webnotes.model.db_schema import updatedb
+	reload_doc(d[0], dt, d[1])
+		
+	# update schema(s)
+	if dt=='DocType':
+		updatedb(d[1])
+	webnotes.conn.sql("update `tab%s` set _last_update=%s where name=%s" % (dt, '%s', '%s'), (ts, d[1]))
+
+#
+# sync doctypes, mappers and 
+#
+def sync_meta():
+	import webnotes, os
+	from webnotes.modules import scrub, get_module_path
+	from webnotes.utils import cint
+
+	tl = ['DocType', 'DocType Mapper', 'Module Def']
+
+	for dt in tl:
+		dtl = get_doc_list(dt)
+				
+		for d in filter(lambda x: x[0], dtl):
+			try:
+				ndt, ndn = dt, d[1]
+				if dt == 'DocType':
+					ndt, ndn = scrub(dt), scrub(d[1])
+					
+				mp = get_module_path(scrub(d[0]))
+				ts = cint(os.stat(os.path.join(mp, scrub(d[0]), ndt, ndn, ndn + '.txt')).st_mtime)
+				
+				if d[2] != str(ts):
+					sync_one_doc(d, dt, ts)
+			except OSError:
+				pass
+
+
+
+
+
 
 #==============================================================================
 	
@@ -104,4 +159,23 @@ def init_db_login(ac_name, db_name):
 			
 	webnotes.session = {'user':'Administrator'}
 	webnotes.user = webnotes.profile.Profile()
+
+#==============================================================================
+# Return module names present in File System
+#==============================================================================
+def get_modules_from_filesystem():
+	import os, webnotes.defs
+	from import_module import listfolders
 	
+	modules = listfolders(webnotes.defs.modules_path, 1)
+	out = []
+	modules.sort()
+	modules = filter(lambda x: x!='patches', modules)
+	
+	for m in modules:
+		file = open(os.path.join(webnotes.defs.modules_path, m, 'module.info'), 'r')
+		out.append([m, eval(file.read()), get_last_update_for(m), \
+			webnotes.conn.exists('Module Def',m) and 'Installed' or 'Not Installed'])
+		file.close()
+
+	return out

@@ -38,6 +38,7 @@ function startup() {
 		if(r.ipinfo) session.ipinfo = r.ipinfo;
 		session.dt_labels = r.dt_labels;
 		session.rev_dt_labels = {} // reverse lookup - get doctype by label
+		_tags.color_map = r.tag_color_map;
 		if(r.dt_labels) {
 			for(key in r.dt_labels)session.rev_dt_labels[r.dt_labels[key]] = key;
 		}

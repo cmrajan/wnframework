@@ -40,6 +40,10 @@ def get():
 	except ImportError, e: 
 		pass # no patches - do nothing
 
+	# sync metadata
+	from webnotes.modules.module_manager import sync_meta
+	sync_meta()
+
 	# check if cache exists
 	if not getattr(webnotes.defs,'auto_cache_clear',None):
 		cache = load(country)
@@ -168,6 +172,7 @@ def build():
 	sd['letter_heads'] = get_letter_heads()
 	sd['home_page'] = home_page or ''
 	sd['start_items'] = webnotes.widgets.menus.get_menu_items()
+	sd['tag_color_map'] = webnotes.widgets.menus.get_color_map()
 	if webnotes.session['data'].get('ipinfo'):
 		sd['ipinfo'] = webnotes.session['data']['ipinfo']
 		
