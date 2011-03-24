@@ -21,7 +21,7 @@ def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 #
 # Class to sync incoming document
 #
-class UpdateDocument():
+class UpdateDocument:
 	def __init__(self, in_doclist=[]):
 		self.in_doclist = in_doclist
 		self.doc = Document(fielddata = in_doclist[0])
