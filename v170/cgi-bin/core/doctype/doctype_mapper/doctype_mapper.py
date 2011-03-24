@@ -238,3 +238,10 @@ class DocType:
       elif self.doc.ref_doc_submitted and det[0][1] != 1:
         msgprint(self.doc.from_doctype + ": " + self.ref_doc + " is not Submitted Document.")
         raise Exception, "Validation Error."
+
+  def on_update(self):
+    import webnotes.defs
+    if hasattr(webnotes.defs, 'developer_mode') and webnotes.defs.developer_mode:
+      from webnotes.modules.export_module import export_to_files
+      export_to_files(record_list=[[self.doc.doctype, self.doc.name]])
+      

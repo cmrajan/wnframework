@@ -36,8 +36,8 @@ def export_to_files(modules = [], record_list=[], from_db=None, from_ac=None, ve
 		write_document_file(doclist, record_module)
 	
 	# write the module.info file
-	for m in updated_modules:
-		write_module_info(m)
+	#for m in updated_modules:
+	#	write_module_info(m)
 	
 	# write out attachments
 	for m in modules:
