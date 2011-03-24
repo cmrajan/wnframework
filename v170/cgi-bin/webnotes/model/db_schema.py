@@ -453,7 +453,7 @@ def updatedb(dt, archive=0):
 		webnotes.conn.commit()
 		tab = DbTable(dt, archive and 'arc' or 'tab')
 		tab.sync()
-		webnotes.conn.begin()		
+		webnotes.conn.begin()
 	
 # -------------------------------------------------
 # patch to create foreign keys on tables

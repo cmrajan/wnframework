@@ -40,10 +40,6 @@ def get():
 	except ImportError, e: 
 		pass # no patches - do nothing
 
-	# sync metadata
-	from webnotes.modules.module_manager import sync_meta
-	sync_meta()
-
 	# check if cache exists
 	if not getattr(webnotes.defs,'auto_cache_clear',None):
 		cache = load(country)

@@ -85,11 +85,11 @@ def sync_meta():
 					ndt, ndn = scrub(dt), scrub(d[1])
 					
 				mp = get_module_path(scrub(d[0]))
-				ts = cint(os.stat(os.path.join(mp, scrub(d[0]), ndt, ndn, ndn + '.txt')).st_mtime)
+				ts = cint(os.stat(os.path.join(mp, ndt, ndn, ndn + '.txt')).st_mtime)
 				
 				if d[2] != str(ts):
 					sync_one_doc(d, dt, ts)
-			except OSError:
+			except OSError, e:
 				pass
 
 

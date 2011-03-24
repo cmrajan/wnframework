@@ -41,7 +41,6 @@ class UpdateDocument:
 			self.update_modified()
 			self.run_on_update()
 			webnotes.conn.commit()
-		#webnotes.msgprint(self.log)
 	
 	# check modified	
 	def is_modified(self):
@@ -112,18 +111,18 @@ class UpdateDocumentMerge(UpdateDocument):
 			# save main doc
 			self.keep_values(self.doc)
 			self.doc.save(ignore_fields = 1, check_links=0)
+			self.doclist.append(self.doc)
 			self.save_children()
 			self.on_save()
 			self.log.append('Updated %s' % self.doc.name)
 		else:
-			UpdateDocument.save()
+			UpdateDocument.save(self)
 		
 	def save_children(self):
 		for df in self.in_doclist[1:]: 
 			d = Document(fielddata = df)
 			# update doctype?
 			if d.doctype in self.to_update_doctype:
-			
 				# update this record?
 				if self.to_update(d):
 				
@@ -135,7 +134,7 @@ class UpdateDocumentMerge(UpdateDocument):
 					else:
 						d.save(1, ignore_fields = 1, check_links=0)
 						self.log.append('new %s' % d.doctype)
-
+			self.doclist.append(d)
 
 	def keep_values(self, d):
 		if hasattr(self, 'get_orignal_values'):
@@ -154,12 +153,15 @@ class UpdateDocType(UpdateDocumentMerge):
 		self.to_update_doctype = ['DocType', 'DocField']
 		
 	def to_udpate(self, d):
-		if d.parenttype=='DocField' and (d.fieldtype not in ['Section Break', 'Column Break', 'HTML']):
+		if (d.fieldtype not in ['Section Break', 'Column Break', 'HTML']) and (d.fieldname or d.label):
 			return 1
 	
 	def get_id(self, d):
-		return webnotes.conn.sql("select name from tabDocField where fieldname=%s or label=if(ifnull(fieldname,'')='', %s, '99999999')", (d.fieldname, d.label))
-		
+		if d.fieldname:
+			return webnotes.conn.sql("select name from tabDocField where fieldname=%s and parent=%s", (d.fieldname, d.parent))
+		elif d.label:
+			return webnotes.conn.sql("select name from tabDocField where label=%s and parent=%s", (d.label, d.parent))
+				
 	def on_save(self):
 		self.renum()
 
@@ -183,8 +185,8 @@ class UpdateDocType(UpdateDocumentMerge):
 		prev_field, prev_field_key, extra = '', '', []
 		
 		# get new fields and labels
-		fieldnames = [d.get('fieldname') for d in self.doclist]
-		labels = [d.get('label') for d in self.doclist]
+		fieldnames = [d.get('fieldname') for d in self.in_doclist]
+		labels = [d.get('label') for d in self.in_doclist]
 		
 		# check if all existing are present
 		for f in webnotes.conn.sql("select fieldname, label, idx from tabDocField where parent=%s and fieldtype not in ('Section Break', 'Column Break', 'HTML') order by idx asc", self.doc.name):
@@ -203,7 +205,7 @@ class UpdateDocType(UpdateDocumentMerge):
 
 	# add section breaks
 	def add_section_breaks_and_renum(self):
-		for d in self.doclist:
+		for d in self.in_doclist:
 			if d.get('parentfield')=='fields':
 				if d.get('fieldtype') in ('Section Break', 'Column Break', 'HTML'):
 					tmp = Document(fielddata = d)
@@ -242,15 +244,17 @@ class UpdateModuleDef(UpdateDocumentMerge):
 		self.to_update_doctype = ['Module Def', 'Module Def Item']
 			
 	def get_id(self, d):
-		return webnotes.conn.sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s", (d.doc_type, d.doc_name))
+		webnotes.msgprint(d.doc_name)
+		return webnotes.conn.sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s and display_name=%s and parent=%s", (d.doc_type, d.doc_name, d.display_name d.parent))
 	
 	def to_update(self, d):
-		if d.doctype=='Moduel Def Item': return 1
+		if d.doctype=='Module Def Item': return 1
 	
 	def get_orignal_values(self, d):
 		if d.doctype=='Module Def Item':
-			return {'name': self.get_id()[0][0]}
-
+			return {'name': self.get_id(d)[0][0]}
+		if d.doctype=='Module Def':
+			return sql("select module_seq, disabled, is_hidden from `tabModule Def` where name=%s", d.name, as_dict = 1)
 
 
 

@@ -189,19 +189,6 @@ def update_module_timestamp(mod):
 			
 	module_info = eval(file.read())
 	file.close()
-	
-	# update in table
-	try:
-		update_module_timestamp_query(mod, module_info['update_date'])
-	except Exception, e:
-		if e.args[0]==1054: # no column
-			# add column
-			webnotes.conn.sql("alter table `tabModule Def` add column last_updated_date varchar(40)")
-			
-			# try again
-			update_module_timestamp_query(mod, module_info['update_date'])
-		else:
-			raise e
 
 # =============================================================================
 
