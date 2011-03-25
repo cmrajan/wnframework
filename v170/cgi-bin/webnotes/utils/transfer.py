@@ -245,7 +245,7 @@ class UpdateModuleDef(UpdateDocumentMerge):
 			
 	def get_id(self, d):
 		webnotes.msgprint(d.doc_name)
-		return webnotes.conn.sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s and display_name=%s and parent=%s", (d.doc_type, d.doc_name, d.display_name d.parent))
+		return webnotes.conn.sql("select name from `tabModule Def Item` where doc_type=%s and doc_name=%s and display_name=%s and parent=%s", (d.doc_type, d.doc_name, d.display_name, d.parent))
 	
 	def to_update(self, d):
 		if d.doctype=='Module Def Item': return 1
