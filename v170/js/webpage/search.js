@@ -19,6 +19,7 @@ function makeselector() {
 		['Data', 'Beginning With', 'Tip: You can use wildcard "%"'],
 		['Select', 'Search By'],
 		['Button', 'Search'],
+		['HTML', 'Help'],
 		['HTML', 'Result']
 	]);	
 	
@@ -37,6 +38,8 @@ function makeselector() {
 			d.values_len = 0;
 		}
 		d.style = 'Link';
+		d.set_query_description()
+		
 		if(!d.sel_type)d.sel_type = 'Value';
 		d.set_title('Select a "'+ d.sel_type +'" for field "'+label+'"');
 	}
@@ -58,12 +61,19 @@ function makeselector() {
 		if(kc==13) if(!btn.disabled)btn.onclick(); 
 	}
 
+	d.set_query_description = function() {
+		if(d.input && d.input.query_description) {
+			d.rows['Help'].innerHTML ='<div class="help_box">' + d.input.query_description + '</div>';
+		} else {
+			d.rows['Help'].innerHTML =''
+		}
+	}
 	d.onshow = function() { 
 		if(d.set_doctype!=d.sel_type) {
 			d.rows['Result'].innerHTML ='';
 			d.values_len = 0;
 		}
-	
+			
 		inp.value = '';		
 		if(d.input && d.input.txt.value) {
 			inp.value = d.input.txt.value;
