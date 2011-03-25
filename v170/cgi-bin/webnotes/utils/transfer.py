@@ -33,7 +33,9 @@ class UpdateDocument:
 
 	# sync
 	def sync(self):
-		if self.is_modified():
+		is_mod = self.is_modified()
+		
+		if (not self.exists) or (is_mod):
 			webnotes.conn.begin()
 			if self.exists:
 				self.delete_existing()
@@ -45,6 +47,7 @@ class UpdateDocument:
 	# check modified	
 	def is_modified(self):
 		timestamp = webnotes.conn.sql("select modified from `tab%s` where name=%s" % (self.doc.doctype, '%s'), self.doc.name)
+
 		if timestamp:
 			self.exists = 1
 			if str(timestamp[0][0]) == self.doc.modified: 
@@ -63,7 +66,7 @@ class UpdateDocument:
 	def save(self):
 		# parent
 		self.doc.save(new = 1, ignore_fields = 1, check_links=0)
-		self.doclist = [doc]
+		self.doclist = [self.doc]
 		self.save_children()
 			
 	def save_children(self):
