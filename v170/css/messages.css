@@ -1,0 +1,45 @@
+
+/* FLOATING MESSAGE */
+
+.btn-img { cursor: pointer; }
+
+div.fetching { color: #888; text-align:right; }
+
+div#floating_message {
+	z-index: 91;
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	border: 1px solid #DA8;
+	background-color: #FFE;
+	display: none;
+	width: 300px;
+}
+
+td#fm_content {
+	width: 70%;
+	padding: 3px;
+}
+
+td#fm_cancel {
+	width: 30%;
+	padding: 3px;
+}
+
+/** help **/
+
+.help_box {
+	background-color:#FFC;
+	padding: 12px;
+	margin: 12px 0px;
+	border: 1px dashed #CCC;
+}
+
+.help_box_big {
+	background-color:#FFC;
+	padding: 12px;
+	margin: 12px 0px;
+	border: 1px dashed #CCC;
+	text-align: center;
+	font-size: 14px;
+}

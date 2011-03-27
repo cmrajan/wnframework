@@ -78,7 +78,9 @@ def load(country):
 				
 def make_cache_table():
 	import webnotes
+	webnotes.conn.commit()
 	webnotes.conn.sql("create table `__SessionCache` (user VARCHAR(120), country VARCHAR(120), cache LONGTEXT)")
+	webnotes.conn.begin()
 
 # dump session to cache
 # ==================================================

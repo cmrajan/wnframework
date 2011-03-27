@@ -1,3 +1,11 @@
+var wn = {} // global namespace
+
+wn.widgets = {}
+wn.utils = {}
+wn.model = {}
+wn.profile = {}
+wn.session = {}
+
 // constants
 var NEWLINE = '\n';
 var login_file = '';

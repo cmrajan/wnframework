@@ -430,10 +430,8 @@ _f.Frm.prototype.refresh_print_layout = function() {
 		$di(this.view_btn_wrapper);
 
 		// archive
-		if(cur_frm.doc.__archived) {
+		if(cur_frm.doc.__archived || (!this.orig_perm[0][WRITE])) {
 			$dh(this.view_btn_wrapper);
-		} else {
-			$di(this.view_btn_wrapper);
 		}
 	} else {
 		$dh(this.view_btn_wrapper);		
@@ -581,6 +579,7 @@ _f.Frm.prototype.check_doc_perm = function() {
 	var dt = this.parent_doctype?this.parent_doctype : this.doctype;
 	var dn = this.parent_docname?this.parent_docname : this.docname;
 	this.perm = get_perm(dt, dn);
+	this.orig_perm = get_perm(dt, dn, 1);
 				  
 	if(!this.perm[0][READ]) { 
 		if(user=='Guest') {

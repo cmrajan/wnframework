@@ -1,0 +1,75 @@
+html { 
+	margin: 0px;
+	padding: 0px;
+}
+
+body {	
+	margin: 0px;
+	padding: 0px;
+	font-family: Arial, Helvetica, Sans;
+	font-size: 12px;
+	color: #000;
+	background: url(foo) fixed;
+}
+
+input, select, button { font-size: 12px; font-family: Arial, Helvetica, Sans; }
+
+li { margin: 4px; }
+
+h1 { font-family: Georgia, Times; margin: 8px 0px; padding: 0px; font-size: 24px; font-weight:normal; }
+h2 { font-family: Georgia, Times; margin: 8px 0px; padding: 0px; font-size: 18px; font-weight:normal; }
+h3 { font-family: Georgia, Times; margin: 4px 0px; padding: 0px; font-size: 16px; font-weight:normal; }
+h4 { font-family: Georgia, Times; margin: 2px 0px; padding: 0px; font-size: 14px; }
+h5 { font-family: Georgia, Times; margin: 2px 0px; padding: 0px; font-size: 14px; font-weight: normal; }
+
+pre { margin: 0px; padding: 0px; }
+
+button { margin: 2px; margin-left: 0px; }
+
+select { border: 1px solid #AAA; }
+
+textarea { font-family: arial, helvetica, sans serif; height: 120px; width: 90%; overflow-x: auto; border: 1px solid #AAA; font-size: 12px; }
+
+table { padding: 0px; border-collapse: 'collapse'}
+
+td { padding:0px; margin: 0px; vertical-align: top; }
+
+a:active { outline:none; }
+
+:focus { -moz-outline-style:none; }
+
+table.simpletable { border-collapse: collapse; margin-bottom: 10px;}
+table.simpletable td {border: 1pt solid #000; vertical-align: top; padding: 2px; }
+
+div.fix_ff_cursor { overflow: auto; }
+
+/* --- Layout --- */
+
+div.comment { color: #444; }
+
+div#body_div {
+	position: relative;
+	display: none;
+}
+
+div.no_script {
+	display: none;
+}
+
+div.loading_div {
+	position: absolute;
+	background-color: #FFFFCC;
+	z-index: 1999;
+	right: 5px;
+	width: 90px;
+	display: none;
+	text-align: center;
+	padding: 2px;
+	font-size: 12px;
+	border: 1px solid #FF4;
+}
+
+
+div#head_div { background-color: #FFF; }
+
+#head_banner { background-color: #FFF; }

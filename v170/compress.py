@@ -1,42 +1,44 @@
 in_files_main = [
-       'utils/rsh.compressed.js'
-       ,'globals.js'
-       ,'utils/datatype.js'
-       ,'utils/browser_detect.js'
-       ,'utils/datetime.js'
-       ,'utils/dom.js'
-       ,'utils/handler.js'
-       ,'utils/msgprint.js'
-       ,'utils/json.js'
-       ,'widgets/dialog.js'
-       ,'widgets/listing.js'
-       ,'widgets/tree.js'
-       ,'widgets/menu.js'
-       ,'widgets/layout.js'
-       ,'widgets/tabbedpage.js'
-       ,'webpage/page_header.js'
-       ,'widgets/autosuggest.js'
-       ,'widgets/select.js'
-       ,'widgets/tags.js'
-       ,'widgets/export_query.js'
-       ,'widgets/list_selector.js'
-       ,'widgets/form/fields.js'
-       ,'webpage/wntoolbar.js'
-       ,'webpage/history.js'
-       ,'webpage/search.js'
-       ,'webpage/spinner.js'
-       ,'webpage/freeze_page.js'
-       ,'webpage/error_console.js'
-       ,'webpage/about.js'
-       ,'webpage/loaders.js'
-       ,'webpage/uploader.js'
-       ,'webpage/page.js'
-       ,'webpage/docbrowser.js'
-       ,'model/local_data.js'
-       ,'model/doclist.js'
-       ,'webpage/body.js'
-       ,'app.js'
-       ,'widgets/calendar.js'
+	'utils/rsh.compressed.js'
+	,'globals.js'
+	,'utils/datatype.js'
+	,'utils/browser_detect.js'
+	,'utils/datetime.js'
+	,'utils/dom.js'
+	,'utils/handler.js'
+	,'utils/msgprint.js'
+	,'utils/json.js'
+	,'widgets/dialog.js'
+	,'widgets/listing.js'
+	,'widgets/tree.js'
+	,'widgets/menu.js'
+	,'widgets/layout.js'
+	,'widgets/tabbedpage.js'
+	,'webpage/page_header.js'
+	,'widgets/autosuggest.js'
+	,'widgets/select.js'
+	,'widgets/tags.js'
+	,'widgets/export_query.js'
+	,'widgets/list_selector.js'
+	,'widgets/form/fields.js'
+	,'webpage/wntoolbar.js'
+	,'webpage/history.js'
+	,'webpage/search.js'
+	,'webpage/spinner.js'
+	,'webpage/freeze_page.js'
+	,'webpage/error_console.js'
+	,'webpage/about.js'
+	,'webpage/loaders.js'
+	,'webpage/uploader.js'
+	,'webpage/page.js'
+	,'webpage/docbrowser.js'
+	,'wn/widgets/doc_column_view.js'
+	,'wn/widgets/page_sidebar.js'
+	,'model/local_data.js'
+	,'model/doclist.js'
+	,'webpage/body.js'
+	,'app.js'
+	,'widgets/calendar.js'
      ]
 
 out_file_main = 'wnf.compressed.js'
@@ -67,6 +69,26 @@ in_files_report = [
 ]
 
 out_file_report = 'report.compressed.js'
+
+in_files_css = [
+	'css/body.css',
+	'css/menus.css',
+	'css/messages.css',
+	'css/forms.css',
+	'css/grid.css',
+	'css/listing.css',
+	'css/report.css',
+	'css/calendar.css',
+	'css/autosuggest.css',
+	'css/dialog.css',
+	'css/wntoolbar.css',
+	'css/tabs.css',
+	'css/jqplot.css',
+	'css/bw-icons.css',
+	'css/doc_column_view.css',
+]
+
+out_file_css = 'css/default.css'
 
 #in_files_main += in_files_form
 
@@ -284,11 +306,24 @@ class JavascriptMinify(object):
         self._jsmin()
         self.instream.close()
 
+def combine_css():
+	global out_file_css, in_files_css
+	
+	data = ''
+	for f in in_files_css:
+		fh = open(f, 'read')
+		data += fh.read() + '\n'
+		fh.close()
+		
+	out_file = open(out_file_css, 'w')
+	out_file.write(data)
+	out_file.close()
+
 def _compress(in_files, out_file, in_type='js', verbose=False,
              temp_file='.temp'):
     temp = open(temp_file, 'w')
     for f in in_files:
-        fh = open(f)
+        fh = open('js/' + f)
         data = fh.read() + '\n'
         fh.close()
 
@@ -315,13 +350,18 @@ def _compress(in_files, out_file, in_type='js', verbose=False,
 
     os.remove(temp_file)
 
-def compress(t):
-	if t=='main':
-		_compress(in_files_main, out_file_main)
-	elif t=='form':
-		_compress(in_files_form, out_file_form)
-	elif t=='report':
-		_compress(in_files_report, out_file_report)
-	else:
-		print 'parameter must be one of main, form or report'
 	
+if __name__=='__main__':
+	import sys
+	if sys.argv[1]=='main':
+		_compress(in_files_main, out_file_main)
+	elif sys.argv[1]=='form':
+		_compress(in_files_form, out_file_form)
+	elif sys.argv[1]=='report':
+		_compress(in_files_report, out_file_report)
+	elif sys.argv[1]=='css':
+		combine_css()
+		
+	else:
+		print 'parameter must be one of main, css, form or report'	
+		
