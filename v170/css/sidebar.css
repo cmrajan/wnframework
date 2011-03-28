@@ -1,0 +1,33 @@
+div.psidebar-wrapper {
+	margin: 8px;
+}
+
+div.psidebar-head {
+	font-size: 14px;
+	font-weight: bold;
+	color: #555;
+	margin-bottom: 12px;
+}
+
+div.psidebar-section {
+	background-color: #e2e2e2;
+	border: 1px solid #bbb;
+	padding: 8px;
+	margin-bottom: 11px;
+}
+
+div.psidebar-section-head {
+	font-weight: bold;
+	color: #555;
+	margin-bottom: 7px;	
+}
+
+div.psidebar-section-item {
+	margin-bottom: 7px;
+	margin-left: 7px;
+}
+
+.psidebar-section-link {
+	font-size: 11px;
+	color: #666;
+}
