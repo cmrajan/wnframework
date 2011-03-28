@@ -2,17 +2,19 @@
 
 	+ this.parent (either FormContainer or Dialog)
  		+ this.wrapper
- 			+ this.saved_wrapper
-			+ this.form_wrapper
-				+ this.head
-				+ this.tip_wrapper
-				+ this.last_comment_wrapper
-				+ this.tab_wrapper
-				+ this.body
-					+ this.layout
-				+ this.footer
-			+ this.print_wrapper
-				+ this.head
+ 			+ this.content
+	 			+ this.saved_wrapper
+				+ this.form_wrapper
+					+ this.head
+					+ this.tip_wrapper
+					+ this.last_comment_wrapper
+					+ this.body
+						+ this.tab_wrapper
+						+ this.layout
+					+ this.footer
+				+ this.print_wrapper
+					+ this.head
+ 			+ this.sidebar
 */
 
 // called from table edit
@@ -73,6 +75,69 @@ _f.Frm = function(doctype, parent) {
 	
 	// notify on rename
 	rename_observers.push(this);
+}
+
+// ======================================================================================
+
+_f.Frm.prototype.setup = function() {
+
+	var me = this;
+	this.fields = [];
+	this.fields_dict = {};
+
+	// wrapper
+	this.wrapper = $a(this.parent.body, 'div', 'frm_wrapper');
+	
+	// create area for print fomrat
+	this.setup_print_layout();
+
+	// thank you goes here (in case of Guest, don't refresh, just say thank you!)
+	this.saved_wrapper = $a(this.wrapper, 'div');
+	
+	// forms go in forms wrapper
+	this.form_wrapper = $a(this.wrapper, 'div');
+
+	// head
+	this.head = $a(this.form_wrapper, 'div');
+
+	// tips
+	this.last_comment_wrapper = $a(this.form_wrapper, 'div', 'help_box', {display:'none', marginRight:'8px', fontSize:'11px', padding:'4px'});
+	this.tip_wrapper = $a(this.form_wrapper, 'div');
+	
+	if(this.meta.use_template) {
+		// template layout
+		this.setup_template_layout();
+	} else {
+		// standard layout
+		this.setup_std_layout();	
+	}
+
+	// setup attachments
+	if(this.meta.allow_attach)
+		this.setup_attach();
+
+	// client script must be called after "setup" - there are no fields_dict attached to the frm otherwise
+	this.setup_client_script();
+	
+	this.setup_done = true;
+}
+
+// ======================================================================================
+
+_f.Frm.prototype.setup_print_layout = function() {
+	this.print_wrapper = $a(this.wrapper, 'div');
+	this.print_head = $a(this.print_wrapper, 'div');
+	this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
+	
+	var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '6px'});
+	this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
+	this.view_btn = $btn(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 
+		{marginRight:'4px'}, 'green');
+
+	this.print_btn = $btn($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
+
+	$y($td(t,0,1), {textAlign: 'right'});
+	this.print_close_btn = $btn($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); });
 }
 
 // ======================================================================================
@@ -231,16 +296,22 @@ _f.Frm.prototype.setup_meta = function() {
 }
 
 _f.Frm.prototype.setup_std_layout = function() {
-	this.tab_wrapper = $a(this.form_wrapper, 'div'); $dh(this.tab_wrapper);
+	this.wtab = make_table(this.form_wrapper, 1, 2, '100%', ['75%', '25%']);
+	this.body = $td(this.wtab, 0, 0);
 
+	
 	// only tray
-	if(this.meta.section_style=='Tabbed') this.meta.section_style='Tray';
+	//if(this.meta.section_style=='Tabbed') this.meta.section_style='Tray';
 	this.meta.section_style='Simple'; // always simple!
 	
-	this.body = $a(this.form_wrapper, 'div', '');
+	//this.body = $a(this.form_wrapper, 'div', '');
+	this.tab_wrapper = $a(this.body, 'div'); $dh(this.tab_wrapper);
 
 	// layout
 	this.layout = new Layout(this.body, '100%');
+	
+	// sidebar
+	this.setup_sidebar();
 	
 	// footer
 	this.setup_footer();
@@ -260,6 +331,12 @@ _f.Frm.prototype.setup_std_layout = function() {
 	
 	// create fields
 	this.setup_fields_std();
+}
+
+// --------------------------------------------------------------------------------------
+
+_f.Frm.prototype.setup_sidebar = function() {
+	this.sidebar = new wn.widgets.form.sidebar.Sidebar(this);
 }
 
 // --------------------------------------------------------------------------------------
@@ -393,24 +470,6 @@ _f.Frm.prototype.set_parent = function(parent) {
 	}
 }
 
-// ======================================================================================
-
-_f.Frm.prototype.setup_print_layout = function() {
-	this.print_wrapper = $a(this.wrapper, 'div');
-	this.print_head = $a(this.print_wrapper, 'div');
-	this.print_body = $a($a(this.print_wrapper,'div','',{backgroundColor:'#888', padding: '8px'}), 'div', 'frm_print_wrapper');
-	
-	var t= make_table(this.print_head, 1 ,2, '100%', [], {padding: '6px'});
-	this.view_btn_wrapper = $a($td(t,0,0) , 'span', 'green_buttons');
-	this.view_btn = $btn(this.view_btn_wrapper, 'View Details', function() { cur_frm.edit_doc() }, 
-		{marginRight:'4px'}, 'green');
-
-	this.print_btn = $btn($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
-
-	$y($td(t,0,1), {textAlign: 'right'});
-	this.print_close_btn = $btn($td(t,0,1), 'Close', function() { nav_obj.show_last_open(); });
-}
-
 // --------------------------------------------------------------------------------------
 
 _f.Frm.prototype.refresh_print_layout = function() {
@@ -442,50 +501,6 @@ _f.Frm.prototype.refresh_print_layout = function() {
 	_p.build(this.default_format, print_callback, null, 1);
 }
 
-// ======================================================================================
-
-_f.Frm.prototype.setup = function() {
-
-	var me = this;
-	this.fields = [];
-	this.fields_dict = {};
-
-	// wrapper
-	this.wrapper = $a(this.parent.body, 'div', 'frm_wrapper');
-	
-	// create area for print fomrat
-	this.setup_print_layout();
-
-	// thank you goes here (in case of Guest, don't refresh, just say thank you!)
-	this.saved_wrapper = $a(this.wrapper, 'div');
-	
-	// forms go in forms wrapper
-	this.form_wrapper = $a(this.wrapper, 'div');
-
-	// head
-	this.head = $a(this.form_wrapper, 'div');
-
-	// tips
-	this.last_comment_wrapper = $a(this.form_wrapper, 'div', 'help_box', {display:'none', marginRight:'8px', fontSize:'11px', padding:'4px'});
-	this.tip_wrapper = $a(this.form_wrapper, 'div');
-	
-	if(this.meta.use_template) {
-		// template layout
-		this.setup_template_layout();
-	} else {
-		// standard layout
-		this.setup_std_layout();	
-	}
-
-	// setup attachments
-	if(this.meta.allow_attach)
-		this.setup_attach();
-
-	// client script must be called after "setup" - there are no fields_dict attached to the frm otherwise
-	this.setup_client_script();
-	
-	this.setup_done = true;
-}
 
 // SHOW!
 // ======================================================================================
@@ -640,7 +655,10 @@ _f.Frm.prototype.refresh = function(docname) {
 			}
 
 			// header
-			if(!this.meta.istable) { this.refresh_header(); }
+			if(!this.meta.istable) { 
+				this.refresh_header(); 
+				this.sidebar.refresh();
+			}
 
 			// comments
 			this.refresh_last_comment();

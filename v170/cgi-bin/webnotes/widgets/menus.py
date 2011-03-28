@@ -201,7 +201,9 @@ def create_tag(tag, color):
 # --------------------------------------------------------------
 
 def add_tag():
-	globals().update(webnotes.form_dict)
+	f = webnotes.form_dict
+	tag, color = f.get('tag'), f.get('color')
+	dt, dn = f.get('dt'), f.get('dn')
 	
 	# create tag in tag table
 	create_tag(tag, color)

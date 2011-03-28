@@ -72,7 +72,7 @@ _f.FrmHeader.prototype.refresh= function() {
 	if(cint(cur_frm.doc.docstatus)==2  && p[AMEND])
 		this.page_head.add_button('Amend', function() { cur_frm.amend_doc() }, 0, 'ui-icon-scissors');
 
-	// New
+/*	// New
 	if(in_list(profile.can_create, cur_frm.doctype)) {
 		this.page_head.add_button('New', function() { new_doc() }, 0, 'ui-icon-document');
 	}
@@ -95,7 +95,7 @@ _f.FrmHeader.prototype.refresh= function() {
 	// Trash
 	if(cur_frm.meta.allow_trash && cint(cur_frm.doc.docstatus) != 2 && (!cur_frm.doc.__islocal) && p[CANCEL])
 		this.page_head.add_button('Trash', function() { cur_frm.savetrash() }, 0, 'ui-icon-trash');	
-	
+*/	
 	// add comment
 	this.comment_btn = this.page_head.add_button('Comments', function() { cur_frm.show_comments(); }, 0, 'ui-icon-comment');
 }

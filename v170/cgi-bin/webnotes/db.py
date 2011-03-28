@@ -56,8 +56,8 @@ class Database:
 		if self.in_transaction and query[:6].lower() in ['update', 'insert']:
 			self.transaction_writes += 1
 			if self.transaction_writes > 5000:
+				webnotes.msgprint('A very long query was encountered. If you are trying to import data, please do so using smaller files')
 				raise Exception, 'Bad Query!!! Too many writes'
-				self.rollback()
 	
 	def fetch_as_dict(self):
 		result = self._cursor.fetchall()

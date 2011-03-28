@@ -1,6 +1,6 @@
 var wn = {} // global namespace
 
-wn.widgets = {}
+wn.widgets = {form:{},report:{}}
 wn.utils = {}
 wn.model = {}
 wn.profile = {}

@@ -18,7 +18,7 @@ _tags = {
 // Tag List
 //
 TagList = function(parent, start_list, dt, dn, static, onclick) {
-	this.start_list = start_list;
+	this.start_list = start_list ? start_list : [];
 	this.tag_list = [];
 	this.dt = dt;
 	this.onclick = onclick;
@@ -97,6 +97,34 @@ TagList.prototype.is_text_okay = function(val) {
 	return 1
 }
 
+// add to local
+TagList.prototype.add_to_locals = function(tag) {
+	if(locals[this.dt] && locals[this.dt][this.dn]) {
+		var doc = locals[this.dt][this.dn];
+	
+		if(!doc._user_tags) {
+			doc._user_tags = ''
+		}
+		var tl = doc._user_tags.split(',')
+		tl.push(tag)
+		doc._user_tags = tl.join(',');
+	}
+}
+
+// remove from local
+TagList.prototype.remove_from_locals = function(tag) {
+	if(locals[this.dt] && locals[this.dt][this.dn]) {
+		var doc = locals[this.dt][this.dn];
+	
+		var tl = doc._user_tags.split(',');
+		var new_tl = [];
+		for(var i=0; i<tl.length; i++) {
+			if(tl[i]!=tag) new_tl.push(tl[i]);
+		}
+		doc._user_tags = new_tl.join(',');
+	}
+}
+
 // save the tag
 TagList.prototype.save_tag = function(d) {
 	var val = strip(d.tag_input.txt.value);
@@ -116,6 +144,9 @@ TagList.prototype.save_tag = function(d) {
 		// hide the dialog
 		d.tag_input.txt.value= '';
 		d.hide();
+		
+		// add in locals
+		me.add_to_locals(val)
 
 		if(!r.message) return;
 		me.add_tag(r.message, 0, '_user_tags');
@@ -261,6 +292,8 @@ DocumentTag.prototype.remove = function() {
 		var nl=[]; for(var i in me.tag_list) if(me.tag_list[i]!=me.label) nl.push(me.tag_list[i]);
 		if(me.taglist)
 			me.taglist.tag_list = nl;
+			
+		me.taglist.remove_from_locals(me.label);
 	}
 	$c('webnotes.widgets.menus.remove_tag', {'dt':me.dt, 'dn':me.dn, 'tag':me.label}, callback)
 	$bg(me.body,'#DDD');

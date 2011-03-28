@@ -158,12 +158,12 @@ Field.prototype.refresh_mandatory = function() {
 	if(this.label_area) {
 		if(this.df.reqd) {
 			this.label_area.style.color= "#d22";
-			if(this.txt)$y(this.txt,{backgroundColor:"#FEE"});
-			else if(this.input)$y(this.input,{backgroundColor:"#FEE"});
+			if(this.txt)$y(this.txt,{backgroundColor:"#FEE", fontSize:'14px', fontWeight: 'bold'});
+			else if(this.input)$y(this.input,{backgroundColor:"#FEE", fontSize:'14px', fontWeight: 'bold'});
 		} else {
 			this.label_area.style.color= "#222";
-			if(this.txt)$y(this.txt,{backgroundColor:"#FFF"});
-			else if(this.input)$y(this.input,{backgroundColor:"#FFF"});
+			if(this.txt)$y(this.txt,{backgroundColor:"#FFF", fontSize:'12px', fontWeight: 'normal'});
+			else if(this.input)$y(this.input,{backgroundColor:"#FFF", fontSize:'12px', fontWeight: 'normal'});
 		}
 	}
 	this.set_reqd = this.df.reqd;

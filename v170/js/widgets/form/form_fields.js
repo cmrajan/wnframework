@@ -130,7 +130,7 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header) {
 	}
 
 	// indent
-	$y(this.row.body, { marginLeft:100/11 + '%' });
+	$y(this.row.body, { marginLeft:'17px' });
 
 }
 

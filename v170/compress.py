@@ -41,7 +41,7 @@ in_files_main = [
 	,'widgets/calendar.js'
      ]
 
-out_file_main = 'wnf.compressed.js'
+out_file_main = 'js/wnf.compressed.js'
 
 #-------------------------------------------------
 
@@ -57,9 +57,10 @@ in_files_form = [
 	,'widgets/form/attachments.js'
 	,'widgets/form/clientscriptAPI.js'
 	,'widgets/form/form_comments.js'
+	,'wn/widgets/form/sidebar.js'
 ]
 
-out_file_form = 'form.compressed.js';
+out_file_form = 'js/form.compressed.js';
 
 in_files_report = [
 	'widgets/report_builder/bargraph.js'
@@ -85,6 +86,7 @@ in_files_css = [
 	'css/tabs.css',
 	'css/jqplot.css',
 	'css/bw-icons.css',
+	'css/sidebar.css',
 	'css/doc_column_view.css',
 ]
 
@@ -329,7 +331,7 @@ def _compress(in_files, out_file, in_type='js', verbose=False,
 
         temp.write(data)
 
-        print ' + %s' % f
+        #print ' + %s' % f
     temp.close()
     
     out = open(out_file, 'w')
