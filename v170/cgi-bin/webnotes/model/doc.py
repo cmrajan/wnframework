@@ -179,7 +179,7 @@ class Document:
 		
 		self.name = self.name.strip() # no leading and trailing blanks
 
-		forbidden = ['%',"'",'"']
+		forbidden = ['%',"'",'"', ',', '.', '#', '*', '?', '&', '`']
 		for f in forbidden:
 			if f in self.name:
 				raise NameError, '%s not allowed in ID (name)' % f
@@ -435,7 +435,6 @@ def removechild(d, is_local = 0):
 			
 # Naming
 # ------
-
 def make_autoname(key, doctype=''):
 	n = ''
 	l = key.split('.')
@@ -459,7 +458,6 @@ def make_autoname(key, doctype=''):
 
 # Get Series for Autoname
 # -----------------------
-
 def getseries(key, digits, doctype=''):
 	# series created ?
 	if webnotes.conn.sql("select name from tabSeries where name='%s'" % key):
