@@ -155,16 +155,18 @@ Field.prototype.refresh_mandatory = function() {
 	if(this.not_in_form)return;
 
 	// mandatory changes
-	if(this.label_area) {
-		if(this.df.reqd) {
+	if(this.df.reqd) {
+		if(this.label_area)
 			this.label_area.style.color= "#d22";
-			if(this.txt)$y(this.txt,{backgroundColor:"#FEE", fontSize:'14px', fontWeight: 'bold'});
-			else if(this.input)$y(this.input,{backgroundColor:"#FEE", fontSize:'14px', fontWeight: 'bold'});
-		} else {
+
+		$(this.txt ? this.txt : this.input).addClass('input-mandatory');
+		if(this.disp_area) $(this.disp_area).addClass('input-mandatory');
+	} else {
+		if(this.label_area)
 			this.label_area.style.color= "#222";
-			if(this.txt)$y(this.txt,{backgroundColor:"#FFF", fontSize:'12px', fontWeight: 'normal'});
-			else if(this.input)$y(this.input,{backgroundColor:"#FFF", fontSize:'12px', fontWeight: 'normal'});
-		}
+
+		$(this.txt ? this.txt : this.input).removeClass('input-mandatory');
+		if(this.disp_area) $(this.disp_area).removeClass('input-mandatory');
 	}
 	this.set_reqd = this.df.reqd;
 }
@@ -298,9 +300,10 @@ Field.prototype.run_trigger = function() {
 
 Field.prototype.set_disp_html = function(t) {
 	if(this.disp_area){
+		$(this.disp_area).addClass('disp_area');
+
 		this.disp_area.innerHTML = (t==null ? '' : t);
-		if(t)this.disp_area.className = 'disp_area';
-		if(!t)this.disp_area.className = 'disp_area_no_val';
+		if(!t) $(this.disp_area).addClass('disp_area_no_val');
 	}
 }
 

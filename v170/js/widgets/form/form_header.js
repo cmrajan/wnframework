@@ -95,9 +95,9 @@ _f.FrmHeader.prototype.refresh= function() {
 	// Trash
 	if(cur_frm.meta.allow_trash && cint(cur_frm.doc.docstatus) != 2 && (!cur_frm.doc.__islocal) && p[CANCEL])
 		this.page_head.add_button('Trash', function() { cur_frm.savetrash() }, 0, 'ui-icon-trash');	
-*/	
 	// add comment
 	this.comment_btn = this.page_head.add_button('Comments', function() { cur_frm.show_comments(); }, 0, 'ui-icon-comment');
+*/	
 }
 
 _f.FrmHeader.prototype.show_toolbar = function() { $ds(this.wrapper); this.refresh(); }
@@ -122,14 +122,14 @@ _f.FrmHeader.prototype.refresh_toolbar = function() {
 			this.show_toolbar();
 		}
 	}
-	this.refresh_comments();
+	//this.refresh_comments();
 }
 
-_f.FrmHeader.prototype.refresh_comments = function() {
+/*_f.FrmHeader.prototype.refresh_comments = function() {
 	var n = cint(cur_frm.n_comments[cur_frm.doc.name]);
 	if(this.comment_btn && !cur_frm.doc.__islocal)
 		this.comment_btn.innerHTML = 'Comments ('+n+')';
-}
+}*/
 
 // refresh heading and labels
 // -------------------------------------------------------------------

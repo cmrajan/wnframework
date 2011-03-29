@@ -7,7 +7,6 @@
 				+ this.form_wrapper
 					+ this.head
 					+ this.tip_wrapper
-					+ this.last_comment_wrapper
 					+ this.body
 						+ this.tab_wrapper
 						+ this.layout
@@ -66,7 +65,7 @@ _f.Frm = function(doctype, parent) {
 	this.tinymce_id_list = [];
 
 	// comments
-	this.last_comments = {};
+	this.comment_list = {};
 	this.n_comments = {};
 
 	frms[doctype] = this;
@@ -101,7 +100,6 @@ _f.Frm.prototype.setup = function() {
 	this.head = $a(this.form_wrapper, 'div');
 
 	// tips
-	this.last_comment_wrapper = $a(this.form_wrapper, 'div', 'help_box', {display:'none', marginRight:'8px', fontSize:'11px', padding:'4px'});
 	this.tip_wrapper = $a(this.form_wrapper, 'div');
 	
 	if(this.meta.use_template) {
@@ -659,9 +657,6 @@ _f.Frm.prototype.refresh = function(docname) {
 				this.refresh_header(); 
 				this.sidebar.refresh();
 			}
-
-			// comments
-			this.refresh_last_comment();
 		
 			// call trigger
 	 		this.runclientscript('refresh');
@@ -936,9 +931,6 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 			return; // no refresh
 		}
 		
-		// scroll to top
-		scroll(0, 0);
-		
 		if(!me.meta.istable) {
 			me.refresh();
 		}
@@ -958,6 +950,9 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 	
 	this.savingflag = true;
 	if(this.docname && validated) {
+		// scroll to top
+		scroll(0, 0);
+		
 		return this.savedoc(save_action, ret_fn, ret_fn_err);
 	}
 }
@@ -1107,7 +1102,7 @@ _f.Frm.prototype.reload_doc = function() {
 		// n tweets and last comment
 		
 		if(r.n_comments) this.n_comments[me.docname] = r.no_of_comments;
-		if(r.last_comment) this.last_comments[me.docname] = r.last_comment;
+		if(r.comment_list) this.comment_list[me.docname] = r.comment_list;
 		
 		me.runclientscript('setup', me.doctype, me.docname);
 		me.refresh();
@@ -1208,19 +1203,6 @@ _f.set_value = function(dt, dn, fn, v) {
 		if(frm && frm==cur_frm) {
 			frm.set_heading();
 		}
-	}
-}
-
-// ======================================================================================
-
-_f.Frm.prototype.refresh_last_comment = function() {
-	if(this.last_comments[this.docname]) {
-		$ds(this.last_comment_wrapper);
-		this.last_comment_wrapper.innerHTML = '<b>Lastest Comment: </b>' + this.last_comments[this.docname];
-		var sp = $a(this.last_comment_wrapper, 'span', 'link_type', {marginLeft:'8px'}, 'View all comments');
-		sp.onclick = function() { cur_frm.show_comments(); }
-	} else {
-		$dh(this.last_comment_wrapper);
 	}
 }
 

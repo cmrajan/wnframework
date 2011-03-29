@@ -160,12 +160,12 @@ div.time_field select{
 .datalabelcell { padding: 2px 0px; width: 160px; vertical-align: top; }
 .datainputcell { padding: 2px 0px; }
 
-.input_area input { width: 80%; font-size: 12px; margin: 0px; border: 1px solid #AAA; padding: 1px;  }
-.input_area select { width: 80%; font-size: 12px; }
-.input_area textarea { width: 90%; font-size: 12px; }
+.input_area input { width: 80%; margin: 0px; border: 1px solid #AAA; padding: 1px;  }
+.input_area select { width: 80%; }
+.input_area textarea { width: 90%; }
 
-.disp_area { width: 80%; padding: 2px 0px; font-size: 12px; color:#888 }
-.disp_area_no_val { width: 80%; padding: 2px; height: 12px; }
+.disp_area { width: 80%; padding: 2px 0px; font-size: 12px; }
+.disp_area_no_val { height: 12px; }
 
 .no_img {
 	padding: 40px;
@@ -174,4 +174,31 @@ div.time_field select{
 	color: #888;
 	text-align: center;
 	border: 1px solid #AAA;
+}
+
+.input-mandatory {
+	background-color:#FEE;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+/* sidebar */
+
+div.sidebar-comment-wrapper input {
+	width: 50%;
+}
+div.sidebar-comment-message {
+	margin-top: 8px;
+	font-size: 11px;
+	color: #777;
+}
+
+div.sidebar-comment-text {
+	font-size: 12px;
+	margin-top: 8px;
+	color: #444;
+}
+div.sidebar-comment-info {
+	font-size: 10px;
+	color: #777;
 }

@@ -22,8 +22,13 @@ wn.widgets.PageSidebar = function(parent, opts) {
 		if(this.opts.title)
 			this.make_head();
 		for(var i=0; i<this.opts.sections.length; i++) {
-			this.sections[this.opts.sections[i].title] 
-				= new wn.widgets.PageSidebarSection(this, this.opts.sections[i]);
+			var section = this.opts.sections[i];
+
+			if((section.display && section.display()) || !section.display) {
+			
+				this.sections[section.title] 
+					= new wn.widgets.PageSidebarSection(this, section);
+			}
 		}
 		if(this.opts.onrefresh) { this.opts.onrefresh(this) }
 	}

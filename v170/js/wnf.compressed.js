@@ -735,7 +735,9 @@ ret='None';if(cint(this.df.hidden))
 ret='None';if(ret=='Write'&&cint(cur_frm.doc.docstatus)>0)ret='Read';var a_o_s=cint(this.df.allow_on_submit);if(a_o_s&&(this.in_grid||(this.frm&&this.frm.not_in_container))){a_o_s=null;if(this.in_grid)a_o_s=this.grid.field.df.allow_on_submit;if(this.frm&&this.frm.not_in_container){a_o_s=cur_grid.field.df.allow_on_submit;}}
 if(cur_frm.editable&&a_o_s&&cint(cur_frm.doc.docstatus)>0&&!this.df.hidden){tmp_perm=get_perm(cur_frm.doctype,cur_frm.docname,1);if(tmp_perm[this.df.permlevel]&&tmp_perm[this.df.permlevel][WRITE])ret='Write';}
 return ret;}
-Field.prototype.refresh_mandatory=function(){if(this.not_in_form)return;if(this.label_area){if(this.df.reqd){this.label_area.style.color="#d22";if(this.txt)$y(this.txt,{backgroundColor:"#FEE",fontSize:'14px',fontWeight:'bold'});else if(this.input)$y(this.input,{backgroundColor:"#FEE",fontSize:'14px',fontWeight:'bold'});}else{this.label_area.style.color="#222";if(this.txt)$y(this.txt,{backgroundColor:"#FFF",fontSize:'12px',fontWeight:'normal'});else if(this.input)$y(this.input,{backgroundColor:"#FFF",fontSize:'12px',fontWeight:'normal'});}}
+Field.prototype.refresh_mandatory=function(){if(this.not_in_form)return;if(this.df.reqd){if(this.label_area)
+this.label_area.style.color="#d22";$(this.txt?this.txt:this.input).addClass('input-mandatory');if(this.disp_area)$(this.disp_area).addClass('input-mandatory');}else{if(this.label_area)
+this.label_area.style.color="#222";$(this.txt?this.txt:this.input).removeClass('input-mandatory');if(this.disp_area)$(this.disp_area).removeClass('input-mandatory');}
 this.set_reqd=this.df.reqd;}
 Field.prototype.refresh_display=function(){if(!this.set_status||this.set_status!=this.disp_status){if(this.disp_status=='Write'){if(this.make_input&&(!this.input)){this.make_input();this.set_comment();if(this.onmake_input)this.onmake_input();}
 if(this.show)this.show()
@@ -761,7 +763,7 @@ Field.prototype.run_trigger=function(){if(this.not_in_form){return;}
 if(this.df.reqd&&!is_null(this.get_value()))
 this.set_as_error(0);if(cur_frm.cscript[this.df.fieldname])
 cur_frm.runclientscript(this.df.fieldname,this.doctype,this.docname);cur_frm.refresh_dependency();this.refresh_label_icon();}
-Field.prototype.set_disp_html=function(t){if(this.disp_area){this.disp_area.innerHTML=(t==null?'':t);if(t)this.disp_area.className='disp_area';if(!t)this.disp_area.className='disp_area_no_val';}}
+Field.prototype.set_disp_html=function(t){if(this.disp_area){$(this.disp_area).addClass('disp_area');this.disp_area.innerHTML=(t==null?'':t);if(!t)$(this.disp_area).addClass('disp_area_no_val');}}
 Field.prototype.set_disp=function(val){this.set_disp_html(val);}
 Field.prototype.set_as_error=function(set){if(this.in_grid||this.not_in_form)return;var w=this.txt?this.txt:this.input;if(set){$y(w,{border:'2px solid RED'});}else{$y(w,{border:'1px solid #888'});}}
 Field.prototype.activate=function(docname){this.docname=docname;this.refresh();if(this.input){this.input.isactive=true;var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);this.last_value=v;if(this.input.onchange&&this.input.get_value&&this.input.get_value()!=v){if(this.validate)
@@ -1187,7 +1189,7 @@ this.sections={}
 this.wrapper=$a(parent,'div','psidebar-wrapper')
 this.refresh=function(){this.wrapper.innerHTML=''
 if(this.opts.title)
-this.make_head();for(var i=0;i<this.opts.sections.length;i++){this.sections[this.opts.sections[i].title]=new wn.widgets.PageSidebarSection(this,this.opts.sections[i]);}
+this.make_head();for(var i=0;i<this.opts.sections.length;i++){var section=this.opts.sections[i];if((section.display&&section.display())||!section.display){this.sections[section.title]=new wn.widgets.PageSidebarSection(this,section);}}
 if(this.opts.onrefresh){this.opts.onrefresh(this)}}
 this.make_head=function(){this.head=$a(this.wrapper,'div','psidebar-head','',this.opts.title);}}
 wn.widgets.PageSidebarSection=function(sidebar,opts){this.items=[];this.sidebar=sidebar;this.wrapper=$a(sidebar.wrapper,'div','psidebar-section');$br(this.wrapper,'3px');this.opts=opts;this.make_head=function(){this.head=$a(this.wrapper,'div','psidebar-section-head','',this.opts.title);}
