@@ -3,8 +3,11 @@
 # 
 import os, sys
 
-import webnotes.defs
-sys.path.append(getattr(webnotes.defs,'modules_path',None))
+try:
+	import webnotes.defs
+	sys.path.append(getattr(webnotes.defs,'modules_path',None))
+except Exception,e:
+	raise e
 
 #
 # map for identifying which field values come from files

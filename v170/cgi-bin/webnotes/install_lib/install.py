@@ -5,9 +5,6 @@ cgi_bin_path = os.path.sep.join(__file__.split(os.path.sep)[:-3])
 sys.path.append(cgi_bin_path)
 
 
-from webnotes import defs
-import webnotes
-import webnotes.db
 		
 #
 # make a copy of defs.py (if not exists)
@@ -116,7 +113,18 @@ if __name__=='__main__':
 
 	parser = get_parser()
 	(options, args)	= parser.parse_args()
-		
+	
+	try:
+	
+		from webnotes import defs
+		import webnotes
+		import webnotes.db
+	except ImportError:
+		copy_defs()
+		from webnotes import defs
+		import webnotes
+		import webnotes.db
+
 	if len(args)==3:
 		
 		root_login, root_password, db_name = args[0], args[1], args[2]
@@ -125,7 +133,6 @@ if __name__=='__main__':
 		inst.import_from_db(db_name, source_path=options.source_path, \
 			password = options.password, verbose = 1)
 
-		copy_defs()
 
 		print "Database created, please edit defs.py to get started"		
 	else:
