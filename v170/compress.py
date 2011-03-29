@@ -34,6 +34,7 @@ in_files_main = [
 	,'webpage/docbrowser.js'
 	,'wn/widgets/doc_column_view.js'
 	,'wn/widgets/page_sidebar.js'
+	,'wn/widgets/follow.js'
 	,'model/local_data.js'
 	,'model/doclist.js'
 	,'webpage/body.js'

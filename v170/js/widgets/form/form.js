@@ -63,11 +63,7 @@ _f.Frm = function(doctype, parent) {
 	this.parent = parent;
 	this.attachments = {};
 	this.tinymce_id_list = [];
-
-	// comments
-	this.comment_list = {};
-	this.n_comments = {};
-
+	
 	frms[doctype] = this;
 
 	this.setup_meta(doctype);
@@ -1101,9 +1097,8 @@ _f.Frm.prototype.reload_doc = function() {
 		page_body.set_status('Done')
 		// n tweets and last comment
 		
-		if(r.n_comments) this.n_comments[me.docname] = r.no_of_comments;
-		if(r.comment_list) this.comment_list[me.docname] = r.comment_list;
-		
+		wn.widgets.form.comments.sync(me.doctype, me.docname, r);
+				
 		me.runclientscript('setup', me.doctype, me.docname);
 		me.refresh();
 	}

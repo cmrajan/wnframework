@@ -339,7 +339,7 @@ else if(d[0]=='Password'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widget
 else if(d[0]=='Select'){c1.innerHTML=d[1];this.widgets[d[1]]=$a(c2,'select','',{width:'160px'})
 if(d[2])$a(c2,'div','comment').innerHTML=d[2];if(d[3])add_sel_options(this.widgets[d[1]],d[3],d[3][0]);}
 else if(d[0]=='Text'){c1.innerHTML=d[1];c2.style.overflow='auto';this.widgets[d[1]]=$a(c2,'textarea');if(d[2])$a(c2,'div','comment').innerHTML=d[2];}
-else if(d[0]=='Button'){c2.style.height='32px';c2.style.textAlign='right';var b=$btn(c2,d[1],null,null,null,1);b.dialog=me;if(d[2]){b._onclick=d[2];b.onclick=function(){this._onclick(me);}}
+else if(d[0]=='Button'){c2.style.height='32px';c2.style.textAlign='right';var b=$btn(c2,d[1],function(btn){if(btn._onclick)btn._onclick(me)},null,null,1);b.dialog=me;if(d[2]){b._onclick=d[2];}
 this.widgets[d[1]]=b;}}
 keypress_observers.push(new function(){this.notify_keypress=function(e,kc){if(cur_dialog&&kc==27&&!cur_dialog.no_cancel_flag)
 cur_dialog.hide();}});list_opts={cell_style:{padding:'3px 2px'},alt_cell_style:{},head_style:{height:'20px',overflow:'hidden',verticalAlign:'middle',fontWeight:'bold',padding:'1px',fontSize:'13px'},head_main_style:{padding:'0px'},hide_export:1,hide_print:1,hide_refresh:0,hide_rec_label:0,show_calc:1,show_empty_tab:0,show_bottom_paging:1,no_border:1,append_records:1,table_width:null};function Listing(head_text,no_index,no_loading){this.start=0;this.page_len=20;this.paging_len=5;this.filters_per_line=7;this.cell_idx=0;this.head_text=head_text?head_text:'Result';this.keyword='records';this.no_index=no_index;this.underline=1;this.no_rec_message='No Result';this.show_cell=null;this.show_result=null;this.colnames=null;this.colwidths=null;this.coltypes=null;this.coloptions=null;this.filters={};this.sort_list={};this.sort_order_dict={};this.sort_heads={};this.is_std_query=false;this.server_call=null;this.no_loading=no_loading;this.opts=copy_dict(list_opts);}
@@ -1031,7 +1031,7 @@ var load_doc=loaddoc;function loaddoc(doctype,name,onload,menuitem,from_archive)
 if(doctype=='DocType'&&frms[name]){msgprint("Cannot open DocType \""+name+"\" when its instance is open.");return;}
 var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
 if(!frms[doctype]){_f.add_frm(doctype,show_doc,name,from_archive);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user,'from_archive':(from_archive?1:0)},show_doc,null,null);page_body.set_status('Loading Document...');}}
-var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){page_body.set_status('Done');var frm=frms[doctype];if(r&&r.no_of_comments)frm.n_comments[name]=r.no_of_comments;frm.refresh(name);if(!frm.in_dialog)
+var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){page_body.set_status('Done');var frm=frms[doctype];wn.widgets.form.comments.sync(doctype,name,r);frm.refresh(name);if(!frm.in_dialog)
 nav_obj.open_notify('Form',doctype,name);}else{if(r.exc){msgprint('There were errors while loading '+doctype+' '+name);}
 loadpage('_home');}}
 new_widget('_f.FrmContainer',show_form,1);}
@@ -1207,6 +1207,28 @@ wn.widgets.PageSidebarLink=function(section,opts,wrapper){this.wrapper=wrapper;t
 this.ln=$a(this.wrapper,'span','link_type psidebar-section-link',opts.style,opts.label);this.ln.onclick=function(){me.opts.onclick(me)};}
 wn.widgets.PageSidebarButton=function(section,opts,wrapper){this.wrapper=wrapper;this.section=section;this.opts=opts;var me=this;this.btn=$btn(this.wrapper,opts.label,opts.onclick,opts.style,opts.color);}
 wn.widgets.PageSidebarHTML=function(section,opts,wrapper){wrapper.innerHTML=opts.content}
+wn.widgets.follow={followers:{},Follow:function(parent,dt,dn){var me=this;this.wrapper=$a(parent,'div','follower-wrapper');this.parent=parent;this.dt=dt;this.dn=dn;this.max_followers=5;this.load_followers=function(){$c('webnotes.widgets.follow.load_followers',{dt:me.dt,dn:me.dn},function(r,rt){me.update_follow(r);})}
+this.make_body=function(){this.wrapper.innerHTML='';if(in_list(this.flist,user_fullname)){this.btn=$btn(this.wrapper,'Unfollow',this.unfollow)}else{this.btn=$btn(this.wrapper,'+ Follow',this.follow,{fontWeight:'bold'},'green');}
+this.invite_link=$ln(this.wrapper,'Invite to follow',function(ln){me.invite()},{marginLeft:'8px',fontSize:'11px'});this.show_followers();}
+this.show_followers=function(){var div=$a(this.wrapper,'div','follower-list')
+var m=(this.flist.length>this.max_followers)?this.max_followers:this.flist.length;var fl=[]
+for(var i=0;i<m;i++){if(this.flist[i]==user_fullname){fl.push('You'.bold())}
+else{fl.push(this.flist[i]);}}
+if(fl.length)
+div.innerHTML=this.flist.length+' people following this including '+fl.join(', ')
+else
+div.innerHTML='Be the first one to follow'}
+this.update_follow=function(r){var f=wn.widgets.follow.followers
+if(!f[r.dt])f[r.dt]={}
+f[r.dt][r.dn]=r.message;this.flist=r.message;this.make_body();}
+this.follow=function(){$c('webnotes.widgets.follow.follow',{dt:me.dt,dn:me.dn,user:user},function(r,rt){me.update_follow(r);})}
+this.unfollow=function(){$c('webnotes.widgets.follow.unfollow',{dt:me.dt,dn:me.dn,user:user},function(r,rt){me.update_follow(r);})}
+this.invite=function(){if(!this.dialog){my_onclick=function(){var v=me.dialog.widgets.Select.value;if(v){$c('webnotes.widgets.follow.follow',{dt:me.dt,dn:me.dn,user:v},function(r,rt){me.update_follow(r);})}}
+this.dialog=new Dialog(400,400,'Invite someone to follow',[['Link','Select','Profile'],['Button','Invite',my_onclick]]);this.dialog.widgets.Select.field_object.get_query=function(){return'SELECT tabProfile.name, tabProfile.first_name, tabProfile.last_name FROM tabProfile WHERE tabProfile.name LIKE "%s" OR tabProfile.first_name LIKE "%s" or tabProfile.last_name LIKE "%s" ORDER BY tabProfile.name ASC LIMIT 50'}}
+this.dialog.show();}
+this.refresh=function(){f=wn.widgets.follow;if(f[dt]&&f[dt][dn]){this.flist=f;this.make_body();}
+else this.load_followers();}
+this.refresh();}}
 var locals={};var fields={};var fields_list={};var LocalDB={};var READ=0;var WRITE=1;var CREATE=2;var SUBMIT=3;var CANCEL=4;var AMEND=5;LocalDB.getchildren=function(child_dt,parent,parentfield,parenttype){var l=[];for(var key in locals[child_dt]){var d=locals[child_dt][key];if((d.parent==parent)&&(d.parentfield==parentfield)){if(parenttype){if(d.parenttype==parenttype)l.push(d);}else{l.push(d);}}}
 l.sort(function(a,b){return(cint(a.idx)-cint(b.idx))});return l;}
 LocalDB.add=function(dt,dn){if(!locals[dt])locals[dt]={};if(locals[dt][dn])delete locals[dt][dn];locals[dt][dn]={'name':dn,'doctype':dt,'docstatus':0};return locals[dt][dn];}

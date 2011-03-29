@@ -88,7 +88,7 @@ function loaddoc(doctype, name, onload, menuitem, from_archive) {
 			var frm = frms[doctype];
 
 			// tweets
-			if(r && r.no_of_comments) frm.n_comments[name] = r.no_of_comments;
+			wn.widgets.form.comments.sync(doctype, name, r);
 			
 			// show
 			frm.refresh(name);

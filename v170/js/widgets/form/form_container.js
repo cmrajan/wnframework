@@ -130,8 +130,7 @@ _f.add_frm = function(doctype, onload, opt_name, from_archive) {
 
 		// set # of comments
 		if(r.no_of_comments) {
-			f.n_comments[opt_name] = r.no_of_comments;
-			f.comment_list[opt_name] = r.comment_list;
+			wn.widgets.form.comments.sync(doctype, opt_name, r);
 		}
 
 		if(onload)onload(r,rt);

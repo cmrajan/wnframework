@@ -189,11 +189,10 @@ Dialog.prototype.make_row = function(d) {
 	else if(d[0]=='Button') {
 		c2.style.height = '32px';
 		c2.style.textAlign = 'right';
-		var b = $btn(c2, d[1], null, null, null, 1);
+		var b = $btn(c2, d[1], function(btn) { if(btn._onclick) btn._onclick(me) }, null, null, 1);
 		b.dialog = me;
 		if(d[2]) {
 			b._onclick = d[2];
-			b.onclick = function() { this._onclick(me); }
 		}
 		this.widgets[d[1]] = b;
 	}

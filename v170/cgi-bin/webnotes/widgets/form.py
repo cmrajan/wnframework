@@ -18,7 +18,7 @@ def getdoc():
 	doclist = load_single_doc(doctype, docname, (form.get('user') or webnotes.session['user']), prefix)
 	
 	# get comments
-	webnotes.response['no_of_comments'], webnotes.response['comment_list'] = get_comments(doctype, docname)
+	webnotes.response['n_comments'], webnotes.response['comment_list'] = get_comments(doctype, docname)
 	
 	# load doctype along with the doc
 	if form.get('getdoctype'):

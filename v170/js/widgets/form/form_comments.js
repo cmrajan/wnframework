@@ -1,3 +1,60 @@
+wn.widgets.form.comments = {	
+	n_comments: {},
+	comment_list: {},
+	
+	sync: function(dt, dn, r) {
+		var f = wn.widgets.form.comments;
+
+		f.n_comments[dn] = r.n_comments;
+		f.comment_list[dn] = r.comment_list;
+	},
+	
+	add: function(input, dt, dn, callback) { 
+		$c('webnotes.widgets.form.add_comment', wn.widgets.form.comments.get_args(input, dt, dn), 
+			function(r,rt) {
+				// update the comments
+				wn.widgets.form.comments.update_comment_list(input, dt, dn);
+		
+				// clean up the text area
+				input.value = '';
+				callback(input, dt, dn);
+			}
+		);
+	},
+	
+	remove: function(dt, dn, comment_id, callback) {
+		$c('webnotes.widgets.form.remove_comment',{
+				id:comment_id, 
+				dt:dt, 
+				dn:dn
+			}, callback
+		);
+	},
+	
+	get_args: function(input, dt, dn) { 
+		return {
+			comment: input.value,
+			comment_by: user,
+			comment_by_fullname: user_fullname,
+			comment_doctype: dt,
+			comment_docname: dn
+		}
+	},
+	
+	update_comment_list: function(input, dt, dn) {
+		var f = wn.widgets.form.comments;
+		
+		// update no of comments
+		f.n_comments[dn] = cint(f.n_comments[dn]) + 1;
+		
+		// update comment list
+		f.comment_list[dn] = add_lists(
+			[f.get_args(input, dt, dn)], 
+			f.comment_list[dn]
+		);
+	}
+}
+
 // Comment Listing
 // ===============
 CommentList = function(parent, dt, dn) {
@@ -25,25 +82,12 @@ CommentList.prototype.make_input = function() {
 // Add comment listing
 // --------------------
 CommentList.prototype.add_comment = function() {
-  //to be called from button
-  var me = this;
-  var args = {};
-  args.comment = this.input.value;
-  args.comment_by = user;
-  args.comment_by_fullname = user_fullname;
-  args.comment_doctype = this.dt;
-  args.comment_docname = this.dn;
-  $c('webnotes.widgets.form.add_comment', args, function(r,rt){
-    me.lst.run();
-    cur_frm.n_comments[cur_frm.doc.name] = cint(cur_frm.n_comments[cur_frm.doc.name]) + 1;
-    cur_frm.last_comments[cur_frm.doc.name] = me.input.value;
-
-    // clean up the text area
-    me.input.value = '';
-
-    cur_frm.frm_head.refresh_comments();
-    cur_frm.refresh_last_comment();
-  });
+	var me = this;
+	var callback = function(input, dt, dn) {
+		me.lst.run();
+		
+	}
+	wn.widgets.form.comments.add(this.input, cur_frm.docname, cur_frm.doctype, callback)
 }
 
 // Make comment listing
@@ -125,11 +169,8 @@ CommentItem.prototype.cmt_delete = function(cell, ri, ci, d) {
     del = $a(cell,'div','wn-icon ic-trash',{cursor:'pointer'});
     del.cmt_id = d[ri][0];
     del.onclick = function(){ 
-      $c('webnotes.widgets.form.remove_comment',{id:this.cmt_id, dt:cur_frm.doctype, dn:cur_frm.docname},function(r,rt){
-      	cur_frm.no_of_comments = cur_frm.no_of_comments - 1;
-      	cur_frm.frm_head.refresh_comments();
-        me.comment.lst.run();
-      });
+      wn.widgets.form.comments.remove(cur_frm.doctype, cur_frm.docname, this.cmt_id, 
+      	function() { me.comment.lst.run(); })
     }
   }
 }

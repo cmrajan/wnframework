@@ -366,6 +366,7 @@ div.sidebar-comment-message {
 
 div.sidebar-comment-text {
 	font-size: 12px;
+	font-weight: bold;
 	margin-top: 8px;
 	color: #444;
 }
@@ -1632,6 +1633,12 @@ div.psidebar-section-item {
 .psidebar-section-link {
 	font-size: 11px;
 	color: #666;
+}
+
+div.follower-list {
+	color: #666;
+	margin-top: 7px;
+	font-size: 11px;
 }
 /******** Listing2 ***********/
 table.dcv-tab {

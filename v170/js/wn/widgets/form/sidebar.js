@@ -61,7 +61,15 @@ wn.widgets.form.sidebar = { Sidebar: function(form) {
 					}
 				]
 			},
-			
+
+			{
+				title: 'Follow this ' + get_doctype_label(me.form.doctype),
+				render: function(wrapper) {
+					new wn.widgets.follow.Follow(wrapper, me.form.doctype, me.form.docname);
+				},
+				display: function() { return !me.form.doc.__islocal }
+			},
+						
 			{
 				title: 'Tags',
 				render: function(wrapper) {
@@ -76,7 +84,7 @@ wn.widgets.form.sidebar = { Sidebar: function(form) {
 			{
 				title: 'Comments',
 				render: function(wrapper) {
-					new wn.widgets.form.sidebar.SidebarComment(wrapper, me);
+					new wn.widgets.form.sidebar.SidebarComment(wrapper, me, me.form.doctype, me.form.docname);
 				},
 				display: function() { return !me.form.doc.__islocal }
 			}
@@ -93,9 +101,10 @@ wn.widgets.form.sidebar = { Sidebar: function(form) {
 
 }, 
 
-SidebarComment: function(parent, sidebar) {
+SidebarComment: function(parent, sidebar, doctype, docname) {
 	var me = this;
 	this.sidebar = sidebar;
+	this.doctype = doctype; this.docname = docname;
 	
 	this.make_body = function() {
 		if(this.wrapper) this.wrapper.innerHTML = '';
@@ -108,13 +117,13 @@ SidebarComment: function(parent, sidebar) {
 
 	}
 	this.render_comments = function() {
-		var f = this.sidebar.form;
-		var cl = f.comment_list ? f.comment_list[f.docname] : null;
+		var f = wn.widgets.form.comments;
+		var cl = f.comment_list[me.docname]
 		this.msg = $a(this.wrapper, 'div', 'sidebar-comment-message');
 
 		if(cl) {
-			this.msg.innerHTML = cl.length + ' out of ' + f.n_comments[f.docname] + ' comments';
-			if(f.n_comments[f.docname] > cl.length) {
+			this.msg.innerHTML = cl.length + ' out of ' + f.n_comments[me.docname] + ' comments';
+			if(f.n_comments[me.docname] > cl.length) {
 				this.msg.innerHTML += ' <span class="link_type" onclick="cur_frm.show_comments()">Show all</span>'
 			}
 			for(var i=0; i< cl.length; i++) {
@@ -136,40 +145,10 @@ SidebarComment: function(parent, sidebar) {
 	this.add_comment = function() {
 		if(!this.input.value) return;
 		this.btn.set_working();
-		$c('webnotes.widgets.form.add_comment', this.get_comment_args(), function(r,rt){
-			// update the comments
+		wn.widgets.form.comments.add(this.input, me.doctype, me.docname, function() {
 			me.btn.done_working();
-			var f = me.sidebar.form
-			me.update_comment_list();
-	
-			// clean up the text area
-			me.input.value = '';
 			me.make_body();
-		});		
-	}
-	
-	this.get_comment_args = function() { 
-		var f = this.sidebar.form
-		return {
-			comment: this.input.value,
-			comment_by: user,
-			comment_by_fullname: user_fullname,
-			comment_doctype: f.doctype,
-			comment_docname: f.docname
-		}
-	}
-	
-	this.update_comment_list = function() {
-		var f = this.sidebar.form;
-		
-		// update no of comments
-		f.n_comments[f.docname] = cint(f.n_comments[f.docname]) + 1;
-		
-		// update comment list
-		f.comment_list[f.docname] = add_lists(
-			[this.get_comment_args()], 
-			f.comment_list[f.docname]
-		);
+		});
 	}
 	
 	this.make_body();

@@ -195,6 +195,7 @@ div.sidebar-comment-message {
 
 div.sidebar-comment-text {
 	font-size: 12px;
+	font-weight: bold;
 	margin-top: 8px;
 	color: #444;
 }

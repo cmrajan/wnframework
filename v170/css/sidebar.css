@@ -31,3 +31,9 @@ div.psidebar-section-item {
 	font-size: 11px;
 	color: #666;
 }
+
+div.follower-list {
+	color: #666;
+	margin-top: 7px;
+	font-size: 11px;
+}
