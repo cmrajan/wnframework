@@ -1096,8 +1096,6 @@ _f.Frm.prototype.reload_doc = function() {
 	var ret_fn = function(r, rtxt) {
 		page_body.set_status('Done')
 		// n tweets and last comment
-		
-		wn.widgets.form.comments.sync(me.doctype, me.docname, r);
 				
 		me.runclientscript('setup', me.doctype, me.docname);
 		me.refresh();

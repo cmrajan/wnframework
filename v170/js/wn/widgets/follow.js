@@ -71,11 +71,13 @@ wn.widgets.follow = {
 		this.invite = function() {
 			if(!this.dialog) {
 
-				my_onclick = function() {
+				my_onclick = function(btn) {
 					var v = me.dialog.widgets.Select.value;
+					btn.set_working();
 					if(v) {
 						$c('webnotes.widgets.follow.follow', {dt: me.dt, dn: me.dn, user: v}, 
 						function(r, rt) {
+							btn.done_working();
 							me.update_follow(r);
 						})
 					}

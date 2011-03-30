@@ -86,9 +86,6 @@ function loaddoc(doctype, name, onload, menuitem, from_archive) {
 		if(locals[doctype] && locals[doctype][name]) {
 			page_body.set_status('Done');
 			var frm = frms[doctype];
-
-			// tweets
-			wn.widgets.form.comments.sync(doctype, name, r);
 			
 			// show
 			frm.refresh(name);

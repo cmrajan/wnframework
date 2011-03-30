@@ -83,6 +83,6 @@ def update_feed(dt, dn, feed_text):
 def make_table():
 	"Make table for followers - if missing"
 	webnotes.conn.commit()
-	from webnotes.modules import reload_doc
+	from webnotes.modules.module_manager import reload_doc
 	reload_doc('core', 'doctype', 'follower')
 	webnotes.conn.begin()	

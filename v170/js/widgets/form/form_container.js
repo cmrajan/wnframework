@@ -127,12 +127,7 @@ _f.add_frm = function(doctype, onload, opt_name, from_archive) {
 		// create the object
 		var f = new _f.Frm(doctype, parent);
 		f.in_dialog = in_dialog;
-
-		// set # of comments
-		if(r.no_of_comments) {
-			wn.widgets.form.comments.sync(doctype, opt_name, r);
-		}
-
+		
 		if(onload)onload(r,rt);
 	}
 	

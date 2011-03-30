@@ -1031,7 +1031,7 @@ var load_doc=loaddoc;function loaddoc(doctype,name,onload,menuitem,from_archive)
 if(doctype=='DocType'&&frms[name]){msgprint("Cannot open DocType \""+name+"\" when its instance is open.");return;}
 var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
 if(!frms[doctype]){_f.add_frm(doctype,show_doc,name,from_archive);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user,'from_archive':(from_archive?1:0)},show_doc,null,null);page_body.set_status('Loading Document...');}}
-var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){page_body.set_status('Done');var frm=frms[doctype];wn.widgets.form.comments.sync(doctype,name,r);frm.refresh(name);if(!frm.in_dialog)
+var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){page_body.set_status('Done');var frm=frms[doctype];frm.refresh(name);if(!frm.in_dialog)
 nav_obj.open_notify('Form',doctype,name);}else{if(r.exc){msgprint('There were errors while loading '+doctype+' '+name);}
 loadpage('_home');}}
 new_widget('_f.FrmContainer',show_form,1);}
@@ -1223,7 +1223,7 @@ if(!f[r.dt])f[r.dt]={}
 f[r.dt][r.dn]=r.message;this.flist=r.message;this.make_body();}
 this.follow=function(){$c('webnotes.widgets.follow.follow',{dt:me.dt,dn:me.dn,user:user},function(r,rt){me.update_follow(r);})}
 this.unfollow=function(){$c('webnotes.widgets.follow.unfollow',{dt:me.dt,dn:me.dn,user:user},function(r,rt){me.update_follow(r);})}
-this.invite=function(){if(!this.dialog){my_onclick=function(){var v=me.dialog.widgets.Select.value;if(v){$c('webnotes.widgets.follow.follow',{dt:me.dt,dn:me.dn,user:v},function(r,rt){me.update_follow(r);})}}
+this.invite=function(){if(!this.dialog){my_onclick=function(btn){var v=me.dialog.widgets.Select.value;btn.set_working();if(v){$c('webnotes.widgets.follow.follow',{dt:me.dt,dn:me.dn,user:v},function(r,rt){btn.done_working();me.update_follow(r);})}}
 this.dialog=new Dialog(400,400,'Invite someone to follow',[['Link','Select','Profile'],['Button','Invite',my_onclick]]);this.dialog.widgets.Select.field_object.get_query=function(){return'SELECT tabProfile.name, tabProfile.first_name, tabProfile.last_name FROM tabProfile WHERE tabProfile.name LIKE "%s" OR tabProfile.first_name LIKE "%s" or tabProfile.last_name LIKE "%s" ORDER BY tabProfile.name ASC LIMIT 50'}}
 this.dialog.show();}
 this.refresh=function(){f=wn.widgets.follow;if(f[dt]&&f[dt][dn]){this.flist=f;this.make_body();}

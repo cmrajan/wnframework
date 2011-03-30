@@ -182,7 +182,7 @@ class Document:
 		forbidden = ['%',"'",'"', ',', '.', '#', '*', '?', '&', '`']
 		for f in forbidden:
 			if f in self.name:
-				raise NameError, '%s not allowed in ID (name)' % f
+				webnotes.msgprint('%s not allowed in ID (name)' % f, raise_exception =1)
 
 	# Insert
 	# ---------------------------------------------------------------------------

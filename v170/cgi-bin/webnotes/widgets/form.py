@@ -17,9 +17,6 @@ def getdoc():
 	# single
 	doclist = load_single_doc(doctype, docname, (form.get('user') or webnotes.session['user']), prefix)
 	
-	# get comments
-	webnotes.response['n_comments'], webnotes.response['comment_list'] = get_comments(doctype, docname)
-	
 	# load doctype along with the doc
 	if form.get('getdoctype'):
 		import webnotes.model.doctype
@@ -33,21 +30,36 @@ def getdoc():
 
 #===========================================================================================
 
-def get_comments(doctype, docname):
+def get_comments(doctype=None, docname=None, limit=5):
+	nc, cl = 0, []
+
+	if not doctype:
+		doctype, docname, limit = webnotes.form_dict.get('dt'), webnotes.form_dict.get('dn'), webnotes.form_dict.get('limit')
+		
 	try:
-		cl = []
 		nc = int(webnotes.conn.sql("select count(*) from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s", (doctype, docname))[0][0])
 		if nc:
-			cl = webnotes.conn.sql("select comment, ifnull(comment_by_fullname, comment_by) AS 'comment_by_fullname', creation from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s order by creation desc limit 3", (doctype, docname), as_dict=1)
+			cl = webnotes.conn.sql("select comment, ifnull(comment_by_fullname, comment_by) AS 'comment_by_fullname', creation from `tabComment Widget Record` where comment_doctype=%s and comment_docname=%s order by creation desc limit %s" % ('%s','%s',limit), (doctype, docname), as_dict=1)
 
-		return nc, cl
 	except Exception, e:
 		if e.args[0]==1146:
 			# no table
-			return 0, []
+			make_comment_table()
 		else:
 			raise e
 
+	webnotes.response['n_comments'], webnotes.response['comment_list'] = nc, cl
+
+#
+# make comment table
+#
+def make_comment_table():
+	"Make table for comments - if missing via import module"
+	webnotes.conn.commit()
+	from webnotes.modules import reload_doc
+	reload_doc('core', 'doctype', 'comment_widget_record')
+	webnotes.conn.begin()	
+	
 #===========================================================================================
 
 def add_comment():

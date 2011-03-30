@@ -39,10 +39,6 @@ class Page:
 		if doc.stylesheet:
 			doclist += self.load_stylesheet(doc.stylesheet)
 		
-		# comments etc
-		from webnotes.widgets.form import get_comments
-		doc.n_comments, doc.last_comment = get_comments('Page', self.name)
-		
 		return doclist
 
 	def load_stylesheet(self, stylesheet):

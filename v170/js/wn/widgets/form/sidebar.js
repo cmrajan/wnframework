@@ -106,6 +106,13 @@ SidebarComment: function(parent, sidebar, doctype, docname) {
 	this.sidebar = sidebar;
 	this.doctype = doctype; this.docname = docname;
 	
+	this.refresh = function() {
+		$c('webnotes.widgets.form.get_comments', {dt: me.doctype, dn: me.docname, limit: 5}, function(r, rt) {
+			wn.widgets.form.comments.sync(me.doctype, me.docname, r);
+			me.make_body();
+		});
+	}
+	
 	this.make_body = function() {
 		if(this.wrapper) this.wrapper.innerHTML = '';
 		else this.wrapper = $a(parent, 'div', 'sidebar-comment-wrapper');
@@ -151,5 +158,5 @@ SidebarComment: function(parent, sidebar, doctype, docname) {
 		});
 	}
 	
-	this.make_body();
+	this.refresh();
 }}
