@@ -83,6 +83,8 @@ def add_days(date, days):
 		date = now_datetime()
 	if type(date)==str:
 		date = getdate(date)
+	if type(date)==unicode:
+		date = getdate(str(date))
 	return (date + datetime.timedelta(days)).strftime('%Y-%m-%d')
 
 def add_months(string_date, months):
