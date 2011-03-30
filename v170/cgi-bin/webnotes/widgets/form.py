@@ -1,8 +1,20 @@
+"""
+
+Server side handler for "Form" events
+
+"""
+
 import webnotes
 import webnotes.model.doc
 import webnotes.model.meta
 
 def getdoc():
+	"""
+	Loads a doclist for a given document. This method is called directly from the client.
+	Requries "doctype", "docname" as form variables. If "from_archive" is set, it will get from archive.
+	Will also call the "onload" method on the document.
+	"""
+
 	import webnotes
 	from webnotes.utils import cint
 	
@@ -249,6 +261,20 @@ def make_csv_output(res, dt):
 #===========================================================================================
 
 def notify_observers(doc, event):
+	""" 
+	Notify observers for Document - save, submit events. To write an observer
+	write an "observers" module and create a dictionary called "observers" inside it.
+	the key must be the doctype and the value the string of the module to be called
+	You must have "notify" method in your module
+	
+	for example:
+	
+	# attach observers to a particular doctype
+	observers = {
+		'MyDocType': 'mypackage.mymodule' # this will call mypackage.mymodule.notify(doc, event)
+	}
+	"""
+
 	try:
 		import observers
 	except ImportError, e:

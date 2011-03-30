@@ -186,7 +186,7 @@ class Document:
 		
 		self.name = self.name.strip() # no leading and trailing blanks
 
-		forbidden = ['%',"'",'"', ',', '.', '#', '*', '?', '&', '`']
+		forbidden = ['%', "'", '"', ',', '#', '*', '?', '&', '`']
 		for f in forbidden:
 			if f in self.name:
 				webnotes.msgprint('%s not allowed in ID (name)' % f, raise_exception =1)
