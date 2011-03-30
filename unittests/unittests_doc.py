@@ -115,7 +115,7 @@ class test_doc(unittest.TestCase):
 		assert (not testlib.test_conn.sql("select count(*) from tabDocType where name = '%s'"%testlib.test_doctype)[0][0])
 
 		
-	def test_6_delete_docfield_record(self):
+	def test_7_delete_docfield_record(self):
 		
 		delete_doc('DocField',self.f1.name)
 		delete_doc('DocField',self.f2.name)

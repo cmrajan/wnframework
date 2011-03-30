@@ -19,16 +19,12 @@ def test_modules():
     	for each in os.listdir('.'):
 		if (each[0:9] == "unittests" and each[-3:] == ".py"):
 			modlist.append(each[0:-3])
-    	for each in os.listdir('./selenium_cases'):
-		if (each[0:9] == "unittests" and each[-3:] == ".py"):
-			modlist.append(each[0:-3])
-	return modlist
+    	return modlist
 
 def run_tests():
 	#for each_size in testlib.sizes:
 	#	print ("Testing with %s graphs" % each_size)
-        
-	#	suite = unittest.TestSuite()
+        #	suite = unittest.TestSuite()
 	#	testlib.use_size = each_size
 #	print ("Testing with %s "%testlib.use_size)
         
@@ -36,9 +32,11 @@ def run_tests():
 
 	for each_module in test_modules():
 		try:
+			
 			suite.addTests(unittest.TestLoader().loadTestsFromName(each_module))
 		except ImportError as ie:
 			log.exception(ie)
+			
 		continue
         
 	tr = unittest.TextTestRunner(verbosity=2)
