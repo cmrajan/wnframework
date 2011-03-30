@@ -65,8 +65,11 @@ def log(event, details):
 
 def getdate(string_date):
 	import datetime
+
+	if type(string_date)==unicode:
+		string_date = str(string_date)
 	
-	if type(string_date)==datetime.datetime: 
+	if type(string_date) in (datetime.datetime, datetime.date): 
 		return string_date
 	
 	if ' ' in string_date:
@@ -81,10 +84,10 @@ def add_days(date, days):
 	import datetime
 	if not date:
 		date = now_datetime()
-	if type(date)==str:
+
+	if type(date) not in (datetime.datetime, datetime.date): 
 		date = getdate(date)
-	if type(date)==unicode:
-		date = getdate(str(date))
+
 	return (date + datetime.timedelta(days)).strftime('%Y-%m-%d')
 
 def add_months(string_date, months):
