@@ -17,6 +17,13 @@ class SuperDocType:
 			raise AttributeError, 'BaseDocType Attribute Error'
 
 class Document:
+	"""
+	The wn(meta-data)framework equivalent of a Database Record.
+	Stores,Retrieves,Updates the record in the corresponding table.
+	Runs the triggers required.
+	
+	"""
+	
 	def __init__(self, doctype = '', name = '', fielddata = {}, prefix='tab'):
 		self._roles = []
 		self._perms = []
@@ -322,7 +329,7 @@ class Document:
 			self._perms = webnotes.conn.sql("select role, `match` from tabDocPerm where parent=%s and ifnull(`read`,0) = 1 and ifnull(permlevel,0)=0", self.doctype)
 
 	def _get_roles(self):
-		# check if roles match
+		# check if roles match/
 		if not self._roles:
 			if webnotes.user:
 				self._roles = webnotes.user.get_roles()
