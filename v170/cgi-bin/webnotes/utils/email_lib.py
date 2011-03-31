@@ -1,8 +1,7 @@
-# ===========================================
-# Email class:
-# Sends email via outgoing server specified in "Control Panel"
-# Allows easy adding of Attachments of "File" objects
-# ===========================================
+"""
+Sends email via outgoing server specified in "Control Panel"
+Allows easy adding of Attachments of "File" objects
+"""
 
 import webnotes	
 import webnotes.defs
@@ -41,8 +40,8 @@ class EMail:
 		from email.mime.image import MIMEImage
 		from email.mime.text import MIMEText
 			
-		fname = res[0][0]
-		fcontent = res[0][1]
+		fname = res[0]
+		fcontent = res[1]
 		
 		import mimetypes
 
