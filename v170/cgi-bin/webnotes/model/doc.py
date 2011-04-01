@@ -1,3 +1,7 @@
+"""
+Contains the Document class representing an object / record
+"""
+
 import webnotes
 import webnotes.model.meta
 
