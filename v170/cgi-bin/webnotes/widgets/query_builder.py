@@ -25,18 +25,6 @@ def get_sql_tables(q):
 		tl = q.split('FROM')[1].split('ORDER BY')[0].split(',')
 	return [t.strip().strip('`')[3:] for t in tl]
 
-def get_sql_fields(q):
-	fl = q.split('SELECT')[1].split('FROM')[0].split(',')
-
-	for i in range(len(fl)):
-		tmp = fl[i].strip()
-		if tmp.lower().startswith('distinct'):
-			fl[i] = tmp[9:]
-		if ' AS ' in tmp:
-			fl[i] = '.' + tmp.split(' AS ')[1][1:-1] # no doctype only aliased
-
-	fl = [f.split('.') for f in fl]
-	return [(f[0].strip().strip('`')[3:], f[1].strip().strip('`')) for f in fl]
 
 def get_parent_dt(dt):
 	pdt = ''
@@ -46,19 +34,18 @@ def get_parent_dt(dt):
 	return pdt
 
 def get_sql_meta(tl):
-	meta = {}
+	meta = {'owner':('Owner', '', '', '100'), 'creation':('Created on', 'Date', '', '100'), 'modified':('Last modified on', 'Date', '', '100'), 'modified_by':('Modified By', '', '', '100')}
 	for dt in tl:
-		meta[dt] = {'owner':('Owner', '', '', '100'), 'creation':('Created on', 'Date', '', '100'), 'modified':('Last modified on', 'Date', '', '100'), 'modified_by':('Modified By', '', '', '100')}
-
 		# for table doctype, the ID is the parent id
 		pdt = get_parent_dt(dt)
-		if pdt: meta[dt]['parent'] = ('ID', 'Link', pdt, '200')
+		if pdt: 
+			meta['parent'] = ('ID', 'Link', pdt, '200')
 			
 		res = sql("select fieldname, label, fieldtype, options, width from tabDocField where parent='%s'" % dt)
 		for r in res:
 			if r[0]:
-				meta[dt][r[0]] = (r[1], r[2], r[3], r[4]);
-		meta[dt]['name'] = ('ID', 'Link', dt, '200')
+				meta[r[0]] = (r[1], r[2], r[3], r[4]);
+		meta['name'] = ('ID', 'Link', dt, '200')
 			
 	return meta
 
@@ -153,18 +140,22 @@ def build_description_simple():
 
 # ====================================================================
 
-def build_description_standard(meta, fl):
+def build_description_standard(meta, tl):
+
+	desc = webnotes.conn.get_description()
 
 	colnames, coltypes, coloptions, colwidths = [], [], [], []
 
-	for f in fl:
-		if meta.has_key(f[0]) and meta[f[0]].has_key(f[1]):
-			colnames.append(meta[f[0]][f[1]][0] or f[1])
-			coltypes.append(meta[f[0]][f[1]][1] or '')
-			coloptions.append(meta[f[0]][f[1]][2] or '')
-			colwidths.append(meta[f[0]][f[1]][3] or '100')
+	for f in desc:
+		fn = f[0]
+		
+		if meta.has_key(fn):
+			colnames.append(meta[fn][0] or fn)
+			coltypes.append(meta[fn][1] or '')
+			coloptions.append(meta[fn][2] or '')
+			colwidths.append(meta[fn][3] or '100')
 		else:
-			colnames.append(f[1])
+			colnames.append(fn)
 			coltypes.append('')
 			coloptions.append('')
 			colwidths.append('100')
@@ -195,11 +186,9 @@ def runquery(q='', ret=0, from_export=0):
 	else:
 		if not q: q = form.getvalue('query')
 
-		tl, fl= get_sql_tables(q), get_sql_fields(q)
+		tl = get_sql_tables(q)
 		meta = get_sql_meta(tl)
-		
-		colnames, coltypes, coloptions, colwidths = build_description_standard(meta, fl)
-	
+			
 		q = add_match_conditions(q, tl, webnotes.user.roles, webnotes.user.get_defaults())
 		
 		# replace special variables
@@ -207,6 +196,8 @@ def runquery(q='', ret=0, from_export=0):
 		q = q.replace('__today', webnotes.utils.nowdate())
 		
 		res = webnotes.conn.convert_to_lists(sql(q))
+
+		colnames, coltypes, coloptions, colwidths = build_description_standard(meta, tl)
 		
 	# run server script
 	# -----------------
@@ -264,8 +255,6 @@ def runquery_csv():
 	
 	rep_name = form.getvalue('report_name')
 	if not form.has_key('simple_query'):
-		tl, fl= get_sql_tables(q), get_sql_fields(q)
-		meta = get_sql_meta(tl)
 
 		# Report Name
 		if not rep_name:
