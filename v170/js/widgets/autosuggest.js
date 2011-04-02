@@ -266,9 +266,10 @@ AutoSuggest.prototype.setSuggestions = function (r, rt, input)
 	if (this.oP.json) {
 		//var jsondata = eval('(' + req.responseText + ')');
 		var jsondata = eval('(' + rt + ')');
-		
-		for (var i=0;i<jsondata.results.length;i++) {
-			this.aSug.push(  { 'id':jsondata.results[i].id, 'value':jsondata.results[i].value, 'info':jsondata.results[i].info }  );
+		if(jsondata) {
+			for (var i=0;i<jsondata.results.length;i++) {
+				this.aSug.push(  { 'id':jsondata.results[i].id, 'value':jsondata.results[i].value, 'info':jsondata.results[i].info }  );
+			}			
 		}
 	}
 	

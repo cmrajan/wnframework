@@ -1,12 +1,11 @@
 """
-
 Server side handler for "Form" events
-
 """
 
 import webnotes
 import webnotes.model.doc
 import webnotes.model.meta
+from webnotes.model.triggers import fire_event
 
 def getdoc():
 	"""
@@ -255,40 +254,6 @@ def make_csv_output(res, dt):
 	webnotes.response['type'] = 'csv'
 	webnotes.response['doctype'] = dt.replace(' ','')						
 
-# Notify Observer
-#===========================================================================================
-# update in modules/observers.py
-#===========================================================================================
-
-def notify_observers(doc, event):
-	""" 
-	Notify observers for Document - save, submit events. To write an observer
-	write an "observers" module and create a dictionary called "observers" inside it.
-	the key must be the doctype and the value the string of the module to be called
-	You must have "notify" method in your module
-	
-	for example:
-	
-	# attach observers to a particular doctype
-	observers = {
-		'MyDocType': 'mypackage.mymodule' # this will call mypackage.mymodule.notify(doc, event)
-	}
-	"""
-
-	try:
-		import observers
-	except ImportError, e:
-		return # no module
-
-	mod = observers.observers.get(doc.doctype, {}).get(event)
-	if mod:
-		# import the module
-		mod = mod.split('.')
-		p1, p2 = '.'.join(mod[:-1]), mod[-1]
-		exec 'from %s import %s' % (p1, p2) in locals()
-		
-		if hasattr(locals()[p2], 'notify'):
-			locals()[p2].notify(doc, event)
 
 # Document Save
 #===========================================================================================
@@ -322,8 +287,8 @@ def _do_action(doc, doclist, so, method_name, docstatus=0):
 			run_server_obj(so, 'custom_'+method_name)
 		errmethod = ''
 
-	# notify observers (if any)
-	notify_observers(doc, method_name)
+	# fire triggers observers (if any)
+	fire_event(doc, method_name)
 
 	# set docstatus for all children records
 	if docstatus:
@@ -388,7 +353,6 @@ def savedocs():
 				t = run_server_obj(server_obj, 'validate')
 			if hasattr(server_obj, 'custom_validate'):
 				t = run_server_obj(server_obj, 'custom_validate')
-			notify_observers(doc, 'validate')
 				
 		# set owner and modified times
 		is_new = cint(doc.fields.get('__islocal'))
@@ -432,7 +396,7 @@ def savedocs():
 				t = run_server_obj(server_obj, 'custom_on_update')
 				if t: webnotes.msgprint(t)
 
-			notify_observers(doc, 'on_update')
+			fire_event(doc, 'on_update')
 				
 		# on_submit
 		if action == 'Submit':

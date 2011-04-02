@@ -306,7 +306,7 @@ function set_title(t) {
 	document.title = (title_prefix ? (title_prefix + ' - ') : '') + t;
 }
 
-function $a(parent, newtag, className, cs, innerHTML) {
+function $a(parent, newtag, className, cs, innerHTML, onclick) {
 	if(parent && parent.substr)parent = $i(parent);
 	var c = document.createElement(newtag);
 	if(parent)
@@ -314,6 +314,7 @@ function $a(parent, newtag, className, cs, innerHTML) {
 	if(className)c.className = className;
 	if(cs)$y(c,cs);
 	if(innerHTML) c.innerHTML = innerHTML;
+	if(onclick) c.onclick = onclick;
 	return c;
 }
 function $a_input(p, in_type, attributes, cs) {

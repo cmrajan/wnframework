@@ -296,6 +296,7 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	this.input = $btn(this.button_area, 
 		me.df.label.substr(0,20) + ((me.df.label.length>20) ? '..' : ''), {width:'170px', fontWeight:'bold'}, null, 1)
 	this.input.onclick = function() {
+		if(me.not_in_form) return;
 		this.set_disabled();
 		if(cur_frm.cscript[me.df.label] && (!me.in_filter)) {			
 			cur_frm.runclientscript(me.df.label, me.doctype, me.docname);

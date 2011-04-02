@@ -26,6 +26,11 @@ wn.widgets.follow = {
 			this.invite_link = $ln(this.wrapper, 'Invite to follow', 
 				function(ln) { me.invite() }, {marginLeft:'8px', fontSize:'11px'}
 			);
+			this.help_link = $ln(this.wrapper, '[?]', 
+				function(ln) { msgprint('<b>What is follow?</b> When you follow something, you are kept updated \
+				with all the events that happen around it. Much like Twitter or Quora') }, 
+					{marginLeft:'8px', fontSize:'11px'}
+			);
 			this.show_followers();
 		}
 
@@ -70,25 +75,29 @@ wn.widgets.follow = {
 		// invite
 		this.invite = function() {
 			if(!this.dialog) {
-
-				my_onclick = function(btn) {
-					var v = me.dialog.widgets.Select.value;
-					btn.set_working();
+				this.dialog = new wn.widgets.Dialog({
+					title:'Invite someone to follow',
+					width:400,
+					fields: [
+						{fieldtype:'Link', fieldname:'user', label:'Select the user to who you want to invite', options:'Profile',reqd:1},
+						{fieldtype:'Button', fieldname:'invite', label:'Invite'}
+					]
+				});
+				this.dialog.make()
+				this.dialog.fields_dict.user.get_query = function() {
+					return 'SELECT tabProfile.name, tabProfile.first_name, tabProfile.last_name FROM tabProfile WHERE tabProfile.name LIKE "%s" OR tabProfile.first_name LIKE "%s" or tabProfile.last_name LIKE "%s" ORDER BY tabProfile.name ASC LIMIT 50'
+				}
+				this.dialog.fields_dict.invite.onclick = function() {
+					var v = me.get_values();
 					if(v) {
-						$c('webnotes.widgets.follow.follow', {dt: me.dt, dn: me.dn, user: v}, 
+						var btn = me.dialog.fields_dict.invite;
+						btn.set_working();
+						$c('webnotes.widgets.follow.follow', {dt: me.dt, dn: me.dn, user: v.user}, 
 						function(r, rt) {
 							btn.done_working();
 							me.update_follow(r);
 						})
 					}
-				}
-
-				this.dialog = new Dialog(400, 400, 'Invite someone to follow', [
-					['Link', 'Select', 'Profile'],
-					['Button', 'Invite', my_onclick]	
-				]);
-				this.dialog.widgets.Select.field_object.get_query = function() {
-					return 'SELECT tabProfile.name, tabProfile.first_name, tabProfile.last_name FROM tabProfile WHERE tabProfile.name LIKE "%s" OR tabProfile.first_name LIKE "%s" or tabProfile.last_name LIKE "%s" ORDER BY tabProfile.name ASC LIMIT 50'
 				}
 			}
 

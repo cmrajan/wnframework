@@ -1,5 +1,5 @@
 //
-// Dialog
+// Dialog - old style dialog - deprecated
 //
 
 var cur_dialog;
@@ -7,16 +7,8 @@ var top_index=91;
 
 function Dialog(w, h, title, content) {
 
-	this.wrapper = $a(popup_cont, 'div', 'dialog_wrapper');
-	this.w = w;
-	this.h = h;
+	this.make({width:w, title:title});
 
-	$w(this.wrapper,w + 'px');
-	
-	this.head = $a(this.wrapper, 'div', 'dialog_head');
-	this.body = $a(this.wrapper, 'div', 'dialog_body');
-	
-	this.make_head(title);
 	if(content)this.make_body(content);
 
 	this.onshow = '';
@@ -26,78 +18,7 @@ function Dialog(w, h, title, content) {
 	var me = this;
 }
 
-Dialog.prototype.make_head = function(title) {
-	var t = make_table(this.head,1,2,'100%',['100%','16px'],{padding:'2px'});
-	
-	//$y(t,{borderBottom:'1px solid #DDD'});
-	$y($td(t,0,0),{paddingLeft:'16px',fontWeight:'bold',fontSize:'14px',textAlign:'center'});
-	$y($td(t,0,1),{textAlign:'right'});	
-
-	var img = $a($td(t,0,01),'img','',{cursor:'pointer'});
-	img.src='images/icons/close.gif';
-	this.title_text = $td(t,0,0);
-	if(!title)title='';
-	this.title_text.innerHTML = title;
-
-	var me = this;
-	img.onclick = function() {
-		if(me.oncancel)me.oncancel();
-		me.hide();
-	}
-	this.cancel_img = img;
-}
-
-Dialog.prototype.no_cancel = function() {
-	$dh(this.cancel_img);
-	this.no_cancel_flag = 1;	
-}
-
-Dialog.prototype.show = function() {
-	// already live, do nothing
-	if(this.display)
-		return;
-
-	// place it at the center
-	var d = get_screen_dims();
-	this.wrapper.style.left  = ((d.w - this.w)/2) + 'px';
-	
-	if(!cint(this.h)) {
-		this.wrapper.style.top = '60px';
-	} else {
-		var t = (get_scroll_top() + ((d.h - this.h)/2));
-		this.wrapper.style.top = (t<60 ? 60 : t) + 'px';
-	}
-	
-	// place it on top
-	top_index++;
-	$y(this.wrapper,{zIndex:top_index});
-
-	// show it
-	$ds(this.wrapper);
-
-	// hide background
-	freeze();
-
-	this.display = true;
-	cur_dialog = this;
-
-	// call onshow
-	if(this.onshow)this.onshow();
-}
-
-Dialog.prototype.hide = function() {
-	var me = this;
-	unfreeze();
-	if(this.onhide)this.onhide();
-	$dh(this.wrapper);
-	
-	if(cur_autosug) cur_autosug.clearSuggestions();
-	
-	this.display = false;
-	cur_dialog = null;
-}
-
-Dialog.prototype.set_title = function(title) { if(!title)title=''; this.title_text.innerHTML = title.bold(); }
+Dialog.prototype = new wn.widgets.Dialog()
 
 Dialog.prototype.make_body = function(content) {
 	this.rows = {}; this.widgets = {};
@@ -198,10 +119,4 @@ Dialog.prototype.make_row = function(d) {
 	}
 }
 
-// Close dialog on Escape
-keypress_observers.push(new function() {
-	this.notify_keypress = function(e, kc) {
-		if(cur_dialog && kc==27 && !cur_dialog.no_cancel_flag) 
-			cur_dialog.hide();
-	}
-});
+

@@ -93,6 +93,7 @@ wn.widgets.form.sidebar = { Sidebar: function(form) {
 	
 	this.refresh = function() {
 		if(!this.sidebar) {
+			$y($td(this.form.wtab, 0, 1), {paddingTop:'8px'})
 			this.sidebar = new wn.widgets.PageSidebar($td(this.form.wtab, 0, 1), this.opts);
 		}
 		this.sidebar.refresh();

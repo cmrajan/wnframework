@@ -64,7 +64,7 @@ def scrub_custom_query(query, key, txt):
 	if '%(key)s' in query:
 		query = query.replace('%(key)s', key)
 	if '%s' in query:
-		query = query % (txt + '%')
+		query = query.replace('%s', key)
 		
 	return query
 

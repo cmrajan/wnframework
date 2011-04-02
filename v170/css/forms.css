@@ -157,15 +157,34 @@ div.time_field select{
 	border-collapse: collapse;
 }
 
-.datalabelcell { padding: 2px 0px; width: 160px; vertical-align: top; }
+.datalabelcell { 
+	padding: 2px 0px; 
+	width: 160px; 
+	vertical-align: top; 
+}
 .datainputcell { padding: 2px 0px; }
 
-.input_area input { width: 80%; margin: 0px; border: 1px solid #AAA; padding: 1px;  }
-.input_area select { width: 80%; }
-.input_area textarea { width: 90%; }
+.input_area input { 
+	width: 80%; 
+	margin: 0px; 
+	border: 1px solid #AAA; 
+	padding: 1px;  
+}
+.input_area select { 
+	width: 80%; 
+}
+.input_area textarea { 
+	width: 90%; 
+}
 
-.disp_area { width: 80%; padding: 2px 0px; font-size: 12px; }
-.disp_area_no_val { height: 12px; }
+.disp_area { 
+	width: 80%; 
+	padding: 2px 0px; 
+	font-size: 12px; 
+}
+.disp_area_no_val { 
+	height: 12px; 
+}
 
 .no_img {
 	padding: 40px;
@@ -176,10 +195,13 @@ div.time_field select{
 	border: 1px solid #AAA;
 }
 
-.input-mandatory {
-	background-color:#FEE;
+.input-mandatory to-update {
 	font-size: 14px;
 	font-weight: bold;
+}
+
+.input-mandatory to-update {
+	background-color:#FEE;
 }
 
 /* sidebar */

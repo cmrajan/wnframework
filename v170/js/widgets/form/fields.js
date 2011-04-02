@@ -150,24 +150,30 @@ Field.prototype.get_status = function() {
 	return ret;
 }
 
+Field.prototype.set_style_mandatory = function(add) {
+	if(add) {
+		$(this.txt ? this.txt : this.input).addClass('input-mandatory');
+		if(this.disp_area) $(this.disp_area).addClass('input-mandatory');		
+	} else {
+		$(this.txt ? this.txt : this.input).removeClass('input-mandatory');
+		if(this.disp_area) $(this.disp_area).removeClass('input-mandatory');		
+	}
+}
 
 Field.prototype.refresh_mandatory = function() { 
-	if(this.not_in_form)return;
+	if(this.in_filter)return;
 
 	// mandatory changes
 	if(this.df.reqd) {
-		if(this.label_area)
-			this.label_area.style.color= "#d22";
-
-		$(this.txt ? this.txt : this.input).addClass('input-mandatory');
-		if(this.disp_area) $(this.disp_area).addClass('input-mandatory');
+		if(this.label_area) this.label_area.style.color= "#d22";
+		this.set_style_mandatory(1);
 	} else {
-		if(this.label_area)
-			this.label_area.style.color= "#222";
+		if(this.label_area) this.label_area.style.color= "#222";
+		this.set_style_mandatory(0);
 
-		$(this.txt ? this.txt : this.input).removeClass('input-mandatory');
-		if(this.disp_area) $(this.disp_area).removeClass('input-mandatory');
 	}
+	
+	this.refresh_label_icon()
 	this.set_reqd = this.df.reqd;
 }
 
@@ -226,7 +232,6 @@ Field.prototype.refresh = function() {
 	this.set_label();
 	this.refresh_display();
 	this.refresh_mandatory();
-	this.refresh_label_icon();
 	
 	// further refresh
 	if(this.onrefresh) this.onrefresh();
@@ -238,17 +243,13 @@ Field.prototype.refresh = function() {
 	this.set_max_width();
 }
 
-Field.prototype.refresh_label_icon = function() {
-	if(this.not_in_form)return;
-	
+Field.prototype.refresh_label_icon = function() {	
 	// mandatory
+	$dh(this.label_icon);
 	if(this.label_icon && this.df.reqd) {
-		var v = _f.get_value(this.doctype, this.docname, this.df.fieldname);
-	 	if(is_null(v)) 
+	 	if(is_null(this.get_value())) 
 	 		$ds(this.label_icon);
-	 	else 
-	 		$dh(this.label_icon);
-	} else { $dh(this.label_icon) }
+	}
 }
 
 // Set / display values
@@ -284,18 +285,20 @@ Field.prototype.set_input = function(val) {
 }
 
 Field.prototype.run_trigger = function() {
+	if(this.df.reqd && !is_null(this.get_value()))
+		this.set_as_error(0);
+	
+	// update mandatory icon
+	this.refresh_label_icon();
+
 	if(this.not_in_form) {
 		return;
 	}
-
-	if(this.df.reqd && !is_null(this.get_value()))
-		this.set_as_error(0);
 
 	if(cur_frm.cscript[this.df.fieldname])
 		cur_frm.runclientscript(this.df.fieldname, this.doctype, this.docname);
 
 	cur_frm.refresh_dependency();
-	this.refresh_label_icon();
 }
 
 Field.prototype.set_disp_html = function(t) {
@@ -312,7 +315,7 @@ Field.prototype.set_disp = function(val) {
 }
 
 Field.prototype.set_as_error = function(set) { 
-	if(this.in_grid || this.not_in_form) return;
+	if(this.in_grid || this.in_filter) return;
 	
 	var w = this.txt ? this.txt : this.input;
 	if(set) {
@@ -502,11 +505,12 @@ DateField.prototype.make_input = function() {
 	var me = this;
 
 	me.input.onchange = function() {
-		if(me.not_in_form) return;
 		// input as dd-mm-yyyy
 		if(this.value==null)this.value='';
 
-		me.set(dateutil.user_to_str(me.input.value));
+		if(!this.not_in_form)
+			me.set(dateutil.user_to_str(me.input.value));
+
 		me.run_trigger();
 	}
 	me.input.set_input = function(val) {
@@ -893,7 +897,7 @@ SelectField.prototype.make_input = function() {
 	var me = this;
 	var opt=[];
 	
-	if(this.not_in_form && (!this.df.single_select)) {
+	if(this.in_filter && (!this.df.single_select)) {
 
 		// multiple select
 		this.input = $a(this.input_area, 'select');
@@ -1033,6 +1037,10 @@ TimeField.prototype.set_time = function(v) {
 	this.input_mn.inp.value = ret[1];
 	this.input_am.inp.value = ret[2];
 }
+
+TimeField.prototype.set_style_mandatory = function() { }
+TimeField.prototype.set_as_error = function() { }
+
 TimeField.prototype.make_input = function() { var me = this;
 	this.input = $a(this.input_area, 'div', 'time_field');
 	
@@ -1175,7 +1183,7 @@ function make_field(docfield, doctype, parent, frm, in_grid, hide_label) { // Fa
 	f.parent 	= parent;
 	f.doctype 	= doctype;
 	f.df 		= docfield;
-	f.perm 		= frm.perm;
+	f.perm 		= frm ? frm.perm : [[1,1,1]];
 	if(_f)
 		f.col_break_width = _f.cur_col_break_width;
 
