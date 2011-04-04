@@ -1,4 +1,79 @@
+"""
+Imports Documents from modules (.txt) files in the filesystem
+"""
 
+import webnotes
+
+#
+# imports / updates all files in a module into the database
+#
+def import_module(module, verbose=0):
+	"imports the all the records and files from the given module"
+	from webnotes.modules import get_module_path
+	import os
+	
+	not_module = ('startup', 'event_handlers', 'files', 'patches')
+	if module in not_module: 
+		if verbose: webnotes.msgprint('%s is not a module' % module)
+		return
+	
+	path = get_module_path(module)
+	
+	for doctype in listfolders(path, 1):
+		for docname in listfolders(os.path.join(path, doctype), 1):
+			import_file(module, doctype, docname, path)
+			if verbose: webnotes.msgprint('Imported %s/%s/%s' % (module, doctype, docname))
+	
+	import_attachments(module)
+
+#
+# get doclist from file
+#
+def get_doclist(path, doctype, docname):
+	"returns a doclist (list of dictionaries) of multiple records for the given parameters"
+	import os
+	do_not_import = ('control_panel')
+	
+	fname = os.path.join(path,doctype,docname,docname+'.txt')
+	if os.path.exists(fname) and (docname not in do_not_import):
+		f = open(fname,'r')
+		dl = eval(f.read())
+		f.close()
+		return dl
+	else:
+		return None
+
+#
+# import a file into the database
+#
+def import_file(module, doctype, docname, path=None):
+	"imports a given file into the database"
+	
+	if not path:
+		from webnotes.modules import get_module_path
+		path = get_module_path(module)
+	
+	doclist = get_doclist(path, doctype, docname)
+	
+	if doclist:
+		from webnotes.utils.transfer import set_doc
+		set_doc(doclist, 1, 1, 1)
+
+#
+# list folders in a dir
+#
+def listfolders(path, only_name=0):
+	"""returns the list of folders (with paths) in the given path, 
+	if only_name is set, it returns only the folder names"""
+
+	import os
+	out = []
+	for each in os.listdir(path):
+		temp = os.path.join(path,each)
+
+		if os.path.isdir(temp) and not each.startswith('.'):
+			only_name and out.append(each) or out.append(temp)
+	return out
 
 # ==============================================================================
 # Import from files
@@ -103,51 +178,6 @@ def get_all_doclist(folder_list):
 	return all_doclist
 	
 
-
-# ==============================================================================
-# Add code to doclist - deprecated
-# =============================================================================
-def add_code_from_files(doclist, folder):
-	import webnotes
-	import os
-	# code will be in the parent only
-	code_fields = webnotes.code_fields_dict.get(doclist[0]['doctype'], [])
-	code = ''
-	for code_field in code_fields:
-		# see if the file exists
-		name_extn = ''
-		if code_field[0]=='static_content':
-			name_extn += ' Static'
-		fname = os.path.join(folder, os.path.basename(folder)+name_extn+'.'+code_field[1])
-		
-		code = ''
-		try:
-			code = open(fname,'r').read()
-		except Exception, e:
-			if e.args[0]==2:
-				pass
-			else:
-				raise e
-		
-		doclist[0][code_field[0]] = code
-	return doclist
-
-
-# =============================================================================
-# Get the deepmost folder with files in the given path tree....
-# =============================================================================
-def listfolders(path, only_name=0):
-	import os
-	out = []
-	for each in os.listdir(path):
-		temp = os.path.join(path,each)
-
-		if os.path.isdir(temp) and not each.startswith('.'):
-			if only_name: out.append(each)
-			else: out.append(temp)
-	return out
-	
-
 # ==============================================================================
 # accept a module coming from a remote server
 # ==============================================================================
@@ -206,12 +236,13 @@ def update_module_timestamp_query(mod, timestamp):
 def import_attachments(m):
 	import os, webnotes.defs
 	import webnotes.utils.file_manager
+	from webnotes.modules import get_module_path
 	
 	out = []
 	
 	# get list
 	try:
-		folder = os.path.join(webnotes.defs.modules_path, m, 'files')
+		folder = os.path.join(get_module_path(m), 'files')
 		fl = os.listdir(folder)
 	except OSError, e:
 		if e.args[0]==2:
