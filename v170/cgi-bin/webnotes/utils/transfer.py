@@ -57,7 +57,9 @@ class UpdateDocument:
 	# delete existing
 	def delete_existing(self):
 		from webnotes.model import delete_doc
+		webnotes.conn.sql("set foreign_key_checks=0")
 		delete_doc(self.doc.doctype, self.doc.name)
+		webnotes.conn.sql("set foreign_key_checks=1")
 
 	# update modified timestamp
 	def update_modified(self):

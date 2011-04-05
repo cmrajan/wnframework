@@ -45,13 +45,11 @@ wn.widgets.PageSidebarSection = function(sidebar, opts) {
 	this.items = [];
 	this.sidebar = sidebar;
 	this.wrapper = $a(sidebar.wrapper, 'div', 'psidebar-section');
+	this.head = $a(this.wrapper, 'div', 'psidebar-section-head', '', opts.title);
+	this.body = $a(this.wrapper, 'div', 'psidebar-section-body');
 	$br(this.wrapper, '3px');
 	this.opts = opts;
 
-	// head
-	this.make_head = function() {
-		this.head = $a(this.wrapper, 'div', 'psidebar-section-head', '', this.opts.title);
-	}
 
 	// make items
 	this.make_items = function() {
@@ -60,7 +58,7 @@ wn.widgets.PageSidebarSection = function(sidebar, opts) {
 			var item = this.opts.items[i];
 			if((item.display && item.display()) || !item.display) {
 				
-				var div = $a(this.wrapper, 'div', 'psidebar-section-item');
+				var div = $a(this.body, 'div', 'psidebar-section-item');
 				this.make_one_item(item, div);
 			}
 				
@@ -94,9 +92,9 @@ wn.widgets.PageSidebarSection = function(sidebar, opts) {
 	}
 	
 	this.refresh = function() {
-		this.make_head();
+		this.body.innerHTML = '';
 		if(this.opts.render) { 
-			this.opts.render(this.wrapper); }
+			this.opts.render(this.body); }
 		else 
 			this.make_items();
 	}

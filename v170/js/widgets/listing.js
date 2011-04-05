@@ -557,7 +557,7 @@ Listing.prototype.run = function(do_continue, run_callback) {
 					me.make_result_tab(r.values.length);
 				}				
 			}
-			me.refresh(r.values.length, nc, r.values);
+			me.refresh(r.values.length, nc, r.values, r.n_values);
 			me.total_records = r.n_values;
 			me.set_rec_label(r.n_values, r.values.length);
 			
@@ -715,10 +715,10 @@ Listing.prototype.refresh_calc = function() {
 // -------------------------------------------------------
 
 
-Listing.prototype.refresh = function(nr, nc, d) {
+Listing.prototype.refresh = function(nr, nc, d, n_values) {
 
 	if(this.opts.append_records) {
-		this.refresh_more_button(nr);
+		this.refresh_more_button(nr, n_values);
 	} else {
 		this.refresh_paging(nr);
 	}
@@ -757,10 +757,10 @@ Listing.prototype.refresh = function(nr, nc, d) {
 }
 // -------------------------------------------------------
 
-Listing.prototype.refresh_more_button = function(nr) {
+Listing.prototype.refresh_more_button = function(nr, n_values) {
 	var me = this;
-	if(this.more_btn) $dh(this.more_btn);	
-	if((this.start + nr) == this.max_len) {
+	if(this.more_btn) $dh(this.more_btn);
+	if((this.start + nr) == this.max_len || (!n_values && nr < this.page_len)) {
 		// all records shown
 	} else if(nr) {
 		if(!this.more_btn) {

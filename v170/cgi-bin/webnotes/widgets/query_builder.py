@@ -233,8 +233,8 @@ def runquery(q='', ret=0, from_export=0):
 	out['values'] = res
 
 	# return num of entries 
-	qm = form.has_key('query_max') and form.getvalue('query_max')
-	if qm:
+	qm = form.has_key('query_max') and form.getvalue('query_max') or ''
+	if qm and qm.strip():
 		if qm.split()[0].lower() != 'select':
 			raise Exception, 'Query (Max) must be a SELECT'
 		if not form.has_key('simple_query'):

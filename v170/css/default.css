@@ -328,15 +328,34 @@ div.time_field select{
 	border-collapse: collapse;
 }
 
-.datalabelcell { padding: 2px 0px; width: 160px; vertical-align: top; }
+.datalabelcell { 
+	padding: 2px 0px; 
+	width: 160px; 
+	vertical-align: top; 
+}
 .datainputcell { padding: 2px 0px; }
 
-.input_area input { width: 80%; margin: 0px; border: 1px solid #AAA; padding: 1px;  }
-.input_area select { width: 80%; }
-.input_area textarea { width: 90%; }
+.input_area input { 
+	width: 80%; 
+	margin: 0px; 
+	border: 1px solid #AAA; 
+	padding: 1px;  
+}
+.input_area select { 
+	width: 80%; 
+}
+.input_area textarea { 
+	width: 90%; 
+}
 
-.disp_area { width: 80%; padding: 2px 0px; font-size: 12px; }
-.disp_area_no_val { height: 12px; }
+.disp_area { 
+	width: 80%; 
+	padding: 2px 0px; 
+	font-size: 12px; 
+}
+.disp_area_no_val { 
+	height: 12px; 
+}
 
 .no_img {
 	padding: 40px;
@@ -348,9 +367,12 @@ div.time_field select{
 }
 
 .input-mandatory {
-	background-color:#FEE;
 	font-size: 14px;
 	font-weight: bold;
+}
+
+.field-to-update {
+	background-color:#FEE;
 }
 
 /* sidebar */
@@ -1614,20 +1636,25 @@ div.psidebar-head {
 
 div.psidebar-section {
 	background-color: #e2e2e2;
-	border: 1px solid #bbb;
-	padding: 8px;
+	border: 1px solid #999;
 	margin-bottom: 11px;
 }
 
 div.psidebar-section-head {
 	font-weight: bold;
-	color: #555;
+	font-size: 13px;
+	color: #222;
+	background-color: #CCC;
 	margin-bottom: 7px;	
+	padding: 3px 11px;
+}
+
+div.psidebar-section-body {
+	margin: 7px 11px 11px 11px;
 }
 
 div.psidebar-section-item {
 	margin-bottom: 7px;
-	margin-left: 7px;
 }
 
 .psidebar-section-link {

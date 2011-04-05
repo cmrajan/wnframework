@@ -10,10 +10,6 @@ _tags = {
 	color_list: ['Default', 'Red', 'Blue', 'Green', 'Orange'] // for sequence
 }
 
-
-
-
-
 //
 // Tag List
 //
@@ -31,7 +27,7 @@ TagList = function(parent, start_list, dt, dn, static, onclick) {
 TagList.prototype.make = function(parent) {
 	for(var i=0; i<this.start_list.length; i++) {
 		if(this.start_list[i])
-			new DocumentTag(this.body, this.start_list[i], this.dt, this.dn, '_user_tags', this.static, this);
+			new SingleTag(this.body, this.start_list[i], this.dt, this.dn, '_user_tags', this.static, this);
 	}
 }
 
@@ -47,7 +43,7 @@ TagList.prototype.make_body = function() {
 TagList.prototype.add_tag = function(label, static, fieldname) {
 	if(!label) return;
 	if(in_list(this.tag_list, label)) return; // no double tags
-	var tag = new DocumentTag(this.body, label, this.dt, this.dn, fieldname, static, this);	
+	var tag = new SingleTag(this.body, label, this.dt, this.dn, fieldname, static, this);	
 }
 
 // add -tag area
@@ -214,9 +210,9 @@ TagList.prototype.make_color_picker = function(parent) {
 
 
 //
-// DocumentTag
+// SingleTag
 //
-function DocumentTag(parent, label, dt, dn, fieldname, static, taglist) {
+function SingleTag(parent, label, dt, dn, fieldname, static, taglist) {
 	this.dt = dt; 
 	this.dn = dn; 
 	this.label = label;
@@ -231,7 +227,7 @@ function DocumentTag(parent, label, dt, dn, fieldname, static, taglist) {
 }
 
 // make body
-DocumentTag.prototype.make_body = function(parent) {
+SingleTag.prototype.make_body = function(parent) {
 	var me = this;
 	// tag area
 	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: this.get_color(), 
@@ -252,19 +248,19 @@ DocumentTag.prototype.make_body = function(parent) {
 }
 
 // color
-DocumentTag.prototype.get_color = function() {
+SingleTag.prototype.get_color = function() {
 	if(this.label=='Submitted') return '#459';
 	else if(this.label=='Draft') return '#4A5';
 	else return (_tags.color_map[this.label] ? _tags.color_map[this.label] : _tags.colors['Default'])
 }
 
 // refresh color from _tags.color_map
-DocumentTag.prototype.refresh_color = function() {
+SingleTag.prototype.refresh_color = function() {
 	$y(this.body, {backgroundColor: this.get_color()});
 }
 
 // remove btn
-DocumentTag.prototype.make_remove_btn = function() {
+SingleTag.prototype.make_remove_btn = function() {
 	var me = this;
 	var span = $a(this.body,'span');
 	span.innerHTML += ' |';
@@ -275,24 +271,31 @@ DocumentTag.prototype.make_remove_btn = function() {
 }
 
 // label
-DocumentTag.prototype.make_label = function() {
+SingleTag.prototype.make_label = function() {
 	var me = this;
 	this.label_span = $a(this.body,'span', '', null, this.label);
 	this.label_span.onclick = function() { if(me.taglist && me.taglist.onclick) me.taglist.onclick(me); }
 }
 
 // remove
-DocumentTag.prototype.remove = function() {
+SingleTag.prototype.remove_tag_body = function() {
+	// clear tag
+	$dh(this.body);
+
+	// remove from tag_list
+	var nl=[]; 
+	for(var i in this.tag_list) 
+		if(this.tag_list[i]!=this.label) 
+			nl.push(this.tag_list[i]);
+	if(this.taglist)
+		this.taglist.tag_list = nl;
+}
+
+// remove
+SingleTag.prototype.remove = function() {
 	var me = this;
 	var callback = function(r,rt) {
-		// clear tag
-		$dh(me.body);
-
-		// remove from tag_list
-		var nl=[]; for(var i in me.tag_list) if(me.tag_list[i]!=me.label) nl.push(me.tag_list[i]);
-		if(me.taglist)
-			me.taglist.tag_list = nl;
-			
+		me.remove_tag_body()
 		me.taglist.remove_from_locals(me.label);
 	}
 	$c('webnotes.widgets.menus.remove_tag', {'dt':me.dt, 'dn':me.dn, 'tag':me.label}, callback)

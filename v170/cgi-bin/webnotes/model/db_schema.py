@@ -157,7 +157,12 @@ class DbTable:
 				if col.options:
 					tab_name = "tab" + col.options
 					if tab_name in tab_list:
-						webnotes.conn.sql("alter table `%s` add foreign key (`%s`) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
+						try:
+							webnotes.conn.sql("alter table `%s` add foreign key (`%s`) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
+						except Exception, e:
+							if e.args[0]==121:
+								webnotes.msgprint("alter table `%s` add foreign key (`%s`) references `%s`(name) on update cascade" % (self.name, col.fieldname, tab_name))
+							else: raise e
 			webnotes.conn.sql("set foreign_key_checks=1")
 
 	# Drop foreign keys

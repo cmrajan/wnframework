@@ -231,7 +231,6 @@ Field.prototype.refresh = function() {
 
 	this.set_label();
 	this.refresh_display();
-	this.refresh_mandatory();
 	
 	// further refresh
 	if(this.onrefresh) this.onrefresh();
@@ -239,16 +238,21 @@ Field.prototype.refresh = function() {
 
 	if(!this.not_in_form)
 		this.set_input(_f.get_value(this.doctype,this.docname,this.df.fieldname));
-		
+
+	this.refresh_mandatory();	
 	this.set_max_width();
 }
 
 Field.prototype.refresh_label_icon = function() {	
 	// mandatory
-	$dh(this.label_icon);
-	if(this.label_icon && this.df.reqd) {
-	 	if(is_null(this.get_value())) 
-	 		$ds(this.label_icon);
+	if(this.df.reqd) {
+		if(this.get_value && is_null(this.get_value())) {
+		 	if(this.label_icon) $ds(this.label_icon);
+			$(this.txt ? this.txt : this.input).addClass('field-to-update')
+		} else {
+		 	if(this.label_icon) $dh(this.label_icon);
+			$(this.txt ? this.txt : this.input).removeClass('field-to-update')
+		}
 	}
 }
 

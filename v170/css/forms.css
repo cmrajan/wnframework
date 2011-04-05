@@ -195,12 +195,12 @@ div.time_field select{
 	border: 1px solid #AAA;
 }
 
-.input-mandatory to-update {
+.input-mandatory {
 	font-size: 14px;
 	font-weight: bold;
 }
 
-.input-mandatory to-update {
+.field-to-update {
 	background-color:#FEE;
 }
 

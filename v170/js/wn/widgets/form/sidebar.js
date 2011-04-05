@@ -62,13 +62,13 @@ wn.widgets.form.sidebar = { Sidebar: function(form) {
 				]
 			},
 
-			{
+/*			{
 				title: 'Follow this ' + get_doctype_label(me.form.doctype),
 				render: function(wrapper) {
 					new wn.widgets.follow.Follow(wrapper, me.form.doctype, me.form.docname);
 				},
 				display: function() { return !me.form.doc.__islocal }
-			},
+			},*/
 						
 			{
 				title: 'Tags',

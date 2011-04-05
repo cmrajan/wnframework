@@ -582,7 +582,7 @@ ItemBrowserItem.prototype.set_tag_filter = function(tag) {
 	if(in_list(keys(me.ib.tag_filter_dict), tag.label)) return;
 	
 	// create a tag in filters
-	var filter_tag = new DocumentTag(me.ib.tag_area, tag.label, me.ib.dt, null, 0, null);
+	var filter_tag = new SingleTag(me.ib.tag_area, tag.label, me.ib.dt, null, 0, null);
 	filter_tag.ib = me.ib;
 	filter_tag.fieldname = tag.fieldname;
 

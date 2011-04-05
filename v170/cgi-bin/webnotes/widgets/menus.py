@@ -163,9 +163,6 @@ def update_tags(dt, dn, tl):
 	
 	# update in table
 	sql("update tab%s set _user_tags=%s where name=%s" % (dt,'%s','%s'), (',' + ','.join(tl), dn))
-	
-	# update in feed (if present)
-	sql("update tabFeed set _user_tags=%s where doc_label=%s and doc_name=%s", (',' + ','.join(tl), dt, dn))
 
 # --------------------------------------------------------------
 

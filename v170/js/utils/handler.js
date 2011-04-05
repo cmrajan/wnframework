@@ -102,18 +102,11 @@ function validate_session(r,rt) {
 // For calling an object
 function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 	// single
-	if(doclist.substr) {
-		$c('runserverobj',{
-			'doctype':doclist,
-			'method':method, 
-			'arg':arg}, call_back, null, no_spinner, freeze_msg);	
-	} else {
-	// doclist
-		$c('runserverobj',{
-			'docs':compress_doclist(doclist), 
-			'method':method, 
-			'arg':arg}, call_back, null, no_spinner, freeze_msg);
-	}
+	$c('runserverobj',{
+		'doctype':(doclist.substr ? doclist : compress_doclist(doclist)),
+		'method':method, 
+		'arg': (arg.substr ? arg : JSON.stringify(arg))
+		}, call_back, null, no_spinner, freeze_msg);	
 }
 
 // For call a page metho

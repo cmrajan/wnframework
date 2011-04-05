@@ -22,6 +22,7 @@ def get_module_path(module):
 	try:
 		exec ('import ' + scrub(module)) in locals()
 		modules_path = eval(scrub(module) + '.__file__')
+		
 		modules_path = os.path.sep.join(modules_path.split(os.path.sep)[:-1])
 	except ImportError, e:
 		pass
