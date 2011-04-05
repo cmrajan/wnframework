@@ -142,6 +142,7 @@ class UpdateDocumentMerge(UpdateDocument):
 	def keep_values(self, d):
 		if hasattr(self, 'get_orignal_values'):
 			ov = self.get_orignal_values(d)
+			print ov
 			if ov:
 				d.fields.update(ov)
 
@@ -257,7 +258,7 @@ class UpdateModuleDef(UpdateDocumentMerge):
 		if d.doctype=='Module Def Item':
 			return {'name': self.get_id(d)[0][0]}
 		if d.doctype=='Module Def':
-			return sql("select module_seq, disabled, is_hidden from `tabModule Def` where name=%s", d.name, as_dict = 1)
+			return webnotes.conn.sql("select module_seq, disabled, is_hidden from `tabModule Def` where name=%s", d.name, as_dict = 1)
 
 
 
