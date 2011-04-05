@@ -64,8 +64,7 @@ def scrub_custom_query(query, key, txt):
 	if '%(key)s' in query:
 		query = query.replace('%(key)s', key)
 	if '%s' in query:
-		query = query.replace('%s', key)
-		
+		query = query.replace('%s', ((txt or '') + '%'))
 	return query
 
 # this is called by the Link Field
