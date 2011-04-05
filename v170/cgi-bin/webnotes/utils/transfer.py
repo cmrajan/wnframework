@@ -71,7 +71,7 @@ class UpdateDocument:
 			
 	def save_children(self):
 		for df in self.in_doclist[1:]:
-			self.save_one_doc(self, df)
+			self.save_one_doc(df)
 			
 	def save_one_doc(self, df, as_new=1):
 		d = Document(fielddata = df)

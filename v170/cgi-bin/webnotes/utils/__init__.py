@@ -36,7 +36,12 @@ def generate_hash():
 def db_exists(dt, dn):
 	return webnotes.conn.sql('select name from `tab%s` where name="%s"' % (dt, dn))
 
+def load_json(arg):
+	try: import json
+	except: import simplejson as json
 
+	return json.loads(arg)
+	
 # Get Traceback
 # ==============================================================================
 

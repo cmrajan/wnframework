@@ -28,14 +28,20 @@ def change_module(dt, dn, from_module, to_module):
 # SYNC
 #==============================================================================
 def reload_doc(module, dt, dn):
-	from webnotes.modules.import_module import import_from_files
+	"alias for webnotes.modules.import_module.import_file"
+	from webnotes.modules.import_module import import_file
 
-	import_from_files(record_list = [[module, dt, dn]])
+	import_file(module, dt, dn)
 
 #
 # get list of doctypes and their last update times
 #
 def get_doc_list(dt):
+	"""
+	returns the list of records and their last update times from the table
+	if the column _last_update does not exist, it will add it to the table
+	"""
+	
 	import webnotes
 	module = dt=='Module Def' and 'name' or 'module'
 	q = "select %s, name, _last_update from `tab%s`" % (module, dt)

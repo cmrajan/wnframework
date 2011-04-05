@@ -8,29 +8,40 @@ form = webnotes.form_dict
 #
 # Follow
 #
-def follow(dt=None, dn=None, user=None, verbose=1):
+def follow(dt=None, dn=None, user=None, verbose=0):
 	"Add as follower to a particular record. If no parameteres, then take from the http request (form)"
 	
-	if not dt: dt, dn, user = form.get('dt'), form.get('dn'), form.get('user')
+	if not dt: 
+		dt, dn, user = form.get('dt'), form.get('dn'), form.get('user')
+		verbose = 1
 
 	if not user: return
 
 	if not is_follower(dt, dn, user):
-		make_follower(dt, dn, user)
+		make_follower(dt, dn, user, verbose)
 	else:
 		if verbose: webnotes.msgprint("%s is already a follower!" % user)
 
 	return load_followers(dt, dn)
 
-def make_follower(dt, dn, user):
+def make_follower(dt, dn, user, verbose):
 	"Add the user as a follower"
-	from webnotes.model.doc import Document
-	d = Document('Follower')
-	d.doc_type = dt
-	d.doc_name = dn
-	d.owner = user
-	d.save(1)
+	if has_permission(dt, user):
+		from webnotes.model.doc import Document
+		d = Document('Follower')
+		d.doc_type = dt
+		d.doc_name = dn
+		d.owner = user
+		d.save(1)
+	else:
+		if verbose: webnotes.msgprint('%s does not have sufficient permission to follow' % user)
 		
+def has_permission(dt, user):
+	"Check to see if the user has permission to follow"
+
+	return webnotes.conn.sql("select name from tabDocPerm where parent=%s and ifnull(`read`,0)=1 and role in ('%s') limit 1" \
+		% ('%s', ("', '".join(webnotes.user.get_roles()))), dt)
+	
 def is_follower(dt, dn, user):
 	"returns true if given user is a follower"
 	
@@ -85,9 +96,9 @@ def email_followers(dt, dn, msg_html=None, msg_text=None):
 #
 def on_docsave(doc):
 	"Add the owner and all linked Profiles as followers"
-	follow(doc.doctype, doc.docname, doc.owner)
+	follow(doc.doctype, doc.name, doc.owner)
 	for p in get_profile_fields(doc.doctype):
-		follow(doc.doctype, doc.docname, doc.field.get(p))
+		follow(doc.doctype, doc.name, doc.fields.get(p))
 
 	update_followers(doc = doc)
 
@@ -98,9 +109,11 @@ def update_followers(dt=None, dn=None, subject=None, update_by=None, doc=None):
 	"Updates the timestamp and subject in follower table (for feed generation)"
 	from webnotes.utils import now
 	webnotes.conn.sql("update tabFollower set modified=%s, subject=%s, modified_by=%s where doc_type=%s and doc_name=%s", \
-		(now(), subject or doc.fields.get('subject'), \
+		(now(), 
+		subject or doc.fields.get('subject'), \
 		update_by or webnotes.session['user'],\
-		dt or doc.doctype, dn or doc.docname))
+		dt or doc.doctype, 
+		dn or doc.name))
 
 #
 # get type of "Profile" fields
@@ -108,7 +121,7 @@ def update_followers(dt=None, dn=None, subject=None, update_by=None, doc=None):
 def get_profile_fields(dt):
 	"returns a list of all profile link fields from the doctype"
 	return [f[0] for f in \
-		webnotes.conn.sql("select fieldname from tabDocField where parent=%s and fieldtype='Link' and options='Profile'")]
+		webnotes.conn.sql("select fieldname from tabDocField where parent=%s and fieldtype='Link' and options='Profile'", dt)]
 
 #
 # setup - make followers table

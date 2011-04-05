@@ -39,7 +39,7 @@ def fire_event(doc, event_name):
 			where (doc_type=%s or doc_type='*')
 			and (doc_name=%s or doc_name='*')
 			and (event_name=%s or event_name='*')""", (doc.doctype, doc.name, event_name)):
-		
+				
 			module, method = '.'.join(t[0].split('.')[:-1]), t[0].split('.')[-1]
 			exec 'from %s import %s' % (module, method) in locals()
 			locals()[method](doc)
