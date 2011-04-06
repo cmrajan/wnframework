@@ -42,16 +42,20 @@ def remove_trigger(doctype, docname, event_name, method):
 def fire_event(doc, event_name):
 	"Fire all triggers on an event and passes the doc to the trigger"
 	try:
-		for t in webnotes.conn.sql("""select method from tabDocTrigger 
+		tl = webnotes.conn.sql("""select method from tabDocTrigger 
 			where (doc_type=%s or doc_type='*')
 			and (doc_name=%s or doc_name='*')
-			and (event_name=%s or event_name='*')""", (doc.doctype, doc.name, event_name)):
-				
-			module, method = '.'.join(t[0].split('.')[:-1]), t[0].split('.')[-1]
-			exec 'from %s import %s' % (module, method) in locals()
-			locals()[method](doc)
+			and (event_name=%s or event_name='*')""", (doc.doctype, doc.name, event_name))
 	except Exception, e:
-		if e.args[0]!=1146: raise e
+		if e.args[0]==1146:
+			setup()
+			tl = []
+		else: raise e
+		
+	for t in tl:
+		module, method = '.'.join(t[0].split('.')[:-1]), t[0].split('.')[-1]
+		exec 'from %s import %s' % (module, method) in locals()
+		locals()[method](doc)
 #
 # setup
 #
