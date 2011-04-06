@@ -281,6 +281,8 @@ def setup_tags():
 def delete_items():
 	il = eval(webnotes.form_dict.get('items'))
 	from webnotes.model import delete_doc
+	from webnotes.model.code import get_obj
+	
 	for d in il:
 		dt_obj = get_obj(d[0], d[1])
 		if hasattr(dt_obj, 'on_trash'):
