@@ -162,10 +162,9 @@ class UpdateDocType(UpdateDocumentMerge):
 			return 1
 	
 	def get_id(self, d):
-		if d.fieldname:
-			return webnotes.conn.sql("select name from tabDocField where fieldname=%s and parent=%s", (d.fieldname, d.parent))
-		elif d.label:
-			return webnotes.conn.sql("select name from tabDocField where label=%s and parent=%s", (d.label, d.parent))
+		key = d.fieldname or d.label
+		return webnotes.conn.sql("""select name, options, permlevel, reqd, print_hide, hidden
+		from tabDocField where %s=%s and parent=%s""" % (key, '%s', '%s'), (d.fieldname, d.parent))
 				
 	def on_save(self):
 		self.renum()
@@ -176,7 +175,11 @@ class UpdateDocType(UpdateDocumentMerge):
 	
 	def get_orignal_values(self, d):
 		if d.doctype=='DocField':
-			return {'name': self.get_id(d)[0][0]}
+			t = self.get_id(d)[0]
+			return {'name': t[0], 'options': t[1]}
+
+		if d.doctype=='DocType':
+			return webnotes.conn.sql("select server_code, client_script from `tabDocType` where name=%s", d.name, as_dict = 1)[0]			return {'name': self.get_id(d)[0][0]}
 
 	# renumber the indexes	
 	def renum(self):
@@ -273,9 +276,9 @@ class UpdateDocTypeMapper(UpdateDocumentMerge):
 			
 	def get_id(self, d):
 		if d.doctype=='Field Mapper Detail':
-			return webnotes.conn.sql("select name from `tabField Mapper Detail` where from_field=%s and to_field=%s and parent=%s", (d.from_field, d.to_field, d.parent))
+			return webnotes.conn.sql("select name from `tabField Mapper Detail` where from_field=%s and to_field=%s and match_id=%s and parent=%s", (d.from_field, d.to_field, d.match_id, d.parent))
 		elif d.doctype=='Table Mapper Detail':
-			return webnotes.conn.sql("select name from `tabTable Mapper Detail` where from_table=%s and to_table = %s and parent=%s", (d.from_table, d.to_table, d.parent))
+			return webnotes.conn.sql("select name from `tabTable Mapper Detail` where from_table=%s and to_table = %s and match_id=%s and parent=%s", (d.from_table, d.to_table, d.match_id, d.parent))
 		
 	def get_orignal_values(self, d):
 		if d.doctype in ['Field Mapper Detail', 'Table Mapper Detail']: 
