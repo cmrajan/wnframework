@@ -1,3 +1,7 @@
+"""
+Server side methods called from DocBrowser and tags
+"""
+
 import webnotes
 from webnotes.utils import cint, cstr
 
@@ -72,9 +76,7 @@ def check_user_tags(dt):
 		sql("select `_user_tags` from `tab%s` limit 1" % dt)
 	except Exception, e:
 		if e.args[0] == 1054:
-			webnotes.conn.commit()
-			sql("alter table `tab%s` add column `_user_tags` varchar(180)" % dt)
-			webnotes.conn.begin()
+			setup_user_tags(dt)
 
 # --------------------------------------------------------------
 # NOTE: THIS SHOULD BE CACHED IN DOCTYPE CACHE
@@ -146,15 +148,38 @@ def get_color_map():
 def get_trend():
 	return {'trend': get_dt_trend(webnotes.form_dict.get('dt'))}
 
-# --------------------------------------------------------------
 
+
+
+
+
+#
+# get tags
+#
 def get_tags(dt, dn):
-	tl = sql("select ifnull(_user_tags,'') from tab%s where name=%s" % (dt,'%s'), dn)[0][0]
-	return tl and tl.split(',') or []
+	"return list of tags in a record"
+	try:
+		tl = webnotes.conn.get_value(dt, dn, '_user_tags')
+		return tl and tl.split(',') or []
+	except Exception, e:
+		if e.args[0]==1054:
+			setup_user_tags(dt)
+			return []
+		else: raise e
 
-# --------------------------------------------------------------
+#
+# update tags in table
+#
+def update_tag_dt(dt, dn, tl):
+	"updates the _user_tag column in the table"
+	
+	sql("update tab%s set _user_tags=%s where name=%s" % (dt,'%s','%s'), (',' + ','.join(tl), dn))
 
+#
+# update tags
+#
 def update_tags(dt, dn, tl):
+	"updates tags in the given record"
 	if len(','.join(tl)) > 179:
 		msgprint("Too many tags")
 		raise Exception
@@ -162,10 +187,25 @@ def update_tags(dt, dn, tl):
 	tl = filter(lambda x: x, tl)
 	
 	# update in table
-	sql("update tab%s set _user_tags=%s where name=%s" % (dt,'%s','%s'), (',' + ','.join(tl), dn))
+	try:
+		update_tag_dt(dt, dn, tl)
+	except Exception, e:
+		if e.args[0]==1054:
+			setup_dt(dt)
+			update_tag_dt(dt, dn, tl)
 
-# --------------------------------------------------------------
+#
+# add _user_tag column (not standard)
+#
+def setup_user_tags(dt):
+	"adds _user_tags column in the database"
+	webnotes.conn.commit()
+	sql("alter table `tab%s` add column `_user_tags` varchar(180)" % dt)
+	webnotes.conn.begin()
 
+#
+# insert tag
+#
 def _add_tag_to_master(tag, color):
 	if color:
 		t, cond = color, ("on duplicate key update tag_color='%s'" % color)
@@ -173,31 +213,27 @@ def _add_tag_to_master(tag, color):
 		t, cond = 'Default', ''
 		
 	sql("insert ignore into tabTag(name, tag_color) values ('%s', '%s') %s" % (tag, t, cond))
-	
+
+#
+# create tag
+#
 def create_tag(tag, color):
 	try:
 		_add_tag_to_master(tag, color)
 	except Exception, e:
 		# add the table
-		if e.args[0]==1146:
-			webnotes.conn.commit()
-			sql("create table `tabTag`(`name` varchar(180), tag_color varchar(180), primary key (`name`))")
-			webnotes.conn.begin()
+		if e.args[0] in (1146, 1054):
+			setup_tags()
 			_add_tag_to_master(tag, color)
-
-		# udpate the color column
-		if e.args[0]==1054:
-			webnotes.conn.commit()
-			sql("alter table tabTag add column tag_color varchar(180)")
-			webnotes.conn.begin()
-			_add_tag_to_master(tag, color)
-			
 		else:
 			raise e
 
-# --------------------------------------------------------------
-
+#
+# Add a new tag
+#
 def add_tag():
+	"adds a new tag to a record, and creates the Tag master"
+	
 	f = webnotes.form_dict
 	tag, color = f.get('tag'), f.get('color')
 	dt, dn = f.get('dt'), f.get('dn')
@@ -214,16 +250,34 @@ def add_tag():
 		
 	return tag
 
-	# --------------------------------------------------------------
-
+#
+# remove tag
+#
 def remove_tag():
-	globals().update(webnotes.form_dict)
-
+	"removes tag from the record"
+	f = webnotes.form_dict
+	tag, dt, dn = f.get('tag'), f.get('dt'), f.get('dn')
+	
 	tl = get_tags(dt, dn)				
 	update_tags(dt, dn, filter(lambda x:x!=tag, tl))
-	
-# --------------------------------------------------------------
 
+#
+# create / update tags table
+#	
+def setup_tags():
+	"creates / updates tabTag from the DocType"
+	webnotes.conn.commit()
+	from webnotes.modules.module_manager import reload_doc
+	reload_doc('core','doctype','tag')
+	webnotes.conn.begin()
+
+
+
+
+
+#
+# delete and archive in docbrowser
+#
 def delete_items():
 	il = eval(webnotes.form_dict.get('items'))
 	from webnotes.model import delete_doc
@@ -241,4 +295,3 @@ def archive_items():
 	from webnotes.utils.archive import archive_doc
 	for d in il:
 		archive_doc(d[0], d[1], webnotes.form_dict.get('action')=='Restore' and 1 or 0)
-

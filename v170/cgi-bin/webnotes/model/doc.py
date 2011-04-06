@@ -285,7 +285,7 @@ class Document:
 			self.modified = now()
 			self.modified_by = webnotes.session['user']
 			for f in self.fields.keys():
-				if (not (f in ('doctype', 'name', 'perm', 'localname', 'creation'))) \
+				if (not (f in ('doctype', 'name', 'perm', 'localname', 'creation','_user_tags'))) \
 					and (not f.startswith('__')): # fields not saved
 					
 					# validate links

@@ -4,8 +4,8 @@ function compress_doclist(list) {
 		var o = list[i];
 		var fl = [];
 		if(!kl[o.doctype]) { // make key only once # doctype must be first
-			var tfl = ['doctype', 'name', 'docstatus', 'owner', 'parent', 'parentfield', 'parenttype', 'idx', 'creation', 'modified', 'modified_by', '__islocal', '__deleted','__newname', '__modified'];  // for text
-			var fl =  ['doctype', 'name', 'docstatus', 'owner', 'parent', 'parentfield', 'parenttype', 'idx', 'creation', 'modified', 'modified_by', '__islocal', '__deleted','__newname', '__modified'];  // for unique
+			var tfl = ['doctype', 'name', 'docstatus', 'owner', 'parent', 'parentfield', 'parenttype', 'idx', 'creation', 'modified', 'modified_by', '__islocal', '__deleted','__newname', '__modified', '_user_tags'];  // for text
+			var fl =  ['doctype', 'name', 'docstatus', 'owner', 'parent', 'parentfield', 'parenttype', 'idx', 'creation', 'modified', 'modified_by', '__islocal', '__deleted','__newname', '__modified', '_user_tags'];  // for unique
 
 			for(key in fields[o.doctype]) { // all other values
 				if((!in_list(fl, key)) && (!in_list(no_value_fields, fields[o.doctype][key].fieldtype))) {
