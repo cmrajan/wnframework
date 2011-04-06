@@ -941,9 +941,10 @@ SelectField.prototype.make_input = function() {
 
 	// set as single (to be called from report builder)
 	this.set_as_single = function() {
-		this.input.multiple = false;
-		this.input.style.height = null; // default
-		$dh(this.input.lab)
+		var i = this.txt ? this.txt : this.input;
+		i.multiple = false;
+		i.style.height = null; // default
+		if(i.lab)$dh(i.lab)
 	}
 	
 	// refresh options list
