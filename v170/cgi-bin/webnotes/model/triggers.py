@@ -5,22 +5,29 @@ Standard events called by the framework are "save, submit, cancel"
 
 import webnotes
 
+def insert_trigger(doctype, docname, event_name, method):
+	"inserts a new trigger record"
+	
+	from webnotes.model.doc import Document
+	d = Document('DocTrigger')
+	d.doc_type = doctype
+	d.doc_name = docname
+	d.event_name = event_name
+	d.method = method
+	d.save(1)
+	
 def add_trigger(doctype, docname, event_name, method):
 	"""Add a trigger to an event on a doctype, docname. The specified method will be called.
 	Wild card '*' is allowed in doctype, docname and/or event_name"""
 
-	if not trigger_exists(doctype, docname, event_name, method):
-		from webnotes.model.doc import Document
-		d = Document('DocTrigger')
-		d.doc_type = doctype
-		d.doc_name = docname
-		d.event_name = event_name
-		d.method = method
-		try:
-			d.save(1)
-		except Exception, e:
-			if e.args[0]==1146: setup()
-			else: raise e
+	try:
+		if not trigger_exists(doctype, docname, event_name, method):
+			insert_trigger(doctype, docname, event_name, method)
+	except Exception, e:
+		if e.args[0]==1146: 
+			setup()
+			insert_trigger(doctype, docname, event_name, method)
+		else: raise e
 
 def trigger_exists(doctype, docname, event_name, method):
 	"returns true if trigger exists"
