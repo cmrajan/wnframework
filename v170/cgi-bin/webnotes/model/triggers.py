@@ -60,6 +60,5 @@ def setup():
 	webnotes.conn.commit()
 	from webnotes.modules.module_manager import reload_doc
 	reload_doc('core','doctype','doctrigger')
-	add_trigger('*','*','*','webnotes.widgets.follow.on_docsave')
 	webnotes.conn.begin()
 	
