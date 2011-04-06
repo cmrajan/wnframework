@@ -12,7 +12,6 @@ list_opts = {
 	hide_rec_label: 0,
 	show_calc: 1,
 	show_empty_tab : 0,
-	show_bottom_paging: 1,
 	no_border: 1,
 	append_records: 1,
 	table_width: null
@@ -23,7 +22,6 @@ list_opts = {
 function Listing(head_text, no_index, no_loading) {
 	this.start = 0; 
 	this.page_len = 20;
-	this.paging_len = 5;
 	this.filters_per_line = 7;
 	this.cell_idx = 0;
 	this.head_text = head_text ? head_text : 'Result';
@@ -71,24 +69,8 @@ Listing.prototype.make = function(parent) {
 	this.btn_area = $a(parent, 'div', '', {margin:'8px 0px'});
 	this.body_area = $a(parent,'div','srs_body_area');
 
-	// paging area
-	if(this.opts.append_records) {
-		if(!this.opts.hide_rec_label)
-			this.rec_label = $a(this.body_area, 'div', '', {margin:'4px 0px',color:'#888'});
-	} else {
-		var div = $a(this.body_area,'div','srs_paging_area');
-		this.body_head = make_table(div, 1, 2, '100%', ['50%','50%'], {verticalAlign:'middle'});
-		$y(this.body_head,{borderCollapse:'collapse'});
-
-		this.rec_label = $td(this.body_head,0,0);
-		$fg(this.rec_label,'#888');
-		
-		if(this.opts.hide_rec_label) {
-			$y($td(this.body_head,0,0),{width:'0%'}); 
-			$y($td(this.body_head,0,1),{width:'100%'});
-		}
-	}
-	
+	if(!this.opts.hide_rec_label)
+		this.rec_label = $a(this.body_area, 'div', '', {margin:'4px 0px',color:'#888'});
 
 	// results
 	this.results = $a($a(this.body_area, 'div','srs_results_area'),'div');
@@ -102,15 +84,7 @@ Listing.prototype.make = function(parent) {
 	
 	this.bottom_div = $a(this.body_area,'div','',{paddingTop:'8px'});
 	
-	this.make_toolbar();
-	
-	if(!this.opts.append_records) {
-		this.paging_nav = {};
-		this.make_paging_area('top',$td(this.body_head,0,1));
-		if(this.opts.show_bottom_paging) 
-			this.make_paging_area('bottom',this.bottom_div);
-	}
-	
+	this.make_toolbar();	
 }
 
 // -------------------------------------------------------
@@ -199,92 +173,6 @@ Listing.prototype.do_print = function() {
 Listing.prototype.do_calc = function() {
 	show_calc(this.result_tab, this.colnames, this.coltypes, 0)
 }
-
-// -------------------------------------------------------
-
-ListPaging = function(id, list, p) {
-	var mo_bg = '#FFF';
-	this.list = list;
-	this.wrapper = $a(p,'div','paging_area');
-	$dh(this.wrapper);
-	var cw = ['15px','50px'];
-	for(var i=0;i<list.paging_len;i++) cw[cw.length]='20px';
-	cw[cw.length]='35px'; cw[cw.length]='15px'
-	var pt = make_table(this.wrapper,1,cw.length,null,cw)
-
-	var me = this;
-	var make_link = function(p,label,onclick,rtborder) {
-		p.innerHTML = label; 
-		p.style.cursor='pointer';
-		p.onmouseover = function() { if(!this.disabled) { this.className = 'srs_paging_item srs_paging_item_mo'} }
-		p.onmouseout = function() { this.className = 'srs_paging_item'; }
-		p.user_onclick = onclick;
-		p.onclick = function() { this.user_onclick(); }
-		p.disable = function(b) { if(!b)$op(this,30); p.style.cursor='default'; this.disabled=1; }
-		p.enable = function() { $op(this,100); p.style.cursor='pointer'; this.disabled=0; }
-		p.rtborder = rtborder;
-		if(rtborder)p.style.borderRight = '1px solid #CCC';
-		return p;
-	}
-
-	var goto_rec = function(t,st) { if(!t.disabled) {list.start=st;list.run(1);} }
-
-	this.prev1 = make_link($td(pt,0,0),'<img src="images/ui/prev_pointer.gif">',function() { goto_rec(this,me.list.start - me.list.page_len); });
-	this.prev2 = make_link($td(pt,0,1),'Previous',function() { goto_rec(this,me.list.start - me.list.page_len); });
-
-	for(var i=0;i<list.paging_len;i++) {
-		this['p_'+i] = make_link($td(pt,0,i+2),'',function() { goto_rec(this,this.st); },((i==list.paging_len-1)?0:1));
-	}
-	this.next1 = make_link($td(pt,0,cw.length-2),'Next',function() { goto_rec(this,me.list.start + me.list.page_len); });
-	this.next2 = make_link($td(pt,0,cw.length-1),'<img src="images/ui/next_pointer.gif">',function() { goto_rec(this,me.list.start + me.list.page_len); });
-
-	list.paging_nav[id] = this;
-}
-
-// -------------------------------------------------------
-
-ListPaging.prototype.refresh = function(nr) {
-	var lst = this.list;
-	if(cint(lst.max_len) <= cint(lst.page_len)) {
-		$dh(this.wrapper); return;
-	}
-	$ds(this.wrapper);
-	var last = 0; var cpage = 1; var page_from = 1;
-	if((lst.start + nr) == lst.max_len) last = 1;
-	
-	if(lst.start>0) {
-		this.prev1.enable(); this.prev2.enable(); 
-		cpage = cint(lst.start / lst.page_len)+1;
-		if(cpage > 3) page_from = cpage - 2;
-	} else { 
-		this.prev1.disable(); this.prev2.disable(); 
-	}
-	
-	// set pages
-	for(var i=0;i<lst.paging_len;i++) {
-		var st = ((page_from-1)+i)* lst.page_len;
-		var p = this['p_'+i];
-		if((page_from+i)==cpage) {
-			p.innerHTML = ((page_from+i)+'').bold();
-			p.disable(1);
-		} else if (st> lst.max_len) {
-			p.innerHTML = (page_from+i)+'';	
-			p.disable();
-		} else {
-			p.innerHTML = (page_from+i)+'';	
-			p.enable();	
-			p.st = st;
-		}
-	}
-	if(!last) { this.next1.enable();this.next2.enable(); } else { this.next1.disable();this.next2.disable(); }
-}
-
-
-// -------------------------------------------------------
-
-Listing.prototype.make_paging_area = function(id, p) { new ListPaging(id,this,p); }
-Listing.prototype.refresh_paging = function(nr) { for(var i in this.paging_nav) this.paging_nav[i].refresh(nr);}
-Listing.prototype.hide_paging = function() { for(var i in this.paging_nav) $dh(this.paging_nav[i].wrapper); }
 
 // -------------------------------------------------------
 
@@ -717,12 +605,7 @@ Listing.prototype.refresh_calc = function() {
 
 Listing.prototype.refresh = function(nr, nc, d, n_values) {
 
-	if(this.opts.append_records) {
-		this.refresh_more_button(nr, n_values);
-	} else {
-		this.refresh_paging(nr);
-	}
-
+	this.refresh_more_button(nr, n_values);
 	this.refresh_calc();
 	
 	if(this.show_result) 

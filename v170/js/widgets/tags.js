@@ -233,7 +233,7 @@ SingleTag.prototype.make_body = function(parent) {
 	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: this.get_color(), 
 		color:'#FFF', marginRight:'4px', fontSize:'11px'});
 	$br(this.body,'3px');
-	if(taglist.onclick) $y(this.body, {cursor:'pointer'});
+	if(this.taglist.onclick) $y(this.body, {cursor:'pointer'});
 	
 	// hover
 	$(this.body).hover(function() { $op(this,60); } ,function() { $op(this,100); });

@@ -179,7 +179,7 @@ class UpdateDocType(UpdateDocumentMerge):
 			return {'name': t[0], 'options': t[1]}
 
 		if d.doctype=='DocType':
-			return webnotes.conn.sql("select server_code, client_script from `tabDocType` where name=%s", d.name, as_dict = 1)[0]			return {'name': self.get_id(d)[0][0]}
+			return webnotes.conn.sql("select server_code, client_script from `tabDocType` where name=%s", d.name, as_dict = 1)[0]
 
 	# renumber the indexes	
 	def renum(self):

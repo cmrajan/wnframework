@@ -42,7 +42,7 @@ LocalDB.delete_doc=function(dt, dn) {
 			for(var ndn in locals[ndt]) {
 				var doc = locals[ndt][ndn];
 				if(doc && doc.parenttype==dt && (doc.parent==dn||doc.__oldparent==dn)) {
-					locals[ndt][ndn];
+					delete locals[ndt][ndn];
 				}
 			}
 		}
