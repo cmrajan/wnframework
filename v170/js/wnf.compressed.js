@@ -247,7 +247,9 @@ if(r.exc&&r.session_status=='Session Expired'){resume_session();return;}
 if(r.exc&&r.session_status=='Logged Out'){msgprint('You have been logged out');setTimeout('redirect_to_login()',3000);return;}
 if(r.exc&&r.exc_type&&r.exc_type=='PermissionError'){loadpage('_home');}
 return true;}
-function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){$c('runserverobj',{'doctype':(doclist.substr?doclist:compress_doclist(doclist)),'method':method,'arg':(arg.substr?arg:JSON.stringify(arg))},call_back,null,no_spinner,freeze_msg);}
+function $c_obj(doclist,method,arg,call_back,no_spinner,freeze_msg){var args={'method':method,'arg':(typeof arg=='string'?arg:JSON.stringify(arg))}
+if(typeof doclist=='string')args.doctype=doclist;else args.docs=compress_doclist(doclist)
+$c('runserverobj',args,call_back,null,no_spinner,freeze_msg);}
 function $c_page(module,page,method,arg,call_back,no_spinner,freeze_msg){if(arg&&!arg.substr)arg=JSON.stringify(arg);$c(module+'.page.'+page+'.'+page+'.'+method,{'arg':arg},call_back,null,no_spinner,freeze_msg);}
 function $c_obj_csv(doclist,method,arg){var args={}
 args.cmd='runserverobj';args.as_csv=1;args.method=method;args.arg=arg;if(doclist.substr)
