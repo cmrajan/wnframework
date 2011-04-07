@@ -95,10 +95,10 @@ var dis_filters_list=[];if(sc&&sc.dis_filters)
 var dis_filters_list=sc.dis_filters.split('\n');var t=me.column_picker.get_selected();for(var i=0;i<t.length;i++){fl.push(table_name(t[i].parent)+'.`'+t[i].fieldname+'`');}
 me.selected_fields=fl;if(sc&&sc.add_col){var adv_fl=sc.add_col.split('\n');for(var i=0;i<adv_fl.length;i++){fl[fl.length]=adv_fl[i];}}
 me.dt.filter_vals={}
-add_to_filter=function(k,v,is_select){if(v==null)v='';if(!in_list(keys(me.dt.filter_vals),k)){me.dt.filter_vals[k]=v;return}else{if(is_select)
+add_to_filter=function(k,v,is_select){if(v==null)v='';if(!in_list(keys(me.dt.filter_vals),k)){me.dt.filter_vals[k]=v;}else{if(is_select)
 me.dt.filter_vals[k]+='\n'+v;else
 me.dt.filter_vals[k+'1']=v;}}
-for(var i=0;i<me.filter_fields.length;i++){var t=me.filter_fields[i];var v=t.get_value?t.get_value():'';if(t.df.fieldtype=='Select'){if(t.input.multiple){for(var sel_i=0;sel_i<v.length;sel_i++){if(v[sel_i]){add_to_filter(t.df.fieldname,v[sel_i],1);}}
+for(var i=0;i<me.filter_fields.length;i++){var t=me.filter_fields[i];var v=t.get_value?t.get_value():'';if(t.df.fieldtype=='Select'){if(t.input.multiple){for(var sel_i=0;sel_i<v.length;sel_i++){add_to_filter(t.df.fieldname,v[sel_i],1);}
 if(!v.length)add_to_filter(t.df.fieldname,"",1);}else{add_to_filter(t.df.fieldname,v);}}else add_to_filter(t.df.fieldname,v);if(!in_list(dis_filters_list,t.df.fieldname)&&!t.df.ignore){if(t.df.fieldname=='docstatus'){if(t.df.label=='Saved'){if(t.get_value())docstatus_cl[docstatus_cl.length]=table_name(t.df.parent)+'.docstatus=0';else cl[cl.length]=table_name(t.df.parent)+'.docstatus!=0';}
 else if(t.df.label=='Submitted'){if(t.get_value())docstatus_cl[docstatus_cl.length]=table_name(t.df.parent)+'.docstatus=1';else cl[cl.length]=table_name(t.df.parent)+'.docstatus!=1';}
 else if(t.df.label=='Cancelled'){if(t.get_value())docstatus_cl[docstatus_cl.length]=table_name(t.df.parent)+'.docstatus=2';else cl[cl.length]=table_name(t.df.parent)+'.docstatus!=2';}}else{var fn='`'+t.df.fieldname+'`';var v=t.get_value?t.get_value():'';if(v){if(in_list(['Data','Link','Small Text','Text'],t.df.fieldtype)){cl[cl.length]=table_name(t.df.parent)+'.'+fn+' LIKE "'+v+'%"';}else if(t.df.fieldtype=='Select'){if(t.input.multiple){var tmp_cl=[];for(var sel_i=0;sel_i<v.length;sel_i++){if(v[sel_i]){tmp_cl[tmp_cl.length]=table_name(t.df.parent)+'.'+fn+' = "'+v[sel_i]+'"';}}

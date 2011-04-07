@@ -681,7 +681,6 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			if(v==null)v='';
 			if(!in_list(keys(me.dt.filter_vals), k)) {
 				me.dt.filter_vals[k] = v;
-				return
 			} else {
 				if(is_select)
 					me.dt.filter_vals[k] += '\n' + v;
@@ -699,8 +698,8 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 			var v = t.get_value?t.get_value():'';
 			if(t.df.fieldtype=='Select') {
 				if(t.input.multiple) {
-					for(var sel_i=0;sel_i < v.length; sel_i++) { 
-						if(v[sel_i]) { add_to_filter(t.df.fieldname, v[sel_i], 1); }
+					for(var sel_i=0;sel_i < v.length; sel_i++) {
+						add_to_filter(t.df.fieldname, v[sel_i], 1);
 					}
 					// no values? atleast add key
 					if(!v.length) add_to_filter(t.df.fieldname, "", 1);
@@ -767,7 +766,7 @@ _r.ReportBuilder.prototype.make_datatable = function() {
 		me.dt.filter_vals.user = user;
 		me.dt.filter_vals.user_email = user_email;
 		me.filter_vals = me.dt.filter_vals; // in both dt and report
-		
+
 		// overloaded query - finish it here
 		this.is_simple = 0;
 		if(sc && sc.custom_query) {
