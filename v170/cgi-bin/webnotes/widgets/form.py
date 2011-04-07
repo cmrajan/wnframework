@@ -77,9 +77,8 @@ def add_comment():
 	import time
 	args = webnotes.form_dict
 
-	if(args['comment']):
+	if args.get('comment'):
 		from webnotes.model.doc import Document
-		from webnotes.model.code import get_obj
 		from webnotes.utils import nowdate
 		
 		cmt = Document('Comment Widget Record')
@@ -88,11 +87,7 @@ def add_comment():
 		cmt.comment_date = nowdate()
 		cmt.comment_time = time.strftime('%H:%M')
 		cmt.save(1)
-      
-		try:
-			get_obj('Feed Control').upate_comment_in_feed(args['comment_doctype'], args['comment_docname'])
-		except: pass
-			
+  			
 #===========================================================================================
 
 def remove_comment():
