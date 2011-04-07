@@ -233,7 +233,8 @@ SingleTag.prototype.make_body = function(parent) {
 	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: this.get_color(), 
 		color:'#FFF', marginRight:'4px', fontSize:'11px'});
 	$br(this.body,'3px');
-	if(this.taglist.onclick) $y(this.body, {cursor:'pointer'});
+	
+	if(this.taglist && this.taglist.onclick) $y(this.body, {cursor:'pointer'});
 	
 	// hover
 	$(this.body).hover(function() { $op(this,60); } ,function() { $op(this,100); });
@@ -266,7 +267,7 @@ SingleTag.prototype.make_remove_btn = function() {
 	var span = $a(this.body,'span');
 	span.innerHTML += ' |';
 	
-	var span = $a(this.body,'span');
+	var span = $a(this.body,'span','',{cursor:'pointer'});
 	span.innerHTML = ' x'
 	span.onclick = function() { me.remove(me); }
 }

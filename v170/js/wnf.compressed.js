@@ -676,10 +676,10 @@ p.picker=div;div.pickers.push(p);p.color_name=_tags.color_list[i];}
 return div;}
 function SingleTag(parent,label,dt,dn,fieldname,static,taglist){this.dt=dt;this.dn=dn;this.label=label;this.taglist=taglist;this.fieldname=fieldname;this.static=static;if(this.taglist&&!in_list(this.taglist.tag_list,label))
 this.taglist.tag_list.push(label);this.make_body(parent);}
-SingleTag.prototype.make_body=function(parent){var me=this;this.body=$a(parent,'span','',{padding:'2px 4px',backgroundColor:this.get_color(),color:'#FFF',marginRight:'4px',fontSize:'11px'});$br(this.body,'3px');if(this.taglist.onclick)$y(this.body,{cursor:'pointer'});$(this.body).hover(function(){$op(this,60);},function(){$op(this,100);});this.make_label();if(!this.static)this.make_remove_btn();_tags.all_tags.push(this);}
+SingleTag.prototype.make_body=function(parent){var me=this;this.body=$a(parent,'span','',{padding:'2px 4px',backgroundColor:this.get_color(),color:'#FFF',marginRight:'4px',fontSize:'11px'});$br(this.body,'3px');if(this.taglist&&this.taglist.onclick)$y(this.body,{cursor:'pointer'});$(this.body).hover(function(){$op(this,60);},function(){$op(this,100);});this.make_label();if(!this.static)this.make_remove_btn();_tags.all_tags.push(this);}
 SingleTag.prototype.get_color=function(){if(this.label=='Submitted')return'#459';else if(this.label=='Draft')return'#4A5';else return(_tags.color_map[this.label]?_tags.color_map[this.label]:_tags.colors['Default'])}
 SingleTag.prototype.refresh_color=function(){$y(this.body,{backgroundColor:this.get_color()});}
-SingleTag.prototype.make_remove_btn=function(){var me=this;var span=$a(this.body,'span');span.innerHTML+=' |';var span=$a(this.body,'span');span.innerHTML=' x'
+SingleTag.prototype.make_remove_btn=function(){var me=this;var span=$a(this.body,'span');span.innerHTML+=' |';var span=$a(this.body,'span','',{cursor:'pointer'});span.innerHTML=' x'
 span.onclick=function(){me.remove(me);}}
 SingleTag.prototype.make_label=function(){var me=this;this.label_span=$a(this.body,'span','',null,this.label);this.label_span.onclick=function(){if(me.taglist&&me.taglist.onclick)me.taglist.onclick(me);}}
 SingleTag.prototype.remove_tag_body=function(){$dh(this.body);var nl=[];for(var i in this.tag_list)
