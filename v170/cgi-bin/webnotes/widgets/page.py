@@ -15,8 +15,8 @@ class Page:
 		doclist = webnotes.model.doc.get('Page', self.name)
 		doc = doclist[0]
 
-		doc.script = None
 		doc.fields['__script'] = compress.get_page_js(doc)
+		doc.script = None
 
 		template = '%(content)s'
 		# load code from template

@@ -66,7 +66,7 @@ def get_page_js(page):
 	from webnotes.modules import scrub, get_module_path
 
 	code = get_js_code(os.path.join(get_module_path(page.module), 'page', scrub(page.name), scrub(page.name)))
-	
+		
 	if not code:
 		code = page.script
 	
