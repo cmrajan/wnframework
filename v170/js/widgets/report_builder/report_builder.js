@@ -949,8 +949,8 @@ _r.ReportFilters.prototype.add_numeric_field = function(cell, f, dt, is_custom) 
 // make a field object
 _r.ReportFilters.prototype.make_field_obj = function(f, dt, parent, is_custom) {
 	var tmp = make_field(f, dt, parent, this.rb, false);
-	tmp.not_in_form = true;
-	tmp.in_filter = true;
+	tmp.not_in_form = 1;
+	tmp.in_filter = 1;
 	tmp.refresh();
 	this.rb.filter_fields[this.rb.filter_fields.length] = tmp;
 	this.rb.filter_fields_dict[f.parent + '\1' + f.label] = tmp;

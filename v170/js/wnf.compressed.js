@@ -856,7 +856,8 @@ me.validate();me.set(me.txt.value);if(isIE&&me.in_grid){$dh(_f.cur_grid_cell.gri
 me.run_trigger();}}
 this.set_as_single=function(){var i=this.txt?this.txt:this.input;i.multiple=false;i.style.height=null;if(i.lab)$dh(i.lab)}
 this.refresh_options=function(options){if(options)
-me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];empty_select(this.input);add_sel_options(this.input,me.options_list);}
+me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];empty_select(this.input);if(me.in_filter&&me.options_list[0]!=''){me.options_list=add_lists([''],me.options_list);}
+add_sel_options(this.input,me.options_list);}
 this.onrefresh=function(){this.refresh_options();if(this.not_in_form){this.input.value='';return;}
 if(_f.get_value)
 var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);else{if(this.options_list&&this.options_list.length)

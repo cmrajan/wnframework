@@ -111,7 +111,7 @@ in_files_report = [
 	,'widgets/report_builder/calculator.js'
 ]
 
-out_file_report = 'report.compressed.js'
+out_file_report = 'js/report.compressed.js'
 
 in_files_css = [
 	'css/body.css',

@@ -956,6 +956,9 @@ SelectField.prototype.make_input = function() {
 		
 		// add options
 		empty_select(this.input);
+		if(me.in_filter && me.options_list[0]!='') {
+			me.options_list = add_lists([''], me.options_list);			
+		}
 		add_sel_options(this.input, me.options_list);
 		
 	}
