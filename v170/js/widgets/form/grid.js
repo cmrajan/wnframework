@@ -422,7 +422,7 @@ _f.Grid.prototype.set_data = function(data) {
 _f.Grid.prototype.set_ht = function(ridx, docname) {
 	var ht = ((cint(this.row_height) + 10) * (((this.tab && this.tab.rows) ? this.tab.rows.length : 0) + 1));
 	if(ht < 100)ht=100; 
-	//if(ht > cint(0.3 * screen.width))ht=cint(0.3 * screen.width);
+	if(ht > cint(0.3 * screen.width))ht=cint(0.3 * screen.width);
 	ht += 4;
 	$y(this.wrapper,{height:ht+'px'});
 }
