@@ -73,7 +73,7 @@ _p.PrintQuery.prototype.render = function(max_rows, page_len) {
 		var html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
 			+ '<html><head>'
 			+'<title>'+args.title+'</title>'
-			+'<style>'+_p.def_print_style+'</style>'
+			+'<style>'+_p.def_print_style_body + _p.def_print_style_other+'</style>'
 			+'</head><body>'
 			+ (r.header_html ? r.header_html : '')
 			+ tl.join('\n<div style="page-break-after: always;"></div>\n')

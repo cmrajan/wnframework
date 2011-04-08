@@ -10,7 +10,7 @@ if (iePos !=-1) {
 }
 var isIE = (iePos!=-1);
 var isIE6 = (isIE && is_major <= 6);
-var isIE7 = (isIE && is_minor >= 7);
+var isIE7 = (isIE && is_major >= 7);
 if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){ //test for Firefox/x.x or Firefox x.x (ignoring remaining digits);
 	var isFF = 1;
 	var ffversion=new Number(RegExp.$1) // capture x.x portion and store as a number
