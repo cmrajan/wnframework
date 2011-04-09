@@ -142,8 +142,9 @@ def load_single_doc(dt, dn, user, prefix):
 		return dl
 
 	try:
-		so = webnotes.model.code.get_server_obj(dl[0], dl)
-		r = webnotes.model.code.run_server_obj(so, 'onload')
+		so, r = webnotes.model.code.get_server_obj(dl[0], dl), None
+		if hasattr(so, 'onload'):
+			r = webnotes.model.code.run_server_obj(so, 'onload')
 		if hasattr(so, 'custom_onload'):
 			r = webnotes.model.code.run_server_obj(so, 'custom_onload')
 		if r: 
@@ -189,6 +190,7 @@ def runserverobj():
 	if dt: # not called from a doctype (from a page)
 		if not dn: dn = dt # single
 		so = webnotes.model.code.get_obj(dt, dn)
+
 	else:
 		clientlist = webnotes.model.doclist.expand(form.getvalue('docs'))
 

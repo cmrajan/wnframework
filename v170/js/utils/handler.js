@@ -105,7 +105,7 @@ function $c_obj(doclist, method, arg, call_back, no_spinner, freeze_msg) {
 	
 	if(typeof doclist=='string') args.doctype = doclist; 
 	else args.docs = compress_doclist(doclist)
-			
+
 	// single
 	$c('runserverobj',args, call_back, null, no_spinner, freeze_msg);	
 }

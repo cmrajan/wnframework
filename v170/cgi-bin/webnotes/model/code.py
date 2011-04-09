@@ -114,7 +114,7 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 	if dt:
 		import webnotes.model.doc
-	
+		
 		if not dn:
 			dn = dt
 		if with_children:
@@ -135,6 +135,8 @@ def run_server_obj(server_obj, method_name, arg=None):
 			return getattr(server_obj, method_name)(arg)
 		else:
 			return getattr(server_obj, method_name)()
+	else:
+		raise Exception, 'No method %s' % method_name
 
 #=================================================================================
 # deprecated methods to keep v160 apps happy
