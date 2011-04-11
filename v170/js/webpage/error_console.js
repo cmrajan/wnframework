@@ -26,11 +26,12 @@ function setup_err_console() {
 	var span = $a(err_console.widgets['Error Report'], 'span', 'link_type');
 	span.innerHTML = 'Send Error Report';
 	span.onclick = function() {
+		msg = prompt('How / where did you get the error [optional]')
 		var call_back = function(r, rt){
 			err_console.hide();
 			msgprint("Error Report Sent")
 		}
-		$c('webnotes.utils.send_error_report', {'err_msg': err_console.rows['Error List'].innerHTML}, call_back);
+		$c('webnotes.utils.send_error_report', {'err_msg': err_console.rows['Error List'].innerHTML, 'msg': msg}, call_back);
 	}
 	err_console.widgets['Clear'].onclick = function() {
 		err_list = [];
