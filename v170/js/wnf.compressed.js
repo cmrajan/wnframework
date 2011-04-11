@@ -755,7 +755,7 @@ if(in_list(['Data','Text','Small Text','Code'],this.df.fieldtype))
 val=clean_smart_quotes(val);var set_val=val;if(this.validate)set_val=this.validate(val);_f.set_value(this.doctype,this.docname,this.df.fieldname,set_val);this.value=val;}
 Field.prototype.set_input=function(val){this.value=val;if(this.input&&this.input.set_input){if(val==null)this.input.set_input('');else this.input.set_input(val);}
 var disp_val=val;if(val==null)disp_val='';this.set_disp(disp_val);}
-Field.prototype.run_trigger=function(){if(this.df.reqd&&!is_null(this.get_value()))
+Field.prototype.run_trigger=function(){if(this.df.reqd&&!is_null(this.get_value())&&this.set_as_error)
 this.set_as_error(0);this.refresh_label_icon();if(this.not_in_form){return;}
 if(cur_frm.cscript[this.df.fieldname])
 cur_frm.runclientscript(this.df.fieldname,this.doctype,this.docname);cur_frm.refresh_dependency();}

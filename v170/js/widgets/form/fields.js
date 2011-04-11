@@ -289,7 +289,7 @@ Field.prototype.set_input = function(val) {
 }
 
 Field.prototype.run_trigger = function() {
-	if(this.df.reqd && !is_null(this.get_value()))
+	if(this.df.reqd && !is_null(this.get_value()) && this.set_as_error)
 		this.set_as_error(0);
 	
 	// update mandatory icon
