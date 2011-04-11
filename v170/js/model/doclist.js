@@ -112,7 +112,7 @@ function check_required(dt, dn) {
 		var key = fl[i].fieldname;
 		var v = doc[key];
 				
-		if(fl[i].reqd && is_null(v)) {
+		if(fl[i].reqd && is_null(v) && fl[i].fieldname) {
 			errfld[errfld.length] = fl[i].label;
 			
 			// Bring to front "Section"
