@@ -236,7 +236,6 @@ _p.build = function(fmtname, onload, no_letterhead, only_body) {
 _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 	var block = document.createElement('div');
 	var tmp_html = '';
-	block.innerHTML = body;
 	
 	if(doc && cint(doc.docstatus)==0 && cur_frm.perm[0][SUBMIT])  {
 		var tmp_html = '<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">DRAFT</div>This box will go away after the document is submitted.</div>';
@@ -246,6 +245,8 @@ _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 	}
 
 	style = (only_body ? '' : _p.def_print_style_body) + _p.def_print_style_other + style;
+	
+	block.innerHTML = body;
 
 	// run embedded javascript
 	var jslist = block.getElementsByTagName('script');
@@ -260,14 +261,15 @@ _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 		}
 		jslist = block.getElementsByTagName('script');
 	}
+		
 	if(only_body) {
 		return tmp_html + block.innerHTML.replace(/<td/g, '\n<td').replace(/<div/g, '\n<div');
 		
 	} else {
+		// print block
 		return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 			+ '<html><head>'
 			+ '<title>'+title+'</title>'
-			+ '<style>'+style+'</style>'
 			+ '</head><body>'
 			+ tmp_html
 			+ block.innerHTML.replace(/<td/g, '\n<td')

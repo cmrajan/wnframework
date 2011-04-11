@@ -44,9 +44,20 @@ class DocType:
 			if used_in:
 				msgprint('<b>Series already in use:</b> The series "%s" is already used in "%s"' % (prefix, used_in[0][0]), raise_exception=1)
 
+	#
+	# field validations
+	#
+	def validate_fields(self):
+		"validates fields for incorrect properties"
+		for d in self.doclist:
+			if d.parent and d.fieldtype:
+				if d.fieldtype in ('HTML', 'Button', 'Section Break', 'Column Break') and d.reqd:
+					webnotes.msgprint('%(lable)s [%(fieldtype)s] cannot be mandatory', raise_exception=1)
+		
 	def validate(self):
 		self.validate_series()
 		self.scrub_field_names()
+		self.validate_fields()
 		self.set_version()
 
 	def on_update(self):

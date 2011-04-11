@@ -148,9 +148,9 @@ _p.def_print_style_other = "\n.simpletable, .noborder { border-collapse: collaps
 	+"\n.noborder td { vertical-align: top; }"
 
 _p.go = function(html) {
-	var w = window.open('');
-	w.document.write(html);
-	w.document.close();
+	var d = document.createElement('div')
+	d.innerHTML = html
+	$(d).printElement();
 }
 
 // setup calendar
