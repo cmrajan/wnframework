@@ -121,7 +121,7 @@ function check_required(dt, dn) {
 				var f = cur_frm.fields_dict[fl[i].fieldname];
 				if(f) {
 					// in form
-					f.set_as_error(1);
+					if(f.set_as_error) f.set_as_error(1);
 					
 					// switch to section
 					if(!cur_frm.error_in_section && f.parent_section) {
