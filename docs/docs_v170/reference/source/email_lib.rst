@@ -1,16 +1,14 @@
 :mod:`email_lib` --- Email
 ==========================
 
-.. module:: email_lib
+.. automodule:: webnotes.utils.email_lib
    :synopsis: Email library
 
 Email object
 ------------
 
-.. class:: Email(self, sender='', recipients=[], subject='')
+.. autoclass:: EMail
    
-   Wrapper on the email module. Email object represents emails to be sent to the client. 
-   Also provides a clean way to add binary `FileData` attachments
       
    .. attribute:: sender
    
@@ -36,33 +34,22 @@ Email object
    
       `list` of cc email ids
 
-   .. method:: set_message(message, mime_type='text/html')
+   .. automethod:: set_message
    
-      append the message with MIME content
-		
-   .. method:: attach(file_id)
+   .. automethod:: attach
 
-      attach a file from the `FileData` table
-	
-   .. method:: validate()
+   .. automethod:: validate
    
-      validate the email ids
-
-   .. method:: setup()
+   .. automethod:: setup
    
-      setup the SMTP (outgoing) server from `Control Panel` or defs.py
-	
-   .. method:: send()
+   .. automethod:: send
    
-      send the message
 
 .. method:: validate_email_add(email_id)
    
    Validate the email id
    
-.. method:: sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[])
-
-   Short cut to method to send an email
+.. automethod:: webnotes.utils.email_lib.sendmail
 
 Example
 -------

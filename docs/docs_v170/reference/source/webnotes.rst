@@ -1,60 +1,36 @@
 :mod:`webnotes` --- Webnotes Module
 ===================================
 
-.. module:: webnotes
+.. automodule:: webnotes
+   :members:	
    :synopsis: Global objects that are used to generate the HTTP response
 
 Global Attributes
 -----------------
 
-.. data:: version
+.. autodata:: version
 
-   'v170'
+.. autodata:: conn
 
-.. data:: conn
+.. autodata:: form
 
-   The database connection :class:`webnotes.db.Database` setup by :mod:`auth`
+.. autodata:: session
 
-.. data:: form
+.. autodata:: is_testing
 
-   The cgi.FieldStorage() object (Dictionary representing the formdata from the URL)
+.. autodata:: add_cookies
 
-.. data:: session
+.. autodata:: response
 
-   Global session dictionary.
+.. autodata:: debug_log
 
-   * session['user'] - Current user   
-   * session['data'] - Returns a dictionary of the session cache
-
-.. data:: is_testing
-
-   Flag to identify if system is in :term:`Testing Mode`
-      
-.. data:: add_cookies
-
-   Dictionary of additional cookies appended by custom code
-
-.. data:: response
-
-   The JSON response object. Default is::
-   
-   {'message':'', 'exc':''}
-
-.. data:: debug_log
-
-   List of exceptions to be shown in the :term:`Error Console`
-
-.. data:: message_log
-
-   List of messages to be shown to the user in a popup box at the end of the request
+.. autodata:: message_log
 
 Global Functions
 ----------------
 
-.. function:: errprint(msg)
+.. autofunction:: errprint(msg)
 
-   Append to the :data:`debug log`
-   
-.. function:: msgprint(msg)
+.. autofunction:: msgprint(msg)
 
-   Append to the :data:`message_log`
+

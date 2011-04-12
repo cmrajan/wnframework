@@ -1,107 +1,59 @@
 :mod:`utils` --- Utilities Module
 =================================
 
-.. module:: utils
+.. automodule:: webnotes.utils
    :synopsis: Utility functions
 
 Date and Time Functions
 -----------------------
 
-.. data:: user_format
+.. autodata:: user_format
 
-   User format specified in :term:`Control Panel`
-   
-   Examples:
-   
-   * dd-mm-yyyy
-   * mm-dd-yyyy
-   * dd/mm/yyyy
-   
-.. function:: getdate(string_date)
+.. autofunction:: webnotes.utils.getdate
 
-   Coverts string date (yyyy-mm-dd) to datetime.date object
+.. autofunction:: webnotes.utils.add_days
 
-.. function:: add_days(string_date, days)
+.. autofunction:: webnotes.utils.now
 
-   Adds `days` to the given `string_date`
+.. autofunction:: webnotes.utils.nowdate 
 
-.. function:: now()
+.. autofunction:: webnotes.utils.get_first_day
 
-   Returns `time.strftime('%Y-%m-%d %H:%M:%S')`
-	
-.. function:: nowdate()
+.. autofunction:: webnotes.utils.get_last_day
 
-   Returns time.strftime('%Y-%m-%d')
-
-.. function:: get_first_day(date, d_years=0, d_months=0)
-
-   Returns the first day of the month for the date specified by date object
-   Also adds `d_years` and `d_months` if specified
-
-
-.. function:: get_last_day(dt)
-
-   Returns last day of the month using:
-   `get_first_day(dt, 0, 1) + datetime.timedelta(-1)`
-
-.. function:: formatdate(dt)
-
-   Convers the given string date to :data:`user_format`
+.. autofunction:: webnotes.utils.formatdate 
 
 
 Datatype Conversions
 --------------------
 
-.. function:: dict_to_str(args, sep='&')
+.. autofunction:: webnotes.utils.dict_to_str
 
-   Converts a dictionary to URL
+.. autofunction:: webnotes.utils.isNull
 
-.. function:: isNull(v)
+.. autofunction:: webnotes.utils.has_common
 
-   Returns true if v='' or v is `None`
+.. autofunction:: webnotes.utils.flt
 
-.. function:: has_common(l1, l2)
+.. autofunction:: webnotes.utils.cint
 
-   Returns true if there are common elements in lists l1 and l2
+.. autofunction:: webnotes.utils.cstr
 
-.. function:: flt(s)
+.. autofunction:: webnotes.utils.str_esc_quote
 
-   Convert to float (ignore commas)
+.. autofunction:: webnotes.utils.replace_newlines
 
-.. function:: cint(s)
+.. autofunction:: webnotes.utils.parse_val
 
-   Convert to integer
-
-.. function:: cstr(s)
-
-   Convert to string
-		
-.. function:: str_esc_quote(s)
-
-   Escape quotes
-
-.. function:: replace_newlines(s)
-
-   Replace newlines by '<br>'
-
-.. function:: parse_val(v)
-
-   Converts to simple datatypes from SQL query results
+.. autofunction:: webnotes.utils.fmt_money
    
-.. function:: fmt_money(amount, fmt = '%.2f')
-
-   Convert to string with commas for thousands, millions etc
 	
 Defaults
 --------
 
-.. function:: get_defaults()
+.. autofunction:: webnotes.utils.get_defaults
 
-   Get dictionary of default values from the :term:`Control Panel`
-
-.. function:: set_default(key, val)
-
-   Set / add a default value to :term:`Control Panel`
+.. autofunction:: webnotes.utils.set_default
 
 
 File (BLOB) Functions
@@ -115,28 +67,17 @@ File (BLOB) Functions
 Email Functions
 ---------------
 
-.. function:: validate_email_add(email_str)
+.. autofunction:: validate_email_add 
 
-   Validates the email string
-   
-.. function:: sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[])
+.. autofunction:: sendmail
 
-   Send an email. For more details see :func:`email_lib.sendmail`
 
 Other Functions
 ---------------
 
-.. function:: getCSVelement(v)
+.. autofunction:: getCSVelement 
 
-   Returns the CSV value of `v`, For example: 
-   
-   * apple becomes "apple"
-   * hi"there becomes "hi""there"
+.. autofunction:: generate_hash
 
-.. function:: generate_hash()
+.. autofunction:: getTraceback 
 
-   Generates reandom hash for session id
-
-.. function:: getTraceback()
-
-   Returns the traceback of the Exception

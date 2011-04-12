@@ -1,19 +1,12 @@
 :mod:`db_schema` --- Database Schema Management Module
 ======================================================
 
-.. module:: db_schema
+.. automodule:: webnotes.model.db_schema
+   :members:	
    :synopsis: Database Schema Management Module
 
-Syncs a database table to the `DocType` (metadata)
-*Note* This module is only used internally
+.. automethod:: webnotes.model.db_schema.updatedb
 
-.. method:: updatedb(dt)
-
-   Syncs a `DocType` to the table
-   * creates if required
-   * updates columns
-   * updates indices
-   
 .. method:: getcoldef(ftype, length='')
 
    converts the user defined field types (ftype) to database fieldtypes

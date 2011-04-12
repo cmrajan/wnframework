@@ -1,50 +1,25 @@
 :mod:`doclist` --- Doclist Module
 =================================
 
-.. module:: doclist
+.. module:: webnotes.model.doclist
    :synopsis: Collection of functions that are used on a list of Document objects (doclist)
 
-.. function:: getlist(doclist, field)
+.. autofunction:: getlist
 
-   Filter a list of records for a specific field from the full doclist
-   
-   Example::
-   
-     # find all phone call details     
-     dl = getlist(self.doclist, 'contact_updates')
-     pl = []
-     for d in dl:
-       if d.type=='Phone':
-         pl.append(d)
+.. autofunction:: copy_doclist
 
-.. function:: copy(doclist, no_copy = [])
-
-      Save & return a copy of the given doclist
-      Pass fields that are not to be copied in `no_copy`
-
-.. function:: to_html(doclist)
-
-   Return a simple HTML format of the doclist
+.. autofunction:: to_html
 
 functions for internal use
 ---------------------------
 
-.. function:: expand(docs)
+.. autofunction:: expand
 
-   Expand a doclist sent from the client side. (Internally used by the request handler)
+.. autofunction:: compress
 
-.. function:: compress(doclist)
+.. autofunction:: validate_links_doclist 
 
-   Compress a doclist before sending it to the client side. (Internally used by the request handler)
-
-.. function:: validate_links_doclist(doclist)
-
-   Validate link fields and return link fields that are not correct.
-   Calls the `validate_links` function on the Document object
-	
-.. function:: getvaluelist(doclist, fieldname)
-
-   Returns a list of values of a particualr fieldname from all Document object in a doclist
+.. autofunction:: getvaluelist
 
 .. function:: getchildren(name, childtype, field='', parenttype='')
 	
