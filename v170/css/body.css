@@ -73,3 +73,16 @@ div.loading_div {
 div#head_div { background-color: #FFF; }
 
 #head_banner { background-color: #FFF; }
+
+.link_type {
+	padding:2px;
+	color: #00b;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.link_type:hover {
+	color: #fff !important; 
+	background-color: #07b;
+	text-decoration: none;
+}
