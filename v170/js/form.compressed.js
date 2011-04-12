@@ -100,7 +100,7 @@ parent.appendChild(this.wrapper);}}
 _f.Frm.prototype.refresh_print_layout=function(){$ds(this.print_wrapper);$dh(this.form_wrapper);var me=this;var print_callback=function(print_html){me.print_body.innerHTML=print_html;}
 if(cur_frm.doc.select_print_heading)
 cur_frm.set_print_heading(cur_frm.doc.select_print_heading)
-if(user!='Guest'){$di(this.view_btn_wrapper);if(cur_frm.doc.__archived||(!this.orig_perm[0][WRITE])){$dh(this.view_btn_wrapper);}}else{$dh(this.view_btn_wrapper);$dh(this.print_close_btn);}
+if(user!='Guest'){$di(this.view_btn_wrapper);if(cur_frm.doc.__archived){$dh(this.view_btn_wrapper);}}else{$dh(this.view_btn_wrapper);$dh(this.print_close_btn);}
 _p.build(this.default_format,print_callback,null,1);}
 _f.Frm.prototype.hide=function(){$dh(this.wrapper);this.display=0;hide_autosuggest();}
 _f.Frm.prototype.show_the_frm=function(){if(this.parent.last_displayed&&this.parent.last_displayed!=this){this.parent.last_displayed.defocus_rest();this.parent.last_displayed.hide();}

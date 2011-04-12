@@ -483,7 +483,7 @@ _f.Frm.prototype.refresh_print_layout = function() {
 		$di(this.view_btn_wrapper);
 
 		// archive
-		if(cur_frm.doc.__archived || (!this.orig_perm[0][WRITE])) {
+		if(cur_frm.doc.__archived) {
 			$dh(this.view_btn_wrapper);
 		}
 	} else {
