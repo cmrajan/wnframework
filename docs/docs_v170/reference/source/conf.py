@@ -12,17 +12,22 @@
 # serve to show the default.
 
 import sys, os
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.append(os.path.abspath('.'))
 
+##Change the below folder path to point to cgi-bin folder of wnframework
+sys.path.append('/var/www/wnf/wnframework/v170/cgi-bin')
+
 # -- General configuration -----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode'] 
+
+autodoc_member_order = 'bysource'
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -38,14 +43,14 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Web Notes Framework'
-copyright = u'2010, Rushabh Mehta'
+copyright = u'2011, Rushabh Mehta'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-# version = ''
+version = '1.7.0'
 # The full version, including alpha/beta/rc tags.
 # release = ''
 
