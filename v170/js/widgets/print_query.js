@@ -79,7 +79,7 @@ _p.PrintQuery.prototype.render = function(max_rows, page_len) {
 			+ tl.join('\n<div style="page-break-after: always;"></div>\n')
 			+ (r.footer_html ? r.footer_html : '')
 			+'</body></html>';
-		_p.go(html)    
+		_p.preview(html);
 	}
 	var out_args = copy_dict(args);
 	if(args.is_simple) {
