@@ -2,6 +2,12 @@ import webnotes
 import webnotes.utils
 
 class FrameworkServer:
+	"""
+	   Connect to a remote server via HTTP (webservice).
+	   
+	   * `remote_host` is the the address of the remote server
+	   * `path` is the path of the Framework (excluding index.cgi)
+	"""
 	def __init__(self, remote_host, path, user='', password='', account='', cookies=None, opts=None, https = 0):
 		# validate
 		if not (remote_host and path):
@@ -52,6 +58,9 @@ class FrameworkServer:
 	# -----------------------------------------------------------------------------------------
 
 	def http_get_response(self, method, args):
+		"""
+		Run a method on the remote server, with the given arguments
+		"""
 		# get response from remote server
 	
 		import urllib, urllib2, os
@@ -76,7 +85,11 @@ class FrameworkServer:
 
 	# -----------------------------------------------------------------------------------------
 
+
 	def runserverobj(self, doctype, docname, method, arg=''):
+		"""
+		Returns the response of a remote method called on a system object specified by `doctype` and `docname`
+		"""
 		res = self.http_get_response('runserverobj', args = {
 			'doctype':doctype
 			,'docname':docname

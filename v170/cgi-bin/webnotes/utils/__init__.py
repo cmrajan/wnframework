@@ -9,6 +9,12 @@ no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable'
 default_fields = ['doctype','name','owner','creation','modified','modified_by','parent','parentfield','parenttype','idx','docstatus']
 
 def getCSVelement(v):
+	"""
+	   Returns the CSV value of `v`, For example: 
+	   
+	   * apple becomes "apple"
+	   * hi"there becomes "hi""there"
+	"""
 	v = cstr(v)
 	if not v: return ''
 	if (',' in v) or ('\n' in v) or ('"' in v):
@@ -17,6 +23,9 @@ def getCSVelement(v):
 	else: return v or ''
 
 def validate_email_add(email_str):
+	"""
+	Validates the email string
+	"""
 	s = email_str
 	if '<' in s:
 		s = s.split('<')[1].split('>')[0]
@@ -26,10 +35,16 @@ def validate_email_add(email_str):
 	return re.match("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", s)
 
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[]):
+	"""
+	Send an email. For more details see :func:`email_lib.sendmail`
+	"""
 	import webnotes.utils.email_lib
 	return email_lib.sendmail(recipients, sender, msg, subject, parts, cc, attach)
 	
 def generate_hash():
+	"""
+	   Generates reandom hash for session id
+	"""
 	import sha, time
 	return sha.new(str(time.time())).hexdigest()
 
@@ -46,6 +61,9 @@ def load_json(arg):
 # ==============================================================================
 
 def getTraceback():
+	"""
+	   Returns the traceback of the Exception
+	"""
 	import sys, traceback, string
 	type, value, tb = sys.exc_info()
 	
@@ -69,6 +87,9 @@ def log(event, details):
 
 
 def getdate(string_date):
+	"""
+	   Coverts string date (yyyy-mm-dd) to datetime.date object
+	"""
 	import datetime
 
 	if type(string_date)==unicode:
@@ -86,6 +107,9 @@ def getdate(string_date):
 		return ''
 
 def add_days(date, days):
+	"""
+	   Adds `days` to the given `string_date`
+	"""
 	import datetime
 	if not date:
 		date = now_datetime()
@@ -123,12 +147,22 @@ def now_datetime():
 	return utcnow.astimezone(timezone(user_time_zone))
 
 def now():
+	"""
+	   Returns `time.strftime('%Y-%m-%d %H:%M:%S')`
+	"""
 	return now_datetime().strftime('%Y-%m-%d %H:%M:%S')
 	
 def nowdate():
+	"""
+	   Returns time.strftime('%Y-%m-%d')
+	"""
 	return now_datetime().strftime('%Y-%m-%d')
 
 def get_first_day(dt, d_years=0, d_months=0):
+	"""
+   Returns the first day of the month for the date specified by date object
+   Also adds `d_years` and `d_months` if specified
+	"""
 	import datetime
 	# d_years, d_months are "deltas" to apply to dt
 	y, m = dt.year + d_years, dt.month + d_months
@@ -136,12 +170,28 @@ def get_first_day(dt, d_years=0, d_months=0):
 	return datetime.date(y+a, m+1, 1)
 
 def get_last_day(dt):
+	"""
+   Returns last day of the month using:
+   `get_first_day(dt, 0, 1) + datetime.timedelta(-1)`
+	"""
 	import datetime
 	return get_first_day(dt, 0, 1) + datetime.timedelta(-1)
 
 user_format = None
+"""
+   User format specified in :term:`Control Panel`
+   
+   Examples:
+   
+   * dd-mm-yyyy
+   * mm-dd-yyyy
+   * dd/mm/yyyy
+"""
+
 def formatdate(string_date):
-	
+	"""
+   	Convers the given string date to :data:`user_format`
+	"""
 	global user_format
 	if not user_format:
 		user_format = webnotes.conn.get_value('Control Panel', None, 'date_format')
@@ -150,6 +200,9 @@ def formatdate(string_date):
 	return out.replace('dd', ('%.2i' % cint(d[2]))).replace('mm', ('%.2i' % cint(d[1]))).replace('yyyy', d[0])
 	
 def dict_to_str(args, sep='&'):
+	"""
+	Converts a dictionary to URL
+	"""
 	import urllib
 	t = []
 	for k in args.keys():
@@ -171,15 +224,24 @@ def global_date_format(date):
 # ==============================================================================
 
 def isNull(v):
+	"""
+	Returns true if v='' or v is `None`
+	"""
 	return (v=='' or v==None)
 	
 def has_common(l1, l2):
+	"""
+	Returns true if there are common elements in lists l1 and l2
+	"""
 	for l in l1:
 		if l in l2: 
 			return 1
 	return 0
 	
 def flt(s):
+	"""
+	Convert to float (ignore commas)
+	"""
 	if type(s)==str: # if string
 		s = s.replace(',','')
 	try: tmp = float(s)
@@ -187,19 +249,31 @@ def flt(s):
 	return tmp
 
 def cint(s):
+	"""
+	Convert to integer
+	"""
 	try: tmp = int(float(s))
 	except: tmp = 0
 	return tmp
 
 def cstr(s):
+	"""	
+	Convert to string
+	"""
 	if s==None: return ''
 	else: return str(s)
 		
 def str_esc_quote(s):
+	"""
+	Escape quotes
+	"""
 	if s==None:return ''
 	return s.replace("'","\'")
 
 def replace_newlines(s):
+	"""
+	Replace newlines by '<br>'
+	"""
 	if s==None:return ''
 	return s.replace("\n","<br>")
 
@@ -207,6 +281,9 @@ def replace_newlines(s):
 # ==============================================================================
 
 def parse_val(v):
+	"""
+	Converts to simple datatypes from SQL query results
+	"""
 	import datetime
 	
 	try: import decimal # for decimal Python 2.5 (?)
@@ -229,6 +306,9 @@ def parse_val(v):
 # ==============================================================================
 
 def fmt_money(amount, fmt = '%.2f'):
+	"""
+	Convert to string with commas for thousands, millions etc
+	"""
 	curr = webnotes.conn.get_value('Control Panel', None, 'currency_format') or 'Millions'
 
 	val = 2
@@ -264,6 +344,9 @@ def fmt_money(amount, fmt = '%.2f'):
 # ==============================================================================
 
 def get_defaults():
+	"""
+	Get dictionary of default values from the :term:`Control Panel`
+	"""
 	res = webnotes.conn.sql('select defkey, defvalue from `tabDefaultValue` where parent = "Control Panel"')
 
 	d = {}
@@ -272,6 +355,9 @@ def get_defaults():
 	return d
 
 def set_default(key, val):
+	"""
+	Set / add a default value to :term:`Control Panel`
+	"""
 	res = webnotes.conn.sql('select defkey from `tabDefaultValue` where defkey="%s" and parent = "Control Panel"' % key)
 	if res:
 		webnotes.conn.sql('update `tabDefaultValue` set defvalue="%s" where parent = "Control Panel" and defkey="%s"' % (val, key))

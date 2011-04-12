@@ -22,10 +22,38 @@ class SuperDocType:
 
 class Document:
 	"""
-	The wn(meta-data)framework equivalent of a Database Record.
-	Stores,Retrieves,Updates the record in the corresponding table.
-	Runs the triggers required.
-	
+	   The wn(meta-data)framework equivalent of a Database Record.
+	   Stores,Retrieves,Updates the record in the corresponding table.
+	   Runs the triggers required.
+
+	   The `Document` class represents the basic Object-Relational Mapper (ORM). The object type is defined by
+	   `DocType` and the object ID is represented by `name`:: 
+	   
+	      Please note the anamoly in the Web Notes Framework that `ID` is always called as `name`
+
+	   If both `doctype` and `name` are specified in the constructor, then the object is loaded from the database.
+	   If only `doctype` is given, then the object is not loaded
+	   If `fielddata` is specfied, then the object is created from the given dictionary.
+	       
+	      **Note 1:**
+	      
+		 The getter and setter of the object are overloaded to map to the fields of the object that
+		 are loaded when it is instantiated.
+	       
+		 For example: doc.name will be the `name` field and doc.owner will be the `owner` field
+
+	      **Note 2 - Standard Fields:**
+	      
+		 * `name`: ID / primary key
+		 * `owner`: creator of the record
+		 * `creation`: datetime of creation
+		 * `modified`: datetime of last modification
+		 * `modified_by` : last updating user
+		 * `docstatus` : Status 0 - Saved, 1 - Submitted, 2- Cancelled
+		 * `parent` : if child (table) record, this represents the parent record
+		 * `parenttype` : type of parent record (if any)
+		 * `parentfield` : table fieldname of parent record (if any)
+		 * `idx` : Index (sequence) of the child record	
 	"""
 	
 	def __init__(self, doctype = '', name = '', fielddata = {}, prefix='tab'):
@@ -311,7 +339,15 @@ class Document:
 	# Save values
 	# ---------------------------------------------------------------------------
 	
-	def save(self, new=0, check_links=1, ignore_fields=0, make_autoname = 1):	
+	def save(self, new=0, check_links=1, ignore_fields=0, make_autoname = 1):
+		"""
+	      Saves the current record in the database. If new = 1, creates a new instance of the record.
+	      Also clears temperory fields starting with `__`
+	      
+	      * if check_links is set, it validates all `Link` fields
+	      * if ignore_fields is sets, it does not throw an exception for any field that does not exist in the 
+		database table
+		"""	
 		res = webnotes.model.meta.get_dt_values(self.doctype, 'autoname, issingle, istable, name_case', as_dict=1)
 		res = res and res[0] or {}
 
@@ -397,6 +433,9 @@ class Document:
 	# ---------------------------------------------------------------------------
 
 	def clear_table(self, doclist, tablefield, save=0):
+		"""
+		Clears the child records from the given `doclist` for a particular `tablefield`
+		"""
 		import webnotes.model.doclist
 		
 		for d in webnotes.model.doclist.getlist(doclist, tablefield):
@@ -408,6 +447,12 @@ class Document:
 		self.fields['__unsaved'] = 1
 
 	def addchild(self, fieldname, childtype = '', local=0, doclist=None):
+		"""
+	      Returns a child record of the give `childtype`.
+	      
+	      * if local is set, it does not save the record
+	      * if doclist is passed, it append the record to the doclist
+		"""
 		if not childtype:
 			childtype = db_getchildtype(self.doctype, fieldname)
 	
@@ -431,12 +476,26 @@ class Document:
 		return d
 
 def addchild(parent, fieldname, childtype = '', local=0, doclist=None):
+	"""
+	
+   Create a child record to the parent doc.
+   
+   Example::
+   
+     c = Document('Contact','ABC')
+     d = addchild(c, 'contact_updates', 'Contact Update', local = 1)
+     d.last_updated = 'Phone call'
+     d.save(1)
+	"""
 	return parent.addchild(fieldname, childtype, local, doclist)
 
 # Remove Child
 # ------------
 
 def removechild(d, is_local = 0):
+	"""
+	   Sets the docstatus of the object d to 2 (deleted) and appends an 'old_parent:' to the parent name
+	"""
 	if not is_local:
 		set(d, 'docstatus', 2)
 		set(d, 'parent', 'old_parent:' + d.parent)
@@ -447,6 +506,22 @@ def removechild(d, is_local = 0):
 # Naming
 # ------
 def make_autoname(key, doctype=''):
+	"""
+   Creates an autoname from the given key:
+   
+   **Autoname rules:**
+      
+         * The key is separated by '.'
+         * '####' represents a series. The string before this part becomes the prefix:
+            Example: ABC.#### creates a series ABC0001, ABC0002 etc
+         * 'MM' represents the current month
+         * 'YY' and 'YYYY' represent the current year
+   
+   *Example:*
+   
+         * DE/./.YY./.MM./.##### will create a series like
+           DE/09/01/0001 where 09 is the year, 01 is the month and 0001 is the series
+	"""
 	n = ''
 	l = key.split('.')
 	for e in l:
@@ -546,6 +621,9 @@ def get_report_builder_code(doc):
 # ---------------------------------------------------------------------
 
 def get(dt, dn='', with_children = 1, from_get_obj = 0, prefix = 'tab'):
+	"""
+	Returns a doclist containing the main record and all child records
+	"""	
 	import webnotes 
 	import webnotes.model
 	import webnotes.defs

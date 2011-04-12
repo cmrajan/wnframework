@@ -1,3 +1,16 @@
+"""
+This is where all the plug-in code is executed. The standard method for DocTypes is declaration of a 
+standardized `DocType` class that has the methods of any DocType. When an object is instantiated using the
+`get_obj` method, it creates an instance of the `DocType` class of that particular DocType and sets the 
+`doc` and `doclist` attributes that represent the fields (properties) of that record.
+
+methods in following modules are imported for backward compatibility
+
+	* webnotes.*
+	* webnotes.utils.*
+	* webnotes.model.doc.*
+	* webnotes.model.doclist.*
+"""
 custom_class = '''
 # Please edit this list and import only required elements
 import webnotes
@@ -28,7 +41,9 @@ class CustomDocType(DocType):
 #=================================================================================
 
 def execute(code, doc=None, doclist=[]):
-
+	"""
+	Execute the code, if doc is given, then return the instance of the `DocType` class created
+	"""
 	# functions used in server script of DocTypes
 	# --------------------------------------------------	
 	from webnotes.utils import add_days, add_months, add_years, cint, cstr, date_diff, default_fields, flt, fmt_money, formatdate, generate_hash, getTraceback, get_defaults, get_first_day, get_last_day, getdate, has_common, month_name, now, nowdate, replace_newlines, sendmail, set_default, str_esc_quote, user_format, validate_email_add
@@ -47,7 +62,6 @@ def execute(code, doc=None, doclist=[]):
 	if webnotes.user:
 		get_roles = webnotes.user.get_roles
 	locals().update({'get_obj':get_obj, 'get_server_obj':get_server_obj, 'run_server_obj':run_server_obj, 'updatedb':updatedb, 'check_syntax':check_syntax})
-		
 	version = 'v170'
 	NEWLINE = '\n'
 	BACKSLASH = '\\'
@@ -73,7 +87,9 @@ def execute(code, doc=None, doclist=[]):
 #=================================================================================
 
 def get_server_obj(doc, doclist = [], basedoctype = ''):
-
+	"""
+	Returns the instantiated `DocType` object. Will also manage caching & compiling
+	"""
 	# for test
 	import webnotes
 	
@@ -112,6 +128,10 @@ def get_server_obj(doc, doclist = [], basedoctype = ''):
 #=================================================================================
 
 def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
+	"""
+	   Returns the instantiated `DocType` object. Here you can pass the DocType and name (ID) to get the object.
+	   If with_children is true, then all child records will be laoded and added in the doclist.
+	"""	
 	if dt:
 		import webnotes.model.doc
 		
@@ -130,6 +150,9 @@ def get_obj(dt = None, dn = None, doc=None, doclist=[], with_children = 0):
 #=================================================================================
 
 def run_server_obj(server_obj, method_name, arg=None):
+	"""
+	   Executes a method (`method_name`) from the given object (`server_obj`)
+	"""
 	if server_obj and hasattr(server_obj, method_name):
 		if arg:
 			return getattr(server_obj, method_name)(arg)

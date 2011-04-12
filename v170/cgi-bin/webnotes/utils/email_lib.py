@@ -8,6 +8,10 @@ import webnotes.defs
 from webnotes import msgprint
 
 class EMail:
+	"""
+	Wrapper on the email module. Email object represents emails to be sent to the client. 
+	Also provides a clean way to add binary `FileData` attachments
+	"""
 	def __init__(self, sender='', recipients=[], subject='', from_defs=0, alternative=0):
 		from email.mime.multipart import MIMEMultipart
 		if type(recipients)==str:
@@ -23,13 +27,20 @@ class EMail:
 		self.cc = []
 		
 	def set_message(self, message, mime_type='text/html'):
+		"""
+		Append the message with MIME content
+		"""
 		from email.mime.text import MIMEText
 		
 		maintype, subtype = mime_type.split('/')
+		#: message object `email.mime.multipart.MIMEMultipart`
 		msg = MIMEText(message, _subtype = subtype)
 		self.msg.attach(msg)
 		
 	def attach(self, n):
+		"""
+		attach a file from the `FileData` table
+		"""
 		from webnotes.utils.file_manager import get_file		
 		res = get_file(n)
 		if not res:
@@ -70,6 +81,9 @@ class EMail:
 		self.msg.attach(msg)
 	
 	def validate(self):
+		"""
+		validate the email ids
+		"""
 		if not self.sender:
 			self.sender = webnotes.conn.get_value('Control Panel',None,'auto_email_id')
 
@@ -86,6 +100,9 @@ class EMail:
 				raise Exception, "%s is not a valid email id" % e	
 	
 	def setup(self):
+		"""
+		setup the SMTP (outgoing) server from `Control Panel` or defs.py
+		"""
 		if self.from_defs:
 			self.server = getattr(webnotes.defs,'mail_server','')
 			self.login = getattr(webnotes.defs,'mail_login','')
@@ -129,6 +146,9 @@ class EMail:
 		q.close()
 
 	def send(self, send_now = 0):
+		"""		
+		send the message
+		"""
 		from webnotes.utils import cint
 		
 		self.setup()
@@ -269,7 +289,9 @@ def make_html_body(content, template = ''):
 # ===========================================
 
 def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc=[], attach=[], send_now=0):
-	
+	"""
+	Short cut to method to send an email
+	"""
 	email = EMail(sender, recipients, subject)
 	email.cc = cc
 		

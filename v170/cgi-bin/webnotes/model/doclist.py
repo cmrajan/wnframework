@@ -9,6 +9,9 @@ def xzip(a,b):
 	return d
 	
 def expand(docs):
+	"""
+   Expand a doclist sent from the client side. (Internally used by the request handler)
+	"""
 	import string
 	try:
 		import json
@@ -23,6 +26,10 @@ def expand(docs):
 	return clist
 
 def compress(doclist):
+	"""
+	   Compress a doclist before sending it to the client side. (Internally used by the request handler)
+
+	"""	
 	if doclist and hasattr(doclist[0],'fields'):
 		docs = [d.fields for d in doclist]
 	else:
@@ -61,6 +68,19 @@ def compress(doclist):
 # ---------------------------------------
 
 def getlist(doclist, field):
+	"""
+   Filter a list of records for a specific field from the full doclist
+   
+   Example::
+   
+     # find all phone call details     
+     dl = getlist(self.doclist, 'contact_updates')
+     pl = []
+     for d in dl:
+       if d.type=='Phone':
+         pl.append(d)
+	"""
+	
 	l = []
 	for d in doclist:
 		if d.parent and (not d.parent.lower().startswith('old_parent:')) and d.parentfield == field:
@@ -71,6 +91,10 @@ def getlist(doclist, field):
 # ------------
 
 def copy_doclist(doclist, no_copy = []):
+	"""
+      Save & return a copy of the given doclist
+      Pass fields that are not to be copied in `no_copy`
+	"""
 	from webnotes.model.doc import Document
 	
 	cl = []
@@ -110,6 +134,10 @@ def copy_doclist(doclist, no_copy = []):
 # -----------------------
 
 def validate_links_doclist(doclist):
+	"""
+	Validate link fields and return link fields that are not correct.
+	Calls the `validate_links` function on the Document object
+	"""
 	ref, err_list = {}, []
 	for d in doclist:
 		if not ref.get(d.doctype):
@@ -122,6 +150,9 @@ def validate_links_doclist(doclist):
 # ------------------------
 
 def getvaluelist(doclist, fieldname):
+	"""
+   Returns a list of values of a particualr fieldname from all Document object in a doclist
+	"""
 	l = []
 	for d in doclist:
 		l.append(d.fields[fieldname])
@@ -148,6 +179,9 @@ def _make_html(doc, link_list):
 	return out
 
 def to_html(doclist):
+	"""
+Return a simple HTML format of the doclist
+	"""
 	out = ''
 	link_lists = {}
 	

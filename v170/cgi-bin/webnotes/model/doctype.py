@@ -1,19 +1,19 @@
-# DocType module
-# 
-# This module has the DocType class that represents a "DocType" as metadata
-# This is usually called by the form builder or report builder
-#
-# Key functions:
-#	- manage cache - read / write
-#	- merge client-side scripts
-#	- compile server-side code
-#	- call updation of database schema
-#
-# Cache management:
-#	- Cache is stored in __DocTypeCache
-#
-# =================================================================
+"""
+ DocType module
+ ==============
+ 
+ This module has the DocType class that represents a "DocType" as metadata.
+ This is usually called by the form builder or report builder.
 
+ Key functions:
+	* manage cache - read / write
+	* merge client-side scripts
+	* compile server-side code
+	* call updation of database schema
+
+ Cache management:
+	* Cache is stored in __DocTypeCache
+"""
 
 import webnotes
 import webnotes.model
@@ -23,6 +23,9 @@ import webnotes.model.doc
 from webnotes.utils import cstr
 
 class _DocType:
+	"""
+	   The _DocType object is created internally using the module's `get` method.
+	"""
 	def __init__(self, name):
 		self.name = name
 	
@@ -30,6 +33,13 @@ class _DocType:
 	# =================================================================
 	
 	def is_modified(self):
+		"""
+		      returns 3 objects:
+		      
+		      * last modified date of the `DocType`
+		      * whether the doctypes is modified after it was cached
+		      * last modified date of the `DocType` from the cache
+		"""		
 		try:
 			# doctype modified
 			modified = webnotes.conn.sql("select modified from tabDocType where name=%s", self.name)[0][0]
@@ -111,6 +121,15 @@ class _DocType:
 	# =================================================================
 
 	def make_doclist(self):
+		"""
+		      returns the :term:`doclist` for consumption by the client
+		      
+		      * it cleans up the server code
+		      * executes all `$import` tags in client code
+		      * replaces `link:` in the `Select` fields
+		      * loads all related `Search Criteria`
+		      * updates the cache
+		"""
 		from webnotes.modules import compress
 		
 		tablefields = webnotes.model.meta.get_table_fields(self.name)
@@ -139,6 +158,9 @@ def clear_cache():
 #=================================================================================================
 
 def get(dt):
+	"""
+	Load "DocType" - called by form builder, report buider and from code.py (when there is no cache)
+	"""
 	doclist = _DocType(dt).make_doclist()
 		
 	return doclist
