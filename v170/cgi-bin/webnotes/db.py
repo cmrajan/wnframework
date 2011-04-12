@@ -13,7 +13,7 @@ class Database:
 	"""
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
-		self.user = user or defs.default_db_name
+		self.user = user or getattr(defs, 'default_db_name', '')
 		self.password = password or getattr(defs, 'db_password', '')
 
 		if ac_name:
