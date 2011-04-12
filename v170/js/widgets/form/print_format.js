@@ -10,7 +10,18 @@ _p.make_dialog = function() {
 	d.make_body(
 		[['HTML','Select']
 		,['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats']
-		,['Button','Go', function() { _p.build(sel_val(cur_frm.print_sel), _p.go, d.widgets['No Letterhead'].checked); }]]);
+		,['HTML', 'Buttons']
+		]);
+	
+	// prints
+	$btn(d.widgets.Buttons, 'Print', 
+		function() { _p.build(sel_val(cur_frm.print_sel), _p.go, d.widgets['No Letterhead'].checked); },
+		{cssFloat:'right', marginBottom:'16px', marginLeft:'7px'}, 'green');
+
+	// preview
+	$btn(d.widgets.Buttons, 'Preview', 
+		function() { _p.build(sel_val(cur_frm.print_sel), _p.preview, d.widgets['No Letterhead'].checked); },
+		{cssFloat:'right', marginBottom:'16px'}, '');
 	
 	_p.dialog = d;
 	d.onshow = function() {
@@ -270,6 +281,7 @@ _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 		return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 			+ '<html><head>'
 			+ '<title>'+title+'</title>'
+			+ '<style>'+style+'</style>'
 			+ '</head><body>'
 			+ tmp_html
 			+ block.innerHTML.replace(/<td/g, '\n<td')

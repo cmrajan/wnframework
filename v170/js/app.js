@@ -153,6 +153,12 @@ _p.go = function(html) {
 	$(d).printElement();
 }
 
+_p.preview = function(html) {
+	var w = window.open('');
+	w.document.write(html)
+	w.document.close();
+}
+
 // setup calendar
 function setup_calendar() {
 

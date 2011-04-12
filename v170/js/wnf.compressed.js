@@ -1376,6 +1376,8 @@ _p.def_print_style_other="\n.simpletable, .noborder { border-collapse: collapse;
 _p.go=function(html){var d=document.createElement('div')
 d.innerHTML=html
 $(d).printElement();}
+_p.preview=function(html){var w=window.open('');w.document.write(html)
+w.document.close();}
 function setup_calendar(){var p=new Page('_calendar');p.wrapper.style.height='100%';p.wrapper.onshow=function(){if(!_c.calendar){new_widget('Calendar',function(c){_c.calendar=c;_c.calendar.init(p.cont);rename_observers.push(_c.calendar);});}}}
 startup_list.push(setup_calendar);if(isIE6){var scroll_list=[]
 window.onscroll=function(){for(var i=0;i<scroll_list.length;i++){scroll_list[i]();}}}
