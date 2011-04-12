@@ -8,6 +8,7 @@
 # [IMPORTANT] - Please set your default db_name
 #
 default_db_name = ''
+db_password = 'some_password'
 
 #
 # map of database names to account names

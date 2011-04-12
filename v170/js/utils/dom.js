@@ -11,20 +11,29 @@ function addEvent(ev, fn) {
 // widget styles
 // ====================================
 
+// normal
+// --------------------
+
+$wid_normal = function(ele) {
+	if(ele.disabled) return;
+	$y(ele, {border:'1px solid #AAC', color:'#446'}); $gr(ele,'#FFF','#D8D8E2');
+	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
+	if(ele.wid_color=='green') {
+		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
+	}
+}
+
 $wid_make = function(ele,color) { 
 	if(ele.disabled) return;
 	fsize = ele.style.fontSize ? ele.style.fontSize : '11px';
 	
-	$y(ele, {padding:'2px 8px', border:'1px solid #CCC',cursor:'pointer',fontSize:fsize, color:'#444'}); 
-	$br(ele,'3px'); $gr(ele,'#FFF','#DDD'); $bs(ele, '0.5px 0.5px 2px #EEE');
+	$y(ele, {padding:'2px 8px', cursor:'pointer',fontSize:fsize}); 
+	$br(ele,'2px'); 
+	$bs(ele, '0.5px 0.5px 2px #EEE');
 	
-	if(!color && ele.wid_color) color = ele.wid_color;
-	
-	if(color=='green') {
-		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
-		ele.wid_color = color;
-	} 
 	ele.wid_color = color ? color : 'normal';
+
+	$wid_normal(ele);
 }
 
 // disabled
@@ -32,27 +41,17 @@ $wid_make = function(ele,color) {
 
 $wid_disabled = function(ele) { 
 	ele.disabled = 1;
-	$y(ele, {border:'1px solid #AAA'}); $bg(ele,'#EEE'); $fg(ele,'#AAA');
+	$y(ele, {border:'1px solid #AAA'}); $bg(ele,'#E8E8EA'); $fg(ele,'#AAA');
 }
 
-// normal
-// --------------------
 
-$wid_normal = function(ele) {
-	if(ele.disabled) return;
-	$y(ele, {border:'1px solid #CCC', color:'#444'}); $gr(ele,'#FFF','#DDD');
-	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
-	if(ele.wid_color=='green') {
-		$y(ele, {color:'#FFF', border:'1px solid #4B4'}); $gr(ele,'#9C9','#4A4');
-	}
-}
 
 // active (mouseover)
 // --------------------
 
 $wid_active = function(ele) {
 	if(ele.disabled) return;
-	$y(ele, {border:'1px solid #444', color:'#444'}); $gr(ele,'#FFF','#EEE');
+	$y(ele, {border:'1px solid #446', color:'#446'}); $gr(ele,'#FFF','#EEF');
 	if(ele.no_left_border) $y(ele, {borderLeft:'0px'})
 	if(ele.wid_color=='green') {
 		$y(ele, {color:'#FFF', border:'1px solid #292'}); $gr(ele,'#AFA','#7C7');
