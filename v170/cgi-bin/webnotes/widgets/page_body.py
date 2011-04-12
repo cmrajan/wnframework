@@ -1,3 +1,4 @@
+#:    HTML Template of index.cgi
 index_template = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head id="head">
@@ -93,6 +94,9 @@ def scrub_ids(content):
 # load the page content and meta tags
 #
 def get_page_content(page):
+	"""
+	   Gets the HTML content from `static_content` or `content` property of a `Page`
+	"""
 	from webnotes.model.code import get_code
 	from webnotes.model.doc import Document
 	global page_properties
@@ -138,6 +142,9 @@ def load_page_metatags(doc):
 # load the form as page (deprecated)
 #
 def get_doc_content(dt, dn):
+	"""
+	   Gets the HTML content of a document record by using the overridden or standard :method: `doclist.to_html`
+	"""
 	import webnotes.model.code
 	
 	if dt in webnotes.user.get_read_list():
@@ -182,6 +189,10 @@ def load_default_properties():
 # generate the page
 # -----------------
 def get():
+	"""
+	   returns the full rendered index.cgi
+	   Gets `keywords` and `site_description` from the `Control Panel`
+	"""
 	import webnotes
 	no_startup = webnotes.form.getvalue('no_startup') or None
 

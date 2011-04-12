@@ -25,16 +25,33 @@ code_fields_dict = {
 #
 # globals
 #
+#: "v170" 
 version = 'v170'
 form_dict = {}
 auth_obj = None
+
+#: The database connection :class:`webnotes.db.Database` setup by :mod:`auth`
 conn = None
+
+#: The cgi.FieldStorage() object (Dictionary representing the formdata from the URL)
 form = None
+
 session = None
+"""
+   Global session dictionary.
+
+   * session['user'] - Current user   
+   * session['data'] - Returns a dictionary of the session cache
+"""
+
 user = None
 is_testing = None
+"""    Flag to identify if system is in :term:`Testing Mode` """
+
 incoming_cookies = {}
 add_cookies = {}
+"""    Dictionary of additional cookies appended by custom code """
+
 cookies = {}
 auto_masters = {}
 tenant_id = None
@@ -49,21 +66,35 @@ class ValidationError(Exception):
 # HTTP standard response
 #
 response = {'message':'', 'exc':''}
+"""
+   The JSON response object. Default is::
+   
+   {'message':'', 'exc':''}
+"""
 
 #
 # the logs
 #
-debug_log, message_log = [], []
+debug_log = []
+"""    List of exceptions to be shown in the :term:`Error Console` """
 
+message_log = []
+"""    List of messages to be shown to the user in a popup box at the end of the request """
 
 def getTraceback():
 	import webnotes.utils
 	return webnotes.utils.getTraceback()
 
 def errprint(msg):
+	"""
+	   Append to the :data:`debug log`
+	"""
 	debug_log.append(str(msg or ''))
 
 def msgprint(msg, small=0, raise_exception=0):
+	"""
+	   Append to the :data:`message_log`
+	"""	
 	message_log.append((small and '__small:' or '')+str(msg or ''))
 	if raise_exception:
 		raise ValidationError

@@ -1,3 +1,9 @@
+"""
+Syncs a database table to the `DocType` (metadata)
+
+.. note:: This module is only used internally
+
+"""
 import os
 import webnotes
 
@@ -450,6 +456,12 @@ def validate_column_name(n):
 # -------------------------------------------------
 
 def updatedb(dt, archive=0):
+	"""
+	Syncs a `DocType` to the table
+	   * creates if required
+	   * updates columns
+	   * updates indices
+	"""
 	res = webnotes.conn.sql("select ifnull(issingle, 0) from tabDocType where name=%s", dt)
 	if not res:
 		raise Exception, 'Wrong doctype "%s" in updatedb' % dt

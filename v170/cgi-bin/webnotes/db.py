@@ -6,6 +6,11 @@ from webnotes import defs
 import webnotes
 
 class Database:
+	"""
+	   Open a database connection with the given parmeters, if use_default is True, use the
+	   login details from `defs.py`. This is called by the request handler and is accessible using
+	   the `conn` global variable. the `sql` method is also global to run queries
+	"""
 	def __init__(self, host='', user='', password='', ac_name = '', use_default = 0):
 		self.host = host or 'localhost'
 		self.user = user or defs.default_db_name
@@ -33,16 +38,25 @@ class Database:
 		return getattr(defs,'db_name_map').get(ac_name, getattr(defs,'default_db_name'))
 
 	def connect(self):
+		"""
+		      Connect to a database
+		"""
 		self._conn = MySQLdb.connect(user=self.user, host=self.host, passwd=self.password)
 		self._cursor = self._conn.cursor()
 		
 		return self._cursor
 	
 	def use(self, db_name):
+		"""
+		      `USE` db_name
+		"""
 		self._conn.select_db(db_name)
 		self.cur_db_name = db_name
 	
 	def check_transaction_status(self, query):
+		"""
+		      Update *in_transaction* and check if "START TRANSACTION" is not called twice
+		"""
 		if self.in_transaction and query and query.strip().split()[0].lower() in ['start', 'alter', 'drop', 'create']:
 			raise Exception, 'This statement can cause implicit commit'
 
@@ -60,6 +74,9 @@ class Database:
 				raise Exception, 'Bad Query!!! Too many writes'
 	
 	def fetch_as_dict(self):
+		"""
+		      Internal - get results as dictionary
+		"""
 		result = self._cursor.fetchall()
 		ret = []
 		for r in result:
@@ -78,7 +95,11 @@ class Database:
 	# ======================================================================================
 	
 	def sql(self, query, values=(), as_dict = 0, as_list = 0, allow_testing = 1, ignore_no_table = 1):
-			
+		"""
+		      * Execute a `query`, with given `values`
+		      * returns as a dictionary if as_dict = 1
+		      * returns as a list of lists (with cleaned up dates and decimals) if as_list = 1
+		"""			
 		# in transaction validations
 		self.check_transaction_status(query)
 		
@@ -112,6 +133,9 @@ class Database:
 	# ======================================================================================
 
 	def get_description(self):
+		"""
+		      Get metadata of the last query
+		"""
 		return self._cursor.description
 
 	# ======================================================================================
@@ -140,6 +164,9 @@ class Database:
 	# ======================================================================================
 
 	def convert_to_lists(self, res):
+		"""
+		      Convert the given result set to a list of lists (with cleaned up dates and decimals)
+		"""
 		nres = []
 		for r in res:
 			nr = []
@@ -151,6 +178,9 @@ class Database:
 	# ======================================================================================
 
 	def replace_tab_by_test(self, query):
+		"""
+		      Relace all ``tab`` + doctype to ``test`` + doctype
+		"""
 		if self.is_testing:
 			tl = self.get_testing_tables()
 			for t in tl:
@@ -158,6 +188,9 @@ class Database:
 		return query
 		
 	def get_testing_tables(self):
+		"""
+		      Get list of all tables for which `tab` is to be replaced by `test` before a query is executed
+		"""
 		if not self.testing_tables:
 			testing_tables = ['tab'+r[0] for r in self.sql('SELECT name from tabDocType where docstatus<2 and (issingle=0 or issingle is null)', allow_testing = 0)]
 			testing_tables+=['tabSeries','tabSingles'] # tabSessions is not included here
@@ -167,6 +200,11 @@ class Database:
 	# get a single value from a record
 
 	def get_value(self, doctype, docname, fieldname):
+		"""
+		      Get a single value from a record.
+
+		      For Single records, let docname be = None
+		"""
 		if docname:
 			try:
 				r = self.sql("select `%s` from `tab%s` where name='%s'" % (fieldname, doctype, docname))
@@ -219,9 +257,15 @@ class Database:
 	# ======================================================================================
 
 	def field_exists(self, dt, fn):
+		"""
+		      Returns True if `fn` exists in `DocType` `dt`
+		"""	
 		return self.sql("select name from tabDocField where fieldname=%s and parent=%s", (dt, fn))
 
 	def exists(self, dt, dn):
+		"""
+		      Returns true if the record exists
+		"""	
 		try:
 			return self.sql('select name from `tab%s` where name=%s' % (dt, '%s'), dn)
 		except:
@@ -229,5 +273,8 @@ class Database:
 
 	# ======================================================================================
 	def close(self):
+		"""
+		      Close my connection
+		"""
 		if self._conn:
 			self._conn.close()
