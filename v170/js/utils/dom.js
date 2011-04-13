@@ -188,11 +188,14 @@ function $btn(parent, label, onclick, style, color, ajax) {
 	// working
 	btn.set_working = function() {
 		this.set_disabled();
+		this.label = this.innerHTML;
+		this.innerHTML = 'Working...';
 		$di(this.loading_img);
 		if(ajax) $y(btn,{marginRight:'0px'});
 	}
 	btn.done_working = function() {
 		this.set_enabled();
+		this.innerHTML = this.label;
 		$dh(this.loading_img);
 		if(ajax) $y(btn,{marginRight:'24px'});
 	}

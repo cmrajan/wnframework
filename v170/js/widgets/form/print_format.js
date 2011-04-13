@@ -97,20 +97,28 @@ _p.print_std_add_field = function(dt, dn, f, layout) {
 	}
 }
 
+_p.get_letter_head = function() {
+	// add letter head
+	var cp = locals['Control Panel']['Control Panel'];
+	if(cur_frm.doc.letter_head)
+		return _p.letter_heads[cur_frm.doc.letter_head];
+	else if(cp.letter_head)
+		return cp.letter_head;
+	else 
+		return '';
+}
+
 // --------------------------------------------------------------------
 
 _p.add_layout = function(dt, no_letterhead) {
 	var l = new Layout();
+	l.addrow();
+
 	if(locals['DocType'][dt].print_outline=='Yes') l.with_border = 1;
 
 	// add letter head
-	var cp = locals['Control Panel']['Control Panel'];
-	l.addrow();
 	if(!no_letterhead) {
-		if(cur_frm.doc.letter_head)
-			l.cur_row.header.innerHTML = _p.letter_heads[cur_frm.doc.letter_head];
-		else if(cp.letter_head)
-			l.cur_row.header.innerHTML = cp.letter_head;
+		l.cur_row.header.innerHTML = _p.get_letter_head();
 	}
 	
 	return l;
@@ -273,9 +281,11 @@ _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 		jslist = block.getElementsByTagName('script');
 	}
 		
+	if(!no_letterhead) {
+		block.innerHTML = '<div>' + _p.get_letter_head() + '</div>' + block.innerHTML;
+	}
 	if(only_body) {
 		return tmp_html + block.innerHTML.replace(/<td/g, '\n<td').replace(/<div/g, '\n<div');
-		
 	} else {
 		// print block
 		return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'

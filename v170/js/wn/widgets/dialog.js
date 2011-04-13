@@ -1,9 +1,65 @@
 // opts { width, height, title, fields (like docfields) }
 
+wn.widgets.FieldGroup = function() {
+	var me = this;
+	me.fields_dict = {};
+	
+	
+	this.make_fields = function(body, fields) {
+		$y(this.body, {padding:'11px'});
+		for(var i=0; i<fields.length; i++) {
+			var df = fields[i];
+			var div = $a(body, 'div', '', {margin:'6px 0px'})
+			f = make_field(df, null, div, null);
+			f.not_in_form = 1;
+			this.fields_dict[df.fieldname] = f
+			f.refresh();
+		}
+	}
+	
+	/* get values */
+	this.get_values = function() {
+		var ret = {};
+		var errors = [];
+		for(var key in this.fields_dict) {
+			var f = this.fields_dict[key];
+			var v = f.get_value ? f.get_value() : null;
+
+			if(f.df.reqd && !v) 
+				errors.push(f.df.label + ' is mandatory');
+
+			if(v) ret[f.df.fieldname] = v;
+		}
+		if(errors.length) {
+			msgprint('<b>Please check the following Errors</b>\n' + errors.join('\n'));
+			return null;
+		}
+		return ret;
+	}
+	
+	/* set field value */
+	this.set_value = function(key, val){
+		var f = this.fields_dict[key];
+		if(f) {
+			f.set_input(val);
+			f.refresh_mandatory();
+		}		
+	}
+
+	/* set values from a dict */
+	this.set_values = function(dict) {	
+		for(var key in dict) {
+			if(this.fields_dict[key]) {
+				this.set_value(key, dict[key]);
+			}
+		}
+	}
+}
+
 wn.widgets.Dialog = function(opts) {
+	
 	this.opts = opts;
 	this.display = false;
-	this.fields_dict = {};
 	
 	this.make = function(opts) {
 		if(opts) this.opts = opts;
@@ -15,7 +71,7 @@ wn.widgets.Dialog = function(opts) {
 		this.make_head();
 		this.body = $a(this.wrapper, 'div', 'dialog_body');	
 		if(this.opts.fields)
-			this.render_fields();
+			this.make_fields(this.body, this.opts.fields);
 	}
 	
 	this.make_head = function() {
@@ -90,59 +146,13 @@ wn.widgets.Dialog = function(opts) {
 		cur_dialog = null;
 	}
 		
-	this.render_fields = function() {
-		$y(this.body, {padding:'11px'});
-		for(var i=0; i<this.opts.fields.length; i++) {
-			var df = this.opts.fields[i];
-			var div = $a(this.body, 'div', '', {margin:'6px 0px'})
-			f = make_field(df, null, div, null);
-			f.not_in_form = 1;
-			this.fields_dict[df.fieldname] = f
-			f.refresh();
-		}
-	}
-	
 	this.no_cancel = function() {
 		$dh(this.cancel_img);
 	}
 
-	this.get_values = function() {
-		var ret = {};
-		var errors = [];
-		for(var key in this.fields_dict) {
-			var f = this.fields_dict[key];
-			var v = f.get_value ? f.get_value() : null;
-
-			if(f.df.reqd && !v) 
-				errors.push(f.df.label + ' is mandatory');
-
-			if(v) ret[f.df.fieldname] = v;
-		}
-		if(errors.length) {
-			msgprint('<b>Please check the following Errors</b>\n' + errors.join('\n'));
-			return null;
-		}
-		return ret;
-	}
-	
-	/* set field value */
-	this.set_value = function(key, val){
-		var f = this.fields_dict[key];
-		if(f) {
-			f.set_input(val);
-			f.refresh_mandatory();
-		}		
-	}
-
-	/* set values from a dict */
-	this.set_values = function(dict) {
-		for(var key in dict) {
-			if(this.fields_dict[key]) {
-				this.set_value(key, dict[key]);
-			}
-		}
-	}
 }
+
+wn.widgets.Dialog.prototype = new wn.widgets.FieldGroup();
 
 // Close dialog on Escape
 keypress_observers.push(new function() {

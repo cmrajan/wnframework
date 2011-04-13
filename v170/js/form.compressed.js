@@ -354,9 +354,11 @@ return layout;}
 _p.print_std_add_field=function(dt,dn,f,layout){var v=_f.get_value(dt,dn,f.fieldname);if(f.fieldtype!="Button"){if(!v&&!in_list(['Float','Int','Currency'],f.fieldtype)){}else{r=_p.field_tab(layout.cur_cell)
 r.cells[0].innerHTML=f.label?f.label:f.fieldname;$s(r.cells[1],v,f.fieldtype);if(f.fieldtype=='Currency')
 $y(r.cells[1],{textAlign:'left'});}}}
-_p.add_layout=function(dt,no_letterhead){var l=new Layout();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;var cp=locals['Control Panel']['Control Panel'];l.addrow();if(!no_letterhead){if(cur_frm.doc.letter_head)
-l.cur_row.header.innerHTML=_p.letter_heads[cur_frm.doc.letter_head];else if(cp.letter_head)
-l.cur_row.header.innerHTML=cp.letter_head;}
+_p.get_letter_head=function(){var cp=locals['Control Panel']['Control Panel'];if(cur_frm.doc.letter_head)
+return _p.letter_heads[cur_frm.doc.letter_head];else if(cp.letter_head)
+return cp.letter_head;else
+return'';}
+_p.add_layout=function(dt,no_letterhead){var l=new Layout();l.addrow();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;if(!no_letterhead){l.cur_row.header.innerHTML=_p.get_letter_head();}
 return l;}
 _p.print_std=function(no_letterhead){var dn=cur_frm.docname;var dt=cur_frm.doctype;var pf_list=[];var layout=_p.add_layout(dt,no_letterhead);pf_list[pf_list.length]=layout;var h1=$a(layout.cur_row.header,'h1','',{fontSize:'22px',marginBottom:'8px'});h1.innerHTML=cur_frm.pformat[dn]?cur_frm.pformat[dn]:get_doctype_label(dt);var h2=$a(layout.cur_row.header,'div','',{fontSize:'16px',color:'#888',marginBottom:'8px',paddingBottom:'8px',borderBottom:(layout.with_border?'0px':'1px solid #000')});h2.innerHTML=dn;var fl=getchildren('DocField',dt,'fields','DocType');if(fl[0]&&fl[0].fieldtype!="Section Break"){layout.addrow();if(fl[0].fieldtype!="Column Break")
 layout.addcell();}
@@ -379,6 +381,7 @@ _p.render=function(body,style,doc,title,no_letterhead,only_body){var block=docum
 if(doc&&doc.__archived){var tmp_html='<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">ARCHIVED</div>You must restore this document to make it editable.</div>';}
 style=(only_body?'':_p.def_print_style_body)+_p.def_print_style_other+style;block.innerHTML=body;var jslist=block.getElementsByTagName('script');while(jslist.length>0){for(var i=0;i<jslist.length;i++){var code=jslist[i].innerHTML;var p=jslist[i].parentNode;var sp=$a(p,'span');p.replaceChild(sp,jslist[i]);var h=eval(code);if(!h)h='';sp.innerHTML=h;}
 jslist=block.getElementsByTagName('script');}
+if(!no_letterhead){block.innerHTML='<div>'+_p.get_letter_head()+'</div>'+block.innerHTML;}
 if(only_body){return tmp_html+block.innerHTML.replace(/<td/g,'\n<td').replace(/<div/g,'\n<div');}else{return'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 +'<html><head>'
 +'<title>'+title+'</title>'
