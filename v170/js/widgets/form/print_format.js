@@ -101,7 +101,7 @@ _p.get_letter_head = function() {
 	// add letter head
 	var cp = locals['Control Panel']['Control Panel'];
 	if(cur_frm.doc.letter_head)
-		return _p.letter_heads[cur_frm.doc.letter_head];
+		return cstr(_p.letter_heads[cur_frm.doc.letter_head]);
 	else if(cp.letter_head)
 		return cp.letter_head;
 	else 
