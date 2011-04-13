@@ -355,7 +355,7 @@ _p.print_std_add_field=function(dt,dn,f,layout){var v=_f.get_value(dt,dn,f.field
 r.cells[0].innerHTML=f.label?f.label:f.fieldname;$s(r.cells[1],v,f.fieldtype);if(f.fieldtype=='Currency')
 $y(r.cells[1],{textAlign:'left'});}}}
 _p.get_letter_head=function(){var cp=locals['Control Panel']['Control Panel'];if(cur_frm.doc.letter_head)
-return _p.letter_heads[cur_frm.doc.letter_head];else if(cp.letter_head)
+return cstr(_p.letter_heads[cur_frm.doc.letter_head]);else if(cp.letter_head)
 return cp.letter_head;else
 return'';}
 _p.add_layout=function(dt,no_letterhead){var l=new Layout();l.addrow();if(locals['DocType'][dt].print_outline=='Yes')l.with_border=1;if(!no_letterhead){l.cur_row.header.innerHTML=_p.get_letter_head();}
