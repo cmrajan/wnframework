@@ -44,5 +44,7 @@ class DocType:
 	# this is default, un-set everyone else
 	#
 	def set_as_default(self):
+		from webnotes.utils import set_default
 		if self.doc.is_default:
 			sql("update `tabLetter Head` set is_default=0 where name != %s", self.doc.name)
+		set_default('letter_head', self.doc.name)
