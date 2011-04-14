@@ -35,10 +35,6 @@ Field.prototype.make_body = function() {
 	if(this.with_label) {	
 		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px', fontSize:'11px'})
 	
-		// help icon
-		this.help_icon = $a(this.label_area,'img','',{cursor:'pointer', margin:'-3px 4px -3px 0px'}); $dh(this.help_icon);
-		this.help_icon.src = 'images/icons/help.gif';
-	
 		// error icon
 		this.label_icon = $a(this.label_area,'img','',{marginRight:'4px', margin:'-3px 4px -3px 0px'}); $dh(this.label_icon);
 		this.label_icon.src = 'images/icons/error.gif';
@@ -58,6 +54,8 @@ Field.prototype.make_body = function() {
 	if(!this.input_area) {
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
+		if(me.df.description)
+			this.desc_area = $a(this.wrapper, 'div', 'comment', {fontStyle:'italic'}, me.df.description);
 	}
 
 	// apply style
@@ -86,15 +84,10 @@ Field.prototype.set_label = function() {
 
 }
 
-Field.prototype.set_comment = function() {
+Field.prototype.set_description = function() {
 	var me = this;
 	if(this.df.description) {
-		if(this.help_icon) {
-			$ds(this.help_icon);
-			this.help_icon.setAttribute('title', me.df.description);
-		} 
-	} else {
-		if(this.help_icon) 	$dh(this.help_icon);
+
 	}
 }
 
@@ -183,7 +176,6 @@ Field.prototype.refresh_display = function() {
 		if(this.disp_status=='Write') { // write
 			if(this.make_input&&(!this.input)) { // make input if reqd
 				this.make_input();
-				this.set_comment();
 				if(this.onmake_input) this.onmake_input();
 			}
 			
@@ -207,7 +199,6 @@ Field.prototype.refresh_display = function() {
 
 			$dh(this.input_area);
 			$ds(this.disp_area);
-			this.set_comment();
 
 		} else { 
 			
