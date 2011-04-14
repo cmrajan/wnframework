@@ -115,11 +115,6 @@ _p.add_layout = function(dt, no_letterhead) {
 	l.addrow();
 
 	if(locals['DocType'][dt].print_outline=='Yes') l.with_border = 1;
-
-	// add letter head
-	if(!no_letterhead) {
-		l.cur_row.header.innerHTML = _p.get_letter_head();
-	}
 	
 	return l;
 }
