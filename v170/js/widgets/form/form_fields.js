@@ -254,6 +254,7 @@ _f.ImageField.prototype.set = function (val) { }
 
 _f.ButtonField = function() { };
 _f.ButtonField.prototype = new Field();
+_f.ButtonField.prototype.with_label = 0;
 _f.ButtonField.prototype.init = function() {
 	this.prev_button = null;
 	// if previous field is a button, add it to the same div!
@@ -264,6 +265,8 @@ _f.ButtonField.prototype.init = function() {
 	//			+ button_area
 	//			+ button_area
 	//			+ button_area
+	
+	if(!this.frm) return;
 	
 	if(cur_frm && 
 		cur_frm.fields[cur_frm.fields.length-1] &&
@@ -295,6 +298,7 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 	// make the input
 	this.input = $btn(this.button_area, 
 		me.df.label.substr(0,20) + ((me.df.label.length>20) ? '..' : ''), {width:'170px', fontWeight:'bold'}, null, 1)
+
 	this.input.onclick = function() {
 		if(me.not_in_form) return;
 		this.set_disabled();
@@ -325,12 +329,12 @@ _f.ButtonField.prototype.set_disp = function(val) {  } // No Disp on readonly
 
 _f.TableField = function() { };
 _f.TableField.prototype = new Field();
+_f.TableField.prototype.with_label = 0;
 _f.TableField.prototype.make_body = function() {
 	if(this.perm[this.df.permlevel] && this.perm[this.df.permlevel][READ]) {
 		// add comment area
 		if(this.df.description) {
-			this.comment_area = $a(this.parent, 'div', 'comment', {padding:'0px 8px 8px 8px'});
-			this.comment_area.innerHTML = this.df.description;
+			this.desc_area = $a(this.parent, 'div', 'field_description', '', this.df.description)
 		}
 		this.grid = new _f.FormGrid(this);
 		if(this.frm)this.frm.grids[this.frm.grids.length] = this;
@@ -388,8 +392,7 @@ _f.CodeField = function() { };
 _f.CodeField.prototype = new Field();
 _f.CodeField.prototype.make_input = function() {
 	var me = this;
-	$ds(this.label_area);
-	this.label_area.innerHTML = this.df.label;
+	this.label_span.innerHTML = this.df.label;
 	this.input = $a(this.input_area, 'textarea','code_text',{fontSize:'12px'});
 	this.myid = 'code-'+codeid;
 	this.input.setAttribute('id',this.myid);

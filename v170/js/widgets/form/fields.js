@@ -13,7 +13,9 @@
 var no_value_fields = ['Section Break', 'Column Break', 'HTML', 'Table', 'FlexTable', 'Button', 'Image'];
 var codeid=0; var code_editors={};
 
-function Field() {	}
+function Field() {	
+	this.with_label = 1;
+}
 
 Field.prototype.make_body = function() { 
 	var ischk = (this.df.fieldtype=='Check' ? 1 : 0);
@@ -33,15 +35,15 @@ Field.prototype.make_body = function() {
 	
 	// label
 	if(this.with_label) {	
-		this.label_span = $a(this.label_area, 'span', '', {marginRight:'4px', fontSize:'11px'})
+		this.label_span = $a(this.label_area, 'span', 'field_label')
 	
 		// error icon
-		this.label_icon = $a(this.label_area,'img','',{marginRight:'4px', margin:'-3px 4px -3px 0px'}); $dh(this.label_icon);
+		this.label_icon = $a(this.label_area,'img','',{margin:'-3px 4px -3px 4px'}); $dh(this.label_icon);
 		this.label_icon.src = 'images/icons/error.gif';
 		this.label_icon.title = 'Mandatory value needs to be entered';
 
 		// error icon
-		this.suggest_icon = $a(this.label_area,'img','',{marginRight:'4px', margin:'-3px 4px -3px 0px'}); $dh(this.suggest_icon);
+		this.suggest_icon = $a(this.label_area,'img','',{margin:'-3px 4px -3px 0px'}); $dh(this.suggest_icon);
 		this.suggest_icon.src = 'images/icons/bullet_arrow_down.png';
 		this.suggest_icon.title = 'With suggestions';
 
@@ -54,8 +56,6 @@ Field.prototype.make_body = function() {
 	if(!this.input_area) {
 		this.input_area = $a(this.wrapper, 'div');
 		this.disp_area = $a(this.wrapper, 'div');
-		if(me.df.description)
-			this.desc_area = $a(this.wrapper, 'div', 'comment', {fontStyle:'italic'}, me.df.description);
 	}
 
 	// apply style
@@ -63,8 +63,12 @@ Field.prototype.make_body = function() {
 		if(this.label_area) $dh(this.label_area);
 	} else {
 		this.input_area.className = 'input_area';
-		$y(this.wrapper,{marginBottom:'4px'})
+		$y(this.wrapper,{marginBottom:'4px'});
+		
+		// set description
+		this.set_description();		
 	}
+	
 
 	if(this.onmake)this.onmake();
 }
@@ -85,9 +89,15 @@ Field.prototype.set_label = function() {
 }
 
 Field.prototype.set_description = function() {
-	var me = this;
 	if(this.df.description) {
+		// parent
+		var p = in_list(['Text', 'Text Editor', 'Code', 'Check'], this.df.fieldtype) ? this.label_area : this.wrapper;
 
+		this.desc_area = $a(p, 'div', 'field_description', '', this.df.description)			
+
+		// padding on the bottom
+		if(in_list(['Text', 'Text Editor', 'Code'], this.df.fieldtype))
+			$(this.desc_area).addClass('field_description_top');
 	}
 }
 
@@ -358,7 +368,6 @@ Field.prototype.activate = function(docname) {
 // ======================================================================================
 
 function DataField() { } DataField.prototype = new Field();
-DataField.prototype.with_label = 1;
 DataField.prototype.make_input = function() {
 	var me = this;
 	this.input = $a(this.input_area, 'input');
@@ -460,12 +469,14 @@ DataField.prototype.onrefresh = function() {
 
 // ======================================================================================
 
-function ReadOnlyField() { } ReadOnlyField.prototype = new Field();
-ReadOnlyField.prototype.with_label = 1;
+function ReadOnlyField() { }
+ReadOnlyField.prototype = new Field();
 
 // ======================================================================================
 
-function HTMLField() { } HTMLField.prototype = new Field();
+function HTMLField() { } 
+HTMLField.prototype = new Field();
+HTMLField.prototype.with_label = 0;
 HTMLField.prototype.set_disp = function(val) { this.disp_area.innerHTML = val; }
 HTMLField.prototype.set_input = function(val) { if(val) this.set_disp(val); }
 HTMLField.prototype.onrefresh = function() { this.set_disp(this.df.options?this.df.options:''); }
@@ -475,7 +486,6 @@ HTMLField.prototype.onrefresh = function() { this.set_disp(this.df.options?this.
 var datepicker_active = 0;
 
 function DateField() { } DateField.prototype = new Field();
-DateField.prototype.with_label = 1;
 DateField.prototype.make_input = function() {
 
 	var me = this;
@@ -545,7 +555,6 @@ var _link_onchange_flag = null;
 
 // reference when a new record is created via link
 function LinkField() { } LinkField.prototype = new Field();
-LinkField.prototype.with_label = 1;
 LinkField.prototype.make_input = function() { 
 	var me = this;
 	
@@ -779,7 +788,6 @@ CurrencyField.prototype.onmake_input = function() {
 // ======================================================================================
 
 function CheckField() { } CheckField.prototype = new Field();
-CheckField.prototype.with_label = 1;
 CheckField.prototype.validate = function(v) {
 	var v= parseInt(v); if(isNaN(v))return 0;
 	return v;
@@ -822,7 +830,6 @@ CheckField.prototype.set_disp = function(val) {
 
 
 function TextField() { } TextField.prototype = new Field();
-TextField.prototype.with_label = 1;
 TextField.prototype.set_disp = function(val) { 
 	this.disp_area.innerHTML = replace_newlines(val);
 }
@@ -887,7 +894,6 @@ TextField.prototype.table_refresh = function() {
 // ======================================================================================
 
 function SelectField() { } SelectField.prototype = new Field();
-SelectField.prototype.with_label = 1;
 SelectField.prototype.make_input = function() { 
 	var me = this;
 	var opt=[];
@@ -1024,7 +1030,6 @@ SelectField.prototype.make_input = function() {
 // ======================================================================================
 
 function TimeField() { } TimeField.prototype = new Field();
-TimeField.prototype.with_label = 1;
 
 TimeField.prototype.get_time = function() {
 	return time_to_hhmm(sel_val(this.input_hr), sel_val(this.input_mn), sel_val(this.input_am));
