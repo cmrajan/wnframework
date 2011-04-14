@@ -10,10 +10,10 @@ default_fields = ['doctype','name','owner','creation','modified','modified_by','
 
 def getCSVelement(v):
 	"""
-	   Returns the CSV value of `v`, For example: 
-	   
-	   * apple becomes "apple"
-	   * hi"there becomes "hi""there"
+		 Returns the CSV value of `v`, For example: 
+		 
+		 * apple becomes "apple"
+		 * hi"there becomes "hi""there"
 	"""
 	v = cstr(v)
 	if not v: return ''
@@ -43,7 +43,7 @@ def sendmail(recipients, sender='', msg='', subject='[No Subject]', parts=[], cc
 	
 def generate_hash():
 	"""
-	   Generates reandom hash for session id
+		 Generates reandom hash for session id
 	"""
 	import sha, time
 	return sha.new(str(time.time())).hexdigest()
@@ -62,7 +62,7 @@ def load_json(arg):
 
 def getTraceback():
 	"""
-	   Returns the traceback of the Exception
+		 Returns the traceback of the Exception
 	"""
 	import sys, traceback, string
 	type, value, tb = sys.exc_info()
@@ -88,7 +88,7 @@ def log(event, details):
 
 def getdate(string_date):
 	"""
-	   Coverts string date (yyyy-mm-dd) to datetime.date object
+		 Coverts string date (yyyy-mm-dd) to datetime.date object
 	"""
 	import datetime
 
@@ -108,7 +108,7 @@ def getdate(string_date):
 
 def add_days(date, days):
 	"""
-	   Adds `days` to the given `string_date`
+		 Adds `days` to the given `string_date`
 	"""
 	import datetime
 	if not date:
@@ -148,20 +148,20 @@ def now_datetime():
 
 def now():
 	"""
-	   Returns `time.strftime('%Y-%m-%d %H:%M:%S')`
+		 Returns `time.strftime('%Y-%m-%d %H:%M:%S')`
 	"""
 	return now_datetime().strftime('%Y-%m-%d %H:%M:%S')
 	
 def nowdate():
 	"""
-	   Returns time.strftime('%Y-%m-%d')
+		 Returns time.strftime('%Y-%m-%d')
 	"""
 	return now_datetime().strftime('%Y-%m-%d')
 
 def get_first_day(dt, d_years=0, d_months=0):
 	"""
-   Returns the first day of the month for the date specified by date object
-   Also adds `d_years` and `d_months` if specified
+	 Returns the first day of the month for the date specified by date object
+	 Also adds `d_years` and `d_months` if specified
 	"""
 	import datetime
 	# d_years, d_months are "deltas" to apply to dt
@@ -171,26 +171,26 @@ def get_first_day(dt, d_years=0, d_months=0):
 
 def get_last_day(dt):
 	"""
-   Returns last day of the month using:
-   `get_first_day(dt, 0, 1) + datetime.timedelta(-1)`
+	 Returns last day of the month using:
+	 `get_first_day(dt, 0, 1) + datetime.timedelta(-1)`
 	"""
 	import datetime
 	return get_first_day(dt, 0, 1) + datetime.timedelta(-1)
 
 user_format = None
 """
-   User format specified in :term:`Control Panel`
-   
-   Examples:
-   
-   * dd-mm-yyyy
-   * mm-dd-yyyy
-   * dd/mm/yyyy
+	 User format specified in :term:`Control Panel`
+	 
+	 Examples:
+	 
+	 * dd-mm-yyyy
+	 * mm-dd-yyyy
+	 * dd/mm/yyyy
 """
 
 def formatdate(string_date):
 	"""
-   	Convers the given string date to :data:`user_format`
+	 	Convers the given string date to :data:`user_format`
 	"""
 	global user_format
 	if not user_format:
@@ -326,33 +326,123 @@ def fmt_money(amount, fmt = '%.2f'):
 	
 	# main logic	
 	if len(cstr(amount)) > 3:
-	  nn = amount[len(amount)-3:]
-	  l.append(nn)
-	  amount = amount[0:len(amount)-3]
-	  while len(cstr(amount)) > val:
-	    nn = amount[len(amount)-val:]
-	    l.insert(0,nn)
-	    amount = amount[0:len(amount)-val]
+		nn = amount[len(amount)-3:]
+		l.append(nn)
+		amount = amount[0:len(amount)-3]
+		while len(cstr(amount)) > val:
+			nn = amount[len(amount)-val:]
+			l.insert(0,nn)
+			amount = amount[0:len(amount)-val]
 	
-	if len(amount) > 0:  l.insert(0,amount)
+	if len(amount) > 0:	l.insert(0,amount)
 
 	amount = ','.join(l)+'.'+temp
 	amount = minus + amount
 	return amount
+
+#
+# convet currency to words
+#
+def money_in_words(number, main_currency = None, fraction_currency=None):
+	"""
+	Returns string in words with currency and fraction currency. 
+	"""
 	
+	d = get_defaults()
+	if not main_currency:
+		main_currency = d.get('currency', 'INR')
+	if not fraction_currency:
+		fraction_currency = d.get('fraction_currency', 'paise')
+
+	n = str(flt(number))
+	main, fraction = n.split('.')
+	if len(fraction)==1: fraction += '0'
+	
+	out = main_currency + ' ' + in_words(main)
+	if cint(fraction):
+		out = out + ' and ' + in_words(fraction) + ' ' + fraction_currency
+
+	return out + ' only.'
+
+#
+# convert number to words
+#
+def in_words(integer):
+	"""
+	Returns string in words for the given integer.
+	"""
+
+	in_million = webnotes.conn.get_value('Control Panel',None,'currency_format')=='Millions' and 1 or 0
+	
+
+	n=int(integer)
+	known = {0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten',
+		11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen', 15: 'fifteen', 16: 'sixteen', 17: 'seventeen', 18: 'eighteen',
+		19: 'nineteen', 20: 'twenty', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety'}
+	
+	def psn(n, known, xpsn):
+		import sys; 
+		if n in known: return known[n]
+		bestguess, remainder = str(n), 0
+
+		if n<=20:
+			print >>sys.stderr, n, "How did this happen?"
+			assert 0
+		elif n < 100:
+			bestguess= xpsn((n//10)*10, known, xpsn) + '-' + xpsn(n%10, known, xpsn)
+			return bestguess
+		elif n < 1000:
+			bestguess= xpsn(n//100, known, xpsn) + ' ' + 'hundred'
+			remainder = n%100
+		else:
+			if in_million:
+				if n < 1000000:
+					bestguess= xpsn(n//1000, known, xpsn) + ' ' + 'thousand'
+					remainder = n%1000
+				elif n < 1000000000:
+					bestguess= xpsn(n//1000000, known, xpsn) + ' ' + 'million'
+					remainder = n%1000000
+				else:
+					bestguess= xpsn(n//1000000000, known, xpsn) + ' ' + 'billion'
+					remainder = n%1000000000				
+			else:
+				if n < 100000:
+					bestguess= xpsn(n//1000, known, xpsn) + ' ' + 'thousand'
+					remainder = n%1000
+				elif n < 10000000:
+					bestguess= xpsn(n//100000, known, xpsn) + ' ' + 'lakh'
+					remainder = n%100000
+				else:
+					bestguess= xpsn(n//10000000, known, xpsn) + ' ' + 'crore'
+					remainder = n%10000000
+		if remainder:
+			if remainder >= 100:
+				comma = ','
+			else:
+				comma = ''
+			return bestguess + comma + ' ' + xpsn(remainder, known, xpsn)
+		else:
+			return bestguess
+
+	return psn(n, known, psn)
+	
+
 # Get Defaults
 # ==============================================================================
 
-def get_defaults():
+def get_defaults(key=None):
 	"""
-	Get dictionary of default values from the :term:`Control Panel`
+	Get dictionary of default values from the :term:`Control Panel`, or a value if key is passed
 	"""
-	res = webnotes.conn.sql('select defkey, defvalue from `tabDefaultValue` where parent = "Control Panel"')
-
-	d = {}
-	for rec in res: 
-		d[rec[0]] = rec[1] or ''
-	return d
+	if key:
+		res = webnotes.conn.sql('select defvalue from `tabDefaultValue` where parent = "Control Panel" where defkey=%s', key)
+		return res and res[0][0] or None
+	else:
+		res = webnotes.conn.sql('select defkey, defvalue from `tabDefaultValue` where parent = "Control Panel"')
+		d = {}
+		for rec in res: 
+			d[rec[0]] = rec[1] or ''
+		return d
 
 def set_default(key, val):
 	"""
@@ -371,9 +461,9 @@ def set_default(key, val):
 		d.defvalue = val
 		d.save(1)
 
+#
 # Clear recycle bin
-# ==============================================================================
-
+#
 def clear_recycle_bin():
 	sql = webnotes.conn.sql
 	

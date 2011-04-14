@@ -243,8 +243,11 @@ function WNToolbar(parent) {
 	// ----------------------------------------------------------------------------------------
 
 	this.setup_logout = function() {
+		
 		var w = $a($td(this.body_tab, 0, 2),'div','',{paddingTop:'2px', textAlign:'right'});
-		var t = make_table(w, 1, 6, null, [], {fontSize:'11px',verticalAlign:'middle',height:'20px',paddingLeft:'4px',paddingRight:'4px'});
+		this.right_table_style = {fontSize:'11px',verticalAlign:'middle',height:'20px',paddingLeft:'4px',paddingRight:'4px'};
+		var t = make_table(w, 1, 6, null, [], this.right_table_style);
+		
 		$y(t,{cssFloat:'right', color:'#FFF'});
 		$td(t,0,0).innerHTML = user_fullname;
 		$td(t,0,1).innerHTML = '<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';
