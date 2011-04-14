@@ -20,6 +20,11 @@ cur_frm.cscript['Set From Image'] = function(doc, dt, dn) {
 	if(url.substr(url.length-1, 1)=='/') 
 		url = url.substr(0, url.length-1)
 
+	if(!in_list(['gif','jpg','jpeg','png'], file_name.split('.')[1])) {
+		msgprint("Please upload a web friendly (GIF, JPG or PNG) image file for the letter head");
+		return;
+	}
+
 	file_name = doc.file_list.split(',')[0]
 	img_link = '<div><img src="'+ url +'/cgi-bin/getfile.cgi?name=' + file_name + 
 		'&acx=' + locals['Control Panel']['Control Panel'].account_id + '"/></div>'
