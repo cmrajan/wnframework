@@ -235,10 +235,7 @@ div.dialog_frm {
 	border: 1px solid #CCC;
 }
 
-td.frm_tray_area {
-	padding-bottom: 200px;
-	width: 128px;
-}
+
 
 /*------------------*/
 
@@ -317,22 +314,39 @@ div.time_field select{
 /* Documents */
 
 .frm_field_table {
-	width: 100%;
-	border-collapse: collapse;
+        width: 100%;
+        border-collapse: collapse;
 }
 
 .datalabelcell { 
-	padding: 2px 0px; 
-	width: 160px; 
-	vertical-align: top; 
+        padding: 2px 0px; 
+        width: 160px; 
+        vertical-align: top; 
 }
 .datainputcell { padding: 2px 0px; }
+
+
+.field_description {
+	margin: 3px 0px 11px 0px;
+	color: #888;
+	font-size: 12px;
+	font-style: italic;
+}
+
+.field_description_top {
+	margin-bottom: 3px;
+}
+
+.field_label {
+	font-size:11px;
+}
 
 .input_area input { 
 	width: 80%; 
 	margin: 0px; 
 	border: 1px solid #AAA; 
-	padding: 1px;  
+	padding: 2px;
+	font-size: 14px;
 }
 .input_area select { 
 	width: 80%; 
@@ -344,10 +358,10 @@ div.time_field select{
 .disp_area { 
 	width: 80%; 
 	padding: 2px 0px; 
-	font-size: 12px; 
+	font-size: 14px; 
 }
 .disp_area_no_val { 
-	height: 12px; 
+	height: 14px; 
 }
 
 .no_img {

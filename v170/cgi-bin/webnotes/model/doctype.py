@@ -8,8 +8,7 @@
  Key functions:
 	* manage cache - read / write
 	* merge client-side scripts
-	* compile server-side code
-	* call updation of database schema
+	* update properties from the modules .txt files
 
  Cache management:
 	* Cache is stored in __DocTypeCache
@@ -34,11 +33,7 @@ class _DocType:
 	
 	def is_modified(self):
 		"""
-		      returns 3 objects:
-		      
-		      * last modified date of the `DocType`
-		      * whether the doctypes is modified after it was cached
-		      * last modified date of the `DocType` from the cache
+			Returns true if modified
 		"""		
 		try:
 			# doctype modified
@@ -106,19 +101,92 @@ class _DocType:
 			if doclist[0].client_script_core: doclist[0].client_script_core = None
 			doclist[0].server_code_compiled = None
 
-	# write code to cache
-	#=================================================================================
-	
-	def _add_compiled_code_to_cache(self, code, dt, modified):
-		import marshal
-		if webnotes.conn.sql("SELECT name FROM __DocTypeCache WHERE name=%s", dt):
-			webnotes.conn.sql("UPDATE __DocTypeCache set server_code_compiled = %s, modified=%s WHERE name=%s", (marshal.dumps(code), modified, dt))
-		else:
-			webnotes.conn.sql("INSERT INTO __DocTypeCache (name, modified, server_code_compiled) VALUES (%s, %s, %s)", (dt, modified, marshal.dumps(code)))
-
-		
 	# build a list of all the records required for the DocType
 	# =================================================================
+	
+	def _get_last_update(self, dt):
+		"""
+			Returns last update timestamp
+		"""
+		try:
+			last_update = webnotes.conn.sql("select _last_update from tabDocType where name=%s", dt)[0][0]
+		except Exception, e:
+			if e.args[0]==1054: 
+				self._setup_last_update(dt)
+				last_update = None
+		
+		return last_update
+
+	def _setup_last_update(self, doctype):
+		"""
+			Adds _last_update column to tabDocType
+
+		"""
+		webnotes.conn.commit()
+		webnotes.conn.sql("alter table `tabDocType` add column _last_update varchar(32)")
+		webnotes.conn.begin()
+		
+	def _get_fields(self, file_name):
+		"""
+			Returns a dictionary of DocFields by fieldname or label
+		"""
+		doclist = open(file_name, 'r').read()
+		doclist = eval(doclist)
+		fields = {}
+		for d in doclist:
+			if d['doctype']=='DocField':
+				if d['fieldname'] or d['label']:
+					fields[d['fieldname'] or d['label']] = d
+		return fields
+		
+	def _update_field_properties(self, doclist):
+		"""
+			Updates properties like description, depends on from the database based on the timestamp
+			of the .txt file. Adds a column _last_updated if not exists in the database and uses
+			it to update the file..
+			
+			This feature is built because description is changed / updated quite often and is tedious to
+			write a patch every time. Can be extended to cover more updates
+		"""
+		
+		update_fields = ('description', 'depends_on')
+
+		from webnotes.modules import get_file_timestamp, get_item_file
+
+		doc = doclist[0] # main doc
+		file_name = get_item_file(doc.module, 'DocType', doc.name)
+		time_stamp = get_file_timestamp(file_name)
+		last_update = self._get_last_update(doc.name)
+		
+		# this is confusing because we are updating the fields of fields
+		
+		if last_update != time_stamp:
+
+			# there are updates!
+			fields = self._get_fields(file_name)
+			for d in doclist:
+				
+				# for each field in teh outgoing doclist
+				if d.doctype=='DocField':
+					key = d.fieldname or d.label
+					
+					# if it has a fieldname or label
+					if key and key in fields:
+						
+						# update the values
+						for field_to_update in update_fields:
+							new_value = fields[key][field_to_update]
+							
+							# in doclist
+							d.fields[field_to_update] = new_value
+							
+							# in database
+							webnotes.conn.sql("update tabDocField set `%s` = %s where parent=%s and `%s`=%s" % \
+								(field_to_update, '%s', '%s', (d.fieldname and 'fieldname' or 'label'), '%s'), \
+								(new_value, doc.name, key))
+					
+			webnotes.conn.sql("update tabDocType set _last_update=%s where name=%s", (time_stamp, doc.name))
+	
 
 	def make_doclist(self):
 		"""
@@ -137,6 +205,9 @@ class _DocType:
 		if self.is_modified():
 			# yes
 			doclist = webnotes.model.doc.get('DocType', self.name, 1)
+			
+			self._update_field_properties(doclist)
+			
 			for t in tablefields: 
 				doclist += webnotes.model.doc.get('DocType', t[0], 1)
 
