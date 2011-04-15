@@ -864,6 +864,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		locals[this.doctype][this.docname].submitted_on = dateutil.full_str();
 		locals[this.doctype][this.docname].submitted_by = user;
 	}
+	
 	if(save_action=='Trash') {
 		var reason = prompt('Reason for trash (mandatory)', '');
 		if(!strip(reason)) {
@@ -872,6 +873,8 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		}
 		locals[this.doctype][this.docname].trash_reason = reason;
 	}
+
+	// run validations
 	if(save_action=='Cancel') {
 		var reason = prompt('Reason for cancellation (mandatory)', '');
 		if(!strip(reason)) {
@@ -881,7 +884,9 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		locals[this.doctype][this.docname].cancel_reason = reason;
 		locals[this.doctype][this.docname].cancelled_on = dateutil.full_str();
 		locals[this.doctype][this.docname].cancelled_by = user;
-	} else if (save_action != 'Update'){ // no validation for cancellation
+	} else if(save_action=='Update') {
+		// no validation for update
+	} else { // no validation for cancellation
 		validated = true;
 		validation_message = '';
 		this.runclientscript('validate', this.doctype, this.docname);
