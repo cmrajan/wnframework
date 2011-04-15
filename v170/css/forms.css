@@ -168,7 +168,7 @@ div.time_field select{
 	margin: 0px; 
 	border: 1px solid #AAA; 
 	padding: 2px;
-	font-size: 14px;
+	font-size: 12px;
 }
 .input_area select { 
 	width: 80%; 
@@ -180,7 +180,7 @@ div.time_field select{
 .disp_area { 
 	width: 80%; 
 	padding: 2px 0px; 
-	font-size: 14px; 
+	font-size: 12px; 
 }
 .disp_area_no_val { 
 	height: 14px; 
