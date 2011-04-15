@@ -145,7 +145,7 @@ def delete_file(fname, verbose=0):
 			if e.args[0]!=2:
 				raise e
 		
-		if verbose: webnotes.msgprint('Deleted %s (%s)' % (fname, file_id))
+		if verbose: webnotes.msgprint('File Deleted')
 
 # Get File
 # -------------------------------------------------------

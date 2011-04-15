@@ -49,6 +49,7 @@ wn.widgets.form.sidebar.Attachments = function(parent, sidebar, doctype, docname
 			$y(this.dialog.body, {margin:'13px'})
 			this.dialog.make();
 		}
+		this.dialog.body.innerHTML = '';
 		this.dialog.show();
 		
 		this.uploader = new Uploader(this.dialog.body, {

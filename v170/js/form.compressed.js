@@ -480,7 +480,7 @@ var doc=locals[me.frm.doctype][me.frm.docname];var fl=doc.file_list?doc.file_lis
 this.add_attachment=function(){if(!this.dialog){this.dialog=new wn.widgets.Dialog({title:'Add Attachment',width:400})
 $y(this.dialog.body,{margin:'13px'})
 this.dialog.make();}
-this.dialog.show();this.uploader=new Uploader(this.dialog.body,{from_form:1,doctype:doctype,docname:docname,at_id:this.at_id},wn.widgets.form.file_upload_done);}
+this.dialog.body.innerHTML='';this.dialog.show();this.uploader=new Uploader(this.dialog.body,{from_form:1,doctype:doctype,docname:docname,at_id:this.at_id},wn.widgets.form.file_upload_done);}
 this.make();}
 wn.widgets.form.sidebar.Attachment=function(parent,filedet,frm){filedet=filedet.split(',')
 this.filename=filedet[0];this.fileid=filedet[1];this.frm=frm;var me=this;this.wrapper=$a(parent,'div','sidebar-comment-message');this.remove_fileid=function(){var doc=locals[me.frm.doctype][me.frm.docname];var fl=doc.file_list.split('\n');new_fl=[];for(var i=0;i<fl.length;i++){if(fl[i].split(',')[1]!=me.fileid)new_fl.push(fl[i]);}
