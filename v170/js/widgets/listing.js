@@ -410,7 +410,7 @@ Listing.prototype.set_rec_label = function(total, cur_page_len) {
 
 // -------------------------------------------------------
 
-Listing.prototype.run = function(do_continue, run_callback) {
+Listing.prototype.run = function(run_callback) {
 	this.build_query();
 	
 	var q = this.query;
@@ -418,7 +418,6 @@ Listing.prototype.run = function(do_continue, run_callback) {
 
 	// add limits
 	if(this.max_len && this.start>=this.max_len) this.start-= this.page_len;
-	if(this.start<0 || (!do_continue)) this.start = 0;
 	
 	q += ' LIMIT ' + this.start + ',' + this.page_len;
 	

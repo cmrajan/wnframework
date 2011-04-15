@@ -203,11 +203,8 @@ function comment_when(dt, only_days) {
 		
 		if(diff < 60) {
 			return "Few moments ago"
-		} else if(diff < 600) {
-			var t = Math.floor(diff/60);
-			return t + " minute" + (t==1?"":"s") + " ago"
 		} else if(diff < 3600) {
-			var t = Math.floor(diff/600);
+			var t = Math.floor(diff/60);
 			return t + " minute" + (t==1?"":"s") + " ago"
 		} else if(diff < 86400) {
 			var t = Math.floor(diff/3600);
