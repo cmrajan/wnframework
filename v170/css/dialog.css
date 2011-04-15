@@ -2,6 +2,7 @@
 
 div.dialog_wrapper {
 	position: absolute;
+	width: 440px;
 	display: none;
 	z-index: 90;
 	background-color: #FFF;

@@ -1,5 +1,6 @@
 
-// ATTACHMENT
+// ATTACHMENT - Deprecated!!!
+
 // ======================================================================================
 
 _f.Frm.prototype.setup_attach = function() {

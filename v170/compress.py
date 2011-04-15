@@ -97,10 +97,11 @@ in_files_form = [
 	,'widgets/form/form_grid.js'
 	,'widgets/form/print_format.js'
 	,'widgets/form/email.js'
-	,'widgets/form/attachments.js'
 	,'widgets/form/clientscriptAPI.js'
 	,'widgets/form/form_comments.js'
 	,'wn/widgets/form/sidebar.js'
+	,'wn/widgets/form/comments.js'
+	,'wn/widgets/form/attachments.js'
 ]
 
 out_file_form = 'js/form.compressed.js';

@@ -61,7 +61,6 @@ _f.Frm = function(doctype, parent) {
 	this.pformat = {};
 	this.fetch_dict = {};
 	this.parent = parent;
-	this.attachments = {};
 	this.tinymce_id_list = [];
 	
 	frms[doctype] = this;
@@ -106,10 +105,6 @@ _f.Frm.prototype.setup = function() {
 		this.setup_std_layout();	
 	}
 
-	// setup attachments
-	if(this.meta.allow_attach)
-		this.setup_attach();
-
 	// client script must be called after "setup" - there are no fields_dict attached to the frm otherwise
 	this.setup_client_script();
 	
@@ -146,15 +141,6 @@ _f.Frm.prototype.rename_notify = function(dt, old, name) {
 	// editable
 	this.is_editable[name] = this.is_editable[old];
 	delete this.is_editable[old];
-
-	// attach
-	if(this.attachments[old]) {
-		this.attachments[name] = this.attachments[old];
-		this.attachments[old] = null;
-		for(var i in this.attachments[name]){ // rename each attachment
-			this.attachments[name][i].docname = name;
-		}
-	}
 
 	// from form
 	if(this.docname == old)
@@ -665,9 +651,6 @@ _f.Frm.prototype.refresh = function(docname) {
 			
 			// dependent fields
 			this.refresh_dependency();
-			
-			// attachments
-			if(this.meta.allow_attach) this.refresh_attachments();
 
 			// footer
 			this.refresh_footer();
@@ -851,9 +834,6 @@ _f.Frm.prototype.setnewdoc = function(docname) {
 		
 	// Section Type
 	if(this.meta.section_style=='Tray'||this.meta.section_style=='Tabbed') { this.cur_section[docname] = 0; }
-
-	// set record attachments
-	if(this.meta.allow_attach) this.set_attachments();
 
 	this.opendocs[docname] = true;
 }

@@ -138,29 +138,30 @@ function flt(v,decimals) {
 }
 
 function esc_quotes(s) { if(s==null)s=''; return s.replace(/'/, "\'");}
-function strip(s, chars) {
-	s = lstrip(s, chars);
+
+var strip = function(s, chars) {
+	var s= lstrip(s, chars)
 	s = rstrip(s, chars);
 	return s;
 }
 
-function lstrip(s, chars) {
+var lstrip = function(s, chars) {
 	if(!chars) chars = ['\n', '\t', ' '];
 	// strip left
 	var first_char = s.substr(0,1);
 	while(in_list(chars, first_char)) {
-		s = s.substr(1);
+		var s = s.substr(1);
 		first_char = s.substr(0,1);
 	}
 	return s;
 }
 
-function rstrip(s, chars) {
+var rstrip = function(s, chars) {
 	if(!chars) chars = ['\n', '\t', ' '];
 	var last_char = s.substr(s.length-1);
 	while(in_list(chars, last_char)) {
-		s = s.substr(0, s.length-1);
-		last_char = s.substr(s.length-1);
+		var s = s.substr(0, this.length-1);
+		last_char = s.substr(this.length-1);
 	}
 	return s;
 }

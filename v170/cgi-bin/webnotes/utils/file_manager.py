@@ -14,7 +14,7 @@ def upload():
 		# refesh the form!
 		webnotes.response['result'] = """
 <script type='text/javascript'>
-window.parent._f.file_upload_done('%s', '%s', '%s', '%s', '%s');
+window.parent.wn.widgets.form.file_upload_done('%s', '%s', '%s', '%s', '%s');
 window.parent.frms['%s'].show_doc('%s');
 </script>
 			""" % (dt, dn, fid, fname.replace("'", "\\'"), at_id, dt, dn)

@@ -21,11 +21,11 @@ Uploader = function(parent, args, callback) {
 	var f_list = [];
   
 	// file data
-	var inp_fdata = $a_input($a(ul_form,'span'),'file',{name:'filedata'});
+	var inp_fdata = $a_input($a(ul_form,'span'),'file',{name:'filedata'},{marginLeft:'7px'});
 
 	var inp = $a_input($a(ul_form,'span'),'hidden',{name:'cmd'}); inp.value = 'uploadfile';
 	var inp = $a_input($a(ul_form,'span'),'hidden',{name:'uploader_id'}); inp.value = id;
-	var inp = $a_input($a(ul_form,'span'),'submit'); inp.value = 'Upload';
+	var inp = $a_input($a(ul_form,'span'),'submit',null,{marginLeft:'7px'}); inp.value = 'Upload';
 	
 	$y(inp,{width:'80px'});
 	$wid_normal(inp);
