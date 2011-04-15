@@ -881,7 +881,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		locals[this.doctype][this.docname].cancel_reason = reason;
 		locals[this.doctype][this.docname].cancelled_on = dateutil.full_str();
 		locals[this.doctype][this.docname].cancelled_by = user;
-	} else { // no validation for cancellation
+	} else if (save_action != 'Update'){ // no validation for cancellation
 		validated = true;
 		validation_message = '';
 		this.runclientscript('validate', this.doctype, this.docname);
