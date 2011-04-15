@@ -14,7 +14,6 @@ var version = 'v170';
 // user
 var profile;
 var session = {};
-var account_name;
 var is_testing = false;
 var user;
 var user_defaults;

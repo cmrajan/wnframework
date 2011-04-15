@@ -568,8 +568,10 @@ set_user_img = function(img, username, get_latest, img_id) {
 			i.src = 'images/ui/no_img/no_img_m.gif';
 		else if(user_img[username]=='no_img_f')
 			i.src = 'images/ui/no_img/no_img_f.gif'; // no image
-		else
-			i.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username],ac:session.account_name});
+		else {
+			ac_id = locals['Control Panel']['Control Panel'].account_id;
+			i.src = repl('cgi-bin/getfile.cgi?ac=%(ac)s&name=%(fn)s', {fn:user_img[username], ac:ac_id});			
+		}
 	}
 
 	// given
