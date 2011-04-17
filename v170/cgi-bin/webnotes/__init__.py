@@ -207,14 +207,20 @@ def setup_logging():
 	# Also please set umask for apache to 002.
 	global logger
 
-	logger = logging.getLogger('WNLogger')
-	logger.setLevel(eval(defs.log_level))
+	try:
+		logger = logging.getLogger('WNLogger')
+		logger.setLevel(eval(defs.log_level))
 
-	log_handler = logging.handlers.RotatingFileHandler(defs.log_file_name, maxBytes = defs.log_file_size, backupCount = defs.log_file_backup_count)	
-	formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s\n%(message)s\n-------------------')
+		log_handler = logging.handlers.RotatingFileHandler(defs.log_file_name, maxBytes = defs.log_file_size, backupCount = defs.log_file_backup_count)	
+		formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s\n%(message)s\n-------------------')
 	
-	log_handler.setFormatter(formatter)
-	logger.addHandler(log_handler)
+		log_handler.setFormatter(formatter)
+		logger.addHandler(log_handler)
+	
+	except IOError,e:
+		if e.args == 13:
+			open(defs.log_file_name).close()
+
 
 if getattr(defs, 'log_file_name', None):
 	setup_logging()
