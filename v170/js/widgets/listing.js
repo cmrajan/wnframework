@@ -103,6 +103,7 @@ Listing.prototype.make_toolbar = function() {
 	// refresh btn
 	if(!this.opts.hide_refresh) {
 		make_btn('Refresh','ui-icon-refresh',function(btn) {
+			me.start = 0;
 			me.run();
 		},1);
 	}
