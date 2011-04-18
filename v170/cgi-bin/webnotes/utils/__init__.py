@@ -358,9 +358,9 @@ def money_in_words(number, main_currency = None, fraction_currency=None):
 	main, fraction = n.split('.')
 	if len(fraction)==1: fraction += '0'
 	
-	out = main_currency + ' ' + in_words(main)
+	out = main_currency + ' ' + in_words(main).title()
 	if cint(fraction):
-		out = out + ' and ' + in_words(fraction) + ' ' + fraction_currency
+		out = out + ' and ' + in_words(fraction).title() + ' ' + fraction_currency
 
 	return out + ' only.'
 
