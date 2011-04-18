@@ -641,8 +641,11 @@ Listing.prototype.refresh = function(nr, nc, d, n_values) {
 
 Listing.prototype.refresh_more_button = function(nr, n_values) {
 	var me = this;
-	if(this.more_btn) $dh(this.more_btn);
-	if((this.start + nr) == this.max_len || (!n_values && nr < this.page_len)) {
+	if(this.more_btn) {
+		$dh(this.more_btn);
+	}
+	
+	if((this.start + nr) == this.max_len || (!this.max_len && nr < this.page_len)) {
 		// all records shown
 	} else if(nr) {
 		if(!this.more_btn) {
@@ -653,7 +656,7 @@ Listing.prototype.refresh_more_button = function(nr, n_values) {
 				function() {
 					me.start = me.start + me.page_len;
 					me.more_btn.set_working();
-					me.run(1,function() { me.more_btn.done_working(); });
+					me.run(function() { me.more_btn.done_working(); });
 				}, {fontSize:'14px'}, 0, 1);
 			$y(this.more_btn.loading_img, {marginBottom:'0px'});
 		}
