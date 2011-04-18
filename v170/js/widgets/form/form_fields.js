@@ -105,8 +105,7 @@ _f.SectionBreak.prototype.make_collapsible = function(head) {
 // ======================================================================================
 
 _f.SectionBreak.prototype.make_simple_section = function(with_header) {
-	var head = $a(this.row.main_head, 'div', '', {margin:'8px 8px 0px 0px'});
-	this.row.header.head = head;
+	this.wrapper = $a(this.row.main_head, 'div', '', {margin:'8px 8px 0px 0px'});
 	var me = this;
 
 	// colour
@@ -119,12 +118,12 @@ _f.SectionBreak.prototype.make_simple_section = function(with_header) {
 	
 	if(with_header) {
 		if(this.df.label && this.df.options!='Simple') {
-			this.make_collapsible(head);
+			this.make_collapsible(this.wrapper);
 		} else {
 			// divider
-			$y(head,{borderBottom:'1px solid #AAA', fontWeight:'bold', paddingBottom:'4px'});
+			$y(this.wrapper, {borderBottom:'1px solid #AAA', fontWeight:'bold', paddingBottom:'4px'});
 			if(this.df.label) {
-				head.innerHTML = this.df.label
+				this.wrapper.innerHTML = this.df.label
 			}
 		}
 	}

@@ -211,8 +211,8 @@ this.chk.onclick=function(){if(this.checked)me.expand();else me.collapse();}
 this.expand=function(){$(me.row.main_body).slideDown();}
 this.collapse=function(){$(me.row.main_body).slideUp();}
 if(me.frm.section_count){$dh(this.row.main_body);}else{this.chk.checked=true;}}
-_f.SectionBreak.prototype.make_simple_section=function(with_header){var head=$a(this.row.main_head,'div','',{margin:'8px 8px 0px 0px'});this.row.header.head=head;var me=this;if(this.df.colour){var col=this.df.colour.split(':')[1];if(col!='FFF'){$y(this.row.sub_wrapper,{margin:'8px',padding:'0px',backgroundColor:('#'+col)});}}
-if(with_header){if(this.df.label&&this.df.options!='Simple'){this.make_collapsible(head);}else{$y(head,{borderBottom:'1px solid #AAA',fontWeight:'bold',paddingBottom:'4px'});if(this.df.label){head.innerHTML=this.df.label}}}
+_f.SectionBreak.prototype.make_simple_section=function(with_header){this.wrapper=$a(this.row.main_head,'div','',{margin:'8px 8px 0px 0px'});var me=this;if(this.df.colour){var col=this.df.colour.split(':')[1];if(col!='FFF'){$y(this.row.sub_wrapper,{margin:'8px',padding:'0px',backgroundColor:('#'+col)});}}
+if(with_header){if(this.df.label&&this.df.options!='Simple'){this.make_collapsible(this.wrapper);}else{$y(this.wrapper,{borderBottom:'1px solid #AAA',fontWeight:'bold',paddingBottom:'4px'});if(this.df.label){this.wrapper.innerHTML=this.df.label}}}
 $y(this.row.body,{marginLeft:'17px'});}
 _f.SectionBreak.prototype.add_to_sections=function(){this.sec_id=this.frm.sections.length;this.frm.sections[this.sec_id]=this;this.frm.sections_by_label[this.df.label]=this;}
 _f.cur_sec_header=null;_f.SectionBreak.prototype.make_body=function(){if((!this.perm[this.df.permlevel])||(!this.perm[this.df.permlevel][READ])||this.df.hidden){return;}
