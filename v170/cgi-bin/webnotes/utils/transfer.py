@@ -3,15 +3,21 @@ from webnotes.model.doc import Document
 
 def set_doc(doclist, ovr=0, ignore=1, onupdate=1):
 	dt = doclist[0]['doctype']
-	if dt=='DocType':
-		ud = UpdateDocType(doclist)
-	elif dt == 'Module Def':
-		ud = UpdateModuleDef(doclist)
-	elif dt == 'DocType Mapper':
-		ud = UpdateDocTypeMapper(doclist)
+	
+	if webnotes.conn.exists(doclist[0]['doctype'], doclist[0]['name']):	
+		# exists, merge if possible
+		
+		if dt=='DocType':
+			ud = UpdateDocType(doclist)
+		elif dt == 'Module Def':
+			ud = UpdateModuleDef(doclist)
+		elif dt == 'DocType Mapper':
+			ud = UpdateDocTypeMapper(doclist)
+		else:
+			ud = UpdateDocument(doclist)
 	else:
 		ud = UpdateDocument(doclist)
-
+		
 	ud.sync()
 	return '\n'.join(ud.log)
 
@@ -211,7 +217,7 @@ class UpdateDocType(UpdateDocumentMerge):
 
 	# clear section breaks
 	def clear_section_breaks(self):
-		webnotes.conn.sql("delete from tabDocField where fieldtype in ('Section Break', 'Column Break', 'HTML') and parent=%s", self.doc.name)
+		webnotes.conn.sql("delete from tabDocField where fieldtype in ('Section Break', 'Column Break', 'HTML') and parent=%s and options!='Custom'", self.doc.name)
 
 	# add section breaks
 	def add_section_breaks_and_renum(self):
