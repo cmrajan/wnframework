@@ -126,8 +126,10 @@ class UpdateDocumentMerge(UpdateDocument):
 	def save_children(self):
 		for df in self.in_doclist[1:]: 
 			d = Document(fielddata = df)
+			
 			# update doctype?
 			if d.doctype in self.to_update_doctype:
+				
 				# update this record?
 				if self.to_update(d):
 				
@@ -164,7 +166,7 @@ class UpdateDocType(UpdateDocumentMerge):
 	def get_id(self, d):
 		key = d.fieldname and 'fieldname' or 'label'
 		return webnotes.conn.sql("""select name, options, permlevel, reqd, print_hide, hidden
-		from tabDocField where %s=%s and parent=%s""" % (key, '%s', '%s'), (d.fieldname, d.parent))
+		from tabDocField where %s=%s and parent=%s""" % (key, '%s', '%s'), (d.fields[key], d.parent))
 				
 	def on_save(self):
 		self.renum()
@@ -176,7 +178,7 @@ class UpdateDocType(UpdateDocumentMerge):
 	def get_orignal_values(self, d):
 		if d.doctype=='DocField':
 			t = self.get_id(d)[0]
-			return {'name': t[0], 'options': t[1]}
+			return {'name': t[0], 'options': t[1], 'reqd':t[3], 'print_hide':t[4], 'hidden':t[5]}
 
 		if d.doctype=='DocType':
 			return webnotes.conn.sql("select server_code, client_script from `tabDocType` where name=%s", d.name, as_dict = 1)[0]
