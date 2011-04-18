@@ -996,7 +996,7 @@ _r.ReportFilters.prototype.add_field = function(f, dt, in_primary, is_custom) {
 	} else if(in_list(['Currency', 'Int', 'Float'], f.fieldtype)) {
 		// numeric
 		this.add_numeric_field(cell, f, dt);
-	} else {
+	} else if (!in_list(['Section Break', 'Column Break', 'Read Only', 'HTML', 'Table', 'Image', 'Button'], f.fieldtype)) {
 		var tmp = this.make_field_obj(f, dt, cell, is_custom);
 	}
 	

@@ -131,7 +131,7 @@ _r.ReportFilters.prototype.make_field_obj=function(f,dt,parent,is_custom){var tm
 _r.ReportFilters.prototype.add_field=function(f,dt,in_primary,is_custom){var me=this;if(f.in_first_page)in_primary=true;var fparent=this.filter_fields_area;if(in_primary){fparent=this.first_page_filter;this.rb.has_primary_filters=1;}
 if(f.on_top){var cell=document.createElement('div');fparent.insertBefore(cell,fparent.firstChild);$y(cell,{width:'70%'});}else if(f.insert_before){var cell=document.createElement('div');fparent.insertBefore(cell,fparent[f.df.insert_before].filter_cell);$y(cell,{width:'70%'});}
 else
-var cell=$a(fparent,'div','',{width:'70%'});f.filter_cell=cell;if(f.fieldtype=='Date'){this.add_date_field(cell,f,dt);}else if(in_list(['Currency','Int','Float'],f.fieldtype)){this.add_numeric_field(cell,f,dt);}else{var tmp=this.make_field_obj(f,dt,cell,is_custom);}
+var cell=$a(fparent,'div','',{width:'70%'});f.filter_cell=cell;if(f.fieldtype=='Date'){this.add_date_field(cell,f,dt);}else if(in_list(['Currency','Int','Float'],f.fieldtype)){this.add_numeric_field(cell,f,dt);}else if(!in_list(['Section Break','Column Break','Read Only','HTML','Table','Image','Button'],f.fieldtype)){var tmp=this.make_field_obj(f,dt,cell,is_custom);}
 if(f.fieldname!='docstatus')
 me.rb.orig_sort_list.push([f.label,'`tab'+f.parent+'`.`'+f.fieldname+'`']);if(f.def_filter)
 tmp.input.checked=true;}
