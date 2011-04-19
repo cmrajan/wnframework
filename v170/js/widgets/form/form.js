@@ -359,7 +359,12 @@ _f.Frm.prototype.setup_fields_std = function() {
 	for(var i=0;i<fl.length;i++) {
 		var f=fl[i];
 		
+		// no section breaks in embedded forms
 		if(get_url_arg('embed') && (in_list(['Section Break','Column Break'], f.fieldtype))) continue;
+		
+		// if section break and next item 
+		// is a section break then ignore
+		if(f.fieldtype=='Section Break' && fl[i+1] && fl[i+1].fieldtype=='Section Break') continue;
 		
 		var fn = f.fieldname?f.fieldname:f.label;
 		var fld = make_field(f, this.doctype, this.layout.cur_cell, this);
