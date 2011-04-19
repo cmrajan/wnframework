@@ -217,7 +217,7 @@ class UpdateDocType(UpdateDocumentMerge):
 
 	# clear section breaks
 	def clear_section_breaks(self):
-		webnotes.conn.sql("delete from tabDocField where fieldtype in ('Section Break', 'Column Break', 'HTML') and parent=%s and options!='Custom'", self.doc.name)
+		webnotes.conn.sql("delete from tabDocField where fieldtype in ('Section Break', 'Column Break', 'HTML') and parent=%s and ifnull(options,'')!='Custom'", self.doc.name)
 
 	# add section breaks
 	def add_section_breaks_and_renum(self):
