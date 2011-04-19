@@ -13,6 +13,8 @@ _p.make_dialog = function() {
 		,['HTML', 'Buttons']
 		]);
 	
+	d.widgets['No Letterhead'].checked = 1;
+	
 	// prints
 	$btn(d.widgets.Buttons, 'Print', 
 		function() { _p.build(sel_val(cur_frm.print_sel), _p.go, d.widgets['No Letterhead'].checked); },
@@ -30,7 +32,6 @@ _p.make_dialog = function() {
 			c.removeChild(c.cur_sel);
 		c.appendChild(cur_frm.print_sel);
 		c.cur_sel = cur_frm.print_sel;
-		d.widgets['No Letterhead'].checked = 1;
 	}
 }
 
