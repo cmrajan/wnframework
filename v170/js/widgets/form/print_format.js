@@ -277,10 +277,20 @@ _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 		}
 		jslist = block.getElementsByTagName('script');
 	}
-		
-	if(!no_letterhead || !only_body) {
+	
+	// show letterhead?
+	if(only_body) 
+		show_lh = false;
+	else {
+		if(!no_letterhead) show_lh = true;
+		else show_lh = false;
+	}
+	
+	// add letter head
+	if(show_lh) {
 		block.innerHTML = '<div>' + _p.get_letter_head() + '</div>' + block.innerHTML;
 	}
+
 	if(only_body) {
 		return tmp_html + block.innerHTML.replace(/<td/g, '\n<td').replace(/<div/g, '\n<div');
 	} else {

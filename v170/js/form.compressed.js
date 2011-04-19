@@ -378,7 +378,9 @@ _p.render=function(body,style,doc,title,no_letterhead,only_body){var block=docum
 if(doc&&doc.__archived){var tmp_html='<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">ARCHIVED</div>You must restore this document to make it editable.</div>';}
 style=(only_body?'':_p.def_print_style_body)+_p.def_print_style_other+style;block.innerHTML=body;var jslist=block.getElementsByTagName('script');while(jslist.length>0){for(var i=0;i<jslist.length;i++){var code=jslist[i].innerHTML;var p=jslist[i].parentNode;var sp=$a(p,'span');p.replaceChild(sp,jslist[i]);var h=eval(code);if(!h)h='';sp.innerHTML=h;}
 jslist=block.getElementsByTagName('script');}
-if(!no_letterhead||!only_body){block.innerHTML='<div>'+_p.get_letter_head()+'</div>'+block.innerHTML;}
+if(only_body)
+show_lh=false;else{if(!no_letterhead)show_lh=true;else show_lh=false;}
+if(show_lh){block.innerHTML='<div>'+_p.get_letter_head()+'</div>'+block.innerHTML;}
 if(only_body){return tmp_html+block.innerHTML.replace(/<td/g,'\n<td').replace(/<div/g,'\n<div');}else{return'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 +'<html><head>'
 +'<title>'+title+'</title>'
