@@ -65,6 +65,10 @@ TagList.prototype.make_tag_dialog = function() {
 	
 	// make a color picker
 	d.color_picker = this.make_color_picker(d.widgets['Tag']);
+	
+	this.onshow = function() {
+		d.color_picker.refresh()
+	}
 
 	// save
 	d.widgets['Save'].onclick = function() { me.save_tag(d) };
@@ -129,12 +133,12 @@ TagList.prototype.save_tag = function(d) {
 	if(!this.is_text_okay(val)) return;
 	
 	var callback = function(r,rt) {
-		var d = _tags.dialog;
+		var d = me.dialog;
 		// update tag color
 		if(d.color_picker.picked) {
 			_tags.color_map[r.message] = d.color_picker.picked.color_name;
 			me.refresh_tags();
-			d.color_picker.picked.unpick()
+			d.color_picker.refresh()
 		}
 		
 		// hide the dialog
@@ -156,10 +160,10 @@ TagList.prototype.save_tag = function(d) {
 TagList.prototype.new_tag = function() {
 	var me = this;
 	
-	if(!_tags.dialog) {
-		_tags.dialog = this.make_tag_dialog();
+	if(!this.dialog) {
+		this.dialog = this.make_tag_dialog();
 	}
-	_tags.dialog.show();
+	this.dialog.show();
 }
 
 // refresh tags
@@ -177,31 +181,43 @@ TagList.prototype.refresh_tags = function() {
 //
 TagList.prototype.make_color_picker = function(parent) {
 	var n_cols = _tags.color_list.length;
-	var div = $a(parent, 'div', '', {margin:'8px 0px'});
 
-	div.tab = make_table(div, 2, n_cols, (26*n_cols) + 'px', [], {textAlign:'center'});
-	div.pickers = [];
+	var picker = $a(parent, 'div', '', {margin:'8px 0px'});
+
+	picker.tab = make_table(picker, 2, n_cols, (26*n_cols) + 'px', [], {textAlign:'center'});
+	picker.boxes = [];
 	for(var i=0; i<n_cols; i++) {
-		var wrapper = $a($td(div.tab, 0, i), 'div', '', {margin:'5px', border:'3px solid #FFF'})
-		var p = $a(wrapper, 'div', '', {backgroundColor: _tags.colors[_tags.color_list[i]],height:'16px', width:'16px', border:'1px solid #000', cursor:'pointer'});
-		p.wrapper = wrapper;
-		p.pick = function() {
+		var wrapper = $a($td(picker.tab, 0, i), 'div', '', {margin:'5px', border:'3px solid #FFF'})
+		var box = $a(wrapper, 'div', '', 
+			{
+				backgroundColor: _tags.colors[_tags.color_list[i]],
+				height:'16px', width:'16px',
+				border:'1px solid #000', cursor:'pointer'
+			});
+
+		box.wrapper = wrapper;
+		box.pick = function() {
 			$y(this.wrapper, {border:'3px solid #000'});
 			if(this.picker.picked) this.picker.picked.unpick();
 			this.picker.picked = this;
 		}
-		p.unpick = function() {
+		box.unpick = function() {
 			$y(this.wrapper, {border:'3px solid #FFF'});
 		}
-		p.onclick = function() {
+		box.onclick = function() {
 			this.pick();
 		}
-		p.picker = div;
-		div.pickers.push(p);
-		p.color_name = _tags.color_list[i];
+		box.picker = picker;
+
+		picker.boxes.push(box);
+		picker.refresh = function() {
+			if(this.picked) this.picked.unpick();
+			this.picked = null;
+		}
+		box.color_name = _tags.color_list[i];
 	}
 	
-	return div;
+	return picker;
 }
 
 

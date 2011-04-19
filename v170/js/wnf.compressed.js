@@ -664,7 +664,8 @@ TagList.prototype.make_body=function(){var div=$a(this.parent,'div','',{margin:'
 TagList.prototype.add_tag=function(label,static,fieldname){if(!label)return;if(in_list(this.tag_list,label))return;var tag=new SingleTag(this.body,label,this.dt,this.dn,fieldname,static,this);}
 TagList.prototype.make_add_tag=function(){var me=this;this.add_tag_span=$a(this.add_tag_area,'span','',{color:'#888',textDecoration:'underline',cursor:'pointer',marginLeft:'4px',fontSize:'11px'});this.add_tag_span.innerHTML='Add tag';this.add_tag_span.onclick=function(){me.new_tag();}}
 TagList.prototype.make_tag_dialog=function(){var me=this;var d=new Dialog(400,200,'New Tag');d.make_body([['HTML','Tag'],['Button','Save']])
-this.make_tag_input(d);d.color_picker=this.make_color_picker(d.widgets['Tag']);d.widgets['Save'].onclick=function(){me.save_tag(d)};return d;}
+this.make_tag_input(d);d.color_picker=this.make_color_picker(d.widgets['Tag']);this.onshow=function(){d.color_picker.refresh()}
+d.widgets['Save'].onclick=function(){me.save_tag(d)};return d;}
 TagList.prototype.make_tag_input=function(d){d.tag_input=make_field({fieldtype:'Link',label:'New Tag',options:'Tag',no_buttons:1},'',d.widgets['Tag'],this,0,1);d.tag_input.not_in_form=1;d.tag_input.refresh();$y(d.tag_input.txt,{width:'80%'});}
 TagList.prototype.is_text_okay=function(val){if(!val){msgprint("Please type something");return;}
 if(validate_spl_chars(val)){msgprint("Special charaters, commas etc not allowed in tags");return;}
@@ -675,19 +676,20 @@ tl.push(tag)
 doc._user_tags=tl.join(',');}}
 TagList.prototype.remove_from_locals=function(tag){if(locals[this.dt]&&locals[this.dt][this.dn]){var doc=locals[this.dt][this.dn];var tl=doc._user_tags.split(',');var new_tl=[];for(var i=0;i<tl.length;i++){if(tl[i]!=tag)new_tl.push(tl[i]);}
 doc._user_tags=new_tl.join(',');}}
-TagList.prototype.save_tag=function(d){var val=strip(d.tag_input.txt.value);var me=this;if(!this.is_text_okay(val))return;var callback=function(r,rt){var d=_tags.dialog;if(d.color_picker.picked){_tags.color_map[r.message]=d.color_picker.picked.color_name;me.refresh_tags();d.color_picker.picked.unpick()}
+TagList.prototype.save_tag=function(d){var val=strip(d.tag_input.txt.value);var me=this;if(!this.is_text_okay(val))return;var callback=function(r,rt){var d=me.dialog;if(d.color_picker.picked){_tags.color_map[r.message]=d.color_picker.picked.color_name;me.refresh_tags();d.color_picker.refresh()}
 d.tag_input.txt.value='';d.hide();me.add_to_locals(val)
 if(!r.message)return;me.add_tag(r.message,0,'_user_tags');}
 var t=d.color_picker.picked?d.color_picker.picked.color_name:'';$c('webnotes.widgets.menus.add_tag',{'dt':me.dt,'dn':me.dn,'tag':val,'color':t},callback);}
-TagList.prototype.new_tag=function(){var me=this;if(!_tags.dialog){_tags.dialog=this.make_tag_dialog();}
-_tags.dialog.show();}
+TagList.prototype.new_tag=function(){var me=this;if(!this.dialog){this.dialog=this.make_tag_dialog();}
+this.dialog.show();}
 TagList.prototype.refresh_tags=function(){for(var i=0;i<_tags.all_tags.length;i++){_tags.all_tags[i].refresh_color();}}
-TagList.prototype.make_color_picker=function(parent){var n_cols=_tags.color_list.length;var div=$a(parent,'div','',{margin:'8px 0px'});div.tab=make_table(div,2,n_cols,(26*n_cols)+'px',[],{textAlign:'center'});div.pickers=[];for(var i=0;i<n_cols;i++){var wrapper=$a($td(div.tab,0,i),'div','',{margin:'5px',border:'3px solid #FFF'})
-var p=$a(wrapper,'div','',{backgroundColor:_tags.colors[_tags.color_list[i]],height:'16px',width:'16px',border:'1px solid #000',cursor:'pointer'});p.wrapper=wrapper;p.pick=function(){$y(this.wrapper,{border:'3px solid #000'});if(this.picker.picked)this.picker.picked.unpick();this.picker.picked=this;}
-p.unpick=function(){$y(this.wrapper,{border:'3px solid #FFF'});}
-p.onclick=function(){this.pick();}
-p.picker=div;div.pickers.push(p);p.color_name=_tags.color_list[i];}
-return div;}
+TagList.prototype.make_color_picker=function(parent){var n_cols=_tags.color_list.length;var picker=$a(parent,'div','',{margin:'8px 0px'});picker.tab=make_table(picker,2,n_cols,(26*n_cols)+'px',[],{textAlign:'center'});picker.boxes=[];for(var i=0;i<n_cols;i++){var wrapper=$a($td(picker.tab,0,i),'div','',{margin:'5px',border:'3px solid #FFF'})
+var box=$a(wrapper,'div','',{backgroundColor:_tags.colors[_tags.color_list[i]],height:'16px',width:'16px',border:'1px solid #000',cursor:'pointer'});box.wrapper=wrapper;box.pick=function(){$y(this.wrapper,{border:'3px solid #000'});if(this.picker.picked)this.picker.picked.unpick();this.picker.picked=this;}
+box.unpick=function(){$y(this.wrapper,{border:'3px solid #FFF'});}
+box.onclick=function(){this.pick();}
+box.picker=picker;picker.boxes.push(box);picker.refresh=function(){if(this.picked)this.picked.unpick();this.picked=null;}
+box.color_name=_tags.color_list[i];}
+return picker;}
 function SingleTag(parent,label,dt,dn,fieldname,static,taglist){this.dt=dt;this.dn=dn;this.label=label;this.taglist=taglist;this.fieldname=fieldname;this.static=static;if(this.taglist&&!in_list(this.taglist.tag_list,label))
 this.taglist.tag_list.push(label);this.make_body(parent);}
 SingleTag.prototype.make_body=function(parent){var me=this;this.body=$a(parent,'span','',{padding:'2px 4px',backgroundColor:this.get_color(),color:'#FFF',marginRight:'4px',fontSize:'11px'});$br(this.body,'3px');if(this.taglist&&this.taglist.onclick)$y(this.body,{cursor:'pointer'});$(this.body).hover(function(){$op(this,60);},function(){$op(this,100);});this.make_label();if(!this.static)this.make_remove_btn();_tags.all_tags.push(this);}
