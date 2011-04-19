@@ -30,6 +30,7 @@ _p.make_dialog = function() {
 			c.removeChild(c.cur_sel);
 		c.appendChild(cur_frm.print_sel);
 		c.cur_sel = cur_frm.print_sel;
+		d.widgets['No Letterhead'].checked = 1;
 	}
 }
 
@@ -276,7 +277,7 @@ _p.render = function(body, style, doc, title, no_letterhead, only_body) {
 		jslist = block.getElementsByTagName('script');
 	}
 		
-	if(!no_letterhead) {
+	if(!no_letterhead || !only_body) {
 		block.innerHTML = '<div>' + _p.get_letter_head() + '</div>' + block.innerHTML;
 	}
 	if(only_body) {

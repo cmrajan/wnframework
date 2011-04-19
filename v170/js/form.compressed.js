@@ -344,7 +344,7 @@ if(swap_row){var cidx=_f.cur_grid_cell.cellIndex;this.cell_deselect();var aidx=l
 _p.show_dialog=function(){if(!_p.dialog){_p.make_dialog();}
 _p.dialog.show();}
 _p.make_dialog=function(){var d=new Dialog(360,140,"Print Formats");d.make_body([['HTML','Select'],['Check','No Letterhead','Will ignore letterhead if it can be set. May not work for all formats'],['HTML','Buttons']]);$btn(d.widgets.Buttons,'Print',function(){_p.build(sel_val(cur_frm.print_sel),_p.go,d.widgets['No Letterhead'].checked);},{cssFloat:'right',marginBottom:'16px',marginLeft:'7px'},'green');$btn(d.widgets.Buttons,'Preview',function(){_p.build(sel_val(cur_frm.print_sel),_p.preview,d.widgets['No Letterhead'].checked);},{cssFloat:'right',marginBottom:'16px'},'');_p.dialog=d;d.onshow=function(){var c=d.widgets['Select'];if(c.cur_sel&&c.cur_sel.parentNode==c)
-c.removeChild(c.cur_sel);c.appendChild(cur_frm.print_sel);c.cur_sel=cur_frm.print_sel;}}
+c.removeChild(c.cur_sel);c.appendChild(cur_frm.print_sel);c.cur_sel=cur_frm.print_sel;d.widgets['No Letterhead'].checked=1;}}
 _p.field_tab=function(layout_cell){var t=$a(layout_cell,'table','',{width:'100%'});var r=t.insertRow(0);this.r=r;r.insertCell(0);r.insertCell(1);r.cells[0].className='datalabelcell';r.cells[1].className='datainputcell';return r}
 _p.print_std_add_table=function(t,layout,pf_list,dt,no_letterhead){if(t.appendChild){layout.cur_cell.appendChild(t);}else{for(var ti=0;ti<t.length-1;ti++){layout.cur_cell.appendChild(t[ti]);layout.close_borders();pf_list[pf_list.length]='<div style="page-break-after: always;" class="page_break"></div>';layout=_p.add_layout(dt,no_letterhead);pf_list[pf_list.length]=layout;layout.addrow();layout.addcell();var div=$a(layout.cur_cell,'div');div.innerHTML='Continued from previous page...';div.style.padding='4px';}
 layout.cur_cell.appendChild(t[t.length-1]);}
@@ -378,7 +378,7 @@ _p.render=function(body,style,doc,title,no_letterhead,only_body){var block=docum
 if(doc&&doc.__archived){var tmp_html='<div style="text-align: center; padding: 8px; background-color: #CCC; "><div style="font-size: 20px; font-weight: bold; ">ARCHIVED</div>You must restore this document to make it editable.</div>';}
 style=(only_body?'':_p.def_print_style_body)+_p.def_print_style_other+style;block.innerHTML=body;var jslist=block.getElementsByTagName('script');while(jslist.length>0){for(var i=0;i<jslist.length;i++){var code=jslist[i].innerHTML;var p=jslist[i].parentNode;var sp=$a(p,'span');p.replaceChild(sp,jslist[i]);var h=eval(code);if(!h)h='';sp.innerHTML=h;}
 jslist=block.getElementsByTagName('script');}
-if(!no_letterhead){block.innerHTML='<div>'+_p.get_letter_head()+'</div>'+block.innerHTML;}
+if(!no_letterhead||!only_body){block.innerHTML='<div>'+_p.get_letter_head()+'</div>'+block.innerHTML;}
 if(only_body){return tmp_html+block.innerHTML.replace(/<td/g,'\n<td').replace(/<div/g,'\n<div');}else{return'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n'
 +'<html><head>'
 +'<title>'+title+'</title>'
