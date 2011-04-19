@@ -936,7 +936,7 @@ var rlist=profile.recent.split('\n');var m=rlist.length;if(m>15)m=15;for(var i=0
 this.rename_notify=function(dt,old,name){me.rdocs.remove(dt,old);me.rdocs.add(dt,name,1);}
 rename_observers.push(this);}
 this.setup_help=function(){me.menu.add_top_menu('Tools',function(){},"sprite-tools");this.menu.add_item('Tools','Error Console',function(){err_console.show();});this.menu.add_item('Tools','Clear Cache',function(){$c('webnotes.session_cache.clear',{},function(r,rt){show_alert(r.message);})});if(has_common(user_roles,['Administrator','System Manager'])){this.menu.add_item('Tools','Download Backup',function(){me.download_backup();});}
-this.menu.add_item('Tools','About <b>Web Notes</b>',function(){show_about();});}
+this.menu.add_item('Tools','Web Notes Framework',function(){show_about();});}
 this.setup_new=function(){me.menu.add_top_menu('New',function(){me.show_new();},'sprite-new');me.show_new=function(){if(!me.new_dialog){var d=new Dialog(240,140,"Create a new record");d.make_body([['HTML','Select'],['Button','Go',function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}]]);d.onshow=function(){me.new_sel.inp.focus();}
 me.new_dialog=d;var nl=profile.can_create.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=get_doctype_label(nl[i]);me.new_sel=new SelectWidget(d.widgets['Select'],nl.sort(),'200px');me.new_sel.onchange=function(){me.new_dialog.hide();new_doc(me.new_sel.inp.value);}}
 me.new_dialog.show();}}
@@ -949,10 +949,6 @@ var nl=profile.can_read.join(',').split(',');for(var i=0;i<nl.length;i++)nl[i]=g
 makeselector();}
 this.setup_logout=function(){var w=$a($td(this.body_tab,0,2),'div','',{paddingTop:'2px',textAlign:'right'});this.right_table_style={fontSize:'11px',verticalAlign:'middle',height:'20px',paddingLeft:'4px',paddingRight:'4px'};var t=make_table(w,1,6,null,[],this.right_table_style);$y(t,{cssFloat:'right',color:'#FFF'});$td(t,0,0).innerHTML=user_fullname;$td(t,0,1).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_help()">Help</span>';$td(t,0,2).innerHTML='<span style="cursor: pointer;font-weight: bold" onclick="get_feedback()">Feedback</span>';$td(t,0,3).innerHTML='<span style="cursor: pointer;" onclick="loaddoc(\'Profile\', user)">Profile</span>';$td(t,0,4).innerHTML='<span style="cursor: pointer;" onclick="logout()">Logout</span>';this.menu_table_right=t;$y($td(t,0,5),{width:'18px'});this.spinner=$a($td(t,0,5),'img','',{display:'none'});this.spinner.src='images/ui/spinner.gif';}
 this.download_backup=function(){$c('webnotes.utils.backups.get_backup',{},function(r,rt){});}
-this.enter_testing=function(){about_dialog.hide();if(is_testing){end_testing();return;}
-var a=prompt('Type in the password','');if(a=='start testing'){$c('start_test',args={},function(){$ds('testing_div');is_testing=true;$i('testing_mode_link').innerHTML='End Testing';});}else{msgprint('Sorry, only administrators are allowed use the testing mode.');}}
-this.setup_testing=function(){about_dialog.hide();$c('setup_test',args={},function(){});}
-this.end_testing=function(){$c('end_test',args={},function(){$dh('testing_div');is_testing=false;$i('testing_mode_link').innerHTML='Enter Testing Mode';});}
 this.setup();}
 var get_help=function(){msgprint('Help not implemented');}
 var get_feedback=function(){var d=new Dialog(640,320,"Please give your feedback");d.make_body([['Text','Feedback'],['Button','Send',function(){$c_obj('Feedback Control','get_feedback',d.widgets['Feedback'].value,function(r,rt){d.hide();if(r.message)msgprint(r.message);})}]]);d.show();}
@@ -1032,14 +1028,11 @@ err_console.onshow=function(){err_console.rows['Error List'].innerHTML='<div sty
 +err_list.join('<div style="height: 10px; margin-bottom: 10px; border-bottom: 1px solid #AAA"></div>')+'</div>';}}
 startup_list.push(setup_err_console);var about_dialog;function show_about(){if(!about_dialog){var d=new Dialog(360,480,'About')
 d.make_body([['HTML','info']]);d.rows['info'].innerHTML="<div style='padding: 16px;'><center>"
-+"<div style='text-align: center'><img src = 'images/ui/webnotes30x120.gif'></div>"
-+"<br><br>&copy; 2007-08 Web Notes Technologies Pvt. Ltd."
-+"<p><span style='color: #888'>Customized Web Based Solutions and Products</span>"
-+"<br>50/2386, Vijaydeep C.H.S,<br>Gandhi Nagar,<br>Opp MIG Cricket Club,<br>Bandra (East),<br>Mumbai 51</p>"
-+"<p>Phone: +91-22-6526-5364 (M-F 9-6)"
-+"<br>Email: info@webnotestech.com"
-+"<br><b>Customer Support: support@webnotestech.com</b></p>"
-+"<p><a href='http://www.webnotestech.com'>www.webnotestech.com</a></p></center>"
++"<h2>Powered by Web Notes Framework</h2>"
++"<p style='color: #888'>Open Source Python + JS Framework</p>"
++"<p>Code Repository: <a href='http://code.google.com/p/wnframework'>http://code.google.com/p/wnframework</a></p>"
++"<p>Forum: <a href='http://groups.google.com/group/wnframework'>http://groups.google.com/group/wnframework</a></p>"
++"<p>Website: <a href='http://wnframework.org'>http://wnframework.org/</a></p>"
 +"</div>";about_dialog=d;}
 about_dialog.show();}
 function loadreport(dt,rep_name,onload,menuitem,reset_report){dt=get_label_doctype(dt);var show_report_builder=function(rb_con){if(!_r.rb_con){_r.rb_con=rb_con;}

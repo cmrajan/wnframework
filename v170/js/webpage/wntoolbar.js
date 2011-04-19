@@ -129,11 +129,10 @@ function WNToolbar(parent) {
 		me.menu.add_top_menu('Tools', function() {  }, "sprite-tools");
 		this.menu.add_item('Tools','Error Console', function() { err_console.show(); });
 		this.menu.add_item('Tools','Clear Cache', function() { $c('webnotes.session_cache.clear',{},function(r,rt){ show_alert(r.message); }) });
-		//this.menu.add_item('Tools','Start / Finish Testing Mode', function() { me.enter_testing(); });
 		if(has_common(user_roles,['Administrator','System Manager'])) {
 			this.menu.add_item('Tools','Download Backup', function() { me.download_backup(); });
 		}
-		this.menu.add_item('Tools','About <b>Web Notes</b>', function() { show_about(); });
+		this.menu.add_item('Tools','Web Notes Framework', function() { show_about(); });
 	}	
 
 	// New
@@ -263,38 +262,6 @@ function WNToolbar(parent) {
 		$c('webnotes.utils.backups.get_backup',{},function(r,rt) {});
 	}
 	
-	this.enter_testing = function() {
-		about_dialog.hide();
-		if(is_testing) {
-			end_testing();
-			return;
-		}
-		var a  = prompt('Type in the password', '');
-		if(a=='start testing') {
-			$c('start_test',args={}, function() {
-					$ds('testing_div'); 
-					is_testing = true;
-					$i('testing_mode_link').innerHTML = 'End Testing';
-				}
-			);
-		} else {
-			msgprint('Sorry, only administrators are allowed use the testing mode.');	
-		}
-	}
-	
-	this.setup_testing = function() {
-		about_dialog.hide();
-		$c('setup_test',args={}, function() { } );
-	}
-	
-	this.end_testing = function() {
-		$c('end_test',args={}, function() {
-				$dh('testing_div'); 
-				is_testing = false;
-				$i('testing_mode_link').innerHTML = 'Enter Testing Mode'; 
-			} 
-		);
-	}
 	this.setup();
 }
 

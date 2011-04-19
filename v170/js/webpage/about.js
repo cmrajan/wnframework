@@ -11,14 +11,11 @@ function show_about() {
 		]);
 		
 		d.rows['info'].innerHTML = "<div style='padding: 16px;'><center>"
-			+"<div style='text-align: center'><img src = 'images/ui/webnotes30x120.gif'></div>"
-			+"<br><br>&copy; 2007-08 Web Notes Technologies Pvt. Ltd."
-			+"<p><span style='color: #888'>Customized Web Based Solutions and Products</span>"
-			+"<br>50/2386, Vijaydeep C.H.S,<br>Gandhi Nagar,<br>Opp MIG Cricket Club,<br>Bandra (East),<br>Mumbai 51</p>"
-			+"<p>Phone: +91-22-6526-5364 (M-F 9-6)"
-			+"<br>Email: info@webnotestech.com"
-			+"<br><b>Customer Support: support@webnotestech.com</b></p>"
-			+"<p><a href='http://www.webnotestech.com'>www.webnotestech.com</a></p></center>"
+			+"<h2>Powered by Web Notes Framework</h2>"
+			+"<p style='color: #888'>Open Source Python + JS Framework</p>"
+			+"<p>Code Repository: <a href='http://code.google.com/p/wnframework'>http://code.google.com/p/wnframework</a></p>"
+			+"<p>Forum: <a href='http://groups.google.com/group/wnframework'>http://groups.google.com/group/wnframework</a></p>"
+			+"<p>Website: <a href='http://wnframework.org'>http://wnframework.org/</a></p>"			
 			+"</div>";
 	
 		about_dialog = d;
