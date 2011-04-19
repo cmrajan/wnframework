@@ -195,7 +195,7 @@ def update_tags(dt, dn, tl):
 		update_tag_dt(dt, dn, tl)
 	except Exception, e:
 		if e.args[0]==1054:
-			setup_dt(dt)
+			setup_user_tags(dt)
 			update_tag_dt(dt, dn, tl)
 
 #
