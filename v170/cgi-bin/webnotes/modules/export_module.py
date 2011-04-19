@@ -97,11 +97,7 @@ def get_module_items(mod):
 		try:
 			dl2 = webnotes.conn.sql('select name, modified from `tab%s` where module="%s"' % (dt,mod))
 			for e in dl2:
-				ndt, ndn = dt, e[0]
-				if dt in ['DocType','Page','Search Criteria']:
-					ndt, ndn = scrub(dt), scrub(e[0])
-
-				dl += [ndt + ',' + ndn + ',0']
+				dl += [dt + ',' + e[0] + ',0']
 				
 				if e[0] == 'Control Panel':
 					dl += [e[0]+','+e[0]+',1']
