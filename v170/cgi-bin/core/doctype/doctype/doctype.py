@@ -48,9 +48,18 @@ class DocType:
 	# field validations
 	#
 	def validate_fields(self):
-		"validates fields for incorrect properties"
+		"validates fields for incorrect properties and double entries"
+		fieldnames = {}
 		for d in self.doclist:
 			if d.parent and d.fieldtype:
+				# check if not double
+				if d.fieldname:
+					if fieldnames.get(d.fieldname):
+						webnotes.msgprint('Fieldname <b>%s</b> appears twice (rows %s and %s). Please rectify' \
+						 	% (d.fieldname, str(d.idx + 1), str(fieldnames[d.fieldname] + 1)), raise_exception=1)
+					fieldnames[d.fieldname] = d.idx
+					
+				# check illegal mandatory
 				if d.fieldtype in ('HTML', 'Button', 'Section Break', 'Column Break') and d.reqd:
 					webnotes.msgprint('%(lable)s [%(fieldtype)s] cannot be mandatory', raise_exception=1)
 		
