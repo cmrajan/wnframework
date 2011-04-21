@@ -69,6 +69,7 @@ Field.prototype.make_body = function() {
 		this.set_description();		
 	}
 	
+	// bind label refresh
 
 	if(this.onmake)this.onmake();
 }
@@ -186,7 +187,7 @@ Field.prototype.refresh_display = function() {
 		if(this.disp_status=='Write') { // write
 			if(this.make_input&&(!this.input)) { // make input if reqd
 				this.make_input();
-				if(this.onmake_input) this.onmake_input();
+				if(this.onmake_input) this.onmake_input();				
 			}
 			
 			if(this.show) this.show()
@@ -290,11 +291,11 @@ Field.prototype.set_input = function(val) {
 }
 
 Field.prototype.run_trigger = function() {
-	if(this.df.reqd && !is_null(this.get_value()) && this.set_as_error)
-		this.set_as_error(0);
-	
 	// update mandatory icon
 	this.refresh_label_icon();
+
+	if(this.df.reqd && !is_null(this.get_value()) && this.set_as_error)
+		this.set_as_error(0);
 
 	if(this.not_in_form) {
 		return;
@@ -640,7 +641,10 @@ LinkField.prototype.set_onchange = function() {
 		// check values are not set in quick succession due to un-intentional event call				
 		if(_link_onchange_flag) { return;}
 		_link_onchange_flag = 1;
-						
+		
+		// refresh mandatory style
+		me.refresh_label_icon();
+		
 		// not in form, do nothing
 		if(me.not_in_form) {
 			_link_onchange_flag = 0;	 

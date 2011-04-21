@@ -32,7 +32,7 @@ TagList.prototype.make = function(parent) {
 }
 
 TagList.prototype.make_body = function() {
-	var div = $a(this.parent, 'div', '', {margin:'3px 0px', padding:'3px 0px'});
+	var div = $a(this.parent, 'span', '', {margin:'3px 0px', padding:'3px 0px'});
 	this.body = $a(div, 'span', '', {marginRight:'4px'});
 	this.add_tag_area = $a(div, 'span');
 	this.make_add_tag();
@@ -49,7 +49,8 @@ TagList.prototype.add_tag = function(label, static, fieldname) {
 // add -tag area
 TagList.prototype.make_add_tag = function() {
 	var me = this;
-	this.add_tag_span = $a(this.add_tag_area, 'span', '', {color:'#888', textDecoration:'underline', cursor:'pointer',marginLeft:'4px',fontSize:'11px'});
+	this.add_tag_span = $a(this.add_tag_area, 'span', '', 
+		{color:'#888', textDecoration:'underline', cursor:'pointer',marginLeft:'4px',fontSize:'11px'});
 	this.add_tag_span.innerHTML = 'Add tag';
 	this.add_tag_span.onclick = function() { me.new_tag(); }
 }
@@ -57,32 +58,23 @@ TagList.prototype.make_add_tag = function() {
 // new tag dialog
 TagList.prototype.make_tag_dialog = function() {
 	var me = this;
-	var d = new Dialog(400,200,'New Tag');
-	d.make_body([['HTML','Tag'],['Button','Save']])
 	
-	// tag input
-	this.make_tag_input(d);
+	var d = new wn.widgets.Dialog({
+		title: 'Add a tag',
+		width: 400,
+		fields: [
+			{fieldtype:'Link', fieldname:'tag', label:'Tag', options:'Tag', 
+				reqd:1, description:'Max chars (20)', no_buttons:1},
+			{fieldtype:'Button', fieldname: 'add', label:'Add'}
+		]
+	})
 	
-	/* make a color picker
-	d.color_picker = this.make_color_picker(d.widgets['Tag']);
-	
-	this.onshow = function() {
-		d.color_picker.refresh()
-	}*/
+	$(d.fields_dict.tag.input).attr('maxlength', 20);
+	d.fields_dict.add.input.onclick = function() { me.save_tag(d); }
 
-	// save
-	d.widgets['Save'].onclick = function() { me.save_tag(d) };
 	return d;
 }
 
-// input with autosuggest
-TagList.prototype.make_tag_input = function(d) {
-	d.tag_input = make_field({fieldtype:'Link', label:'New Tag', options:'Tag', no_buttons:1}, '', 
-		d.widgets['Tag'], this, 0, 1);		
-	d.tag_input.not_in_form = 1;
-	d.tag_input.refresh();
-	$y(d.tag_input.txt, {width:'80%'});
-}
 
 // check if tag text is okay
 TagList.prototype.is_text_okay = function(val) {
@@ -127,7 +119,9 @@ TagList.prototype.remove_from_locals = function(tag) {
 
 // save the tag
 TagList.prototype.save_tag = function(d) {
-	var val = strip(d.tag_input.txt.value);
+	var val = d.get_values();
+	if(val) val = val.tag;
+
 	var me = this;
 
 	if(!this.is_text_okay(val)) return;
@@ -135,7 +129,8 @@ TagList.prototype.save_tag = function(d) {
 	var callback = function(r,rt) {
 		var d = me.dialog;
 		// hide the dialog
-		d.tag_input.txt.value= '';
+		d.fields_dict.add.input.done_working();
+		d.fields_dict.tag.input.set_input('');
 		d.hide();
 		
 		// add in locals
@@ -145,7 +140,8 @@ TagList.prototype.save_tag = function(d) {
 		me.add_tag(r.message, 0, '_user_tags');
 		
 	}
-	$c('webnotes.widgets.menus.add_tag',{'dt': me.dt, 'dn': me.dn, 'tag':val, 'color':'na'}, callback);
+	me.dialog.fields_dict.add.input.set_working();
+	$c('webnotes.widgets.tags.add_tag',{'dt': me.dt, 'dn': me.dn, 'tag':val, 'color':'na'}, callback);
 }
 
 // create a new tag
@@ -160,62 +156,7 @@ TagList.prototype.new_tag = function() {
 
 // refresh tags
 TagList.prototype.refresh_tags = function() {
-	/*for(var i=0; i<_tags.all_tags.length; i++) {
-		_tags.all_tags[i].refresh_color();
-	}*/
 }
-
-
-
-
-//
-// Color Picker
-//
-/*TagList.prototype.make_color_picker = function(parent) {
-	var n_cols = _tags.color_list.length;
-
-	var picker = $a(parent, 'div', '', {margin:'8px 0px'});
-
-	picker.tab = make_table(picker, 2, n_cols, (26*n_cols) + 'px', [], {textAlign:'center'});
-	picker.boxes = [];
-	for(var i=0; i<n_cols; i++) {
-		var wrapper = $a($td(picker.tab, 0, i), 'div', '', {margin:'5px', border:'3px solid #FFF'})
-		var box = $a(wrapper, 'div', '', 
-			{
-				backgroundColor: _tags.colors[_tags.color_list[i]],
-				height:'16px', width:'16px',
-				border:'1px solid #000', cursor:'pointer'
-			});
-
-		box.wrapper = wrapper;
-		box.pick = function() {
-			$y(this.wrapper, {border:'3px solid #000'});
-			if(this.picker.picked) this.picker.picked.unpick();
-			this.picker.picked = this;
-		}
-		box.unpick = function() {
-			$y(this.wrapper, {border:'3px solid #FFF'});
-		}
-		box.onclick = function() {
-			this.pick();
-		}
-		box.picker = picker;
-
-		picker.boxes.push(box);
-		picker.refresh = function() {
-			if(this.picked) this.picked.unpick();
-			this.picked = null;
-		}
-		box.color_name = _tags.color_list[i];
-	}
-	
-	return picker;
-}*/
-
-
-
-
-
 
 //
 // SingleTag
@@ -309,6 +250,6 @@ SingleTag.prototype.remove = function() {
 		me.remove_tag_body()
 		me.taglist.remove_from_locals(me.label);
 	}
-	$c('webnotes.widgets.menus.remove_tag', {'dt':me.dt, 'dn':me.dn, 'tag':me.label}, callback)
+	$c('webnotes.widgets.tags.remove_tag', {'dt':me.dt, 'dn':me.dn, 'tag':me.label}, callback)
 	$bg(me.body,'#DDD');
 }

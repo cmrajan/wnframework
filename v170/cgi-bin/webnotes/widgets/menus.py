@@ -1,5 +1,5 @@
 """
-Server side methods called from DocBrowser and tags
+Server side methods called from DocBrowser
 """
 
 import webnotes
@@ -73,14 +73,6 @@ def get_columns(out, sf, fl, dt):
 			
 	return res
 
-# --------------------------------------------------------------
-
-def check_user_tags(dt):
-	try:
-		sql("select `_user_tags` from `tab%s` limit 1" % dt)
-	except Exception, e:
-		if e.args[0] == 1054:
-			setup_user_tags(dt)
 
 # --------------------------------------------------------------
 # NOTE: THIS SHOULD BE CACHED IN DOCTYPE CACHE
@@ -127,153 +119,18 @@ def get_dt_details():
 	# -------
 	res = get_columns(out, sf, fl, dt)
 	
+	from webnotes.widgets.tags import check_user_tags
 	check_user_tags(dt)
 	
 	out['columns'] = [['name', 'ID', 'Link', dt], ['modified', 'Modified', 'Data', ''], ['_user_tags', 'Tags', 'Data', '']] + res
 		
 	return out
 
-# --------------------------------------------------------------
-
-def get_color_map():
-	d={}
-	try:
-		for tag in sql("select name, tag_color from tabTag"):
-			d[tag[0]] = tag[1]
-	except Exception, e:
-		if e.args[0] in (1146, 1054):
-			return {}
-		else:
-			raise e
-	return d
 
 # --------------------------------------------------------------
 
 def get_trend():
 	return {'trend': get_dt_trend(webnotes.form_dict.get('dt'))}
-
-
-
-
-
-
-#
-# get tags
-#
-def get_tags(dt, dn):
-	"return list of tags in a record"
-	try:
-		tl = webnotes.conn.get_value(dt, dn, '_user_tags')
-		return tl and tl.split(',') or []
-	except Exception, e:
-		if e.args[0]==1054:
-			setup_user_tags(dt)
-			return []
-		else: raise e
-
-#
-# update tags in table
-#
-def update_tag_dt(dt, dn, tl):
-	"updates the _user_tag column in the table"
-	
-	sql("update tab%s set _user_tags=%s where name=%s" % (dt,'%s','%s'), (',' + ','.join(tl), dn))
-
-#
-# update tags
-#
-def update_tags(dt, dn, tl):
-	"updates tags in the given record"
-	if len(','.join(tl)) > 179:
-		msgprint("Too many tags")
-		raise Exception
-	
-	tl = filter(lambda x: x, tl)
-	
-	# update in table
-	try:
-		update_tag_dt(dt, dn, tl)
-	except Exception, e:
-		if e.args[0]==1054:
-			setup_user_tags(dt)
-			update_tag_dt(dt, dn, tl)
-
-#
-# add _user_tag column (not standard)
-#
-def setup_user_tags(dt):
-	"adds _user_tags column in the database"
-	webnotes.conn.commit()
-	sql("alter table `tab%s` add column `_user_tags` varchar(180)" % dt)
-	webnotes.conn.begin()
-
-#
-# insert tag
-#
-def _add_tag_to_master(tag, color):
-	if color:
-		t, cond = color, ("on duplicate key update tag_color='%s'" % color)
-	else:
-		t, cond = 'Default', ''
-		
-	sql("insert ignore into tabTag(name, tag_color) values ('%s', '%s') %s" % (tag, t, cond))
-
-#
-# create tag
-#
-def create_tag(tag, color):
-	try:
-		_add_tag_to_master(tag, color)
-	except Exception, e:
-		# add the table
-		if e.args[0] in (1146, 1054):
-			setup_tags()
-			_add_tag_to_master(tag, color)
-		else:
-			raise e
-
-#
-# Add a new tag
-#
-def add_tag():
-	"adds a new tag to a record, and creates the Tag master"
-	
-	f = webnotes.form_dict
-	tag, color = f.get('tag'), f.get('color')
-	dt, dn = f.get('dt'), f.get('dn')
-	
-	# create tag in tag table
-	create_tag(tag, color)
-	
-	# add in _user_tags
-	tl = get_tags(dt, dn)
-	
-	if not tag in tl:
-		tl.append(tag)
-		update_tags(dt, dn, tl)
-		
-	return tag
-
-#
-# remove tag
-#
-def remove_tag():
-	"removes tag from the record"
-	f = webnotes.form_dict
-	tag, dt, dn = f.get('tag'), f.get('dt'), f.get('dn')
-	
-	tl = get_tags(dt, dn)				
-	update_tags(dt, dn, filter(lambda x:x!=tag, tl))
-
-#
-# create / update tags table
-#	
-def setup_tags():
-	"creates / updates tabTag from the DocType"
-	webnotes.conn.commit()
-	from webnotes.modules.module_manager import reload_doc
-	reload_doc('core','doctype','tag')
-	webnotes.conn.begin()
 
 
 

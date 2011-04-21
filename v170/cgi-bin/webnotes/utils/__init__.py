@@ -52,6 +52,11 @@ def db_exists(dt, dn):
 	return webnotes.conn.sql('select name from `tab%s` where name="%s"' % (dt, dn))
 
 def load_json(arg):
+	
+	# already a dictionary?
+	if type(arg)!=str:
+		return arg
+	
 	try: import json
 	except: import simplejson as json
 

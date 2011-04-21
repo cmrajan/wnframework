@@ -170,7 +170,6 @@ def build():
 	sd['letter_heads'] = get_letter_heads()
 	sd['home_page'] = home_page or ''
 	sd['start_items'] = webnotes.widgets.menus.get_menu_items()
-	sd['tag_color_map'] = webnotes.widgets.menus.get_color_map()
 	if webnotes.session['data'].get('ipinfo'):
 		sd['ipinfo'] = webnotes.session['data']['ipinfo']
 		

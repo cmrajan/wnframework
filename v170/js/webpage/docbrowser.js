@@ -557,7 +557,8 @@ ItemBrowserItem.prototype.make_tags = function() {
 	// make custom tags
 	var me = this;
 	var tl = this.det[2] ? this.det[2].split(',') : [];
-	this.taglist = new TagList(this.body, tl, this.ib.dt, this.dn, 0, function(tag) { me.set_tag_filter(tag); });
+	var div = $a(this.body, 'div', '', {margin: '7px 0px'})
+	this.taglist = new TagList(div, tl, this.ib.dt, this.dn, 0, function(tag) { me.set_tag_filter(tag); });
 
 	// std tags
 	if(this.ib.dt_details.submittable) { 

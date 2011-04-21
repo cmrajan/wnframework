@@ -374,7 +374,7 @@ div.time_field select{
 }
 
 .input-mandatory {
-	font-size: 14px;
+	font-size: 14px !important;
 	font-weight: bold;
 }
 

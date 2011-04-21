@@ -150,6 +150,8 @@ wn.widgets.Dialog = function(opts) {
 		$dh(this.cancel_img);
 	}
 
+	if(opts) this.make();
+
 }
 
 wn.widgets.Dialog.prototype = new wn.widgets.FieldGroup();
