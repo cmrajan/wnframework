@@ -3,6 +3,8 @@ pscript['onload_Login Page'] = function(){
 	$bs(lw, '1px 1px 3px #888');
 	$bg(document.getElementsByTagName('body')[0], '#DDD');
 	
+	pscript.login_btn = $btn('login_btn', 'Login', pscript.doLogin)
+	
     keypress_observers.push(new function() {
       this.notify_keypress = function(kc) { if(kc==13 && $i("password").value) pscript.doLogin(); }
     }
@@ -12,6 +14,7 @@ pscript['onload_Login Page'] = function(){
 
 // Login Callback
 pscript.onLoginReply = function(r, rtext) {
+	pscript.login_btn.done_working();
     if(r.message=="Logged In"){
         window.location.href='index.cgi' + (get_url_arg('page') ? ('?page='+get_url_arg('page')) : '');
     } else {
@@ -30,6 +33,8 @@ pscript.doLogin = function(){
     if($i('remember_me').checked) 
       args['remember_me'] = 1;
 
+	pscript.login_btn.set_working();
+	
     $c("login", args, pscript.onLoginReply);
 }
 
