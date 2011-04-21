@@ -56,7 +56,7 @@ function save_doclist(dt, dn, save_action, onsave, onerr) {
 	if(save_action!='Cancel') {
 		for(var n in doclist) {
 			// type / mandatory checking
-			var tmp = check_required(doclist[n].doctype, doclist[n].name);
+			var tmp = check_required(doclist[n].doctype, doclist[n].name, doclist[0].doctype);
 			if(doclist[n].docstatus+''!='2'&&all_clear) // if not deleted
 				all_clear = tmp;
 		}
@@ -99,7 +99,7 @@ function save_doclist(dt, dn, save_action, onsave, onerr) {
 	}
 }
 
-function check_required(dt, dn) {
+function check_required(dt, dn, parent_dt) {
 	var doc = locals[dt][dn];
 	if(doc.docstatus>1)return true;
 	var fl = fields_list[dt];
@@ -134,6 +134,8 @@ function check_required(dt, dn) {
 			if(all_clear)all_clear = false;
 		}
 	}
-	if(errfld.length)msgprint('<b>Following fields are required:</b>\n' + errfld.join('\n'));
+	if(errfld.length)msgprint('<b>Mandatory fields required in '+
+	 	(doc.parenttype ? (fields[doc.parenttype][doc.parentfield].label + ' (Table)') : get_doctype_label(doc.doctype)) +
+		':</b>\n' + errfld.join('\n'));
 	return all_clear;
 }

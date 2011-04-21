@@ -237,6 +237,26 @@ function $ln(parent, label, onclick, style, ajax) {
 	return span;
 }
 
+// standard input pattern
+// has a standard text that clears on change
+// and if onchange the value is empty, shows the text
+
+(function($) {
+	$.fn.add_default_text = function(txt) {
+		return this.each(function() {
+			$(this).attr('default_text', txt).bind('focus', function() {
+				if(this.value==$(this).attr('default_text')) {
+					$(this).val('').css('color', '#000');
+				}
+			}).bind('blur', function() {
+				if(!this.value) {
+					$(this).val($(this).attr('default_text')).css('color', '#888');
+				}
+			}).blur();
+		});
+	};
+})(jQuery);
+
 // Select
 // ====================================
 
@@ -310,7 +330,14 @@ function $a(parent, newtag, className, cs, innerHTML, onclick) {
 	var c = document.createElement(newtag);
 	if(parent)
 		parent.appendChild(c);
-	if(className)c.className = className;
+		
+	// if image, 3rd parameter is source
+	if(className) {
+		if(newtag.toLowerCase()=='img')
+			c.src = className
+		else
+			c.className = className;		
+	}
 	if(cs)$y(c,cs);
 	if(innerHTML) c.innerHTML = innerHTML;
 	if(onclick) c.onclick = onclick;

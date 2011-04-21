@@ -1,3 +1,14 @@
+/* listing 2.0 */
+
+div.listing-more {
+	margin: 7px 0px 17px 0px;
+	textAlign: center;
+	display: none;
+}
+
+div.listing-toolbar {
+	margin: 7px 0px;
+}
 
 /* SRS */
 
@@ -39,18 +50,6 @@ div.srs_filter_area {
 
 div.srs_filter_area td {
 	vertical-align: middle;
-}
-
-.srs_paging_area {
-	padding: 4px 0px 8px 0px;
-}
-
-.paging_area { text-align: right; }
-.paging_area table { table-layout: fixed; float:right; }
-.paging_area td { text-align: center; vertical-align: middle; }
-.srs_paging_item { }
-.srs_paging_item_mo { 
-	background-color: #FFF;
 }
 
 

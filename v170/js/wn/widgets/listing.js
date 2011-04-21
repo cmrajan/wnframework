@@ -5,8 +5,10 @@
 
 wn.widgets.Listing = function(opts) {
 	this.opts = opts;
+	this.page_length = 20;
 	this.btns = {};
 	this.start = 0;
+	var me = this;
 
 	// create place holders for all the elements
 	this.make = function(opts) {
@@ -14,13 +16,18 @@ wn.widgets.Listing = function(opts) {
 		this.filters_area = $a(this.wrapper, 'div', 'listing-filters');
 		this.toolbar_area = $a(this.wrapper, 'div', 'listing-toolbar');
 		this.results_area = $a(this.wrapper, 'div', 'listing-results');
-		this.loading_area = $a(this.wrapper, 'div', 'listing-loading');
-		this.more_button = $a(this.wrapper, 'div', 'listing-more');
-		this.no_results_area = $a(this.wrapper, 'div', 'help_box', {display: 'none'});
+
+		this.more_button_area = $a(this.wrapper, 'div', 'listing-more');
+
+		this.no_results_area = $a(this.wrapper, 'div', 'help_box', {display: 'none'}, 
+			(this.opts.no_results_message ? this.opts.no_results_message : 'No results'));
 
 		if(opts) this.opts = opts;
+		this.page_length = this.opts.page_length ? this.opts.page_length : this.page_length;
+		
 		this.make_toolbar();
 		this.make_filters();
+		this.make_more_button();
 	}
 	
 	// make filters using FieldGroup
@@ -36,24 +43,36 @@ wn.widgets.Listing = function(opts) {
 	
 	// make the toolbar
 	this.make_toolbar = function() {
-		if(this.opts.filters.hide_refresh)
-			this.btns.refresh = $btn(this.toolbar_area, 'Refresh', this.run);
+		if(!this.opts.hide_refresh) {
+			this.ref_img = $a(this.toolbar_area, 'span', 'link_type', {color:'#888'}, '[refresh]');
+			this.ref_img.onclick = function() { me.run(); }
+			
+			this.loading_img = $a(this.toolbar_area, 'img', 'images/ui/button-load.gif', {display:'none', marginLeft:'3px', marginBottom:'-2px'});
+			
+		}
+	}
 
-		if(this.opts.filters.show_report)
-			this.btns.report = $btn(this.toolbar_area, 'Report', this.show_report);
-
-		if(this.opts.filters.show_export)
-			this.btns.export = $btn(this.toolbar_area, 'Export', this.do_export);
-
-		if(this.opts.filters.show_print)
-			this.btns.print = $btn(this.toolbar_area, 'Print', this.do_print);
+	// make more button
+	// that shows more results when they are displayed
+	this.make_more_button = function() {
+		this.more_btn = $btn(this.more_button_area, 'Show more results...', 
+			function() {
+				me.more_btn.set_working();
+				me.run(function() { 
+					me.more_btn.done_working(); 
+				}, 1);
+			}, {fontSize:'14px'}, 0, 1
+		);
+		
+		$y(this.more_btn.loading_img, {marginBottom:'0px'});
 	}
 
 	// clear the results and re-run the query
 	this.clear = function() {
 		this.results_area.innerHTML = '';
 		this.table = null;
-		$dh(this.no_result_area);
+		$ds(this.results_area);
+		$dh(this.no_results_area);
 	}
 	
 	// callback on the query
@@ -62,25 +81,22 @@ wn.widgets.Listing = function(opts) {
 	this.make_results = function(r, rt) {
 		if(this.start==0) this.clear();
 		
-		if(r.values) {
-			if(this.opts.headers && !this.table) {
-				this.build_table()
-			}
-			
+		$dh(this.more_button_area);
+		if(this.loading_img) $dh(this.loading_img)
+
+		if(r.values && r.values.length) {
 			// render the rows
 			for(var i=0; i<r.values.length; i++) {
 				var row = this.add_row();
-				if(this.opts.render_row) {
-					// call the show_cell with row, ri, ci, d
-					this.opts.render_row(row, i, 0, r.values);
-				} else {
-					// render the cells
-					this.render_row(r.values, i)
-				}
+				
+				// call the show_cell with row, ri, ci, d
+				this.opts.render_row(row, r.values[i], this);
 			}
-			
 			// extend start
 			this.start += r.values.length;
+			
+			// refreh more button
+			if(r.values.length==this.page_length) $ds(this.more_button_area);
 			
 		} else {
 			if(this.start==0) {
@@ -88,86 +104,44 @@ wn.widgets.Listing = function(opts) {
 				$ds(this.no_results_area);
 			}
 		}
+		
+		// callbacks
+		if(this.onrun) this.onrun();
+		if(this.opts.onrun) this.opts.onrun();
 	}
 	
-	// build a table of headers
-	// add serial number column if
-	// required
-	this.build_table = function() {
-		var widths = [];
-		for(var i=0; i<this.opts.headers.length; i++) {
-			widths.push(this.opts.headers[i].width);
-		}
-		var cell_style = opts.cell_style ? opts.cell_style : {padding: '3px'};
-		
-		// table
-		this.results_table = make_table(this.results_area, 1, this.opts.headers.length, '100%', widths, cell_style)
-		
-		// headings
-		for(var i=0; i<this.opts.headers.length; i++) {
-			var cell = $td(this.results_table, 0, i);
-			cell.innerHTML = this.opts.headers[i].label;
-			$y(cell, {fontWeight:'bold'});
-		}
-	}
 	
 	// add a results row
 	this.add_row = function() {
-		if(this.results_table) {
-			this.results_table.append_row();
-		} else {
-			return $a(this.results_area, 'div', '', (opts.cell_style ? opts.cell_style : {padding: '3px'}));
-		}
+		return $a(this.results_area, 'div', '', (opts.cell_style ? opts.cell_style : {padding: '3px'}));
 	}
 	
-	// render a simple row based on the
-	// values and style given
-	this.render_row = function(data, ridx) {
-		for(var i=0; i<data[ridx].length; i++) {
-			if(i==0) {
-				// serial number
-				$td(this.results_table, ridx+1, i) = i+1;
-			}
 
-			// render the cell value
-			this.render_cell($td(this.results_table, ridx+1, i+1), data[ridx][i], this.opts.headers[i].fieldtype, this.opts.headers[i].options)
-		}
-	}
-	
-	// render a cell based on the datatype
-	this.render_cell = function(cell, data, type, options) {
-		cell.div = $a(cell, 'div');
-		$s(cell.div, data, type, options);		
-	}
-	
 	// run the query, get the query from 
 	// the get_query method of opts
-	this.run = function() {
+	this.run = function(callback, append) {
+		if(callback) 
+			this.onrun = callback;
+
+		if(!append)
+			this.start = 0;
+
 		// load query
-		this.opts.get_query();
+		this.query = this.opts.get_query();
 		this.add_limits();
+
+		args={ query_max: this.query_max ? this.query_max : '' }
+		args.simple_query = this.query;
 		
-		args={ query_max: this.query_max }
-		
-		if(this.is_std_query) 
-			args.query = q;
-		else 
-			args.simple_query = q;
-		$c('webnotes.widgets.query_builder.runquery', args, this.make_results, null, this.opts.no_loading);
+		// show loading
+		if(this.loading_img) $di(this.loading_img);
+		$c('webnotes.widgets.query_builder.runquery', args, 
+			function(r, rt) { me.make_results(r, rt) }, null, this.opts.no_loading);
 	}
 	
 	this.add_limits = function() {
-		var page_len = this.opts.page_length ? this.opts.page_length ? 20
-		this.query += ' LIMIT ' + this.start + ',' + page_len;
-		
+		this.query += ' LIMIT ' + this.start + ',' + this.page_length;
 	}
-	this.show_report = function() {
-		
-	}
-	this.do_export = function() {
-		
-	}
-	this.do_print = function() {
-		
-	}
+	
+	if(opts) this.make();
 }

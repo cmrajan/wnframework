@@ -367,6 +367,7 @@ _f.Frm.prototype.setup_fields_std = function() {
 		if(f.fieldtype=='Section Break' && fl[i+1] && fl[i+1].fieldtype=='Section Break') continue;
 		
 		var fn = f.fieldname?f.fieldname:f.label;
+				
 		var fld = make_field(f, this.doctype, this.layout.cur_cell, this);
 		this.fields[this.fields.length] = fld;
 		this.fields_dict[fn] = fld;

@@ -1,4 +1,7 @@
 // Listing
+// this listing object will soon be 
+// deprecated because it has a very non standard way of creation
+// the new listing object is at wn.widgets.Listing
 // -----------------------
 
 list_opts = {
@@ -380,7 +383,8 @@ Listing.prototype.build_query = function() {
 
 	if(cond) {
 		this.query += NEWLINE + cond.join(NEWLINE)
-		this.query_max += NEWLINE + cond.join(NEWLINE)
+		if(this.query_max)
+			this.query_max += NEWLINE + cond.join(NEWLINE)
 	}
 
     // add grouping
@@ -477,10 +481,10 @@ Listing.prototype.run = function(run_callback) {
 	
 	this.set_rec_label(-1);
 	$di(this.loading_img);
-	if(this.server_call) 
-		{ this.server_call(this, call_back); }
-	else {
-		args={ query_max: this.query_max }
+	if(this.server_call) { 
+		this.server_call(this, call_back); 
+	} else {
+		args={ query_max: (this.query_max ? this.query_max : '') }
 		if(this.is_std_query) args.query = q;
 		else args.simple_query = q;
 		$c('webnotes.widgets.query_builder.runquery', args, call_back, null, this.no_loading);

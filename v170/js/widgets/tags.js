@@ -6,8 +6,8 @@ _tags = {
 	dialog: null,
 	color_map: {},
 	all_tags: [],
-	colors: {'Default':'#489', 'Red':'#FF0000', 'Blue':'#000088', 'Green':'#008800', 'Orange':'#FF8800'},
-	color_list: ['Default', 'Red', 'Blue', 'Green', 'Orange'] // for sequence
+	colors: {'Default':'#add8e6'}
+	//color_list: ['Default'] // for sequence
 }
 
 //
@@ -63,12 +63,12 @@ TagList.prototype.make_tag_dialog = function() {
 	// tag input
 	this.make_tag_input(d);
 	
-	// make a color picker
+	/* make a color picker
 	d.color_picker = this.make_color_picker(d.widgets['Tag']);
 	
 	this.onshow = function() {
 		d.color_picker.refresh()
-	}
+	}*/
 
 	// save
 	d.widgets['Save'].onclick = function() { me.save_tag(d) };
@@ -134,13 +134,6 @@ TagList.prototype.save_tag = function(d) {
 	
 	var callback = function(r,rt) {
 		var d = me.dialog;
-		// update tag color
-		if(d.color_picker.picked) {
-			_tags.color_map[r.message] = d.color_picker.picked.color_name;
-			me.refresh_tags();
-			d.color_picker.refresh()
-		}
-		
 		// hide the dialog
 		d.tag_input.txt.value= '';
 		d.hide();
@@ -152,8 +145,7 @@ TagList.prototype.save_tag = function(d) {
 		me.add_tag(r.message, 0, '_user_tags');
 		
 	}
-	var t = d.color_picker.picked ? d.color_picker.picked.color_name : '';
-	$c('webnotes.widgets.menus.add_tag',{'dt': me.dt, 'dn': me.dn, 'tag':val, 'color':t}, callback);
+	$c('webnotes.widgets.menus.add_tag',{'dt': me.dt, 'dn': me.dn, 'tag':val, 'color':'na'}, callback);
 }
 
 // create a new tag
@@ -168,9 +160,9 @@ TagList.prototype.new_tag = function() {
 
 // refresh tags
 TagList.prototype.refresh_tags = function() {
-	for(var i=0; i<_tags.all_tags.length; i++) {
+	/*for(var i=0; i<_tags.all_tags.length; i++) {
 		_tags.all_tags[i].refresh_color();
-	}
+	}*/
 }
 
 
@@ -179,7 +171,7 @@ TagList.prototype.refresh_tags = function() {
 //
 // Color Picker
 //
-TagList.prototype.make_color_picker = function(parent) {
+/*TagList.prototype.make_color_picker = function(parent) {
 	var n_cols = _tags.color_list.length;
 
 	var picker = $a(parent, 'div', '', {margin:'8px 0px'});
@@ -218,7 +210,7 @@ TagList.prototype.make_color_picker = function(parent) {
 	}
 	
 	return picker;
-}
+}*/
 
 
 
@@ -247,7 +239,7 @@ SingleTag.prototype.make_body = function(parent) {
 	var me = this;
 	// tag area
 	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: this.get_color(), 
-		color:'#FFF', marginRight:'4px', fontSize:'11px'});
+		color:'#226', marginRight:'4px'});
 	$br(this.body,'3px');
 	
 	if(this.taglist && this.taglist.onclick) $y(this.body, {cursor:'pointer'});
@@ -267,15 +259,16 @@ SingleTag.prototype.make_body = function(parent) {
 
 // color
 SingleTag.prototype.get_color = function() {
-	if(this.label=='Submitted') return '#459';
+	return '#add8e6';
+	/*if(this.label=='Submitted') return '#459';
 	else if(this.label=='Draft') return '#4A5';
-	else return (_tags.color_map[this.label] ? _tags.color_map[this.label] : _tags.colors['Default'])
+	else return (_tags.color_map[this.label] ? _tags.color_map[this.label] : _tags.colors['Default'])*/
 }
 
 // refresh color from _tags.color_map
-SingleTag.prototype.refresh_color = function() {
+/*SingleTag.prototype.refresh_color = function() {
 	$y(this.body, {backgroundColor: this.get_color()});
-}
+}*/
 
 // remove btn
 SingleTag.prototype.make_remove_btn = function() {
