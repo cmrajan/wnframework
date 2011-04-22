@@ -36,6 +36,8 @@ wn.widgets.PageSidebar = function(parent, opts) {
 	this.make_head = function() {
 		this.head = $a(this.wrapper, 'div', 'psidebar-head', '', this.opts.title);
 	}
+	
+	this.refresh();
 }
 
 //

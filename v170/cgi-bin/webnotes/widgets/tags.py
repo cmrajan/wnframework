@@ -98,7 +98,7 @@ def add_tag():
 	if not tag in tl:
 		tl.append(tag)
 		update_tags(dt, dn, tl)
-		update_tag_cnt(dt, tag, 1)
+		TagCounter(dt).update(tag, 1)
 		
 	return tag
 
@@ -112,7 +112,7 @@ def remove_tag():
 	
 	tl = get_tags(dt, dn)				
 	update_tags(dt, dn, filter(lambda x:x!=tag, tl))
-	update_tag_cnt(dt, tag, -1)
+	TagCounter(dt).update(tag, -1)
 
 
 #
@@ -134,59 +134,88 @@ def setup_user_tags(dt):
 	
 
 
-# setup / update tag cnt
-# keeps tags in _tag_cnt (doctype, tag, cnt)
-# if doctype cnt does not exist
-# creates it for the first time 
-def update_tag_cnt(dt, tag, n):
-	"updates tag cnt for a doctype and tag"
-	try:
-		cnt = webnotes.conn.sql("select cnt from `_tag_cnt` where doctype=%s and tag=%s", (dt, tag))
-	except Exception, e:
-		if e.args[0]==1146:
-			setup_tag_cnt()
-			cnt = 0
-		else: raise e
-			
-	if not cnt:
-		# first time? build a cnt and add
-		build_cnt(dt, tag)
-	else:
-		webnotes.conn.sql("update `_tag_cnt` set cnt = ifnull(cnt,0) + (%s) where doctype=%s and tag=%s",\
-			(n, dt, tag))
 
+class TagCounter:
+	"""
+	represents the a tag counter stores tag count per doctype in table _tag_cnt
+	"""
+	def __init__(self, doctype):
+		self.doctype = doctype
 
+	# setup / update tag cnt
+	# keeps tags in _tag_cnt (doctype, tag, cnt)
+	# if doctype cnt does not exist
+	# creates it for the first time
+	def update(self, tag, diff):
+		"updates tag cnt for a doctype and tag"
+		cnt = webnotes.conn.sql("select cnt from `_tag_cnt` where doctype=%s and tag=%s", (self.dt, tag))
 
-# insert a new row in _tag_cnt
-def build_cnt(dt, tag):
-	"adds a new row of doctype, tag to the table"
-	cnt = webnotes.conn.sql("select count(*) from `tab%s` where _user_tags like '%s'" \
-		% (dt, '%,'+tag+'%'))[0][0]	
-	webnotes.conn.sql("insert into `_tag_cnt`(doctype, tag, cnt) values (%s, %s, %s)", \
-		(dt, tag, cnt))
-	
-	
+		if not cnt:
+			# first time? build a cnt and add
+			self.new_tag(tag, 1)
+		else:
+			webnotes.conn.sql("update `_tag_cnt` set cnt = ifnull(cnt,0) + (%s) where doctype=%s and tag=%s",\
+				(diff, dt, tag))
 
+ 	
+	def new_tag(self, tag, cnt=0):
+		"Creates a new row for the tag and doctype"
+		webnotes.conn.sql("insert into `_tag_cnt`(doctype, tag, cnt) values (%s, %s, %s)", \
+			(self.doctype, tag, cnt))
 
-# create the tag cnt table
-def setup_tag_cnt():
-	"creates the tag cnt table from the DocType"
-	webnotes.conn.commit()
-	webnotes.conn.sql("""
-	create table `_tag_cnt` (
-		doctype varchar(180), tag varchar(22), cnt int(10),
-		primary key (doctype, tag), index cnt(cnt)) ENGINE=InnoDB
-	""")
-	webnotes.conn.begin()	
+	def build(self, dt=None):
+		"Builds / rebuilds the counting"
+		dt = dt or self.doctype
+		
+		webnotes.conn.sql("delete from _tag_cnt where doctype=%s", dt)
+		
+		# count
+		tags = {}
+		for ut in webnotes.conn.sql("select _user_tags from `tab%s`" % dt):
+			if ut[0]:
+				tag_list = ut[0].split(',')
+				for t in tag_list:
+					if t:
+						tags[t] = tags.get(t, 0) + 1
+
+		# insert
+		for t in tags:
+			self.new_tag(t, tags[t])
+						
+	def get_top(self):
+		return webnotes.conn.sql("select tag, cnt from `_tag_cnt` where doctype=%s order by cnt desc limit 10", self.doctype, as_list = 1)
+
+	def load_top(self):
+		try:
+			return self.get_top()
+		except Exception, e:
+			if e.args[0]==1146:
+				self.setup()
+				return self.get_top()
+			else: raise e
+
+	def setup(self):
+		"creates the tag cnt table from the DocType"
+		webnotes.conn.commit()
+		webnotes.conn.sql("""
+		create table `_tag_cnt` (
+			doctype varchar(180), tag varchar(22), cnt int(10),
+			primary key (doctype, tag), index cnt(cnt)) ENGINE=InnoDB
+		""")
+		webnotes.conn.begin()
+		
+		# build all
+		for dt in webnotes.conn.sql("select name from tabDocType where ifnull(issingle,0)=0 and docstatus<2"):
+			try:
+				self.build(dt[0])
+			except Exception, e:
+				if e.args[0]==1054: pass
+				else: raise e
 		
 # returns the top ranked 10 tags for the
 # doctype. will only return tags that are
 # custom made
-def get_top_tags(dt):
+def get_top_tags(arg=''):
 	"returns the top 10 tags for the doctype"
-	try:
-		webnotes.conn.sql("select tag, cnt from `_tag_cnt` where doctype=%s order by cnt desc limit 10")
-	except Exception, e:
-		if e.args[0]==1146:
-			setup_tag_cnt()
-		else: raise e
+	dt = webnotes.form_dict.get('dt')
+	return TagCounter(dt).load_top()

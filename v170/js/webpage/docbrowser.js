@@ -57,11 +57,42 @@ ItemBrowser = function(parent, dt, label, field_list) {
 	// body
 	this.body = $a(this.wrapper, 'div');
 	
-	// toolbar
-	this.toolbar_area = $a(this.body, 'div', '', {padding: '4px', backgroundColor:'#EEE'});
-	$br(this.toolbar_area, '4px'); $gr(this.toolbar_area, '#DDD', '#CCC');
+	// setup toolbar
+	this.setup_toolbar();
 	
-	this.sub_toolbar = $a(this.body, 'div', '', {marginBottom:'8px', padding: '4px', textAlign:'right', fontSize:'11px', color:'#444'});
+	// setup list and sidebar
+	this.setup_sidebar();
+}
+
+ItemBrowser.prototype.setup_sidebar = function() {
+	var me = this;
+	
+	// table
+	var tab = make_table(this.body, 1, 2, '100%', ['75%', '25%'], {paddingRight:'7px'});
+	this.list_area = $td(tab, 0, 0);
+	$y($td(tab, 0, 1), {paddingTop:'53px'});
+	
+	// sidebar
+	this.sidebar = new wn.widgets.PageSidebar($td(tab, 0, 1), {
+		sections: [
+			{
+				title: 'Top Tags',
+				render: function(body) {
+					new wn.widgets.TagCloud(body, me.dt, function(tag) { me.set_tag_filter(tag) });
+				}				
+			}
+		]
+	});
+}
+
+// setup the toolbar and archiving and deleteing functionality
+ItemBrowser.prototype.setup_toolbar = function() {
+	
+	// toolbar
+	this.toolbar_area = $a(this.body, 'div', '', {padding: '3px', backgroundColor:'#EEE'});
+	$br(this.toolbar_area, '3px'); $gr(this.toolbar_area, '#DDD', '#CCC');
+	
+	this.sub_toolbar = $a(this.body, 'div', '', {marginBottom:'7px', padding: '3px', textAlign:'right', fontSize:'11px', color:'#444'});
 	
 	// archives label
 	this.archives_label = $a(this.body, 'div', 'help_box_big',{display:'none'});
@@ -230,7 +261,7 @@ ItemBrowser.prototype.load_details = function(load_callback) {
 		me.dt_details = r.message;
 		if(r.message) {
 			me.make_toolbar();
-			me.make_the_list(me.dt, me.body);
+			me.make_the_list(me.dt, me.list_area);
 			me.show_results();
 			if(load_callback) load_callback();
 		}
@@ -327,6 +358,7 @@ ItemBrowser.prototype.add_tag_conditions = function(q) {
 			var op = '=';
 				
 			var fn = me.tag_filter_dict[key].fieldname;
+			fn = fn ? fn : '_user_tags';
 				
 			// conditions based on user tags
 			if(fn=='docstatus')val=(key=='Draft'?'0':'1');
@@ -468,6 +500,46 @@ ItemBrowser.prototype.archive_items = function() {
 	$c('webnotes.widgets.menus.archive_items', arg, function(r, rt) { if(!r.exc) me.run(); })
 }
 
+// -------------------------------------------------
+
+ItemBrowser.prototype.set_tag_filter = function(tag) {
+	var me = this;
+		
+	// check if exists
+	if(in_list(keys(me.tag_filter_dict), tag.label)) return;
+	
+	// create a tag in filters
+	var filter_tag = new SingleTag({
+		parent: me.tag_area,
+		label: tag.label,
+		dt: me.dt,
+		color: tag.color
+	});
+
+	filter_tag.fieldname = tag.fieldname;
+
+	// remove tag from filters
+	filter_tag.remove = function(tag_remove) {
+		$(tag_remove.body).fadeOut();
+		delete me.tag_filter_dict[tag_remove.label];
+		
+		// hide everything?
+		if(!keys(me.tag_filter_dict).length) {
+			$(me.tag_filters).slideUp(); // hide
+		}
+		
+		// run
+		me.run();
+	}
+
+	// add to dict
+	me.tag_filter_dict[tag.label] = filter_tag;
+	$ds(me.tag_filters);
+	
+	// run
+	me.run();
+}
+
 // ========================== ITEM ==================================
 
 function ItemBrowserItem(parent, det, ib) {
@@ -527,7 +599,7 @@ ItemBrowserItem.prototype.make_details = function() {
 				cl[i][1].indexOf('Group') != -1 || 
 				cl[i][1].indexOf('Priority') != -1 || 
 				cl[i][1].indexOf('Type') != -1) {
-					me.taglist.add_tag(me.det[i], 1, cl[i][0]);	
+					me.taglist.add_tag(me.det[i], 1, cl[i][0], '#c0c0c0');	
 			} else {
 
 				// separator
@@ -558,11 +630,11 @@ ItemBrowserItem.prototype.make_tags = function() {
 	var me = this;
 	var tl = this.det[2] ? this.det[2].split(',') : [];
 	var div = $a(this.body, 'div', '', {margin: '7px 0px'})
-	this.taglist = new TagList(div, tl, this.ib.dt, this.dn, 0, function(tag) { me.set_tag_filter(tag); });
+	this.taglist = new TagList(div, tl, this.ib.dt, this.dn, 0, function(tag) { me.ib.set_tag_filter(tag); });
 
 	// std tags
 	if(this.ib.dt_details.submittable) { 
-		this.taglist.add_tag((docstatus ? 'Submitted' : 'Draft'), 1, 'docstatus'); }
+		this.taglist.add_tag((docstatus ? 'Submitted' : 'Draft'), 1, 'docstatus', '#c0c0c0'); }
 
 }
 
@@ -574,38 +646,3 @@ ItemBrowserItem.prototype.add_timestamp = function() {
 	div.innerHTML = comment_when(this.det[1]);
 }
 
-// -------------------------------------------------
-
-ItemBrowserItem.prototype.set_tag_filter = function(tag) {
-	var me = this;
-		
-	// check if exists
-	if(in_list(keys(me.ib.tag_filter_dict), tag.label)) return;
-	
-	// create a tag in filters
-	var filter_tag = new SingleTag(me.ib.tag_area, tag.label, me.ib.dt, null, 0, null);
-	filter_tag.ib = me.ib;
-	filter_tag.fieldname = tag.fieldname;
-
-	// remove tag from filters
-	filter_tag.remove = function(tag_remove) {
-		var ib = tag_remove.ib;
-		$(tag_remove.body).fadeOut();
-		delete ib.tag_filter_dict[tag_remove.label];
-		
-		// hide everything?
-		if(!keys(ib.tag_filter_dict).length) {
-			$(ib.tag_filters).slideUp(); // hide
-		}
-		
-		// run
-		ib.run();
-	}
-
-	// add to dict
-	me.ib.tag_filter_dict[tag.label] = filter_tag;
-	$ds(me.ib.tag_filters);
-	
-	// run
-	me.ib.run();
-}

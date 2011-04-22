@@ -1,4 +1,4 @@
-cur_frm.cscript['Execute on Server'] = function(doc, dt, dn) {
+cur_frm.cscript['Server (Python)'] = function(doc, dt, dn) {
 	$c_obj([doc], 'execute_server', '', function(r, rt) {
 		doc = locals[doc.doctype][doc.name];
 		if(r.exc) {
@@ -10,7 +10,7 @@ cur_frm.cscript['Execute on Server'] = function(doc, dt, dn) {
 	})
 }
 
-cur_frm.cscript['Execute in Client'] = function(doc, dt, dn) {
+cur_frm.cscript['Client (JS)'] = function(doc, dt, dn) {
 	try {
 		doc.response = eval(doc.script);		
 	} catch(e) {

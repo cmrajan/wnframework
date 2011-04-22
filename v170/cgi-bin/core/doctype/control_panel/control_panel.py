@@ -17,14 +17,6 @@ class DocType:
 		self.doc = doc
 		self.doclist = doclist
 
-	def execute_test(self, arg=''):
-		if webnotes.user.name=='Guest':
-			raise Exception, 'Guest cannot call execute test!'
-		out = ''
-		exec(arg and arg or self.doc.test_code)
-		webnotes.msgprint('that worked!')
-		return out
-
 	def on_update(self):
 		# clear cache on save
 		sql("delete from __SessionCache")

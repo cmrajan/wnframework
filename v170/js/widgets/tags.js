@@ -27,7 +27,16 @@ TagList = function(parent, start_list, dt, dn, static, onclick) {
 TagList.prototype.make = function(parent) {
 	for(var i=0; i<this.start_list.length; i++) {
 		if(this.start_list[i])
-			new SingleTag(this.body, this.start_list[i], this.dt, this.dn, '_user_tags', this.static, this);
+			new SingleTag({
+				parent: this.body,
+				label: this.start_list[i],
+				dt: this.dt,
+				dn: this.dn,
+				fieldname: '_user_tags',
+				static: this.static,
+				taglist: this,
+				onclick: this.onclick
+			});
 	}
 }
 
@@ -40,10 +49,20 @@ TagList.prototype.make_body = function() {
 }
 
 // render a new tag
-TagList.prototype.add_tag = function(label, static, fieldname) {
+TagList.prototype.add_tag = function(label, static, fieldname, color) {
 	if(!label) return;
 	if(in_list(this.tag_list, label)) return; // no double tags
-	var tag = new SingleTag(this.body, label, this.dt, this.dn, fieldname, static, this);	
+	var tag = new SingleTag({
+		parent: this.body,
+		label: label,
+		dt: this.dt,
+		dn: this.dn,
+		fieldname: fieldname,
+		static: static,
+		taglist: this,
+		color: color,
+		onclick: this.onclick
+	});
 }
 
 // add -tag area
@@ -160,30 +179,28 @@ TagList.prototype.refresh_tags = function() {
 
 //
 // SingleTag
+// parameters {parent, label, dt, dn, fieldname, static, taglist, color}
 //
-function SingleTag(parent, label, dt, dn, fieldname, static, taglist) {
-	this.dt = dt; 
-	this.dn = dn; 
-	this.label = label;
-	this.taglist = taglist;
-	this.fieldname = fieldname;	
-	this.static = static;
+function SingleTag(opts) {
+	$.extend(this, opts);
+
+	if(!this.color) this.color = '#add8e6';
 	
-	if(this.taglist && !in_list(this.taglist.tag_list, label))
-		this.taglist.tag_list.push(label);
+	if(this.taglist && !in_list(this.taglist.tag_list, this.label))
+		this.taglist.tag_list.push(this.label);
 	
-	this.make_body(parent);
+	this.make_body(this.parent);
 }
 
 // make body
 SingleTag.prototype.make_body = function(parent) {
 	var me = this;
 	// tag area
-	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: this.get_color(), 
+	this.body = $a(parent,'span','',{padding:'2px 4px', backgroundColor: this.color, 
 		color:'#226', marginRight:'4px'});
 	$br(this.body,'3px');
 	
-	if(this.taglist && this.taglist.onclick) $y(this.body, {cursor:'pointer'});
+	if(this.onclick) $y(this.body, {cursor:'pointer'});
 	
 	// hover
 	$(this.body).hover(function() { $op(this,60); } ,function() { $op(this,100); });
@@ -197,19 +214,6 @@ SingleTag.prototype.make_body = function(parent) {
 	// add to all tags
 	_tags.all_tags.push(this);
 }
-
-// color
-SingleTag.prototype.get_color = function() {
-	return '#add8e6';
-	/*if(this.label=='Submitted') return '#459';
-	else if(this.label=='Draft') return '#4A5';
-	else return (_tags.color_map[this.label] ? _tags.color_map[this.label] : _tags.colors['Default'])*/
-}
-
-// refresh color from _tags.color_map
-/*SingleTag.prototype.refresh_color = function() {
-	$y(this.body, {backgroundColor: this.get_color()});
-}*/
 
 // remove btn
 SingleTag.prototype.make_remove_btn = function() {
@@ -226,7 +230,7 @@ SingleTag.prototype.make_remove_btn = function() {
 SingleTag.prototype.make_label = function() {
 	var me = this;
 	this.label_span = $a(this.body,'span', '', null, this.label);
-	this.label_span.onclick = function() { if(me.taglist && me.taglist.onclick) me.taglist.onclick(me); }
+	this.label_span.onclick = function() { if(me.onclick) me.onclick(me); }
 }
 
 // remove
@@ -253,3 +257,48 @@ SingleTag.prototype.remove = function() {
 	$c('webnotes.widgets.tags.remove_tag', {'dt':me.dt, 'dn':me.dn, 'tag':me.label}, callback)
 	$bg(me.body,'#DDD');
 }
+
+// tag cloud
+// render the tag cloud
+// n1 x [tag1]
+// n2 x [tag2]
+
+wn.widgets.TagCloud = function(parent, doctype, onclick) {
+	var me = this;
+		
+	this.make = function(r, rt) {
+		if(r.message && r.message.length) {
+			this.tab = make_table(parent, r.message.length, 2, '100%', ['30px', null], {padding:'5px 3px 5px 0px'})
+			$y($td(this.tab, 0, 0), {textAlign:'right'});
+			
+			for(var i=0; i<r.message.length; i++) {
+				new wn.widgets.TagCloud.Tag($td(this.tab, i, 0), $td(this.tab, i, 1), r.message[i], onclick) 
+			}
+		} else {
+			me.set_no_tags();
+		}
+	}
+	
+	this.set_no_tags = function() {
+		$a(parent, 'div', 'comment', '', 'No tags yet!, please start tagging')
+	}
+	$c('webnotes.widgets.tags.get_top_tags', {dt:doctype}, this.make);
+}
+
+// make a single row of a tag
+wn.widgets.TagCloud.Tag = function(lh, rh, det, onclick) {
+	// counter
+	$(lh).css('text-align', 'right').html(det[1] + ' x');
+	
+	// tag
+	this.tag = new SingleTag({
+		parent: rh,
+		label: det[0],
+		static: 1,
+		onclick: onclick
+	})
+}
+
+
+
+
