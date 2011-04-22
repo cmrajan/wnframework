@@ -78,12 +78,12 @@ class DbTable:
 		webnotes.conn.sql("set foreign_key_checks=0")
 		webnotes.conn.sql("""create table `%s` (
 			name varchar(120) not null primary key, 
-			creation datetime, 
-			modified datetime, 
+			creation datetime,
+			modified datetime,
 			modified_by varchar(40), 
-			owner varchar(40), 
+			owner varchar(40),
 			docstatus int(1) default 0, 
-			parent varchar(120), 
+			parent varchar(120),
 			parentfield varchar(120), 
 			parenttype varchar(120), 
 			idx int(8),
