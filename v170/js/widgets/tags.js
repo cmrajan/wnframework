@@ -267,22 +267,32 @@ wn.widgets.TagCloud = function(parent, doctype, onclick) {
 	var me = this;
 		
 	this.make = function(r, rt) {
+		parent.innerHTML = '';
 		if(r.message && r.message.length) {
-			this.tab = make_table(parent, r.message.length, 2, '100%', ['30px', null], {padding:'5px 3px 5px 0px'})
-			$y($td(this.tab, 0, 0), {textAlign:'right'});
+			me.tab = make_table(parent, r.message.length, 2, '100%', ['30px', null], {padding:'5px 3px 5px 0px'})
+			$y($td(me.tab, 0, 0), {textAlign:'right'});
 			
 			for(var i=0; i<r.message.length; i++) {
-				new wn.widgets.TagCloud.Tag($td(this.tab, i, 0), $td(this.tab, i, 1), r.message[i], onclick) 
+				new wn.widgets.TagCloud.Tag($td(me.tab, i, 0), $td(me.tab, i, 1), r.message[i], onclick) 
 			}
 		} else {
 			me.set_no_tags();
 		}
+		
+		me.refresh = $ln($a(parent, 'div'), 'refresh', function() {
+			me.refresh.set_working();
+			me.render();
+		}, {fontSize:'11px', margin:'3px 0px', color:'#888'}, 1);
 	}
 	
 	this.set_no_tags = function() {
-		$a(parent, 'div', 'comment', '', 'No tags yet!, please start tagging')
+		$a(parent, 'div', 'comment', {fontSize:'11px', margin:'3px 0px'}, '<i>No tags yet!, please start tagging</i>');
 	}
-	$c('webnotes.widgets.tags.get_top_tags', {dt:doctype}, this.make);
+	
+	this.render = function() {
+		$c('webnotes.widgets.tags.get_top_tags', {dt:doctype}, this.make);		
+	}
+	this.render();
 }
 
 // make a single row of a tag

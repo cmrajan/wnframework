@@ -215,7 +215,7 @@ function $btn_join(btn1, btn2) {
 // Link
 // ====================================
 
-function $ln(parent, label, onclick, style, ajax) {
+function $ln(parent, label, onclick, style) {
 	var span = $a(parent, 'span', 'link_type', style);
 	span.loading_img = $a(parent,'img','',{margin:'0px 4px -2px 4px', display:'none'});
 	span.loading_img.src= 'images/ui/button-load.gif';

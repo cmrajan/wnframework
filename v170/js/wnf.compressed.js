@@ -140,7 +140,7 @@ btn.set_working=function(){this.set_disabled();$di(this.loading_img);if(ajax)$y(
 btn.done_working=function(){this.set_enabled();$dh(this.loading_img);if(ajax)$y(btn,{marginRight:'24px'});}
 if(style)$y(btn,style);return btn;}
 function $btn_join(btn1,btn2){$br(btn1,'0px',[0,1,1,0]);$br(btn2,'0px',[1,0,0,1]);$y(btn1,{marginRight:'0px'});$y(btn2,{marginLeft:'0px',borderLeft:'0px'});btn2.no_left_border=1;}
-function $ln(parent,label,onclick,style,ajax){var span=$a(parent,'span','link_type',style);span.loading_img=$a(parent,'img','',{margin:'0px 4px -2px 4px',display:'none'});span.loading_img.src='images/ui/button-load.gif';span.innerHTML=label;span.user_onclick=onclick;span.onclick=function(){if(!this.disabled)this.user_onclick(this);}
+function $ln(parent,label,onclick,style){var span=$a(parent,'span','link_type',style);span.loading_img=$a(parent,'img','',{margin:'0px 4px -2px 4px',display:'none'});span.loading_img.src='images/ui/button-load.gif';span.innerHTML=label;span.user_onclick=onclick;span.onclick=function(){if(!this.disabled)this.user_onclick(this);}
 span.set_working=function(){this.disabled=1;$di(this.loading_img);}
 span.done_working=function(){this.disabled=0;$dh(this.loading_img);}
 return span;}
@@ -716,10 +716,12 @@ SingleTag.prototype.remove=function(){var me=this;var callback=function(r,rt){me
 me.taglist.remove_from_locals(me.label);}
 $c('webnotes.widgets.tags.remove_tag',{'dt':me.dt,'dn':me.dn,'tag':me.label},callback)
 $bg(me.body,'#DDD');}
-wn.widgets.TagCloud=function(parent,doctype,onclick){var me=this;this.make=function(r,rt){if(r.message&&r.message.length){this.tab=make_table(parent,r.message.length,2,'100%',['30px',null],{padding:'5px 3px 5px 0px'})
-$y($td(this.tab,0,0),{textAlign:'right'});for(var i=0;i<r.message.length;i++){new wn.widgets.TagCloud.Tag($td(this.tab,i,0),$td(this.tab,i,1),r.message[i],onclick)}}else{me.set_no_tags();}}
-this.set_no_tags=function(){$a(parent,'div','comment','','No tags yet!, please start tagging')}
-$c('webnotes.widgets.tags.get_top_tags',{dt:doctype},this.make);}
+wn.widgets.TagCloud=function(parent,doctype,onclick){var me=this;this.make=function(r,rt){parent.innerHTML='';if(r.message&&r.message.length){me.tab=make_table(parent,r.message.length,2,'100%',['30px',null],{padding:'5px 3px 5px 0px'})
+$y($td(me.tab,0,0),{textAlign:'right'});for(var i=0;i<r.message.length;i++){new wn.widgets.TagCloud.Tag($td(me.tab,i,0),$td(me.tab,i,1),r.message[i],onclick)}}else{me.set_no_tags();}
+me.refresh=$ln($a(parent,'div'),'refresh',function(){me.refresh.set_working();me.render();},{fontSize:'11px',margin:'3px 0px',color:'#888'},1);}
+this.set_no_tags=function(){$a(parent,'div','comment',{fontSize:'11px',margin:'3px 0px'},'<i>No tags yet!, please start tagging</i>');}
+this.render=function(){$c('webnotes.widgets.tags.get_top_tags',{dt:doctype},this.make);}
+this.render();}
 wn.widgets.TagCloud.Tag=function(lh,rh,det,onclick){$(lh).css('text-align','right').html(det[1]+' x');this.tag=new SingleTag({parent:rh,label:det[0],static:1,onclick:onclick})}
 var export_dialog;function export_query(query,callback){if(!export_dialog){var d=new Dialog(400,300,"Export...");d.make_body([['Data','Max rows','Blank to export all rows'],['Button','Go'],]);d.widgets['Go'].onclick=function(){export_dialog.hide();n=export_dialog.widgets['Max rows'].value;if(cint(n))
 export_dialog.query+=' LIMIT 0,'+cint(n);callback(export_dialog.query);}

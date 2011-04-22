@@ -148,25 +148,23 @@ class TagCounter:
 	# creates it for the first time
 	def update(self, tag, diff):
 		"updates tag cnt for a doctype and tag"
-		cnt = webnotes.conn.sql("select cnt from `_tag_cnt` where doctype=%s and tag=%s", (self.dt, tag))
+		cnt = webnotes.conn.sql("select cnt from `_tag_cnt` where doctype=%s and tag=%s", (self.doctype, tag))
 
 		if not cnt:
 			# first time? build a cnt and add
 			self.new_tag(tag, 1)
 		else:
 			webnotes.conn.sql("update `_tag_cnt` set cnt = ifnull(cnt,0) + (%s) where doctype=%s and tag=%s",\
-				(diff, dt, tag))
+				(diff, self.doctype, tag))
 
  	
-	def new_tag(self, tag, cnt=0):
+	def new_tag(self, tag, cnt=0, dt=None):
 		"Creates a new row for the tag and doctype"
 		webnotes.conn.sql("insert into `_tag_cnt`(doctype, tag, cnt) values (%s, %s, %s)", \
-			(self.doctype, tag, cnt))
+			(dt or self.doctype, tag, cnt))
 
-	def build(self, dt=None):
-		"Builds / rebuilds the counting"
-		dt = dt or self.doctype
-		
+	def build(self, dt):
+		"Builds / rebuilds the counting"		
 		webnotes.conn.sql("delete from _tag_cnt where doctype=%s", dt)
 		
 		# count
@@ -180,10 +178,10 @@ class TagCounter:
 
 		# insert
 		for t in tags:
-			self.new_tag(t, tags[t])
+			self.new_tag(t, tags[t], dt)
 						
 	def get_top(self):
-		return webnotes.conn.sql("select tag, cnt from `_tag_cnt` where doctype=%s order by cnt desc limit 10", self.doctype, as_list = 1)
+		return webnotes.conn.sql("select tag, cnt from `_tag_cnt` where doctype=%s and cnt>0 order by cnt desc limit 10", self.doctype, as_list = 1)
 
 	def load_top(self):
 		try:
