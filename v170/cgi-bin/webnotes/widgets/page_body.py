@@ -132,7 +132,7 @@ def load_page_metatags(doc):
 	global page_properties
 
 	# page meta-tags
-	page_properties['page_title'] = doc.page_title or doc.name
+	page_properties['title'] = doc.page_title or doc.name
 	page_properties['keywords'] = doc.keywords or webnotes.conn.get_value('Control Panel',None,'keywords') or ''
 	page_properties['site_description'] = doc.site_description or webnotes.conn.get_value('Control Panel',None,'site_description') or ''
 	page_properties['add_in_head'] = webnotes.conn.get_global('add_in_head') or ''
