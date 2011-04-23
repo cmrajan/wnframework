@@ -22,29 +22,15 @@ class DocType:
 		sql("delete from __SessionCache")
 
 	def upload_many(self,form):
-		form_name = form.getvalue('form_name')
-		if form_name == 'File Browser':
-			self.ret = get_obj('File Browser Control').upload_many(form)
-		elif form_name == 'banner_options' or form_name == 'letter_head_options':
-			self.ret = get_obj('Personalize Page Control').upload_many(form)
+		pass
 
 	def upload_callback(self,form):
-		form_name = form.getvalue('form_name')
-		if(self.ret) and form_name == 'File Browser':
-			if self.ret == 'No file found.':
-				return 'window.parent.msgprint("No file found.")'
-			elif self.ret == 'File Group is mandatory.':
-				return 'window.parent.msgprint("File Group is mandatory.")'
-			else:
-				ret = eval(self.ret)
-				return "window.parent.pscript.load_child_nodes()"
-		elif form_name == 'banner_options':
-			if(self.ret == 'No file found'):
-				return "window.parent.msgprint('Please select file to upload')"
-			else:
-				return "window.parent.pscript.set_pp_banner(); window.parent.pscript.upload_obj.obj.hide();"
-		elif form_name == 'letter_head_options':
-			if(self.ret == 'No file found'):
-				return "window.parent.msgprint('Please select file to upload')"
-			else:
-				return "window.parent.pscript.set_pp_lh(); window.parent.pscript.upload_obj.obj.hide();"
+		pass
+		
+	def execute_test(self, arg=''):
+		if webnotes.user.name=='Guest':
+			raise Exception, 'Guest cannot call execute test!'
+		out = ''
+		exec(arg and arg or self.doc.test_code)
+		webnotes.msgprint('that worked!')
+		return out
