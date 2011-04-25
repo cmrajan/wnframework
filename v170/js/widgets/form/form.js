@@ -1161,7 +1161,7 @@ _f.Frm.prototype.amend_doc = function() {
 
 _f.get_value = function(dt, dn, fn) {
 	if(locals[dt] && locals[dt][dn]) 
-		return locals[dt][dn][fn];	
+		return locals[dt][dn][fn];
 }
 
 _f.set_value = function(dt, dn, fn, v) {

@@ -73,12 +73,12 @@ function loaddoc(doctype, name, onload, menuitem, from_archive) {
 
 		// case B - both loaded
 		} else if(LocalDB.is_doc_loaded(doctype, name)) {
+			msgprint(2)
 			show_doc();
 		
 		// case C - only frm loaded
 		} else {
 			$c('webnotes.widgets.form.getdoc', {'name':name, 'doctype':doctype, 'user':user, 'from_archive':(from_archive ? 1 : 0) }, show_doc, null, null);	// onload
-			page_body.set_status('Loading Document...');
 		}
 	}
 				
@@ -93,6 +93,8 @@ function loaddoc(doctype, name, onload, menuitem, from_archive) {
 			// notify for back button
 			if(!frm.in_dialog)
 				nav_obj.open_notify('Form',doctype,name);
+
+			if(onload) onload();
 
 		} else {
 			// nothing, go home - there were errors

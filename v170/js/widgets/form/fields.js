@@ -908,28 +908,17 @@ SelectField.prototype.make_input = function() {
 		this.input = $a(this.input_area, 'select');
 		this.input.multiple = true;
 		this.input.style.height = '4em';
-		this.txt = this.input;
 		this.input.lab = $a(this.input_area, 'div', {fontSize:'9px',color:'#999'});
 		this.input.lab.innerHTML = '(Use Ctrl+Click to select multiple or de-select)'
 	} else {
 
 		// Single select
-		this.input = new SelectWidget(this.input_area, [], '80%');	
-
-		this.txt = this.input.inp;
-		if(this.input.custom_select) {
-			this.btn = this.input.btn;
-			$y(this.input.wrapper, {marginLeft:'1px'});
-		}
+		this.input = $a(this.input_area, 'select');
 		
-		// for reference
-		this.txt.field_object = this;
-		this.txt.fieldname = this.df.fieldname;
-
-		this.txt.onchange = function() {
+		this.input.onchange = function() {
 			if(me.validate)
 				me.validate();
-			me.set(me.txt.value);
+			me.set(sel_val(this));
 			// IE grid disappears
 			if(isIE && me.in_grid) {
 				$dh(_f.cur_grid_cell.grid.wrapper);
@@ -942,7 +931,7 @@ SelectField.prototype.make_input = function() {
 
 	// set as single (to be called from report builder)
 	this.set_as_single = function() {
-		var i = this.txt ? this.txt : this.input;
+		var i = this.input;
 		i.multiple = false;
 		i.style.height = null; // default
 		if(i.lab)$dh(i.lab)
@@ -990,9 +979,9 @@ SelectField.prototype.make_input = function() {
 				if(me.docname) { // if called from onload without docname being set on fields
 					if(me.options_list && me.options_list.length) {
 						me.set(me.options_list[0]);
-						me.txt.value = me.options_list[0];
+						me.input.value = me.options_list[0];
 					} else {
-						me.txt.value = '';
+						me.input.value = '';
 					}
 				}
 			}
@@ -1005,7 +994,7 @@ SelectField.prototype.make_input = function() {
 							me.input.options[i].selected = 1;
 					}
 				} else {
-					me.txt.value = v;
+					me.input.value = v;
 				}
 			}
 		}
@@ -1018,13 +1007,13 @@ SelectField.prototype.make_input = function() {
 			}
 			return l;
 		} else {
-			if(me.txt.options) {
-				var val = sel_val(me.txt);
-				if(!val && !me.txt.selectedIndex)
-					val = me.txt.options[0].value;
+			if(me.input.options) {
+				var val = sel_val(me.input);
+				if(!val && !me.input.selectedIndex)
+					val = me.input.options[0].value;
 				return val;
 			}
-			return me.txt.value;
+			return me.input.value;
 		}
 	}
 	this.refresh();

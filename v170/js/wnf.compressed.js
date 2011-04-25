@@ -471,7 +471,7 @@ wn.widgets.Listing=function(opts){this.opts=opts;this.page_length=20;this.btns={
 this.make_filters=function(){if(this.opts.filters){$ds(this.filters_area);this.filters=new wn.widgets.FieldGroup(this.filters_area,this.opts.fields);}}
 this.make_toolbar=function(){if(!this.opts.hide_refresh){this.ref_img=$a(this.toolbar_area,'span','link_type',{color:'#888'},'[refresh]');this.ref_img.onclick=function(){me.run();}
 this.loading_img=$a(this.toolbar_area,'img','images/ui/button-load.gif',{display:'none',marginLeft:'3px',marginBottom:'-2px'});}
-if(this.opts.new_doctype){this.new_btn=$btn(this.toolbar_area,'New '+get_doctype_label(this.opts.new_doctype),function(){newdoc(me.opts.new_doctype);},{marginLeft:'7px'});}}
+if(this.opts.new_doctype){this.new_btn=$btn(this.toolbar_area,'New '+get_doctype_label(this.opts.new_doctype),function(){newdoc(me.opts.new_doctype,me.opts.new_doctype_onload);},{marginLeft:'7px'});}}
 this.make_more_button=function(){this.more_btn=$btn(this.more_button_area,'Show more results...',function(){me.more_btn.set_working();me.run(function(){me.more_btn.done_working();},1);},{fontSize:'14px'},0,1);$y(this.more_btn.loading_img,{marginBottom:'0px'});}
 this.clear=function(){this.results_area.innerHTML='';this.table=null;$ds(this.results_area);$dh(this.no_results_area);}
 this.make_results=function(r,rt){if(this.start==0)this.clear();$dh(this.more_button_area);if(this.loading_img)$dh(this.loading_img)
@@ -888,11 +888,10 @@ _f.cur_grid_cell.grid.cell_deselect();}
 text_dialog=d;}
 TextField.prototype.table_refresh=function(){if(!this.text_dialog)
 make_text_dialog();text_dialog.set_title('Enter text for "'+this.df.label+'"');text_dialog.field=this;text_dialog.show();}
-function SelectField(){}SelectField.prototype=new Field();SelectField.prototype.make_input=function(){var me=this;var opt=[];if(this.in_filter&&(!this.df.single_select)){this.input=$a(this.input_area,'select');this.input.multiple=true;this.input.style.height='4em';this.txt=this.input;this.input.lab=$a(this.input_area,'div',{fontSize:'9px',color:'#999'});this.input.lab.innerHTML='(Use Ctrl+Click to select multiple or de-select)'}else{this.input=new SelectWidget(this.input_area,[],'80%');this.txt=this.input.inp;if(this.input.custom_select){this.btn=this.input.btn;$y(this.input.wrapper,{marginLeft:'1px'});}
-this.txt.field_object=this;this.txt.fieldname=this.df.fieldname;this.txt.onchange=function(){if(me.validate)
-me.validate();me.set(me.txt.value);if(isIE&&me.in_grid){$dh(_f.cur_grid_cell.grid.wrapper);$ds(_f.cur_grid_cell.grid.wrapper);}
+function SelectField(){}SelectField.prototype=new Field();SelectField.prototype.make_input=function(){var me=this;var opt=[];if(this.in_filter&&(!this.df.single_select)){this.input=$a(this.input_area,'select');this.input.multiple=true;this.input.style.height='4em';this.input.lab=$a(this.input_area,'div',{fontSize:'9px',color:'#999'});this.input.lab.innerHTML='(Use Ctrl+Click to select multiple or de-select)'}else{this.input=$a(this.input_area,'select');this.input.onchange=function(){if(me.validate)
+me.validate();me.set(sel_val(this));if(isIE&&me.in_grid){$dh(_f.cur_grid_cell.grid.wrapper);$ds(_f.cur_grid_cell.grid.wrapper);}
 me.run_trigger();}}
-this.set_as_single=function(){var i=this.txt?this.txt:this.input;i.multiple=false;i.style.height=null;if(i.lab)$dh(i.lab)}
+this.set_as_single=function(){var i=this.input;i.multiple=false;i.style.height=null;if(i.lab)$dh(i.lab)}
 this.refresh_options=function(options){if(options)
 me.df.options=options;me.options_list=me.df.options?me.df.options.split('\n'):[];empty_select(this.input);if(me.in_filter&&me.options_list[0]!=''){me.options_list=add_lists([''],me.options_list);}
 add_sel_options(this.input,me.options_list);}
@@ -902,12 +901,12 @@ var v=_f.get_value(this.doctype,this.docname,this.df.fieldname);else{if(this.opt
 var v=this.options_list[0];else
 var v=null;}
 this.input.set_input(v);}
-this.input.set_input=function(v){if(!v){if(!me.input.multiple){if(me.docname){if(me.options_list&&me.options_list.length){me.set(me.options_list[0]);me.txt.value=me.options_list[0];}else{me.txt.value='';}}}}else{if(me.options_list&&in_list(me.options_list,v)){if(me.input.multiple){for(var i=0;i<me.input.options.length;i++){me.input.options[i].selected=0;if(me.input.options[i].value&&me.input.options[i].value==v)
-me.input.options[i].selected=1;}}else{me.txt.value=v;}}}}
+this.input.set_input=function(v){if(!v){if(!me.input.multiple){if(me.docname){if(me.options_list&&me.options_list.length){me.set(me.options_list[0]);me.input.value=me.options_list[0];}else{me.input.value='';}}}}else{if(me.options_list&&in_list(me.options_list,v)){if(me.input.multiple){for(var i=0;i<me.input.options.length;i++){me.input.options[i].selected=0;if(me.input.options[i].value&&me.input.options[i].value==v)
+me.input.options[i].selected=1;}}else{me.input.value=v;}}}}
 this.get_value=function(){if(me.input.multiple){var l=[];for(var i=0;i<me.input.options.length;i++){if(me.input.options[i].selected)l[l.length]=me.input.options[i].value;}
-return l;}else{if(me.txt.options){var val=sel_val(me.txt);if(!val&&!me.txt.selectedIndex)
-val=me.txt.options[0].value;return val;}
-return me.txt.value;}}
+return l;}else{if(me.input.options){var val=sel_val(me.input);if(!val&&!me.input.selectedIndex)
+val=me.input.options[0].value;return val;}
+return me.input.value;}}
 this.refresh();}
 function TimeField(){}TimeField.prototype=new Field();TimeField.prototype.get_time=function(){return time_to_hhmm(sel_val(this.input_hr),sel_val(this.input_mn),sel_val(this.input_am));}
 TimeField.prototype.set_time=function(v){ret=time_to_ampm(v);this.input_hr.inp.value=ret[0];this.input_mn.inp.value=ret[1];this.input_am.inp.value=ret[2];}
@@ -1062,9 +1061,10 @@ new_widget('_r.ReportContainer',show_report_builder,1);}
 var load_doc=loaddoc;function loaddoc(doctype,name,onload,menuitem,from_archive){doctype=get_label_doctype(doctype);if(frms['DocType']&&frms['DocType'].opendocs[doctype]){msgprint("Cannot open an instance of \""+doctype+"\" when the DocType is open.");return;}
 if(doctype=='DocType'&&frms[name]){msgprint("Cannot open DocType \""+name+"\" when its instance is open.");return;}
 var show_form=function(f){if(!_f.frm_con&&f){_f.frm_con=f;}
-if(!frms[doctype]){_f.add_frm(doctype,show_doc,name,from_archive);}else if(LocalDB.is_doc_loaded(doctype,name)){show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user,'from_archive':(from_archive?1:0)},show_doc,null,null);page_body.set_status('Loading Document...');}}
+if(!frms[doctype]){_f.add_frm(doctype,show_doc,name,from_archive);}else if(LocalDB.is_doc_loaded(doctype,name)){msgprint(2)
+show_doc();}else{$c('webnotes.widgets.form.getdoc',{'name':name,'doctype':doctype,'user':user,'from_archive':(from_archive?1:0)},show_doc,null,null);}}
 var show_doc=function(r,rt){if(locals[doctype]&&locals[doctype][name]){page_body.set_status('Done');var frm=frms[doctype];frm.refresh(name);if(!frm.in_dialog)
-nav_obj.open_notify('Form',doctype,name);}else{if(r.exc){msgprint('There were errors while loading '+doctype+' '+name);}
+nav_obj.open_notify('Form',doctype,name);if(onload)onload();}else{if(r.exc){msgprint('There were errors while loading '+doctype+' '+name);}
 loadpage('_home');}}
 new_widget('_f.FrmContainer',show_form,1);}
 function new_doc(doctype,onload,in_dialog,on_save_callback,cdt,cdn,cnic){doctype=get_label_doctype(doctype);if(!doctype){if(cur_frm)doctype=cur_frm.doctype;else return;}

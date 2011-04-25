@@ -131,7 +131,7 @@ _f.add_frm = function(doctype, onload, opt_name, from_archive) {
 		if(onload)onload(r,rt);
 	}
 	
-	// check if record is new
+	// check if record is new (called from mapper etc)
 	var is_new = 0;
 	if(opt_name && locals[doctype] && locals[doctype][opt_name] && locals[doctype][opt_name].__islocal) {
 		is_new = 1;
@@ -145,11 +145,9 @@ _f.add_frm = function(doctype, onload, opt_name, from_archive) {
 		if(from_archive) args['from_archive'] = 1;
 
 		$c('webnotes.widgets.form.getdoc', args, callback);
-		page_body.set_status('Loading Document...')
 	} else {
 		// get doctype only
 		$c('webnotes.widgets.form.getdoctype', args={'doctype':doctype}, callback);
-		page_body.set_status('Loading Document...')
 	}
 }
 

@@ -51,7 +51,12 @@ wn.widgets.Listing = function(opts) {
 		}
 		
 		if(this.opts.new_doctype) {
-			this.new_btn = $btn(this.toolbar_area, 'New ' + get_doctype_label(this.opts.new_doctype), function() { newdoc(me.opts.new_doctype); }, {marginLeft:'7px'});
+			this.new_btn = $btn(this.toolbar_area, 
+				'New ' + get_doctype_label(this.opts.new_doctype),
+				function() { 
+					newdoc(me.opts.new_doctype, me.opts.new_doctype_onload); 
+				},
+				{marginLeft:'7px'});
 		}
 	}
 
