@@ -20,7 +20,7 @@ def generate_xml(conn, site_prefix):
 	if site_prefix:
 		# list of all Guest pages (static content)
 		for r in conn.sql("SELECT name, modified FROM tabPage WHERE ifnull(publish,0)=1 ORDER BY modified DESC"):
-			page_url = site_prefix + '?page=' + urllib.quote(r[0])
+			page_url = site_prefix + '#!' + urllib.quote(r[0])
 			site_map += link_xml % (page_url, r[1].strftime('%Y-%m-%d'))
 		
 		# list of all Records that are viewable by guests (Blogs, Articles etc)
